@@ -7,12 +7,13 @@
     <a-assets>
     <a-asset-item id="scene" src="https://raw.githubusercontent.com/pierkiroule/gltf/master/drone/scene.gltf"></a-asset-item>
   </a-assets>
-      <a-entity gltf-model="#scene" rotation="-90 0 0" position="0 0 0" scale="0.01 0.01 0.01" animation-mixer></a-entity>
+      <a-entity gltf-model="#scene" rotation="0 0 0" position="0 0 0" scale="0.008 0.008 0.008" animation-mixer></a-entity>
      <a-animation attribute="rotation" fill="forwards" easing="linear" dur="8000" from="0 0 0" to="0 0 360" repeat="indefinite"></a-animation>
 <a-marker-camera preset='hiro'></a-marker-camera>
            <a-entity id="river" geometry="primitive: plane" material="color: blue"
           position="-10 0 0" sound="src: url(http://s1download-universal-soundbank.com/mp3/sounds/3245.mp3); autoplay: true"></a-entity>
-<audio src="http://s1download-universal-soundbank.com/mp3/sounds/3245.mp3" autoplay loop controls>
-         </audio></a-scene>
+</a-scene>
          
 </body>
+<audio src="http://s1download-universal-soundbank.com/mp3/sounds/3245.mp3" autoplay loop controls>
+         </audio>
