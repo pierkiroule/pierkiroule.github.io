@@ -6,9 +6,8 @@
   <a-scene embedded arjs>
     <a-assets>
     <a-asset-item id="scene" src="https://raw.githubusercontent.com/pierkiroule/gltf/master/drone/scene.gltf"></a-asset-item>
-    <audio id=river src="http://s1download-universal-soundbank.com/mp3/sounds/3624.mp3" autoplay="true" loop="true" preload="auto"></audio>
-             <img id="ground" src="http://www.jaitoutcompris.com/img/illust/smiley.JPEG">
-  </a-assets>
+            <a-assets-img id="ground" src="http://www.jaitoutcompris.com/img/illust/smiley.JPEG">
+  </a-assets-img>
 
       
                   <a-image src="#ground"></a-image>
@@ -17,7 +16,7 @@
 <a-marker-camera preset='hiro'></a-marker-camera>
            <a-text value="Bienvenue mon ami!" color="#BBB"
         position="-0.9 0.2 -3" scale="0.008 0.008 0.008"></a-text>
-           <a-sound src="#river"></a-sound>
+        <a-sound src="src: url(http://s1download-universal-soundbank.com/mp3/sounds/3624.mp3)" autoplay="true" position="0 2 5"></a-sound>
        
           </a-scene>
          
