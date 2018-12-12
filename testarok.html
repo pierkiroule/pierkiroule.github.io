@@ -7,13 +7,14 @@
       <a-assets>
     <a-asset-item id="scene" src="https://raw.githubusercontent.com/pierkiroule/anim/master/mech_drone/scene.gltf";"
 animation-mixer="clip : Take 001; loop:once"></a-asset-item>
- <a-animation attribute="rotation"
+
+            <a-entity scale="0.005 0.008 0.008" gltf-model="#scene"></a-entity>
+								    <a-animation attribute="rotation"
         dur="7000"
         fill="forwards"
         to="0 360 0"
         easing ="linear"
-        repeat="none"></a-animation> </a-assets>
-            <a-entity scale="0.005 0.008 0.008" gltf-model="#scene"></a-entity>
+        repeat="none"></a-animation>
 		
 		<a-marker-camera preset='hiro'></a-marker-camera>
 	</a-scene>
