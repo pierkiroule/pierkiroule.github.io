@@ -6,12 +6,20 @@
 <body style='margin : 0px; overflow: hidden;'>
 	<a-scene embedded arjs='sourceType: webcam;'>
 
-<a-gltf-model src="https://raw.githubusercontent.com/pierkiroule/anim/master/escarpo5/scene.gltf" position="0 0 0" rotation="-90 0 0" scale="0.8 0.8 0.8" animation-mixer="clip: Cinema_4D_Prise Principale; loop:infinity> 
+<a-gltf-model src="https://raw.githubusercontent.com/pierkiroule/anim/master/animatetescan/scene.gltf" position="0 0 0" rotation="-90 0 0" scale="0.8 0.8 0.8" animation-mixer="clip: Cinema_4D_Prise Principale; loop:infinity> 
 		  <a-entity light="type: directional;
                    castShadow: true;
                    intensity: 0.2;
                    shadowCameraVisible: false;"
             position="5 5 5"></a-entity></a-entity>
+			    a-entity>
+  <a-entity position="5 0 0"></a-entity>
+  <a-animation attribute="rotation"
+               dur="10000"
+               fill="forwards"
+               to="0 360 0"
+               repeat="indefinite"></a-animation>
+</a-entity>
  </a-gltf-model>
 		
 	
