@@ -1,0 +1,11 @@
+<!-- AR.js by @jerome_etienne - github: https://github.com/jeromeetienne/ar.js - info: https://medium.com/arjs/augmented-reality-in-10-lines-of-html-4e193ea9fdbf -->
+<script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
+<script src="https://rawgit.com/mayognaise/aframe-gif-shader/master/dist/aframe-gif-shader.min.js"></script>
+
+<body style='margin : 0px; overflow: hidden;'>
+	
+
+		  <a-scene><a-entity geometry="primitive:box;" scale="1 1 1"; material="shader:gif;src:url(https://github.com/pierkiroule/anim/blob/master/Animtran.gif);color:green;opacity:.8"></a-entity>  </a-scene>
+
+
+</body>
