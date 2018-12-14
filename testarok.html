@@ -5,6 +5,16 @@
 <script src="https://rawgit.com/mayognaise/aframe-gif-shader/master/dist/aframe-gif-shader.min.js"></script>
 
 <body style='margin : 0px; overflow: hidden;'>
+	<a-scene embedded arjs='sourceType: webcam;'>
+
+<a-gltf-model src="https://raw.githubusercontent.com/pierkiroule/anim/master/moleculeimaginaire1/scene.gltf" position="0 0 0" rotation="-90 0 0" scale="0.08 0.08 0.08"> 
+		  			   <a-animation attribute="rotation"
+               dur="30000"
+               fill="forwards"
+               to="0 360 0"
+               repeat="indefinite"></a-animation>
+
+ </a-gltf-model>
 	
 		  <a-scene><a-entity geometry="primitive:box;" scale="1 1 1"; material="shader:gif;src:url(https://github.com/pierkiroule/anim/blob/master/Animtran.gif);color:green;opacity:.8"></a-entity>  </a-scene>
 		
