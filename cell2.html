@@ -1,11 +1,8 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <style>
-.embed360 {height: 400px ; width: 650px;}
-</style>
-  <link rel="stylesheet" href="/style.css"/>
-  <meta charset="utf-8">
+  <script src="../../../dist/aframe-master.js"></script>
+    <meta charset="utf-8">
   <title>cell2</title>
 
 <script src="https://cdn.rawgit.com/leemark/embed360/20dac87eea4d7fc0f8a368519fc6c3b3a208f492/embed360.js"></script>
@@ -23,10 +20,13 @@ HEIGHT=700 align="center">
      </audio>
   <br><img src="tableaux/cloudgif.gif" alt="nuage transnumerique">
   
-  <div class= "embed360">
-<img src= "VR/cloud.jpg">
-   
-</div>
+<a-scene>
+      <a-sky src="puydesancy.jpg" rotation="0 -130 0"></a-sky>
+
+      <a-text font="kelsonsans" value="Puy de Sancy, France" width="6" position="-2.5 0.25 -1.5"
+              rotation="0 15 0"></a-text>
+    </a-scene>
+  
   
   
   </center>
