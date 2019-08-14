@@ -1,18 +1,83 @@
+
+  <!doctype html>
 <html>
-  @import url(https://fonts.googleapis.com/css?family=Advent+Pro:100);
-html { 
-  background:  url(http://upload.wikimedia.org/wikipedia/commons/d/dd/Muybridge_race_horse_animated.gif) no-repeat center center fixed; 
-  background-size: cover;
-}
-h1{
-  font-family: 'Advent Pro', sans-serif;
-  font-size: 3em;
-  margin: .2em .5em;
-  color: rgba(0,0,0, 0.3);
-}
-body {
-    height: 100%;
-}
+  <head>
+    <title>Test API HTML5 : Fullscreen (Plein écran)</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="dcterms.publisher" content="Conception Oznogco Multimédia (http://oznogco.com)" />
+    <style>
+      html {
+        background: #f0f0f0;
+        -webkit-font-smoothing: antialiased;
+      }
+      .container {
+        width:100%;
+        max-width: 500px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 30px 20px;
+        background: #fcfcfc;
+        text-align: center;
+        box-shadow: 0 1px 10px #a7a7a7, inset 0 1px 0 #fff;
+      }
+      #oMonImage {
+        width: 100%;
+        height: auto;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section>
+        <h1>L'API HTML5 FullScreen<br /><small>(Plein écran)</small></h1> 
+        <p>
+	  <a href="#" onClick="twPleinEcran();" id="monBouton">Ouvrir/Fermer le mode « Plein écran »</a><br />
+	  <a href="#" onClick="twPleinEcran(document.getElementById('oMonImage'));">Ouvrir/Fermer l'image en mode « Plein écran </a><br />
+          ou cliquez l'image pour la visualiser en mode « Plein écran »
+        </p>
+        <img id="oMonImage" onClick="twPleinEcran(this);" src="https://neural3.com/documents/images/2017/2015-05-31-8.jpg" />
+      </section>
+    </main>
+
+    <script>
+    function twPleinEcran(_element) {
+      var monElement = _element||document.documentElement;
+      if (document.mozFullScreenEnabled) {
+	if (!document.mozFullScreenElement) {
+          monElement.mozRequestFullScreen();
+        } else {
+          document.mozCancelFullScreen();
+        }
+      }
+      if (document.fullscreenElement) {
+	if (!document.fullscreenElement) {
+          monElement.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      }
+      if (document.webkitFullscreenEnabled) {
+	if (!document.webkitFullscreenElement) {
+          monElement.webkitRequestFullscreen();
+        } else {
+          document.webkitExitFullscreen();
+        }
+      }
+      if (document.msFullscreenEnabled) {
+	if (!document.msFullscreenElement) {
+          monElement.msRequestFullscreen();
+        } else {
+          document.msExitFullscreen();
+        }
+      }
+    }
+    </script>
+  </body>
+</html>
 
   
   <center>
