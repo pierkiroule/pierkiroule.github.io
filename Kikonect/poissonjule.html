@@ -33,7 +33,7 @@
   <body>
     <main class="container">
       <section>
-	      <img id="oMonImage" onClick="twPleinEcran(this);" src="Gifs/juloheron.gif" />
+	      <img id="oMonImage" src="Gifs/juloheron.gif" />
       <audio controls loop autoplay>
 <source src="mp3/wav.mp3" type="audio/mpeg">
 Your browser does not support the audio element.
@@ -42,38 +42,5 @@ Your browser does not support the audio element.
 	      <p>© 2019 pierkiroule/juloheron! </p>
 	    </section>
     </main>
-
-    <script>
-    function twPleinEcran(_element) {
-      var monElement = _element||document.documentElement;
-      if (document.mozFullScreenEnabled) {
-	if (!document.mozFullScreenElement) {
-          monElement.mozRequestFullScreen();
-        } else {
-          document.mozCancelFullScreen();
-        }
-      }
-      if (document.fullscreenElement) {
-	if (!document.fullscreenElement) {
-          monElement.requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
-      }
-      if (document.webkitFullscreenEnabled) {
-	if (!document.webkitFullscreenElement) {
-          monElement.webkitRequestFullscreen();
-        } else {
-          document.webkitExitFullscreen();
-        }
-      }
-      if (document.msFullscreenEnabled) {
-	if (!document.msFullscreenElement) {
-          monElement.msRequestFullscreen();
-        } else {
-          document.msExitFullscreen();
-        }
-      }
-    }
-    </script>
+  
   </body></html>
