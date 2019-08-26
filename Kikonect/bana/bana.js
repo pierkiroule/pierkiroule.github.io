@@ -3,12 +3,12 @@
 var p; // shortcut to reference prototypes
 var lib={};var ss={};var img={};
 lib.ssMetadata = [
-		{name:"bana_atlas_", frames: [[1506,752,500,750],[0,752,500,750],[502,0,500,750],[1506,0,500,750],[1004,0,500,750],[0,0,500,750],[1004,752,500,750],[502,752,500,750]]},
-		{name:"bana_atlas_2", frames: [[502,0,500,750],[1506,752,500,750],[0,0,500,750],[502,752,500,750],[0,752,500,750],[1004,0,500,750],[1506,0,500,750],[1004,752,500,750]]},
-		{name:"bana_atlas_3", frames: [[502,0,500,750],[0,0,500,750],[0,752,500,750],[1004,0,500,750],[1506,0,500,750],[502,752,500,750],[1004,752,500,750],[1506,752,500,750]]},
-		{name:"bana_atlas_4", frames: [[0,0,500,750],[0,752,500,750],[502,0,500,750],[1004,0,500,750],[1506,0,500,750],[502,752,500,750],[1004,752,500,750],[1506,752,500,750]]},
-		{name:"bana_atlas_5", frames: [[1506,0,500,750],[0,752,500,750],[502,752,500,750],[1004,752,500,750],[0,0,500,750],[502,0,500,750],[1004,0,500,750],[1506,752,500,750]]},
-		{name:"bana_atlas_6", frames: [[0,0,500,750],[0,752,500,750],[502,0,500,750],[1004,752,500,750],[502,752,500,750],[1004,0,500,750]]}
+		{name:"bana_atlas_", frames: [[0,0,500,750],[0,752,500,750],[502,0,500,750],[1004,0,500,750],[1506,0,500,750],[502,752,500,750],[1004,752,500,750],[1506,752,500,750]]},
+		{name:"bana_atlas_2", frames: [[1004,0,500,750],[1506,0,500,750],[1004,752,500,750],[1506,752,500,750],[0,752,500,750],[0,0,500,750],[502,752,500,750],[502,0,500,750]]},
+		{name:"bana_atlas_3", frames: [[1506,0,500,750],[0,0,500,750],[0,752,500,750],[502,752,500,750],[1506,752,500,750],[502,0,500,750],[1004,0,500,750],[1004,752,500,750]]},
+		{name:"bana_atlas_4", frames: [[1004,752,500,750],[1506,752,500,750],[1506,0,500,750],[502,0,500,750],[1004,0,500,750],[502,752,500,750],[0,0,500,750],[0,752,500,750]]},
+		{name:"bana_atlas_5", frames: [[502,752,500,750],[1004,752,500,750],[0,0,500,750],[1506,752,500,750],[0,752,500,750],[502,0,500,750],[1004,0,500,750],[1506,0,500,750]]},
+		{name:"bana_atlas_6", frames: [[0,0,500,750],[1004,0,500,750],[0,752,500,750],[502,0,500,750],[1004,752,500,750],[502,752,500,750]]}
 ];
 
 
@@ -31,295 +31,295 @@ lib.ssMetadata = [
 
 
 (lib.bana3_10 = function() {
-	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(0);
+	this.initialize(ss["bana_atlas_"]);
+	this.gotoAndStop(2);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_11 = function() {
-	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(0);
+	this.initialize(ss["bana_atlas_"]);
+	this.gotoAndStop(3);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_12 = function() {
 	this.initialize(ss["bana_atlas_"]);
-	this.gotoAndStop(2);
+	this.gotoAndStop(4);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_13 = function() {
-	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(1);
+	this.initialize(ss["bana_atlas_"]);
+	this.gotoAndStop(5);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_14 = function() {
-	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(2);
+	this.initialize(ss["bana_atlas_"]);
+	this.gotoAndStop(6);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_15 = function() {
 	this.initialize(ss["bana_atlas_"]);
-	this.gotoAndStop(3);
+	this.gotoAndStop(7);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_16 = function() {
-	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(1);
+	this.initialize(ss["bana_atlas_4"]);
+	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_17 = function() {
 	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(3);
+	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_18 = function() {
 	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(4);
+	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_19 = function() {
-	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(5);
+	this.initialize(ss["bana_atlas_3"]);
+	this.gotoAndStop(0);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_2 = function() {
-	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(6);
+	this.initialize(ss["bana_atlas_3"]);
+	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_20 = function() {
-	this.initialize(ss["bana_atlas_"]);
-	this.gotoAndStop(4);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_21 = function() {
 	this.initialize(ss["bana_atlas_2"]);
-	this.gotoAndStop(7);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_22 = function() {
-	this.initialize(ss["bana_atlas_3"]);
 	this.gotoAndStop(2);
 }).prototype = p = new cjs.Sprite();
 
 
 
+(lib.bana3_21 = function() {
+	this.initialize(ss["bana_atlas_5"]);
+	this.gotoAndStop(0);
+}).prototype = p = new cjs.Sprite();
+
+
+
+(lib.bana3_22 = function() {
+	this.initialize(ss["bana_atlas_4"]);
+	this.gotoAndStop(1);
+}).prototype = p = new cjs.Sprite();
+
+
+
 (lib.bana3_23 = function() {
-	this.initialize(ss["bana_atlas_"]);
-	this.gotoAndStop(5);
+	this.initialize(ss["bana_atlas_2"]);
+	this.gotoAndStop(3);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_24 = function() {
 	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(3);
+	this.gotoAndStop(2);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_25 = function() {
-	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(4);
+	this.initialize(ss["bana_atlas_4"]);
+	this.gotoAndStop(2);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_26 = function() {
-	this.initialize(ss["bana_atlas_"]);
-	this.gotoAndStop(6);
+	this.initialize(ss["bana_atlas_2"]);
+	this.gotoAndStop(4);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_27 = function() {
 	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(5);
+	this.gotoAndStop(3);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_28 = function() {
-	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(6);
+	this.initialize(ss["bana_atlas_4"]);
+	this.gotoAndStop(3);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_29 = function() {
-	this.initialize(ss["bana_atlas_3"]);
-	this.gotoAndStop(7);
+	this.initialize(ss["bana_atlas_2"]);
+	this.gotoAndStop(5);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_3 = function() {
-	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(0);
+	this.initialize(ss["bana_atlas_2"]);
+	this.gotoAndStop(6);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_30 = function() {
-	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(1);
+	this.initialize(ss["bana_atlas_3"]);
+	this.gotoAndStop(4);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_31 = function() {
-	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(2);
+	this.initialize(ss["bana_atlas_5"]);
+	this.gotoAndStop(1);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_32 = function() {
 	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(3);
+	this.gotoAndStop(4);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_33 = function() {
-	this.initialize(ss["bana_atlas_"]);
-	this.gotoAndStop(7);
+	this.initialize(ss["bana_atlas_5"]);
+	this.gotoAndStop(2);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_34 = function() {
 	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(4);
+	this.gotoAndStop(5);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_35 = function() {
-	this.initialize(ss["bana_atlas_6"]);
-	this.gotoAndStop(0);
+	this.initialize(ss["bana_atlas_3"]);
+	this.gotoAndStop(5);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_36 = function() {
-	this.initialize(ss["bana_atlas_5"]);
-	this.gotoAndStop(0);
+	this.initialize(ss["bana_atlas_3"]);
+	this.gotoAndStop(6);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_37 = function() {
-	this.initialize(ss["bana_atlas_6"]);
-	this.gotoAndStop(1);
+	this.initialize(ss["bana_atlas_4"]);
+	this.gotoAndStop(6);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_38 = function() {
 	this.initialize(ss["bana_atlas_5"]);
-	this.gotoAndStop(1);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_39 = function() {
-	this.initialize(ss["bana_atlas_5"]);
-	this.gotoAndStop(2);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_4 = function() {
-	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(5);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_40 = function() {
-	this.initialize(ss["bana_atlas_5"]);
 	this.gotoAndStop(3);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.bana3_41 = function() {
-	this.initialize(ss["bana_atlas_4"]);
-	this.gotoAndStop(6);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_42 = function() {
-	this.initialize(ss["bana_atlas_6"]);
-	this.gotoAndStop(2);
-}).prototype = p = new cjs.Sprite();
-
-
-
-(lib.bana3_43 = function() {
+(lib.bana3_39 = function() {
 	this.initialize(ss["bana_atlas_4"]);
 	this.gotoAndStop(7);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.bana3_44 = function() {
+(lib.bana3_4 = function() {
 	this.initialize(ss["bana_atlas_5"]);
 	this.gotoAndStop(4);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.bana3_45 = function() {
+(lib.bana3_40 = function() {
+	this.initialize(ss["bana_atlas_3"]);
+	this.gotoAndStop(7);
+}).prototype = p = new cjs.Sprite();
+
+
+
+(lib.bana3_41 = function() {
 	this.initialize(ss["bana_atlas_5"]);
 	this.gotoAndStop(5);
 }).prototype = p = new cjs.Sprite();
 
 
 
-(lib.bana3_5 = function() {
+(lib.bana3_42 = function() {
 	this.initialize(ss["bana_atlas_5"]);
 	this.gotoAndStop(6);
 }).prototype = p = new cjs.Sprite();
 
 
 
+(lib.bana3_43 = function() {
+	this.initialize(ss["bana_atlas_5"]);
+	this.gotoAndStop(7);
+}).prototype = p = new cjs.Sprite();
+
+
+
+(lib.bana3_44 = function() {
+	this.initialize(ss["bana_atlas_2"]);
+	this.gotoAndStop(7);
+}).prototype = p = new cjs.Sprite();
+
+
+
+(lib.bana3_45 = function() {
+	this.initialize(ss["bana_atlas_6"]);
+	this.gotoAndStop(0);
+}).prototype = p = new cjs.Sprite();
+
+
+
+(lib.bana3_5 = function() {
+	this.initialize(ss["bana_atlas_6"]);
+	this.gotoAndStop(1);
+}).prototype = p = new cjs.Sprite();
+
+
+
 (lib.bana3_6 = function() {
 	this.initialize(ss["bana_atlas_6"]);
-	this.gotoAndStop(3);
+	this.gotoAndStop(2);
 }).prototype = p = new cjs.Sprite();
 
 
 
 (lib.bana3_7 = function() {
-	this.initialize(ss["bana_atlas_5"]);
-	this.gotoAndStop(7);
+	this.initialize(ss["bana_atlas_6"]);
+	this.gotoAndStop(3);
 }).prototype = p = new cjs.Sprite();
 
 
@@ -508,12 +508,12 @@ lib.properties = {
 	color: "#FFFFFF",
 	opacity: 1.00,
 	manifest: [
-		{src:"images/bana/bana_atlas_.png", id:"bana_atlas_"},
-		{src:"images/bana/bana_atlas_2.png", id:"bana_atlas_2"},
-		{src:"images/bana/bana_atlas_3.png", id:"bana_atlas_3"},
-		{src:"images/bana/bana_atlas_4.png", id:"bana_atlas_4"},
-		{src:"images/bana/bana_atlas_5.png", id:"bana_atlas_5"},
-		{src:"images/bana/bana_atlas_6.png", id:"bana_atlas_6"}
+		{src:"bana/bana_atlas_.png", id:"bana_atlas_"},
+		{src:"bana/bana_atlas_2.png", id:"bana_atlas_2"},
+		{src:"bana/bana_atlas_3.png", id:"bana_atlas_3"},
+		{src:"bana/bana_atlas_4.png", id:"bana_atlas_4"},
+		{src:"bana/bana_atlas_5.png", id:"bana_atlas_5"},
+		{src:"bana/bana_atlas_6.png", id:"bana_atlas_6"}
 	],
 	preloads: []
 };
