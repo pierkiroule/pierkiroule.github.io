@@ -503,7 +503,7 @@ lib.properties = {
 	color: "#FFFFFF",
 	opacity: 1.00,
 	manifest: [
-		{src:"banananantes_atlas_.jpg", id:"banananantes_atlas_"}
+		{src:"banananantes_atlas_.png", id:"banananantes_atlas_"}
 	],
 	preloads: []
 };
