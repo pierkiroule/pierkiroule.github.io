@@ -1,0 +1,17 @@
+
+<?xml version="1.0"?>
+<challenges>
+  <challenge id="1">
+    <question>Quelle est la définition de l'empathie ?</question>
+    <answer>La capacité de comprendre et de partager les émotions et les points de vue d'autrui.</answer>
+  </challenge>
+  <challenge id="2">
+    <question>Quelle est la définition de l'analyse transactionnelle ?</question>
+    <answer>Théorie de la personnalité et de la communication qui met en lumière les échanges et les transactions entre individus.</answer>
+  </challenge>
+  <challenge id="3">
+    <question>Quelle est la définition de la psychologie cognitive ?</question>
+    <answer>Branche de la psychologie qui étudie les processus mentaux qui sous-tendent les activités de perception, de pensée, de mémorisation et de résolution de problèmes.</answer>
+  </challenge>
+  ...
+</challenges>
