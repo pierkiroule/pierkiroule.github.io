@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <challenges>
-    <challenge>Mimez le mot "empathie"</challenge>
-    <challenge>Définissez le reframing</challenge>
-    <challenge>Chantez une chanson contenant le mot "communication"</challenge>
+    <challenge>
+        <question>Le reframing est une technique de communication qui consiste à changer la perspective d'un individu sur une situation</question>
+        <answer>Vrai</answer>
+    </challenge>
+    <challenge>
+        <question>L'analyse transactionnelle est une thérapie qui vise à changer le comportement des individus</question>
+        <answer>Faux</answer>
+    </challenge>
+    <challenge>
+        <question>La psychologie cognitive s'intéresse à la manière dont les individus perçoivent, traitent et stockent l'information</question>
+        <answer>Vrai</answer>
+    </challenge>
 </challenges>
-
