@@ -1,9 +1,73 @@
 body {
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
+  text-align: center;
 }
 
-#challenge-container {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
+h1 {
+  color: #333;
+}
+
+button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #444;
+}
+
+.challenge {
+  margin: 20px 0;
+  font-size: 1.5em;
+  color: #333;
+}
+
+.question {
+  margin: 20px 0;
+  font-size: 1.2em;
+  color: #333;
+}
+
+.answers {
+  display: flex;
+  justify-content: space-around;
+}
+
+.answer {
+  flex: 1;
+  margin: 10px 0;
+  font-size: 1.2em;
+  color: #333;
+  text-align: center;
+  cursor: pointer;
+}
+
+.answer.true {
+  background-color: #0f0;
+}
+
+.answer.false {
+  background-color: #f00;
+}
+
+.answer:hover {
+  background-color: #eee;
+}
+
+.success {
+  margin: 20px 0;
+  font-size: 1.5em;
+  color: #0f0;
+}
+
+.error {
+  margin: 20px 0;
+  font-size: 1.5em;
+  color: #f00;
 }
