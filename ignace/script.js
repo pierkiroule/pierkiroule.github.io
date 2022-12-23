@@ -1,7 +1,7 @@
 
 $(document).ready(function() {
   // fonction qui gère le clic sur le bouton "Lancer un défi"
-  $("#btn-launch-challenge").click(function() {
+  $("#btchal").click(function() {
     // Récupération de la liste des épreuves à partir du fichier XML
     $.get("challenges.xml", function(xml) {
       // Sélection aléatoire d'une épreuve dans la liste
