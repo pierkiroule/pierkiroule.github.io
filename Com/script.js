@@ -7,7 +7,7 @@ $(document).ready(function() {
       var randomIndex = Math.floor(Math.random() * $(xml).find("challenge").length);
       var randomChallenge = $(xml).find("challenge").eq(randomIndex).text();
 
-      // Affichage de l'épreuve sélectionnée sur l'interface web
+      // Affichage de l'épppreuve sélectionnée sur l'interface web
       $("#challenge-text").text(randomChallenge);
     });
   });
