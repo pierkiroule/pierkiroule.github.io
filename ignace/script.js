@@ -9,7 +9,7 @@ $(document).ready(function() {
       var randomChallenge = $(xml).find("challenge").eq(randomIndex).text();
 
       // Affichage de l'épppreuve sélectionnée sur l'interface web
-      $("#challenge-text").text(randomChallenge);
+      $("#challenge").text(randomChallenge);
     });
   });
 });
