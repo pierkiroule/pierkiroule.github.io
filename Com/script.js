@@ -1,9 +1,14 @@
 $(document).ready(function() {
-    $.get('challenges.xml', function(data) {
-        var challenges = $(data).find('challenge');
-        $('#generate-challenge').click(function() {
-            var challenge = challenges.eq(Math.floor(Math.random() * challenges.length));
-            $('#challenge-container').html(challenge.text());
-        });
+  // Fonction qui gère le clic sur le bouton "Lancer un défi"
+  $("#btn-launch-challenge").click(function() {
+    // Récupération de la liste des épreuves à partir du fichier XML
+    $.get("challenges.xml", function(xml) {
+      // Sélection aléatoire d'une épreuve dans la liste
+      var randomIndex = Math.floor(Math.random() * $(xml).find("challenge").length);
+      var randomChallenge = $(xml).find("challenge").eq(randomIndex).text();
+
+      // Affichage de l'épreuve sélectionnée sur l'interface web
+      $("#challenge-text").text(randomChallenge);
     });
+  });
 });
