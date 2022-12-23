@@ -1,43 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <challenges>
-  <challenge>
-    <text>Inventez une chanson ou un poème contenant le mot "empathie". Vos coéquipiers devront identifier le bon mot.</text>
-    <answer>empathie</answer>
-  </challenge>
-  <challenge>
-    <text>Mimez un geste ou une expression pour faire deviner le mot "communication non violente".</text>
-    <answer>communication non violente</answer>
-  </challenge>
-  <challenge>
-    <text>Chantez une chanson ou faites une scène de théâtre pour faire deviner le mot "confiance en soi".</text>
-    <answer>confiance en soi</answer>
-  </challenge>
-  <challenge>
-    <text>Dansez sur une musique pour faire deviner le mot "assertivité".</text>
-    <answer>assertivité</answer>
-  </challenge>
-  <challenge>
-    <text>Mimez une scène de théâtre pour faire deviner le mot "motivation".</text>
-    <answer>motivation</answer>
-  </challenge>
-  <challenge>
-    <text>Chantez une chanson ou faites une scène de théâtre pour faire deviner le mot "estime de soi".</text>
-    <answer>estime de soi</answer>
-  </challenge>
-  <challenge>
-    <text>Mimez un geste ou une expression pour faire deviner le mot "complicité".</text>
-    <answer>complicité</answer>
-  </challenge>
-  <challenge>
-    <text>Dansez sur une musique pour faire deviner le mot "empathie".</text>
-    <answer>empathie</answer>
-  </challenge>
-  <challenge>
-    <text>Mimez une scène de théâtre pour faire deviner le mot "communication bienveillante".</text>
-    <answer>communication bienveillante</answer>
-  </challenge>
-  <challenge>
-    <text>Chantez une chanson ou faites une scène de théâtre pour faire deviner le mot "cohésion d'équipe".</text>
-    <answer>cohésion d'équipe</answer>
-  </challenge>
+    <challenge>Mimez le mot "empathie"</challenge>
+    <challenge>Définissez le reframing</challenge>
+    <challenge>Chantez une chanson contenant le mot "communication"</challenge>
 </challenges>
+
