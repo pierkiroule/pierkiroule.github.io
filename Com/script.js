@@ -1,17 +1,21 @@
- $(document).ready(function() {
-  // Liste des épreuves
-  const challenges = [
-    "Mimez le mot 'empathie'",
-    "Chantez le mot 'communication'",
-    "Dansez le mot 'bienveillance'",
-    "Jouez le mot 'bien-être'",
-    "Mimez le mot 'réassurance'",
-    "Chantez le mot 'soutien'",
-    "Dansez le mot 'écoute'",
-    "Jouez le mot 'acceptation'",
-    "Mimez le mot 'confiance'",
-    "Chantez le mot 'validation'"
-  ];
+$(document).ready(function() {
+  // Récupération de la liste des épreuves au format XML
+  $.get("challenges.xml", function(xml) {
+    // Fonction de callback qui sera exécutée une fois la liste des épreuves récupérée
 
-  // Fonction de génération aléatoire d'un défi
-  function getRandomChallenge
+    // Sélection aléatoire d'un défi dans la liste
+    var randomIndex = Math.floor(Math.random() * $(xml).find("challenge").length);
+    var challenge = $(xml).find("challenge").eq(randomIndex).text();
+
+    // Affichage du défi sélectionné dans le formulaire
+    $("#challenge-form").text(challenge);
+
+    // Gestion du click sur le bouton "Lancer un défi"
+    $("#launch-challenge-button").click(function() {
+      // Sélection d'un nouveau défi aléatoire et mise à jour de l'affichage
+      randomIndex = Math.floor(Math.random() * $(xml).find("challenge").length);
+      challenge = $(xml).find("challenge").eq(randomIndex).text();
+      $("#challenge-form").text(challenge);
+    });
+  });
+});
