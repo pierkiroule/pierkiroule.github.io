@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toile Dynamique Personnalisable</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fafafa;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            animation: fadeInBody 1s ease-in;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+            animation: slideInFromTop 0.8s ease-out;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            position: relative;
+        }
+
+        .target-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            overflow: visible;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 0;
+            animation: scaleIn 1s ease-out;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0;
+            animation: fadeInCircle 0.5s ease-out forwards, oscillate 4s infinite ease-in-out;
+        }
+
+        .circle1 { background-color: #ffb3b3; width: 10%; height: 10%; top: 45%; left: 45%; animation-delay: 0.1s, 0s; }
+        .circle2 { background-color: #ffdab3; width: 25%; height: 25%; top: 37.5%; left: 37.5%; animation-delay: 0.2s, 0.2s; }
+        .circle3 { background-color: #fff5b3; width: 45%; height: 45%; top: 27.5%; left: 27.5%; animation-delay: 0.3s, 0.4s; }
+        .circle4 { background-color: #b3f5b3; width: 65%; height: 65%; top: 17.5%; left: 17.5%; animation-delay: 0.4s, 0.6s; }
+        .circle5 { background-color: #b3d9ff; width: 85%; height: 85%; top: 7.5%; left: 7.5%; animation-delay: 0.5s, 0.8s; }
+
+        .label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 12px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            z-index: 7;
+            padding: 2px 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 4px;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            opacity: 0;
+            animation: slideInLabel 0.6s ease-out forwards;
+        }
+
+        .label:hover {
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .label.selected {
+            background-color: #ff4081;
+            color: white;
+            transform: scale(1.15);
+        }
+
+        #canvas, #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        #particle-canvas {
+            z-index: 8;
+        }
+
+        .menu-horizontal {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            animation: slideInFromBottom 0.8s ease-out;
+        }
+
+        .menu-horizontal input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+
+        .menu-horizontal input:focus {
+            border-color: #ff4081;
+            outline: none;
+        }
+
+        .menu-horizontal button {
+            padding: 5px 10px;
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        .menu-horizontal button:hover {
+            transform: scale(1.05);
+            background-color: #e91e63;
+        }
+
+        .menu-horizontal button:active {
+            transform: scale(0.95);
+        }
+
+        .note-input {
+            width: 300px;
+            height: 50px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes oscillate {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(1deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(5px) rotate(-1deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        @keyframes fadeInBody {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideInFromTop {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInFromBottom {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeInCircle {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInLabel {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Perception de ma santé globale</h1>
+    <div class="main-container">
+        <textarea id="userNotes" class="note-input" placeholder="Écrivez vos notes ici... nom, date, objectifs etc."></textarea>
+        <div class="target-container" id="target-container">
+            <canvas id="canvas"></canvas>
+            <canvas id="particle-canvas"></canvas>
+            <div class="circle circle5"></div>
+            <div class="circle circle4"></div>
+            <div class="circle circle3"></div>
+            <div class="circle circle2"></div>
+            <div class="circle circle1"></div>
+        </div>
+        <div class="menu-horizontal">
+            <input type="text" id="editKeyword" placeholder="Modifier">
+            <button onclick="updateKeyword()">Modifier</button>
+            <button onclick="deleteKeyword()">Supprimer</button>
+            <input type="text" id="newKeyword" placeholder="Ajouter">
+            <button onclick="addKeyword()">Ajouter</button>
+            <button onclick="captureAndDownload()">Télécharger</button>
+        </div>
+    </div>
+
+    <!-- Inclusion des bibliothèques directement dans le fichier -->
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        let keywords = [
+            { text: "psychologique", x: null, y: null },
+            { text: "physique", x: null, y: null },
+            { text: "sommeil", x: null, y: null },
+            { text: "alimentation", x: null, y: null },
+            { text: "famille", x: null, y: null },
+            { text: "scolarité", x: null, y: null },
+            { text: "loisirs", x: null, y: null },
+            { text: "parents", x: null, y: null },
+            { text: "écrans", x: null, y: null }
+        ];
+        let selectedKeywordIndex = null;
+        let particles = [];
+
+        const canvas = document.getElementById('canvas');
+        const particleCanvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        const particleCtx = particleCanvas.getContext('2d');
+
+        function renderKeywords() {
+            const container = document.getElementById('target-container');
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+
+            container.querySelectorAll('.label').forEach(e => e.remove());
+
+            keywords.forEach((word, index) => {
+                if (word.x === null || word.y === null) {
+                    const angleStep = (2 * Math.PI) / keywords.length;
+                    const angle = index * angleStep;
+                    word.x = centerX + 120 * Math.cos(angle) - 30;
+                    word.y = centerY + 120 * Math.sin(angle) - 10;
+                }
+                const label = document.createElement('div');
+                label.className = 'label draggable';
+                label.style.left = `${word.x}px`;
+                label.style.top = `${word.y}px`;
+                label.textContent = word.text;
+                label.id = `keyword-${index}`;
+                label.style.animationDelay = `${index * 0.1}s`;
+                label.addEventListener('click', () => selectKeyword(index));
+                container.appendChild(label);
+            });
+            resizeCanvas();
+            initDragAndDrop();
+        }
+
+        function selectKeyword(index) {
+            selectedKeywordIndex = index;
+            document.getElementById('editKeyword').value = keywords[index].text;
+            document.querySelectorAll('.label').forEach(label => label.classList.remove('selected'));
+            const selectedLabel = document.getElementById(`keyword-${index}`);
+            selectedLabel.classList.add('selected');
+            createParticles(selectedLabel);
+        }
+
+        function initDragAndDrop() {
+            if (typeof interact === 'undefined') {
+                console.error("interact.js n'a pas encore chargé. Attente...");
+                setTimeout(initDragAndDrop, 500);
+                return;
+            }
+            interact('.draggable').draggable({
+                inertia: true,
+                modifiers: [
+                    interact.modifiers.restrictRect({
+                        restriction: '#target-container',
+                        endOnly: true
+                    })
+                ],
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        const index = parseInt(target.id.split('-')[1]);
+                        keywords[index].x += event.dx;
+                        keywords[index].y += event.dy;
+                        target.style.left = `${keywords[index].x}px`;
+                        target.style.top = `${keywords[index].y}px`;
+                        resizeCanvas();
+                    }
+                }
+            });
+            console.log("Glisser-déposer initialisé avec succès.");
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            particleCanvas.width = particleCanvas.parentElement.offsetWidth;
+            particleCanvas.height = particleCanvas.parentElement.offsetHeight;
+            drawLines(ctx);
+        }
+
+        function drawLines(ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff4081';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            const positions = keywords.map(k => ({ x: k.x + 30, y: k.y + 10 }));
+            positions.forEach((pos, i) => {
+                const nextPos = positions[(i + 1) % positions.length];
+                ctx.moveTo(pos.x, pos.y);
+                ctx.lineTo(nextPos.x, nextPos.y);
+            });
+            ctx.stroke();
+        }
+
+        function createParticles(label) {
+            const rect = label.getBoundingClientRect();
+            const containerRect = document.getElementById('target-container').getBoundingClientRect();
+            const x = rect.left - containerRect.left + rect.width / 2;
+            const y = rect.top - containerRect.top + rect.height / 2;
+
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    radius: Math.random() * 3 + 1,
+                    life: 60,
+                    color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
+                });
+            }
+            animateParticles();
+        }
+
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particles = particles.filter(p => p.life > 0);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.05;
+                p.life--;
+                p.radius *= 0.98;
+
+                particleCtx.beginPath();
+                particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                particleCtx.fillStyle = p.color;
+                particleCtx.fill();
+            });
+
+            if (particles.length > 0) {
+                requestAnimationFrame(animateParticles);
+            }
+        }
+
+        function addKeyword() {
+            const input = document.getElementById('newKeyword');
+            if (input.value.trim()) {
+                keywords.push({ text: input.value.trim(), x: null, y: null });
+                input.value = '';
+                renderKeywords();
+            }
+        }
+
+        function updateKeyword() {
+            const editInput = document.getElementById('editKeyword').value.trim();
+            if (editInput && selectedKeywordIndex !== null) {
+                keywords[selectedKeywordIndex].text = editInput;
+                renderKeywords();
+            }
+        }
+
+        function deleteKeyword() {
+            if (selectedKeywordIndex !== null) {
+                keywords.splice(selectedKeywordIndex, 1);
+                selectedKeywordIndex = null;
+                document.getElementById('editKeyword').value = '';
+                renderKeywords();
+            }
+        }
+
+        function captureAndDownload() {
+            html2canvas(document.querySelector('.main-container')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `carte_${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderKeywords();
+        });
+    </script>
+</body>
+</html>
