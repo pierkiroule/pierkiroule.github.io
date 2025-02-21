@@ -33,31 +33,25 @@
         }
         .target-container {
             position: relative;
-            width: 300px;
-            height: 320px;
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
             overflow: visible;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             z-index: 0;
         }
-        .legend-text {
-            width: 100%;
-            text-align: center;
-            font-size: 12px;
-            color: #333;
-            margin-top: 5px;
-        }
         .circle {
             position: absolute;
             border-radius: 50%;
-            z-index: 0;
+            z-index: 1;
         }
-        /* Pastel colors from red to blue */
-        .circle1 { background-color: #ffb3b3; width: 20%; height: 20%; top: 40%; left: 40%; } /* Pastel Red */
-        .circle2 { background-color: #ffdab3; width: 40%; height: 40%; top: 30%; left: 30%; } /* Pastel Orange */
-        .circle3 { background-color: #fff5b3; width: 60%; height: 60%; top: 20%; left: 20%; } /* Pastel Yellow */
-        .circle4 { background-color: #b3f5b3; width: 80%; height: 80%; top: 10%; left: 10%; } /* Pastel Green */
-        .circle5 { background-color: #b3d9ff; width: 100%; height: 100%; top: 0; left: 0; } /* Pastel Blue */
+        /* Reproportionnement des cercles */
+        .circle1 { background-color: #ffb3b3; width: 10%; height: 10%; top: 45%; left: 45%; }
+        .circle2 { background-color: #ffdab3; width: 25%; height: 25%; top: 37.5%; left: 37.5%; }
+        .circle3 { background-color: #fff5b3; width: 45%; height: 45%; top: 27.5%; left: 27.5%; }
+        .circle4 { background-color: #b3f5b3; width: 65%; height: 65%; top: 17.5%; left: 17.5%; }
+        .circle5 { background-color: #b3d9ff; width: 85%; height: 85%; top: 7.5%; left: 7.5%; }
+
         .label {
             position: absolute;
             font-weight: bold;
@@ -66,7 +60,7 @@
             cursor: pointer;
             user-select: none;
             white-space: nowrap;
-            z-index: 5;
+            z-index: 7;
             padding: 2px 5px;
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 4px;
@@ -75,50 +69,13 @@
             background-color: #ff4081;
             color: white;
         }
-        .note-input {
-            width: 300px;
-            height: 80px;
-            padding: 5px;
-            font-size: 12px;
-            margin-bottom: 5px;
-            text-align: left;
-            resize: vertical;
-            overflow-y: auto;
-        }
-        .menu-horizontal {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            background-color: #fff;
-            padding: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .menu-horizontal input, .menu-horizontal button {
-            padding: 5px;
-            font-size: 12px;
-        }
-        .menu-horizontal button {
-            background-color: #ff4081;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .menu-horizontal button:hover {
-            background-color: #e91e63;
-        }
-        .modify-delete-group {
-            display: flex;
-            gap: 5px;
-        }
         canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2;
+            z-index: 6;
             pointer-events: none;
         }
     </style>
@@ -127,13 +84,18 @@
     <h1>Perception de ma santé globale</h1>
     <div class="main-container">
         <textarea id="userNotes" class="note-input" placeholder="Écrivez vos notes ici... nom, date, objectifs etc."></textarea>
-        <div class="target-container" id="target-container"></div>
+        <div class="target-container" id="target-container">
+            <canvas id="canvas"></canvas>
+            <div class="circle circle5"></div>
+            <div class="circle circle4"></div>
+            <div class="circle circle3"></div>
+            <div class="circle circle2"></div>
+            <div class="circle circle1"></div>
+        </div>
         <div class="menu-horizontal">
             <input type="text" id="editKeyword" placeholder="Modifier">
-            <div class="modify-delete-group">
-                <button onclick="updateKeyword()">Modifier</button>
-                <button onclick="deleteKeyword()">Supprimer</button>
-            </div>
+            <button onclick="updateKeyword()">Modifier</button>
+            <button onclick="deleteKeyword()">Supprimer</button>
             <input type="text" id="newKeyword" placeholder="Ajouter">
             <button onclick="addKeyword()">Ajouter</button>
             <button onclick="captureAndDownload()">Télécharger</button>
@@ -157,22 +119,17 @@
 
         function renderKeywords() {
             const container = document.getElementById('target-container');
-            container.innerHTML = `
-                <div class="circle circle5"></div>
-                <div class="circle circle4"></div>
-                <div class="circle circle3"></div>
-                <div class="circle circle2"></div>
-                <div class="circle circle1"></div>
-                <canvas id="canvas"></canvas>
-                <div class="legend-text" id="legend-text">${document.getElementById('userNotes').value}</div>
-            `;
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+
+            container.querySelectorAll('.label').forEach(e => e.remove());
 
             keywords.forEach((word, index) => {
                 if (word.x === null || word.y === null) {
                     const angleStep = (2 * Math.PI) / keywords.length;
                     const angle = index * angleStep;
-                    word.x = 150 + 120 * Math.cos(angle) - 30;
-                    word.y = 150 + 120 * Math.sin(angle) - 10;
+                    word.x = centerX + 150 * Math.cos(angle) - 30; // Ajustement du rayon pour plus d'espace
+                    word.y = centerY + 150 * Math.sin(angle) - 10;
                 }
                 const label = document.createElement('div');
                 label.className = 'label draggable';
@@ -180,9 +137,7 @@
                 label.style.top = `${word.y}px`;
                 label.textContent = word.text;
                 label.id = `keyword-${index}`;
-                label.style.position = 'absolute';
                 label.addEventListener('click', () => selectKeyword(index));
-                if (index === selectedKeywordIndex) label.classList.add('selected');
                 container.appendChild(label);
             });
             resizeCanvas();
@@ -203,8 +158,8 @@
                     move(event) {
                         const target = event.target;
                         const index = parseInt(target.id.split('-')[1]);
-                        keywords[index].x = (keywords[index].x || 0) + event.dx;
-                        keywords[index].y = (keywords[index].y || 0) + event.dy;
+                        keywords[index].x += event.dx;
+                        keywords[index].y += event.dy;
                         target.style.left = `${keywords[index].x}px`;
                         target.style.top = `${keywords[index].y}px`;
                         resizeCanvas();
@@ -213,20 +168,16 @@
             });
         }
 
-        function updateLegend() {
-            document.getElementById('legend-text').textContent = document.getElementById('userNotes').value;
-        }
-
         function resizeCanvas() {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = canvas.parentElement.offsetWidth;
             canvas.height = canvas.parentElement.offsetHeight;
-            drawLines(ctx, canvas);
+            drawLines(ctx);
         }
 
-        function drawLines(ctx, canvas) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function drawLines(ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.beginPath();
             ctx.strokeStyle = '#ff4081';
             ctx.lineWidth = 2;
@@ -243,7 +194,7 @@
         function addKeyword() {
             const input = document.getElementById('newKeyword');
             if (input.value.trim()) {
-                keywords.push({ text: input.value.trim(), x: 150, y: 150 });
+                keywords.push({ text: input.value.trim(), x: null, y: null });
                 input.value = '';
                 renderKeywords();
             }
@@ -280,4 +231,3 @@
     </script>
 </body>
 </html>
-
