@@ -142,12 +142,18 @@
         }
 
         .note-input {
-            width: 100%;
-            height: 80px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: none;
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: none;                  /* ✅ Suppression des bordures pour un rendu épuré */
+    border-radius: 0;
+    resize: none;
+    font-size: 20px;               /* ✅ Taille du texte plus grande pour un effet de titre */
+    font-weight: bold;
+    text-align: center;            /* ✅ Centrage du texte */
+    background-color: transparent; /* ✅ Fond transparent pour ne pas gêner la capture */
+    box-shadow: none;
+}
         }
     </style>
 </head>
