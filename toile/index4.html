@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -55,13 +54,12 @@
             z-index: 1;
         }
 
-.circle1 { background-color: #ffb3b3; width: 8%; height: 8%; top: 46%; left: 46%; }
-.circle2 { background-color: #ffdab3; width: 20%; height: 20%; top: 40%; left: 40%; }
-.circle3 { background-color: #fff5b3; width: 35%; height: 35%; top: 32.5%; left: 32.5%; }
-.circle4 { background-color: #b3f5b3; width: 55%; height: 55%; top: 22.5%; left: 22.5%; }
-.circle5 { background-color: #b3d9ff; width: 75%; height: 75%; top: 12.5%; left: 12.5%; }
+        .circle1 { background-color: #ffb3b3; width: 8%; height: 8%; top: 46%; left: 46%; }
+        .circle2 { background-color: #ffdab3; width: 20%; height: 20%; top: 40%; left: 40%; }
+        .circle3 { background-color: #fff5b3; width: 35%; height: 35%; top: 32.5%; left: 32.5%; }
+        .circle4 { background-color: #b3f5b3; width: 55%; height: 55%; top: 22.5%; left: 22.5%; }
+        .circle5 { background-color: #b3d9ff; width: 75%; height: 75%; top: 12.5%; left: 12.5%; }
 
-        
         .label {
             position: absolute;
             font-weight: bold;
@@ -143,18 +141,17 @@
         }
 
         .note-input {
-    width: 100%;
-    height: 80px;
-    padding: 10px;
-    border: none;                  /* ✅ Suppression des bordures pour un rendu épuré */
-    border-radius: 0;
-    resize: none;
-    font-size: 20px;               /* ✅ Taille du texte plus grande pour un effet de titre */
-    font-weight: bold;
-    text-align: center;            /* ✅ Centrage du texte */
-    background-color: transparent; /* ✅ Fond transparent pour ne pas gêner la capture */
-    box-shadow: none;
-}
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: none;
+            border-radius: 0;
+            resize: none;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            background-color: transparent;
+            box-shadow: none;
         }
     </style>
 </head>
@@ -208,15 +205,15 @@
             const container = document.getElementById('target-container');
             const centerX = container.offsetWidth / 2;
             const centerY = container.offsetHeight / 2;
-            const radius = Math.min(centerX, centerY) * 0.3; // Adjusted radius
+            const radius = Math.min(centerX, centerY) * 0.3;
 
             container.querySelectorAll('.label').forEach(e => e.remove());
 
             keywords.forEach((word, index) => {
                 const angleStep = (2 * Math.PI) / keywords.length;
-                const angle = index * angleStep - Math.PI / 2; // Start from the top
-                const labelWidth = 60; // Approximate width of the label
-                const labelHeight = 20; // Approximate height of the label
+                const angle = index * angleStep - Math.PI / 2;
+                const labelWidth = 60;
+                const labelHeight = 20;
                 word.x = centerX + radius * Math.cos(angle) - labelWidth / 2;
                 word.y = centerY + radius * Math.sin(angle) - labelHeight / 2;
 
@@ -225,7 +222,7 @@
                 label.style.left = `${word.x}px`;
                 label.style.top = `${word.y}px`;
                 label.textContent = word.text;
-                label.id = `keyword-${index}`;
+                label.id = `keyword-${word.text}`; // Utiliser le texte comme identifiant unique
                 label.addEventListener('click', () => selectKeyword(index));
                 container.appendChild(label);
             });
@@ -237,17 +234,12 @@
             selectedKeywordIndex = index;
             document.getElementById('editKeyword').value = keywords[index].text;
             document.querySelectorAll('.label').forEach(label => label.classList.remove('selected'));
-            const selectedLabel = document.getElementById(`keyword-${index}`);
+            const selectedLabel = document.getElementById(`keyword-${keywords[index].text}`);
             selectedLabel.classList.add('selected');
             createParticles(selectedLabel);
         }
 
         function initDragAndDrop() {
-            if (typeof interact === 'undefined') {
-                console.error("interact.js n'a pas encore chargé. Attente...");
-                setTimeout(initDragAndDrop, 500);
-                return;
-            }
             interact('.draggable').draggable({
                 inertia: true,
                 modifiers: [
@@ -259,7 +251,7 @@
                 listeners: {
                     move(event) {
                         const target = event.target;
-                        const index = parseInt(target.id.split('-')[1]);
+                        const index = keywords.findIndex(word => `keyword-${word.text}` === target.id);
                         keywords[index].x += event.dx;
                         keywords[index].y += event.dy;
                         target.style.left = `${keywords[index].x}px`;
@@ -268,7 +260,6 @@
                     }
                 }
             });
-            console.log("Glisser-déposer initialisé avec succès.");
         }
 
         function resizeCanvas() {
@@ -295,46 +286,46 @@
         }
 
         function createParticles(label) {
-    const rect = label.getBoundingClientRect();
-    const containerRect = document.getElementById('target-container').getBoundingClientRect();
-    const x = rect.left - containerRect.left + rect.width / 2;
-    const y = rect.top - containerRect.top + rect.height / 2;
+            const rect = label.getBoundingClientRect();
+            const containerRect = document.getElementById('target-container').getBoundingClientRect();
+            const x = rect.left - containerRect.left + rect.width / 2;
+            const y = rect.top - containerRect.top + rect.height / 2;
 
-    for (let i = 0; i < 20; i++) {
-        particles.push({
-            x: x,
-            y: y,
-            vx: (Math.random() - 0.3) * 4,
-            vy: (Math.random() - 0.3) * 4,
-            life: 50,
-            size: Math.random() * 12 + 8, // Taille variable des étoiles
-            opacity: 0.8,
-            color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
-        });
-    }
-    animateParticles();
-}
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.3) * 4,
+                    vy: (Math.random() - 0.3) * 4,
+                    life: 50,
+                    size: Math.random() * 12 + 8,
+                    opacity: 0.8,
+                    color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
+                });
+            }
+            animateParticles();
+        }
 
-function animateParticles() {
-    particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-    particles = particles.filter(p => p.life > 0);
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particles = particles.filter(p => p.life > 0);
 
-    particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.05; // Gravité
-        p.life--;
-        p.opacity -= 0.025; // Fondu progressif
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.05;
+                p.life--;
+                p.opacity -= 0.025;
 
-        particleCtx.font = `${p.size}px Arial`;
-        particleCtx.fillStyle = `rgba(255, 215, 0, ${p.opacity})`; // Doré avec opacité dégressive
-        particleCtx.fillText("☆", p.x, p.y);
-    });
+                particleCtx.font = `${p.size}px Arial`;
+                particleCtx.fillStyle = `rgba(255, 215, 0, ${p.opacity})`;
+                particleCtx.fillText("☆", p.x, p.y);
+            });
 
-    if (particles.length > 0) {
-        requestAnimationFrame(animateParticles);
-    }
-}
+            if (particles.length > 0) {
+                requestAnimationFrame(animateParticles);
+            }
+        }
 
         function addKeyword() {
             const input = document.getElementById('newKeyword');
@@ -348,73 +339,69 @@ function animateParticles() {
         function updateKeyword() {
             const editInput = document.getElementById('editKeyword').value.trim();
             if (editInput && selectedKeywordIndex !== null) {
+                const oldText = keywords[selectedKeywordIndex].text;
                 keywords[selectedKeywordIndex].text = editInput;
-                renderKeywords();
+                // Mettre à jour l'ID de l'élément DOM
+                const label = document.getElementById(`keyword-${oldText}`);
+                if (label) {
+                    label.id = `keyword-${editInput}`;
+                    label.textContent = editInput;
+                }
             }
         }
 
         function deleteKeyword() {
             if (selectedKeywordIndex !== null) {
-                keywords.splice(selectedKeywordIndex, 1);
+                const removedKeyword = keywords.splice(selectedKeywordIndex, 1)[0];
                 selectedKeywordIndex = null;
                 document.getElementById('editKeyword').value = '';
-                renderKeywords();
+                // Supprimer l'élément DOM en utilisant le texte comme identifiant
+                const elementToRemove = document.getElementById(`keyword-${removedKeyword.text}`);
+                if (elementToRemove) {
+                    elementToRemove.remove();
+                }
             }
         }
 
         function captureAndDownload() {
-    console.log("Début de la capture...");
+            const buttons = document.querySelector('.menu-horizontal');
+            const note = document.getElementById('userNotes');
 
-    // ✅ Masquer les boutons et autres éléments avant la capture
-    const buttons = document.querySelector('.menu-horizontal');
-    const layers = document.querySelector('.layer-buttons');
-    buttons.style.visibility = 'hidden';
-    layers.style.visibility = 'hidden';
+            buttons.style.visibility = 'hidden';
+            note.style.textAlign = 'center';
+            note.style.fontSize = '24px';
+            note.style.fontWeight = 'bold';
+            note.style.backgroundColor = 'transparent';
+            note.style.border = 'none';
+            note.style.boxShadow = 'none';
 
-    // ✅ Centrer et styliser la note pour un rendu propre
-    const note = document.getElementById('userNotes');
-    note.style.textAlign = 'center';
-    note.style.fontSize = '24px';
-    note.style.fontWeight = 'bold';
-    note.style.backgroundColor = 'transparent';
-    note.style.border = 'none';
-    note.style.boxShadow = 'none';
+            resizeCanvas();
 
-    // ✅ Redessiner les canvas pour le rendu final
-    resizeCanvas();
+            html2canvas(document.querySelector('.main-container'), {
+                scale: 2,
+                backgroundColor: '#fafafa',
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `carte_${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL('image/png');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
 
-    html2canvas(document.querySelector('.main-container'), {
-        scale: 2,
-        backgroundColor: '#fafafa',
-        useCORS: true,
-        logging: false
-    }).then(canvas => {
-        console.log("Capture réussie, génération du fichier...");
+                buttons.style.visibility = 'visible';
+                note.style.textAlign = '';
+                note.style.fontSize = '';
+                note.style.fontWeight = '';
+                note.style.backgroundColor = '';
+                note.style.border = '';
+                note.style.boxShadow = '';
 
-        const link = document.createElement('a');
-        link.download = `carte_${new Date().toISOString().split('T')[0]}.png`;
-        link.href = canvas.toDataURL('image/png');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        console.log("Téléchargement déclenché.");
-
-        // ✅ Restaurer l'affichage après la capture
-        buttons.style.visibility = 'visible';
-        layers.style.visibility = 'visible';
-        note.style.textAlign = '';
-        note.style.fontSize = '';
-        note.style.fontWeight = '';
-        note.style.backgroundColor = '';
-        note.style.border = '';
-        note.style.boxShadow = '';
-
-    }).catch(err => {
-        console.error("Erreur lors de la capture:", err);
-    });
-}
-        
+            }).catch(err => {
+                console.error("Erreur lors de la capture:", err);
+            });
+        }
 
         function resetKeywords() {
             keywords.forEach(word => {
@@ -423,7 +410,6 @@ function animateParticles() {
             });
             renderKeywords();
         }
-          
 
         window.addEventListener('resize', renderKeywords);
         document.addEventListener('DOMContentLoaded', () => {
