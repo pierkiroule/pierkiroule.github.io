@@ -201,7 +201,7 @@
             const container = document.getElementById('target-container');
             const centerX = container.offsetWidth / 2;
             const centerY = container.offsetHeight / 2;
-            const radius = Math.min(centerX, centerY) * 0.4; // Adjusted radius
+            const radius = Math.min(centerX, centerY) * 0.3; // Adjusted radius
 
             container.querySelectorAll('.label').forEach(e => e.remove());
 
@@ -297,11 +297,11 @@
         particles.push({
             x: x,
             y: y,
-            vx: (Math.random() - 0.5) * 4,
-            vy: (Math.random() - 0.5) * 4,
-            life: 60,
-            size: Math.random() * 16 + 8, // Taille variable des étoiles
-            opacity: 1,
+            vx: (Math.random() - 0.3) * 4,
+            vy: (Math.random() - 0.3) * 4,
+            life: 50,
+            size: Math.random() * 12 + 8, // Taille variable des étoiles
+            opacity: 0.8,
             color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
         });
     }
@@ -317,7 +317,7 @@ function animateParticles() {
         p.y += p.vy;
         p.vy += 0.05; // Gravité
         p.life--;
-        p.opacity -= 0.015; // Fondu progressif
+        p.opacity -= 0.025; // Fondu progressif
 
         particleCtx.font = `${p.size}px Arial`;
         particleCtx.fillStyle = `rgba(255, 215, 0, ${p.opacity})`; // Doré avec opacité dégressive
