@@ -1,0 +1,40 @@
+
+        // Appliquer le formatage du texte aux nœuds sélectionnés
+        function applyTextFormatting() {
+            const size = document.getElementById('textSize').value;
+            const color = document.getElementById('textColor').value;
+            selectedNodes.forEach(node => {
+                node.dataset.fontSize = size;
+                node.dataset.color = color;
+                node.style.fontSize = `${size}px`;
+                node.style.color = color;
+            });
+        }
+
+        // Appliquer le formatage des liens entre les nœuds sélectionnés
+        function applySelectedLinkFormatting() {
+            const thickness = document.getElementById('linkThickness').value;
+            const color = document.getElementById('linkColor').value;
+            const style = document.getElementById('linkStyle').value;
+
+            if (selectedNodes.length === 2) {
+                const selectedLink = connections.find(c => 
+                    (c.fromNode === selectedNodes[0] && c.toNode === selectedNodes[1]) ||
+                    (c.fromNode === selectedNodes[1] && c.toNode === selectedNodes[0])
+                );
+                if (selectedLink) {
+                    selectedLink.path.strokeColor = color;
+                    selectedLink.path.strokeWidth = thickness;
+                    if (style === 'dashed') selectedLink.path.dashArray = [10, 10];
+                    else if (style === 'zigzag') selectedLink.path.dashArray = [5, 5, 0, 5];
+                    else selectedLink.path.dashArray = null;
+                    selectedLink.thickness = thickness;
+                    selectedLink.color = color;
+                    selectedLink.style = style;
+                    paper.view.draw();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
