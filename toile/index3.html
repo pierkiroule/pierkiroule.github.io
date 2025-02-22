@@ -287,46 +287,46 @@
         }
 
         function createParticles(label) {
-            const rect = label.getBoundingClientRect();
-            const containerRect = document.getElementById('target-container').getBoundingClientRect();
-            const x = rect.left - containerRect.left + rect.width / 2;
-            const y = rect.top - containerRect.top + rect.height / 2;
+    const rect = label.getBoundingClientRect();
+    const containerRect = document.getElementById('target-container').getBoundingClientRect();
+    const x = rect.left - containerRect.left + rect.width / 2;
+    const y = rect.top - containerRect.top + rect.height / 2;
 
-            for (let i = 0; i < 20; i++) {
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: (Math.random() - 0.5) * 4,
-                    vy: (Math.random() - 0.5) * 4,
-                    radius: Math.random() * 3 + 1,
-                    life: 60,
-                    color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
-                });
-            }
-            animateParticles();
-        }
+    for (let i = 0; i < 20; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 4,
+            vy: (Math.random() - 0.5) * 4,
+            life: 60,
+            size: Math.random() * 16 + 8, // Taille variable des étoiles
+            opacity: 1,
+            color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
+        });
+    }
+    animateParticles();
+}
 
-        function animateParticles() {
-            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-            particles = particles.filter(p => p.life > 0);
+function animateParticles() {
+    particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+    particles = particles.filter(p => p.life > 0);
 
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.vy += 0.05;
-                p.life--;
-                p.radius *= 0.98;
+    particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05; // Gravité
+        p.life--;
+        p.opacity -= 0.015; // Fondu progressif
 
-                particleCtx.beginPath();
-                particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                particleCtx.fillStyle = p.color;
-                particleCtx.fill();
-            });
+        particleCtx.font = `${p.size}px Arial`;
+        particleCtx.fillStyle = `rgba(255, 215, 0, ${p.opacity})`; // Doré avec opacité dégressive
+        particleCtx.fillText("☆", p.x, p.y);
+    });
 
-            if (particles.length > 0) {
-                requestAnimationFrame(animateParticles);
-            }
-        }
+    if (particles.length > 0) {
+        requestAnimationFrame(animateParticles);
+    }
+}
 
         function addKeyword() {
             const input = document.getElementById('newKeyword');
