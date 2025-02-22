@@ -32,7 +32,7 @@
             align-items: center;
             gap: 15px;
             width: 100%;
-            max-width: 800px;
+            max-width: 600px;
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
@@ -72,11 +72,11 @@
             padding: 3px 6px;
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 4px;
-            transition: transform 0.4s ease;
+            transition: transform 0.2s ease;
         }
 
         .label:hover {
-            transform: scale(1.5);
+            transform: scale(1.1);
             background-color: rgba(255, 255, 255, 0.9);
         }
 
@@ -156,7 +156,7 @@
     </style>
 </head>
 <body>
-    <h1>Étoile de mots </h1>
+    <h1>Perception de ma santé globale</h1>
     <div class="main-container">
         <textarea id="userNotes" class="note-input" placeholder="Écrivez vos notes ici... nom, date, objectifs etc."></textarea>
         <div class="target-container" id="target-container">
@@ -210,22 +210,27 @@
             container.querySelectorAll('.label').forEach(e => e.remove());
 
             keywords.forEach((word, index) => {
-                const angleStep = (2 * Math.PI) / keywords.length;
-                const angle = index * angleStep - Math.PI / 2;
                 const labelWidth = 60;
                 const labelHeight = 20;
-                word.x = centerX + radius * Math.cos(angle) - labelWidth / 2;
-                word.y = centerY + radius * Math.sin(angle) - labelHeight / 2;
+
+                // Calculer la position uniquement si non définie
+                if (word.x === null || word.y === null) {
+                    const angleStep = (2 * Math.PI) / keywords.length;
+                    const angle = index * angleStep - Math.PI / 2;
+                    word.x = centerX + radius * Math.cos(angle) - labelWidth / 2;
+                    word.y = centerY + radius * Math.sin(angle) - labelHeight / 2;
+                }
 
                 const label = document.createElement('div');
                 label.className = 'label draggable';
                 label.style.left = `${word.x}px`;
                 label.style.top = `${word.y}px`;
                 label.textContent = word.text;
-                label.id = `keyword-${word.text}`; // Utiliser le texte comme identifiant unique
+                label.dataset.index = index;
                 label.addEventListener('click', () => selectKeyword(index));
                 container.appendChild(label);
             });
+
             resizeCanvas();
             initDragAndDrop();
         }
@@ -234,7 +239,7 @@
             selectedKeywordIndex = index;
             document.getElementById('editKeyword').value = keywords[index].text;
             document.querySelectorAll('.label').forEach(label => label.classList.remove('selected'));
-            const selectedLabel = document.getElementById(`keyword-${keywords[index].text}`);
+            const selectedLabel = document.querySelector(`.label[data-index='${index}']`);
             selectedLabel.classList.add('selected');
             createParticles(selectedLabel);
         }
@@ -251,7 +256,7 @@
                 listeners: {
                     move(event) {
                         const target = event.target;
-                        const index = keywords.findIndex(word => `keyword-${word.text}` === target.id);
+                        const index = parseInt(target.dataset.index);
                         keywords[index].x += event.dx;
                         keywords[index].y += event.dy;
                         target.style.left = `${keywords[index].x}px`;
@@ -274,7 +279,7 @@
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.beginPath();
             ctx.strokeStyle = '#ff4081';
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
             const positions = keywords.map(k => ({ x: k.x + 30, y: k.y + 10 }));
             positions.forEach((pos, i) => {
@@ -297,10 +302,10 @@
                     y: y,
                     vx: (Math.random() - 0.3) * 4,
                     vy: (Math.random() - 0.3) * 4,
-                    life: 80,
-                    size: Math.random() * 16 + 8,
-                    opacity: 1,
-                    color: `hsl(${Math.random() * 60 + 300}, 100%, 60%)`
+                    life: 50,
+                    size: Math.random() * 12 + 8,
+                    opacity: 0.8,
+                    color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
                 });
             }
             animateParticles();
@@ -315,7 +320,7 @@
                 p.y += p.vy;
                 p.vy += 0.05;
                 p.life--;
-                p.opacity -= 0.25;
+                p.opacity -= 0.025;
 
                 particleCtx.font = `${p.size}px Arial`;
                 particleCtx.fillStyle = `rgba(255, 215, 0, ${p.opacity})`;
@@ -339,27 +344,17 @@
         function updateKeyword() {
             const editInput = document.getElementById('editKeyword').value.trim();
             if (editInput && selectedKeywordIndex !== null) {
-                const oldText = keywords[selectedKeywordIndex].text;
                 keywords[selectedKeywordIndex].text = editInput;
-                // Mettre à jour l'ID de l'élément DOM
-                const label = document.getElementById(`keyword-${oldText}`);
-                if (label) {
-                    label.id = `keyword-${editInput}`;
-                    label.textContent = editInput;
-                }
+                document.querySelector(`.label[data-index='${selectedKeywordIndex}']`).textContent = editInput;
             }
         }
 
         function deleteKeyword() {
             if (selectedKeywordIndex !== null) {
-                const removedKeyword = keywords.splice(selectedKeywordIndex, 1)[0];
+                keywords.splice(selectedKeywordIndex, 1);
                 selectedKeywordIndex = null;
                 document.getElementById('editKeyword').value = '';
-                // Supprimer l'élément DOM en utilisant le texte comme identifiant
-                const elementToRemove = document.getElementById(`keyword-${removedKeyword.text}`);
-                if (elementToRemove) {
-                    elementToRemove.remove();
-                }
+                renderKeywords();
             }
         }
 
@@ -397,7 +392,6 @@
                 note.style.backgroundColor = '';
                 note.style.border = '';
                 note.style.boxShadow = '';
-
             }).catch(err => {
                 console.error("Erreur lors de la capture:", err);
             });
