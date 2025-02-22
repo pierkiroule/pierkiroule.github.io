@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -228,6 +227,9 @@
                 label.textContent = word.text;
                 label.dataset.index = index;
                 label.addEventListener('click', () => selectKeyword(index));
+                if (index === selectedKeywordIndex) {
+                    label.classList.add('selected');
+                }
                 container.appendChild(label);
             });
 
@@ -345,7 +347,9 @@
             const editInput = document.getElementById('editKeyword').value.trim();
             if (editInput && selectedKeywordIndex !== null) {
                 keywords[selectedKeywordIndex].text = editInput;
-                document.querySelector(`.label[data-index='${selectedKeywordIndex}']`).textContent = editInput;
+                const selectedLabel = document.querySelector(`.label[data-index='${selectedKeywordIndex}']`);
+                selectedLabel.textContent = editInput;
+                // Pas de renderKeywords() ici pour préserver les positions
             }
         }
 
