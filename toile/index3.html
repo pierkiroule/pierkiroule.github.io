@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toile Dynamique Personnalisable</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fafafa;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #555;
+            text-align: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .target-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .circle1 { background-color: #ffb3b3; width: 10%; height: 10%; top: 45%; left: 45%; }
+        .circle2 { background-color: #ffdab3; width: 25%; height: 25%; top: 37.5%; left: 37.5%; }
+        .circle3 { background-color: #fff5b3; width: 45%; height: 45%; top: 27.5%; left: 27.5%; }
+        .circle4 { background-color: #b3f5b3; width: 65%; height: 65%; top: 17.5%; left: 17.5%; }
+        .circle5 { background-color: #b3d9ff; width: 85%; height: 85%; top: 7.5%; left: 7.5%; }
+
+        .label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            z-index: 7;
+            padding: 5px 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .label:hover {
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .label.selected {
+            background-color: #ff4081;
+            color: white;
+            transform: scale(1.15);
+        }
+
+        #canvas, #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        #particle-canvas {
+            z-index: 8;
+        }
+
+        .menu-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .menu-horizontal input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+
+        .menu-horizontal input:focus {
+            border-color: #ff4081;
+            outline: none;
+        }
+
+        .menu-horizontal button {
+            padding: 10px 20px;
+            background-color: #ff4081;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+
+        .menu-horizontal button:hover {
+            transform: scale(1.05);
+            background-color: #e91e63;
+        }
+
+        .menu-horizontal button:active {
+            transform: scale(0.95);
+        }
+
+        .note-input {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Perception de ma santé globale</h1>
+    <div class="main-container">
+        <textarea id="userNotes" class="note-input" placeholder="Écrivez vos notes ici... nom, date, objectifs etc."></textarea>
+        <div class="target-container" id="target-container">
+            <canvas id="canvas"></canvas>
+            <canvas id="particle-canvas"></canvas>
+            <div class="circle circle5"></div>
+            <div class="circle circle4"></div>
+            <div class="circle circle3"></div>
+            <div class="circle circle2"></div>
+            <div class="circle circle1"></div>
+        </div>
+        <div class="menu-horizontal">
+            <input type="text" id="editKeyword" placeholder="Modifier">
+            <button onclick="updateKeyword()">Modifier</button>
+            <button onclick="deleteKeyword()">Supprimer</button>
+            <input type="text" id="newKeyword" placeholder="Ajouter">
+            <button onclick="addKeyword()">Ajouter</button>
+            <button onclick="captureAndDownload()">Télécharger</button>
+            <button onclick="resetKeywords()">Réinitialiser</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        let keywords = [
+            { text: "psychologique", x: null, y: null },
+            { text: "physique", x: null, y: null },
+            { text: "sommeil", x: null, y: null },
+            { text: "alimentation", x: null, y: null },
+            { text: "famille", x: null, y: null },
+            { text: "scolarité", x: null, y: null },
+            { text: "loisirs", x: null, y: null },
+            { text: "parents", x: null, y: null },
+            { text: "écrans", x: null, y: null }
+        ];
+        let selectedKeywordIndex = null;
+        let particles = [];
+
+        const canvas = document.getElementById('canvas');
+        const particleCanvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        const particleCtx = particleCanvas.getContext('2d');
+
+        function renderKeywords() {
+            const container = document.getElementById('target-container');
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+            const radius = Math.min(centerX, centerY) * 0.4; // Adjusted radius
+
+            container.querySelectorAll('.label').forEach(e => e.remove());
+
+            keywords.forEach((word, index) => {
+                const angleStep = (2 * Math.PI) / keywords.length;
+                const angle = index * angleStep - Math.PI / 2; // Start from the top
+                const labelWidth = 60; // Approximate width of the label
+                const labelHeight = 20; // Approximate height of the label
+                word.x = centerX + radius * Math.cos(angle) - labelWidth / 2;
+                word.y = centerY + radius * Math.sin(angle) - labelHeight / 2;
+
+                const label = document.createElement('div');
+                label.className = 'label draggable';
+                label.style.left = `${word.x}px`;
+                label.style.top = `${word.y}px`;
+                label.textContent = word.text;
+                label.id = `keyword-${index}`;
+                label.addEventListener('click', () => selectKeyword(index));
+                container.appendChild(label);
+            });
+            resizeCanvas();
+            initDragAndDrop();
+        }
+
+        function selectKeyword(index) {
+            selectedKeywordIndex = index;
+            document.getElementById('editKeyword').value = keywords[index].text;
+            document.querySelectorAll('.label').forEach(label => label.classList.remove('selected'));
+            const selectedLabel = document.getElementById(`keyword-${index}`);
+            selectedLabel.classList.add('selected');
+            createParticles(selectedLabel);
+        }
+
+        function initDragAndDrop() {
+            if (typeof interact === 'undefined') {
+                console.error("interact.js n'a pas encore chargé. Attente...");
+                setTimeout(initDragAndDrop, 500);
+                return;
+            }
+            interact('.draggable').draggable({
+                inertia: true,
+                modifiers: [
+                    interact.modifiers.restrictRect({
+                        restriction: '#target-container',
+                        endOnly: true
+                    })
+                ],
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        const index = parseInt(target.id.split('-')[1]);
+                        keywords[index].x += event.dx;
+                        keywords[index].y += event.dy;
+                        target.style.left = `${keywords[index].x}px`;
+                        target.style.top = `${keywords[index].y}px`;
+                        resizeCanvas();
+                    }
+                }
+            });
+            console.log("Glisser-déposer initialisé avec succès.");
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            particleCanvas.width = particleCanvas.parentElement.offsetWidth;
+            particleCanvas.height = particleCanvas.parentElement.offsetHeight;
+            drawLines(ctx);
+        }
+
+        function drawLines(ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff4081';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            const positions = keywords.map(k => ({ x: k.x + 30, y: k.y + 10 }));
+            positions.forEach((pos, i) => {
+                const nextPos = positions[(i + 1) % positions.length];
+                ctx.moveTo(pos.x, pos.y);
+                ctx.lineTo(nextPos.x, nextPos.y);
+            });
+            ctx.stroke();
+        }
+
+        function createParticles(label) {
+            const rect = label.getBoundingClientRect();
+            const containerRect = document.getElementById('target-container').getBoundingClientRect();
+            const x = rect.left - containerRect.left + rect.width / 2;
+            const y = rect.top - containerRect.top + rect.height / 2;
+
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    radius: Math.random() * 3 + 1,
+                    life: 60,
+                    color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
+                });
+            }
+            animateParticles();
+        }
+
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particles = particles.filter(p => p.life > 0);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.05;
+                p.life--;
+                p.radius *= 0.98;
+
+                particleCtx.beginPath();
+                particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                particleCtx.fillStyle = p.color;
+                particleCtx.fill();
+            });
+
+            if (particles.length > 0) {
+                requestAnimationFrame(animateParticles);
+            }
+        }
+
+        function addKeyword() {
+            const input = document.getElementById('newKeyword');
+            if (input.value.trim()) {
+                keywords.push({ text: input.value.trim(), x: null, y: null });
+                input.value = '';
+                renderKeywords();
+            }
+        }
+
+        function updateKeyword() {
+            const editInput = document.getElementById('editKeyword').value.trim();
+            if (editInput && selectedKeywordIndex !== null) {
+                keywords[selectedKeywordIndex].text = editInput;
+                renderKeywords();
+            }
+        }
+
+        function deleteKeyword() {
+            if (selectedKeywordIndex !== null) {
+                keywords.splice(selectedKeywordIndex, 1);
+                selectedKeywordIndex = null;
+                document.getElementById('editKeyword').value = '';
+                renderKeywords();
+            }
+        }
+
+        function captureAndDownload() {
+            console.log("Début de la capture...");
+            // Désactiver les animations pour un rendu statique
+            document.querySelectorAll('.circle, .label, .note-input, .menu-horizontal').forEach(el => {
+                el.style.animation = 'none';
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+            });
+
+            // Redessiner les canvas
+            resizeCanvas();
+            drawLines(ctx);
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particles.forEach(p => {
+                particleCtx.beginPath();
+                particleCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                particleCtx.fillStyle = p.color;
+                particleCtx.fill();
+            });
+
+            console.log("Canvas redessinés.");
+
+            // Capturer avec html2canvas
+            html2canvas(document.querySelector('.main-container'), {
+                scale: 2,
+                backgroundColor: '#fafafa',
+                logging: true,
+                scrollX: 0,
+                scrollY: -window.scrollY,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight,
+                allowTaint: true, // Autoriser les ressources externes
+                useCORS: true, // Gérer les ressources cross-origin si nécessaire
+                removeContainer: false // Garder le conteneur pour éviter des problèmes
+            }).then(canvas => {
+                console.log("Capture réussie, génération du fichier...");
+                const link = document.createElement('a');
+                link.download = `carte_${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                console.log("Téléchargement déclenché.");
+
+                // Restaurer les animations après la capture
+                setTimeout(() => {
+                    document.querySelectorAll('.circle, .label, .note-input, .menu-horizontal').forEach(el => {
+                        el.style.animation = '';
+                        el.style.opacity = '';
+                        el.style.transform = '';
+                    });
+                }, 100);
+            }).catch(err => {
+                console.error("Erreur lors de la capture:", err);
+            });
+        }
+
+        function resetKeywords() {
+            keywords.forEach(word => {
+                word.x = null;
+                word.y = null;
+            });
+            renderKeywords();
+        }
+
+        window.addEventListener('resize', renderKeywords);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderKeywords();
+        });
+    </script>
+</body>
+</html>
