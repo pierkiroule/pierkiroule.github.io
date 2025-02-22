@@ -32,7 +32,7 @@
             align-items: center;
             gap: 15px;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
@@ -72,11 +72,11 @@
             padding: 3px 6px;
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 4px;
-            transition: transform 0.2s ease;
+            transition: transform 0.4s ease;
         }
 
         .label:hover {
-            transform: scale(1.1);
+            transform: scale(1.5);
             background-color: rgba(255, 255, 255, 0.9);
         }
 
@@ -156,7 +156,7 @@
     </style>
 </head>
 <body>
-    <h1>Perception de ma santé globale</h1>
+    <h1>Étoile de mots </h1>
     <div class="main-container">
         <textarea id="userNotes" class="note-input" placeholder="Écrivez vos notes ici... nom, date, objectifs etc."></textarea>
         <div class="target-container" id="target-container">
@@ -297,7 +297,7 @@
                     y: y,
                     vx: (Math.random() - 0.3) * 4,
                     vy: (Math.random() - 0.3) * 4,
-                    life: 50,
+                    life: 80,
                     size: Math.random() * 12 + 8,
                     opacity: 0.8,
                     color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
@@ -315,7 +315,7 @@
                 p.y += p.vy;
                 p.vy += 0.05;
                 p.life--;
-                p.opacity -= 0.025;
+                p.opacity -= 0.25;
 
                 particleCtx.font = `${p.size}px Arial`;
                 particleCtx.fillStyle = `rgba(255, 215, 0, ${p.opacity})`;
