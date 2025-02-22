@@ -365,42 +365,51 @@ function animateParticles() {
         function captureAndDownload() {
     console.log("Début de la capture...");
 
-    // ✅ Masquer les boutons et autres éléments
+    // ✅ Masquer les boutons et autres éléments avant la capture
     const buttons = document.querySelector('.menu-horizontal');
     const layers = document.querySelector('.layer-buttons');
-    buttons.style.display = 'none';
-    layers.style.display = 'none';
+    buttons.style.visibility = 'hidden';
+    layers.style.visibility = 'hidden';
 
-    // ✅ Centrer la note
+    // ✅ Centrer et styliser la note pour un rendu propre
     const note = document.getElementById('userNotes');
-    note.style.marginBottom = '20px';
+    note.style.textAlign = 'center';
     note.style.fontSize = '24px';
+    note.style.fontWeight = 'bold';
+    note.style.backgroundColor = 'transparent';
+    note.style.border = 'none';
+    note.style.boxShadow = 'none';
 
     // ✅ Redessiner les canvas pour le rendu final
     resizeCanvas();
+
     html2canvas(document.querySelector('.main-container'), {
         scale: 2,
         backgroundColor: '#fafafa',
-        logging: true,
-        scrollX: 0,
-        scrollY: -window.scrollY,
-        windowWidth: document.documentElement.offsetWidth,
-        windowHeight: document.documentElement.offsetHeight,
-        allowTaint: true,
-        useCORS: true
+        useCORS: true,
+        logging: false
     }).then(canvas => {
         console.log("Capture réussie, génération du fichier...");
+
         const link = document.createElement('a');
         link.download = `carte_${new Date().toISOString().split('T')[0]}.png`;
         link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+
         console.log("Téléchargement déclenché.");
 
         // ✅ Restaurer l'affichage après la capture
-        buttons.style.display = '';
-        layers.style.display = '';
-        note.style.marginBottom = '';
+        buttons.style.visibility = 'visible';
+        layers.style.visibility = 'visible';
+        note.style.textAlign = '';
         note.style.fontSize = '';
+        note.style.fontWeight = '';
+        note.style.backgroundColor = '';
+        note.style.border = '';
+        note.style.boxShadow = '';
+
     }).catch(err => {
         console.error("Erreur lors de la capture:", err);
     });
