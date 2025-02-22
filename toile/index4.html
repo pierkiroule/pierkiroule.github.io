@@ -274,7 +274,7 @@
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.beginPath();
             ctx.strokeStyle = '#ff4081';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
             const positions = keywords.map(k => ({ x: k.x + 30, y: k.y + 10 }));
             positions.forEach((pos, i) => {
@@ -298,9 +298,9 @@
                     vx: (Math.random() - 0.3) * 4,
                     vy: (Math.random() - 0.3) * 4,
                     life: 80,
-                    size: Math.random() * 12 + 8,
-                    opacity: 0.8,
-                    color: `hsl(${Math.random() * 60 + 300}, 100%, 70%)`
+                    size: Math.random() * 16 + 8,
+                    opacity: 1,
+                    color: `hsl(${Math.random() * 60 + 300}, 100%, 60%)`
                 });
             }
             animateParticles();
