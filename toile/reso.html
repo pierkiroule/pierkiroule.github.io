@@ -1,370 +1,235 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Réseau de Mots - Responsive</title>
-  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body,
-    html {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-    }
-
-    .toolbar,
-    .format-bar {
-      padding: 10px;
-      display: flex;
-      gap: 5px;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .toolbar button,
-    .format-bar select,
-    .format-bar input {
-      padding: 8px;
-      border: none;
-      border-radius: 5px;
-      font-size: 14px;
-      cursor: pointer;
-      background-color: #f0f0f0;
-      transition: background-color 0.3s;
-    }
-
-    .toolbar button:hover,
-    .format-bar input:hover,
-    .format-bar select:hover {
-      background-color: #ddd;
-    }
-
-    .toolbar button.active {
-      background-color: #ff4081;
-      color: white;
-    }
-
-    .canvas-wrapper {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      touch-action: none;
-    }
-
-    #networkCanvas {
-      width: 100%;
-      height: 100%;
-      background-color: #f9f9f9;
-    }
-
-    .node {
-      position: absolute;
-      padding: 8px 12px;
-      background: #fff;
-      border-radius: 5px;
-      border: 2px solid #ccc;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-      font-size: 18px;
-      min-width: 50px;
-      touch-action: none;
-    }
-
-    .node.selected {
-      border-color: #ff4081;
-      box-shadow: 0 0 5px #ff4081;
-    }
-
-    @media (max-width: 768px) {
-
-      .toolbar,
-      .format-bar {
-        padding: 5px;
-        gap: 3px;
-      }
-
-      .toolbar button,
-      .format-bar select,
-      .format-bar input {
-        padding: 6px;
-        font-size: 12px;
-      }
-
-      .node {
-        padding: 6px 10px;
-        font-size: 16px;
-        min-width: 40px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réseau de Mots - Gestion Avancée</title>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.15/paper-full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; width: 100%; overflow: hidden; font-family: Arial, sans-serif; }
+        .container { display: flex; flex-direction: column; height: 100%; width: 100%; }
+        .toolbar, .format-bar {
+            padding: 10px; display: flex; gap: 10px; background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .toolbar button, .format-bar select, .format-bar input {
+            padding: 10px; border: none; border-radius: 5px; font-size: 14px;
+            cursor: pointer; background-color: #f0f0f0; transition: background-color 0.3s;
+        }
+        .toolbar button:hover, .format-bar input:hover, .format-bar select:hover { background-color: #ddd; }
+        .toolbar button.active { background-color: #ff4081; color: white; }
+        .canvas-wrapper { flex: 1; position: relative; overflow: hidden; touch-action: none; }
+        #networkCanvas { width: 100%; height: 100%; background-color: #f9f9f9; }
+        .node {
+            position: absolute; padding: 10px 15px; background: #fff; border-radius: 5px;
+            border: 2px solid #ccc; cursor: pointer; user-select: none; white-space: nowrap;
+            font-size: 18px; min-width: 60px; touch-action: none;
+        }
+        .node.selected { border-color: #ff4081; box-shadow: 0 0 5px #ff4081; }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="toolbar">
-      <button onclick="toggleAddMode()" aria-label="Ajouter un mot">📝 Ajouter</button>
-      <button onclick="connectSelectedNodes()" aria-label="Relier les mots">🔗 Relier</button>
-      <button onclick="toggleEraserMode()" id="eraserButton" aria-label="Supprimer">🧹 Gomme</button>
-      <button onclick="resetNetwork()" aria-label="Réinitialiser">🔄 Réinit.</button>
+    <div class="container">
+        <div class="toolbar">
+            <button onclick="toggleAddMode()">📝 Ajouter Mot</button>
+            <button onclick="connectSelectedNodes()">🔗 Relier Mots</button>
+            <button onclick="toggleEraserMode()" id="eraserButton">🧹 Gomme</button>
+            <button onclick="resetNetwork()">🔄 Réinitialiser</button>
+        </div>
+        <div class="format-bar">
+            <label>Taille du texte : <input type="range" id="textSize" min="10" max="40" value="18" onchange="applyTextFormatting()"></label>
+            <label>Couleur du texte : <input type="color" id="textColor" value="#000000" onchange="applyTextFormatting()"></label>
+            <label>Épaisseur du lien : <input type="range" id="linkThickness" min="1" max="10" value="3" onchange="applySelectedLinkFormatting()"></label>
+            <label>Couleur du lien : <input type="color" id="linkColor" value="#000000" onchange="applySelectedLinkFormatting()"></label>
+            <label>Style du lien :
+                <select id="linkStyle" onchange="applySelectedLinkFormatting()">
+                    <option value="solid">Continu</option>
+                    <option value="dashed">Pointillé</option>
+                    <option value="zigzag">Dent de scie</option>
+                </select>
+            </label>
+        </div>
+        <div class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="networkCanvas"></canvas>
+        </div>
     </div>
-    <div class="format-bar">
-      <label>Taille texte : <input type="range" id="textSize" min="10" max="40" value="18" onchange="applyTextFormatting()"></label>
-      <label>Couleur : <input type="color" id="textColor" value="#000000" onchange="applyTextFormatting()"></label>
-      <label>Épaisseur lien : <input type="range" id="linkThickness" min="1" max="10" value="3" onchange="applySelectedLinkFormatting()"></label>
-      <label>Couleur lien : <input type="color" id="linkColor" value="#000000" onchange="applySelectedLinkFormatting()"></label>
-      <label>Style :
-        <select id="linkStyle" onchange="applySelectedLinkFormatting()">
-          <option value="solid">Continu</option>
-          <option value="dashed">Pointillé</option>
-          <option value="zigzag">Dent de scie</option>
-        </select>
-      </label>
-    </div>
-    <div class="canvas-wrapper" id="canvas-wrapper">
-      <canvas id="networkCanvas"></canvas>
-    </div>
-  </div>
+    <script>
+    paper.setup('networkCanvas');
+    let nodes = [], connections = [], selectedNodes = [], selectedLink = null;
+    let addMode = false, eraserMode = false;
 
-  <script>
-    // Configuration initiale
-    const config = {
-      defaultTextSize: 18,
-      defaultLinkThickness: 3,
-      defaultTextColor: '#000000',
-      defaultLinkColor: '#000000'
-    };
-    // Initialisation Paper.js
-    if (typeof paper === 'undefined') {
-      console.error("Paper.js n'a pas pu être chargé.");
-      alert("Erreur de chargement. Veuillez recharger la page.");
-    } else {
-      paper.setup('networkCanvas');
-    }
-    let nodes = [],
-      connections = [],
-      selectedNodes = [];
-    let addMode = false,
-      eraserMode = false;
-    // Redimensionnement du canvas
     window.addEventListener('resize', resizeCanvas);
-
     function resizeCanvas() {
-      const canvas = document.getElementById('networkCanvas');
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
-      paper.view.viewSize = new paper.Size(canvas.width, canvas.height);
-      updateConnections();
+        const canvas = document.getElementById('networkCanvas');
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+        paper.view.viewSize = new paper.Size(canvas.width, canvas.height);
+        updateConnections();
     }
     resizeCanvas();
-    // Gestion des modes
+
     function toggleAddMode() {
-      addMode = !addMode;
-      eraserMode = false;
-      document.getElementById('eraserButton').classList.remove('active');
-      document.getElementById('canvas-wrapper').style.cursor = addMode ? 'crosshair' : 'default';
+        addMode = !addMode;
+        eraserMode = false;
+        document.getElementById('eraserButton').classList.remove('active');
+        document.getElementById('canvas-wrapper').style.cursor = addMode ? 'crosshair' : 'default';
     }
 
     function toggleEraserMode() {
-      eraserMode = !eraserMode;
-      addMode = false;
-      document.getElementById('eraserButton').classList.toggle('active', eraserMode);
-      document.getElementById('canvas-wrapper').style.cursor = eraserMode ? 'pointer' : 'default';
+        eraserMode = !eraserMode;
+        addMode = false;
+        document.getElementById('eraserButton').classList.toggle('active', eraserMode);
+        document.getElementById('canvas-wrapper').style.cursor = eraserMode ? 'cell' : 'default';
     }
-    // Événements sur le canvas
-    document.getElementById('canvas-wrapper').addEventListener('click', function(e) {
-      if (addMode && e.target.id === 'networkCanvas') {
-        const text = prompt("Entrez un mot :");
-        if (text) addNode(e.offsetX, e.offsetY, text);
-      } else if (eraserMode) {
-        // Vérifier si on clique sur un nœud
-        const clickedNode = nodes.find(node => {
-          const rect = node.getBoundingClientRect();
-          const canvasRect = document.getElementById('canvas-wrapper').getBoundingClientRect();
-          return (e.clientX >= rect.left && e.clientX <= rect.right &&
-            e.clientY >= rect.top && e.clientY <= rect.bottom);
-        });
-        if (clickedNode) {
-          deleteNode(clickedNode);
-          return;
-        }
-        // Vérifier si on clique sur un lien
-        const hitResult = paper.project.hitTest(new paper.Point(e.offsetX, e.offsetY), {
-          segments: true,
-          stroke: true,
-          fill: true,
-          tolerance: 5
-        });
-        if (hitResult && hitResult.item) {
-          const link = connections.find(c => c.path === hitResult.item);
-          if (link) deleteLink(link);
-        }
-      }
-    });
-    // Ajouter un nœud
-    function addNode(x, y, text) {
-      const node = document.createElement('div');
-      node.className = 'node';
-      node.style.left = `${x}px`;
-      node.style.top = `${y}px`;
-      node.textContent = text;
-      node.dataset.fontSize = config.defaultTextSize; // Stocker la taille initiale
-      node.dataset.color = config.defaultTextColor; // Stocker la couleur initiale
-      node.style.fontSize = `${node.dataset.fontSize}px`;
-      node.style.color = node.dataset.color;
-      node.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleSelection(node);
-      });
-      document.getElementById('canvas-wrapper').appendChild(node);
-      interact(node).draggable({
-        listeners: {
-          move: event => {
-            node.style.left = `${event.pageX - 25}px`;
-            node.style.top = `${event.pageY - 15}px`;
-            updateConnections(node);
-          }
-        }
-      });
-      nodes.push(node);
-    }
-    // Supprimer un nœud
-    function deleteNode(node) {
-      connections = connections.filter(c => {
-        if (c.fromNode === node || c.toNode === node) c.path.remove();
-        return c.fromNode !== node && c.toNode !== node;
-      });
-      node.remove();
-      nodes = nodes.filter(n => n !== node);
-      selectedNodes = selectedNodes.filter(n => n !== node);
-    }
-    // Supprimer un lien
-    function deleteLink(link) {
-      link.path.remove();
-      connections = connections.filter(c => c !== link);
-      paper.view.draw();
-    }
-    // Gestion de la sélection
-    function toggleSelection(node) {
-      if (node.classList.contains('selected')) {
-        node.classList.remove('selected');
-        selectedNodes = selectedNodes.filter(n => n !== node);
-      } else if (selectedNodes.length < 2) {
-        node.classList.add('selected');
-        selectedNodes.push(node);
-      }
-    }
-    // Relier les nœuds sélectionnés
-    function connectSelectedNodes() {
-      if (selectedNodes.length === 2) {
-        createLink(selectedNodes[0], selectedNodes[1]);
-        selectedNodes.forEach(n => n.classList.remove('selected'));
-        selectedNodes = [];
-      }
-    }
-    // Créer un lien
-    function createLink(fromNode, toNode) {
-      const thickness = document.getElementById('linkThickness').value;
-      const color = document.getElementById('linkColor').value;
-      const style = document.getElementById('linkStyle').value;
-      const path = new paper.Path({
-        strokeColor: color,
-        strokeWidth: thickness
-      });
-      if (style === 'dashed') path.dashArray = [10, 10];
-      else if (style === 'zigzag') path.dashArray = [5, 5, 0, 5];
-      path.add(getNodeCenter(fromNode));
-      path.add(getNodeCenter(toNode));
-      connections.push({
-        fromNode,
-        toNode,
-        path,
-        thickness,
-        color,
-        style
-      });
-      paper.view.draw();
-    }
-    // Calculer le centre d’un nœud
-    function getNodeCenter(node) {
-      const rect = node.getBoundingClientRect(),
-        canvasRect = document.getElementById('canvas-wrapper').getBoundingClientRect();
-      return new paper.Point(rect.left - canvasRect.left + rect.width / 2, rect.top - canvasRect.top + rect.height / 2);
-    }
-    // Mettre à jour les connexions
-    function updateConnections(movedNode = null) {
-      connections.forEach(c => {
-        if (!movedNode || c.fromNode === movedNode || c.toNode === movedNode) {
-          c.path.segments = [getNodeCenter(c.fromNode), getNodeCenter(c.toNode)];
-          c.path.smooth();
-        }
-      });
-      paper.view.draw();
-    }
-    // Réinitialiser le réseau
-    function resetNetwork() {
-      nodes.forEach(n => n.remove());
-      connections.forEach(c => c.path.remove());
-      nodes = [];
-      connections = [];
-      selectedNodes = [];
-      paper.view.draw();
-    }
-    // Appliquer le formatage du texte aux nœuds sélectionnés
-    function applyTextFormatting() {
-      const size = document.getElementById('textSize').value;
-      const color = document.getElementById('textColor').value;
-      selectedNodes.forEach(node => {
-        node.dataset.fontSize = size;
-        node.dataset.color = color;
-        node.style.fontSize = `${size}px`;
-        node.style.color = color;
-      });
-    }
-    // Appliquer le formatage des liens entre les nœuds sélectionnés
-    function applySelectedLinkFormatting() {
-      const thickness = document.getElementById('linkThickness').value;
-      const color = document.getElementById('linkColor').value;
-      const style = document.getElementById('linkStyle').value;
-      if (selectedNodes.length === 2) {
-        const selectedLink = connections.find(c =>
-          (c.fromNode === selectedNodes[0] && c.toNode === selectedNodes[1]) ||
-          (c.fromNode === selectedNodes[1] && c.toNode === selectedNodes[0])
-        );
-        if (selectedLink) {
-          selectedLink.path.strokeColor = color;
-          selectedLink.path.strokeWidth = thickness;
-          if (style === 'dashed') selectedLink.path.dashArray = [10, 10];
-          else if (style === 'zigzag') selectedLink.path.dashArray = [5, 5, 0, 5];
-          else selectedLink.path.dashArray = null;
-          selectedLink.thickness = thickness;
-          selectedLink.color = color;
-          selectedLink.style = style;
-          paper.view.draw();
-        }
-      }
-    }
-  </script>
-</body>
 
+    document.getElementById('canvas-wrapper').addEventListener('click', function (e) {
+        if (addMode && e.target.id === 'networkCanvas') {
+            addNode(e.offsetX, e.offsetY, prompt("Entrez un mot :"));
+        } else if (eraserMode) {
+            const targetNode = nodes.find(node => node.contains(e.target));
+            if (targetNode) return deleteNode(targetNode);
+
+            const hitResult = paper.project.hitTest(new paper.Point(e.offsetX, e.offsetY), {
+                segments: true, stroke: true, fill: true, tolerance: 5
+            });
+            if (hitResult && hitResult.item) {
+                const link = connections.find(c => c.path === hitResult.item);
+                if (link) deleteLink(link);
+            }
+        }
+    });
+
+    function addNode(x, y, text) {
+        if (!text) return;
+        const node = document.createElement('div');
+        node.className = 'node';
+        node.style.left = `${x}px`;
+        node.style.top = `${y}px`;
+        node.textContent = text;
+        node.addEventListener('click', () => toggleSelection(node));
+
+        document.getElementById('canvas-wrapper').appendChild(node);
+
+        interact(node).draggable({
+            listeners: {
+                move(event) {
+                    const target = event.target;
+                    // Calculer les nouvelles coordonnées en tenant compte de la position initiale
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                    // Mettre à jour la position du nœud
+                    target.style.left = `${x}px`;
+                    target.style.top = `${y}px`;
+
+                    // Mettre à jour les attributs de données pour la prochaine fois
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+
+                    updateConnections();
+                }
+            }
+        });
+
+        // Initialiser les attributs de données pour la position
+        node.setAttribute('data-x', x);
+        node.setAttribute('data-y', y);
+
+        nodes.push(node);
+    }
+
+    function deleteNode(node) {
+        connections = connections.filter(c => {
+            if (c.fromNode === node || c.toNode === node) c.path.remove();
+            return c.fromNode !== node && c.toNode !== node;
+        });
+        node.remove();
+        nodes = nodes.filter(n => n !== node);
+    }
+
+    function deleteLink(link) {
+        link.path.remove();
+        connections = connections.filter(c => c !== link);
+        paper.view.draw();
+    }
+
+    function toggleSelection(node) {
+        node.classList.toggle('selected');
+        if (node.classList.contains('selected')) selectedNodes.push(node);
+        else selectedNodes = selectedNodes.filter(n => n !== node);
+    }
+
+    function connectSelectedNodes() {
+        if (selectedNodes.length === 2) {
+            createLink(selectedNodes[0], selectedNodes[1]);
+            selectedNodes.forEach(n => n.classList.remove('selected'));
+            selectedNodes = [];
+        }
+    }
+
+    function createLink(fromNode, toNode) {
+        const thickness = document.getElementById('linkThickness').value;
+        const color = document.getElementById('linkColor').value;
+        const style = document.getElementById('linkStyle').value;
+
+        const path = new paper.Path({ strokeColor: color, strokeWidth: thickness });
+        if (style === 'dashed') path.dashArray = [10, 10];
+        else if (style === 'zigzag') path.dashArray = [5, 5, 0, 5];
+
+        path.add(getNodeCenter(fromNode));
+        path.add(getNodeCenter(toNode));
+        connections.push({ fromNode, toNode, path, thickness, color, style });
+        paper.view.draw();
+    }
+
+    function getNodeCenter(node) {
+        const rect = node.getBoundingClientRect(), canvasRect = document.getElementById('canvas-wrapper').getBoundingClientRect();
+        return new paper.Point(rect.left - canvasRect.left + rect.width / 2, rect.top - canvasRect.top + rect.height / 2);
+    }
+
+    function updateConnections() {
+        connections.forEach(c => {
+            c.path.segments = [getNodeCenter(c.fromNode), getNodeCenter(c.toNode)];
+            c.path.smooth();
+        });
+        paper.view.draw();
+    }
+
+    function resetNetwork() {
+        nodes.forEach(n => n.remove());
+        connections.forEach(c => c.path.remove());
+        nodes = [];
+        connections = [];
+        selectedNodes = [];
+        selectedLink = null;
+        paper.view.draw();
+    }
+
+    function applyTextFormatting() {
+        const size = document.getElementById('textSize').value;
+        const color = document.getElementById('textColor').value;
+        nodes.forEach(node => {
+            node.style.fontSize = `${size}px`;
+            node.style.color = color;
+        });
+    }
+
+    function applySelectedLinkFormatting() {
+        const thickness = document.getElementById('linkThickness').value;
+        const color = document.getElementById('linkColor').value;
+        const style = document.getElementById('linkStyle').value;
+        connections.forEach(c => {
+            c.path.strokeColor = color;
+            c.path.strokeWidth = thickness;
+            if (style === 'dashed') c.path.dashArray = [10, 10];
+            else if (style === 'zigzag') c.path.dashArray = [5, 5, 0, 5];
+            else c.path.dashArray = null;
+        });
+        paper.view.draw();
+    }
+    </script>
+</body>
 </html>
 
