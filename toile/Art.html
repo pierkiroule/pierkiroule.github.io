@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Autohypnose Interactive - I.A. & Doigts</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>
+  <style>
+    body, html { margin: 0; padding: 0; overflow: hidden; background: black; }
+    #status { position: absolute; color: white; top: 10px; left: 10px; font-family: sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="status">Chargement... Bougez vos doigts devant la caméra.</div>
+  <script>
+    let video, handpose, predictions = [];
+    let angle = 0, freq = 200, osc;
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      video = createCapture(VIDEO);
+      video.size(width, height);
+      video.hide();
+
+      handpose = ml5.handpose(video, modelReady);
+      handpose.on("predict", results => predictions = results);
+
+      osc = new p5.Oscillator('sine');
+      osc.start();
+      osc.amp(0.1);
+    }
+
+    function modelReady() {
+      select('#status').html('Autohypnose activée : bougez vos doigts lentement...');
+    }
+
+    function draw() {
+      background(0, 20);
+      translate(width / 2, height / 2);
+
+      if (predictions.length > 0) {
+        const hand = predictions[0].landmarks;
+        let centerX = 0, centerY = 0;
+
+        hand.forEach(pt => {
+          centerX += pt[0];
+          centerY += pt[1];
+        });
+        centerX /= hand.length;
+        centerY /= hand.length;
+
+        const speed = dist(centerX, centerY, width / 2, height / 2) / 500;
+        angle += speed * 0.05;
+        freq = map(speed, 0, 2, 100, 800);
+        osc.freq(freq);
+
+        strokeWeight(2);
+        noFill();
+        stroke(150 + sin(angle * 2) * 105, 100, 255, 150);
+
+        // Spirale hypnotique générée par la position des doigts
+        beginShape();
+        for (let t = 0; t < TWO_PI * 5; t += 0.1) {
+          let r = 50 + 30 * sin(angle + t * speed * 2);
+          let x = r * cos(t + angle);
+          let y = r * sin(t + angle);
+          vertex(x, y);
+        }
+        endShape();
+
+        // Points lumineux sur les doigts
+        hand.forEach(pt => {
+          fill(255, 150);
+          noStroke();
+          ellipse(pt[0] - width / 2, pt[1] - height / 2, 15 + speed * 10);
+        });
+
+        // Pulsation centrale
+        noFill();
+        stroke(255, 100);
+        ellipse(0, 0, 100 + sin(angle * 3) * 50);
+      } else {
+        // Animation en attente
+        angle += 0.005;
+        stroke(100, 100, 255, 80);
+        noFill();
+        ellipse(0, 0, 150 + sin(angle * 4) * 30);
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+</body>
+</html>
