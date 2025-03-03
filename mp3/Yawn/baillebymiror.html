@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baille By Mirror</title>
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background-color: #000;
+      font-family: 'Arial', sans-serif;
+      color: white;
+    }
+
+    canvas {
+      position: absolute;
+    }
+
+    #title {
+      position: absolute;
+      top: 2%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      font-family: "Arial", sans-serif;
+      font-weight: bold;
+      color: white;
+      text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.6);
+      letter-spacing: 2px;
+      opacity: 0.9;
+      z-index: 10;
+    }
+
+    #startButton {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 15px 30px;
+      font-size: 20px;
+      cursor: pointer;
+      border: none;
+      background: white;
+      color: black;
+      border-radius: 10px;
+      z-index: 10;
+    }
+
+    #messageBox {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #000;
+      font-size: 26px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 10px;
+      max-width: 90%;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      z-index: 10;
+    }
+
+    #emoji {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      opacity: 0.4;
+      /* Réduit l'opacité pour un effet plus doux */
+      display: none;
+      z-index: 10;
+    }
+
+   @keyframes swing {
+    0% { transform: translateX(-25px) rotate(-8deg); }
+    50% { transform: translateX(25px) rotate(8deg); }
+    100% { transform: translateX(-25px) rotate(-8deg); }
+}
+
+#emoji {
+    position: absolute;
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: center;
+    font-size: 80px;
+    opacity: 0.7;
+    display: block;
+    animation: swing 4s infinite cubic-bezier(0.4, 0, 0.6, 1); /* Transition plus douce */
+    z-index: 10;
+}
+    #emoji {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 30px;
+      opacity: 0.7;
+      display: none;
+      z-index: 10;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .filter-overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 200, 200, 0.2), rgba(200, 200, 255, 0.3), rgba(255, 255, 150, 0.2));
+      mix-blend-mode: lighten;
+      z-index: 1;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body>
+  <h3 id="title">Bâille By Mirror</h3>
+
+  <button id="startButton">Démarrer</button>
+  <div class="filter-overlay"></div>
+  <div id="messageBox"></div>
+  <div id="emoji">😴</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+
+  <script>
+    let faceMesh, video, faces = [];
+    let isYawning = false;
+    let particles = [];
+    let lastMessageTime = 0; // Permet d'attendre 10s avant d'afficher un autre message
+    let yawningSounds = [
+      "https://pierkiroule.github.io/mp3/Yawn/Y1.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y2.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y3.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y4.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y5.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y6.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y7.mp3",
+      "https://pierkiroule.github.io/mp3/Yawn/Y8.mp3"
+    ];
+    let audio = new Audio();
+    let messages = [
+      "Un bâillement est une porte qui s’ouvre sur l’infini du corps.",
+      "Bâiller, c’est tisser un souffle entre l’espace et le rêve.",
+      "Chaque bâillement déplie les ailes invisibles du silence.",
+      "Quand tu bâilles, ton esprit s’étire jusqu’aux confins des étoiles.",
+      "Un bâillement, et le temps s’arrête pour écouter l’univers respirer.",
+      "Bâiller, c’est embrasser l’air comme un vieux compagnon de voyage.",
+      "Le bâillement est une vague lente qui berce l’âme fatiguée.",
+      "Chaque bâillement est un soupir d’éternité qui glisse sur les lèvres du monde.",
+      "Quand tu bâilles, ton cœur danse un instant avec l’invisible.",
+      "Le bâillement murmure aux étoiles que le sommeil n’est qu’un songe éveillé.",
+      "Bâiller, c’est ouvrir une brèche entre la fatigue et le rêve.",
+      "Dans chaque bâillement, une tempête d’oxygène caresse les songes endormis.",
+      "Le bâillement est une vague hypnotique où flottent les pensées inachevées.",
+      "Bâiller, c’est libérer une bulle de temps hors du tumulte du monde.",
+      "À chaque bâillement, le vent souffle plus fort dans les couloirs du sommeil."
+    ];
+    let backgroundMusic;
+
+    function preload() {
+      faceMesh = ml5.faceMesh({
+        maxFaces: 1,
+        refineLandmarks: false,
+        flipHorizontal: false
+      });
+      backgroundMusic = new Audio("https://pierkiroule.github.io/mp3/Yawn/Background.mp3"); // Remplace par le lien de ta musique
+      backgroundMusic.loop = true; // La musique tourne en boucle
+      backgroundMusic.volume = 0.3; // Volume réduit pour ne pas gêner
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      video = createCapture(VIDEO);
+      video.size(640, 480);
+      video.hide();
+      faceMesh.detectStart(video, gotFaces);
+      fullscreen(true);
+      document.getElementById("startButton").addEventListener("click", startExperience);
+    }
+
+    function startExperience() {
+      document.getElementById("startButton").style.display = "none";
+      document.getElementById("messageBox").style.display = "block";
+      backgroundMusic.play().catch(e => console.error("Erreur lors de la lecture de la musique de fond :", e));
+    }
+
+    function draw() {
+      background(0);
+      image(video, 0, 0, width, height);
+      if (faces.length > 0) {
+        detectYawning(faces[0]);
+        updateParticles();
+      }
+    }
+
+    function detectYawning(face) {
+      let mouthHeight = face.keypoints[14].y - face.keypoints[13].y;
+      if (mouthHeight > 20 && !isYawning) {
+        isYawning = true;
+        playRandomYawnSound();
+        showRandomMessage();
+        showEmoji();
+        spawnParticles();
+      } else if (mouthHeight <= 20) {
+        isYawning = false;
+      }
+    }
+
+    function gotFaces(results) {
+      faces = results;
+    }
+
+    function playRandomYawnSound() {
+      let randomIndex = floor(random(yawningSounds.length));
+      audio.src = yawningSounds[randomIndex];
+      audio.play().catch(e => console.error("❌ Erreur lecture audio :", e));
+    }
+
+    function showRandomMessage() {
+      let currentTime = millis();
+      if (currentTime - lastMessageTime < 10000) return; // Attendre 10s avant un nouveau message
+      lastMessageTime = currentTime; // Mise à jour du temps du dernier message
+      let randomIndex = floor(random(messages.length));
+      let messageBox = document.getElementById("messageBox");
+      messageBox.innerText = messages[randomIndex];
+      messageBox.style.opacity = 1;
+      setTimeout(() => {
+        messageBox.style.opacity = 0;
+      }, 10000);
+    }
+
+    function showEmoji() {
+      let emoji = document.getElementById("emoji");
+      emoji.style.display = "block";
+      emoji.style.opacity = 0.7;
+      emoji.style.animation = "swing 1.5s infinite ease-in-out"; // Active l’oscillation
+      setTimeout(() => {
+        emoji.style.opacity = 0;
+        emoji.style.animation = ""; // Supprime l'animation après disparition
+      }, 20000);
+    }
+
+    function spawnParticles() {
+      for (let i = 0; i < 15; i++) { // 🔥 Bulles sur tout l'écran
+        particles.push({
+          x: random(width),
+          y: random(height, height + 80),
+          size: random(5, 30),
+          speedY: random(1, 4),
+          life: 800
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.y -= p.speedY;
+        p.life -= 2;
+        fill(255, 255, 255, p.life);
+        ellipse(p.x, p.y, p.size);
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+</body>
+
+</html>
+
