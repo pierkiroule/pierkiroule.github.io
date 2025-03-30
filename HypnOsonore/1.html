@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <title>Balade HypnOsonore •°○</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
   <style>
     html, body { margin: 0; padding: 0; font-family: sans-serif; }
     #banner { width: 100%; height: auto; display: block; }
-    #map { width: 100vw; height: 100vw; margin: 0; border: 1px solid #ccc; touch-action: none; }
-    #startBtn { padding: 10px 20px; font-size: 1em; margin: 1em; }
+    #map { width: 100vw; height: 70vh; margin: 0; border: 1px solid #ccc; }
+    #startBtn, #resetBtn { padding: 10px 20px; font-size: 1em; margin: 1em; }
     .hypno-marker { font-size: 24px; color: red; font-weight: bold; cursor: pointer; }
     .user-marker { font-size: 20px; color: blue; font-weight: bold; }
     #info { padding: 0 1em; }
@@ -19,16 +20,17 @@
   </style>
 </head>
 <body>
-<img id="banner" src="Img1.jpg" alt="Bannière HypnOsonore" style="width:100%;">
+  <img id="banner" src="Img1.jpg" alt="Bannière HypnOsonore" style="width:100%;">
   <h1 style="padding:1em;">Balade HypnOsonore •°○</h1>
   <p id="instructions">Placez les 3 bulles sonores sur la carte. Ajustez leur taille. Zoomez pour précision.</p>
   <div id="info">Cliquez sur la carte pour positionner les 3 bulles.</div>
   <button id="startBtn" disabled>Activer l’audio</button>
+  <button id="resetBtn">Réinitialiser</button>
   <div id="sliders-container"></div>
   <div id="map"></div>
 
   <script>
-    const map = L.map('map', { maxZoom: 25 }).setView([47.1497961, -1.5245526], 20);
+    const map = L.map('map', { maxZoom: 25, dragging: true, tap: false }).setView([47.1497961, -1.5245526], 20);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 25
@@ -40,21 +42,36 @@
     const urls = [
       "https://pierkiroule.github.io/mp3/muzik1.mp3",
       "https://pierkiroule.github.io/mp3/muzik2.mp3",
-      "https://pierkiroule.github.io/mp3/muzik3.mp3"
+      "https://pierkiroule.github.io/mp3/muzic3.mp3"
     ];
 
     let soundPoints = [];
     let audioReady = false;
     let userMarker = null;
+    let firstGPS = true;
+
+    const preloadedHowls = urls.map(url => new Howl({ src: [url], preload: true }));
 
     document.getElementById("startBtn").addEventListener("click", () => {
-      const test = new Howl({ src: [urls[0]], volume: 0 });
-      test.play();
-      setTimeout(() => test.stop(), 300);
+      preloadedHowls.forEach(howl => howl.play());
+      setTimeout(() => preloadedHowls.forEach(h => h.stop()), 300);
       Howler.ctx.resume();
       audioReady = true;
       document.getElementById("startBtn").style.display = "none";
       document.getElementById("info").innerText = "Marchez pour explorer les bulles sonores.";
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      soundPoints.forEach(p => {
+        if (p.marker) map.removeLayer(p.marker);
+        if (p.circle) map.removeLayer(p.circle);
+        if (p.howl) p.howl.unload();
+      });
+      soundPoints = [];
+      document.getElementById("sliders-container").innerHTML = "";
+      document.getElementById("startBtn").disabled = true;
+      document.getElementById("startBtn").style.display = "inline";
+      document.getElementById("info").innerText = "Cliquez sur la carte pour positionner les 3 bulles.";
     });
 
     map.on('click', function(e) {
@@ -62,8 +79,8 @@
       const lat = e.latlng.lat;
       const lon = e.latlng.lng;
       const radius = 50;
-      const url = urls[soundPoints.length];
-      const howl = new Howl({ src: [url], loop: true, volume: 0 });
+      const index = soundPoints.length;
+      const howl = new Howl({ src: [urls[index]], loop: true, volume: 0 });
 
       const point = { lat, lon, radius, howl, marker: null, circle: null, playing: false };
       const circle = L.circle([lat, lon], {
@@ -76,16 +93,18 @@
       const sliderContainer = document.createElement('div');
       sliderContainer.className = 'slider-container';
       sliderContainer.innerHTML = `
-        <label>Taille de la bulle ${soundPoints.length + 1} (dm) :</label>
+        <label>Taille de la bulle ${index + 1} (dm) : <span id="val${index}">50</span> m</label>
         <input type="range" min="1" max="1000" value="500" step="0.1">
       `;
       document.getElementById('sliders-container').appendChild(sliderContainer);
 
       const slider = sliderContainer.querySelector('input');
+      const span = sliderContainer.querySelector('span');
       slider.addEventListener('input', (event) => {
         const newRadius = event.target.value / 10;
         circle.setRadius(newRadius);
         point.radius = newRadius;
+        span.innerText = newRadius.toFixed(1);
       });
 
       point.marker = marker;
@@ -102,6 +121,11 @@
       navigator.geolocation.watchPosition(pos => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
+
+        if (firstGPS) {
+          map.setView([lat, lon], 20);
+          firstGPS = false;
+        }
 
         if (userMarker) map.removeLayer(userMarker);
         userMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
