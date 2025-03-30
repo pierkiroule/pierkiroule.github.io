@@ -9,8 +9,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
   <style>
     html, body { margin: 0; padding: 0; font-family: sans-serif; }
-    #spectro { width: 100%; height: 100px; background: black; }
-    #map { height: 400px; margin: 0; border: 1px solid #ccc; touch-action: none; }
+    #banner { width: 100%; height: auto; display: block; }
+    #map { width: 100vw; height: 100vw; margin: 0; border: 1px solid #ccc; touch-action: none; }
     #startBtn { padding: 10px 20px; font-size: 1em; margin: 1em; }
     .hypno-marker { font-size: 24px; color: red; font-weight: bold; cursor: pointer; }
     .user-marker { font-size: 20px; color: blue; font-weight: bold; }
@@ -19,24 +19,19 @@
   </style>
 </head>
 <body>
-  <h1 style="padding:1em;">Balade Hypnosonore •°○</h1>
-  <p id="instructions">Placez les 3 bulles sonores sur la carte. Utilisez les sliders pour ajuster leur taille avec précision. Zoomez pour une précision au mètre près.</p>
-  <canvas id="spectro"></canvas>
+  <img id="banner" src="https://via.placeholder.com/800x200?text=Balade+HypnOsonore" alt="bannière">
+  <h1 style="padding:1em;">Balade HypnOsonore •°○</h1>
+  <p id="instructions">Placez les 3 bulles sonores sur la carte. Ajustez leur taille. Zoomez pour précision.</p>
   <div id="info">Cliquez sur la carte pour positionner les 3 bulles.</div>
   <button id="startBtn" disabled>Activer l’audio</button>
-  <div id="sliders-container">
-    <!-- Sliders will be dynamically added here -->
-  </div>
+  <div id="sliders-container"></div>
   <div id="map"></div>
 
   <script>
-    const map = L.map('map', {
-      maxZoom: 22 // Set a higher max zoom level
-    }).setView([47.1497961, -1.5245526], 20);
-
+    const map = L.map('map', { maxZoom: 25 }).setView([47.1497961, -1.5245526], 20);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 22 // Ensure the tile layer supports the higher zoom level
+      maxZoom: 25
     }).addTo(map);
 
     const hypnoIcon = L.divIcon({ className: 'hypno-marker', html: '•°', iconSize: [24, 24], iconAnchor: [12, 12] });
@@ -45,49 +40,25 @@
     const urls = [
       "https://pierkiroule.github.io/mp3/muzik1.mp3",
       "https://pierkiroule.github.io/mp3/muzik2.mp3",
-      "https://pierkiroule.github.io/mp3/muzic3.mp3" // Corrected URL
+      "https://pierkiroule.github.io/mp3/muzik3.mp3"
     ];
 
     let soundPoints = [];
     let audioReady = false;
     let userMarker = null;
 
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioCtx = new AudioContext();
-    const analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-    const canvas = document.getElementById("spectro");
-    const ctx = canvas.getContext("2d");
-
-    function drawSpectrogram() {
-      requestAnimationFrame(drawSpectrogram);
-      analyser.getByteFrequencyData(dataArray);
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      const barWidth = canvas.width / dataArray.length;
-      for (let i = 0; i < dataArray.length; i++) {
-        const barHeight = dataArray[i];
-        ctx.fillStyle = "lime";
-        ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth, barHeight);
-      }
-    }
-
     document.getElementById("startBtn").addEventListener("click", () => {
       const test = new Howl({ src: [urls[0]], volume: 0 });
       test.play();
       setTimeout(() => test.stop(), 300);
-      audioCtx.resume();
+      Howler.ctx.resume();
       audioReady = true;
       document.getElementById("startBtn").style.display = "none";
       document.getElementById("info").innerText = "Marchez pour explorer les bulles sonores.";
-      drawSpectrogram();
     });
 
     map.on('click', function(e) {
       if (soundPoints.length >= 3) return;
-
       const lat = e.latlng.lat;
       const lon = e.latlng.lng;
       const radius = 50;
@@ -106,19 +77,15 @@
       sliderContainer.className = 'slider-container';
       sliderContainer.innerHTML = `
         <label>Taille de la bulle ${soundPoints.length + 1} (dm) :</label>
-        <input type="range" id="radiusSlider-${soundPoints.length}" min="1" max="1000" value="500" step="0.1">
+        <input type="range" min="1" max="1000" value="500" step="0.1">
       `;
       document.getElementById('sliders-container').appendChild(sliderContainer);
 
       const slider = sliderContainer.querySelector('input');
       slider.addEventListener('input', (event) => {
-        const newRadius = event.target.value / 10; // Convert decimeters to meters
+        const newRadius = event.target.value / 10;
         circle.setRadius(newRadius);
         point.radius = newRadius;
-      });
-
-      marker.on('click', () => {
-        map.setView([lat, lon], 22); // Zoom in precisely
       });
 
       point.marker = marker;
@@ -132,16 +99,11 @@
     });
 
     if (navigator.geolocation) {
-      const watchID = navigator.geolocation.watchPosition(pos => {
+      navigator.geolocation.watchPosition(pos => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
 
-        // Supprimer l'ancien marqueur s'il existe
-        if (userMarker) {
-          map.removeLayer(userMarker);
-        }
-
-        // Ajouter un nouveau marqueur pour la position actuelle
+        if (userMarker) map.removeLayer(userMarker);
         userMarker = L.marker([lat, lon], { icon: userIcon }).addTo(map);
 
         if (!audioReady) return;
@@ -163,12 +125,7 @@
             }
           }
         });
-      }, err => {
-        alert("Erreur GPS : " + err.message);
-      }, { enableHighAccuracy: true });
-
-      // Assurez-vous de nettoyer watchPosition si nécessaire
-      // navigator.geolocation.clearWatch(watchID);
+      }, err => alert("Erreur GPS : " + err.message), { enableHighAccuracy: true });
     }
 
     function getDistance(lat1, lon1, lat2, lon2) {
@@ -176,8 +133,8 @@
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dLat/2)**2 +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon/2)**2;
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2)**2;
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     }
