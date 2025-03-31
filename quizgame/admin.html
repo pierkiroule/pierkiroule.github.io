@@ -54,6 +54,25 @@
 
     let questions = [];
     let questionMarkers = [];
+    let userMarker = null;
+
+    // Suivi de la position de l'administrateur en temps réel
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        if (userMarker) {
+          userMarker.setLatLng([lat, lng]);
+        } else {
+          userMarker = L.marker([lat, lng], { title: "Votre position" }).addTo(map);
+          map.setView([lat, lng], 15);
+        }
+      }, error => {
+        console.error("Erreur de géolocalisation : ", error);
+      });
+    } else {
+      alert("La géolocalisation n'est pas supportée par ce navigateur.");
+    }
 
     // Génération des bulles sur la carte
     document.getElementById("generateBtn").addEventListener("click", () => {
@@ -75,7 +94,7 @@
             color: 'orange',
             fillOpacity: 0.3,
             className: 'question-marker'
-          }).addTo(map).bindPopup(`Q`${{index + 1}:}$`{questionText}`);
+          }).addTo(map).bindPopup(`Q${index + 1}: ${questionText}`);
 
           questions.push({ lat: coords.lat, lng: coords.lng, radius, question: questionText });
           questionMarkers.push(marker);
