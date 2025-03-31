@@ -1,1 +1,26 @@
-
+[
+  {
+    "question": "Quel est le plus grand océan ?",
+    "choices": ["Atlantique", "Indien", "Pacifique"],
+    "answer": 2,
+    "lat": 47.14979,
+    "lon": -1.52455,
+    "audio": "https://pierkiroule.github.io/mp3/muzik1.mp3"
+  },
+  {
+    "question": "Combien de planètes dans le système solaire ?",
+    "choices": ["7", "8", "9"],
+    "answer": 1,
+    "lat": 47.14981,
+    "lon": -1.52448,
+    "audio": "https://pierkiroule.github.io/mp3/muzik2.mp3"
+  },
+  {
+    "question": "Quelle est la capitale du Japon ?",
+    "choices": ["Tokyo", "Osaka", "Kyoto"],
+    "answer": 0,
+    "lat": 47.14977,
+    "lon": -1.52463,
+    "audio": "https://pierkiroule.github.io/mp3/muzik3.mp3"
+  }
+]
