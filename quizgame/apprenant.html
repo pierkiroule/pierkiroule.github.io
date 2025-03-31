@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Chasse au Trésor GPS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 80vh; width: 100%; }
+    #message { padding: 1em; font-size: 1.2em; background: #ffe; }
+  </style>
+</head>
+<body class="container-fluid">
+  <header class="bg-primary text-white p-3 mb-3">
+    <h1 class="h3">Chasse au Trésor GPS</h1>
+    <p class="mb-0">Trouve les énigmes cachées sur la carte !</p>
+  </header>
+
+  <div id="map"></div>
+  <div id="message">Approchez-vous d’une zone pour voir la question...</div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Charger les données du quiz
+    fetch('/quizgame/quiz_data.json')
+      .then(response => response.json())
+      .then(data => {
+        const questions = data.questions;
+
+        // Initialisation de la carte
+        const map = L.map('map').setView([47.2173, -1.5534], 17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 22,
+          attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let userMarker = null;
+
+        // Suivi de la position de l'apprenant
+        if (navigator.geolocation) {
+          navigator.geolocation.watchPosition(pos => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            if (userMarker) {
+              userMarker.setLatLng([lat, lng]);
+            } else {
+              userMarker = L.marker([lat, lng]).addTo(map);
+              map.setView([lat, lng], 17);
+            }
+
+            // Calcul de la distance par rapport aux questions
+            let closestDistance = Infinity;
+            let closestQuestion = null;
+
+            questions.forEach(q => {
+              const distance = getDistanceFromLatLonInM(lat, lng, q.lat, q.lng);
+              if (distance < closestDistance) {
+                closestDistance = distance;
+                closestQuestion = q;
+              }
+            });
+
+            // Mise à jour du message en fonction de la distance
+            if (closestDistance < closestQuestion.radius) {
+              document.getElementById('message').innerText = closestQuestion.question;
+            } else if (closestDistance < closestQuestion.radius * 2) {
+              document.getElementById('message').innerText = "Tu brûles !";
+            } else {
+              document.getElementById('message').innerText = "Tu refroidis...";
+            }
+          });
+        }
+
+        // Fonction pour calculer la distance entre deux points GPS
+        function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
+          const R = 6371000; // Rayon de la Terre en mètres
+          const dLat = deg2rad(lat2 - lat1);
+          const dLon = deg2rad(lon2 - lon1);
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
+        }
+
+        function deg2rad(deg) {
+          return deg * (Math.PI / 180);
+        }
+      }).catch(error => {
+        console.error('Erreur lors du chargement des données du quiz:', error);
+      });
+  </script>
+</body>
+</html>
+
