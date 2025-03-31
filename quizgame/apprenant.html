@@ -21,7 +21,7 @@
   </header>
 
   <div id="map"></div>
-  <div id="message">Approchez-vous d’une zone pour voir la question...</div>
+  <div id="message">Cliquez sur les bulles pour voir les questions...</div>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
@@ -44,6 +44,15 @@
 
         let userMarker = null;
 
+        // Ajout des questions sur la carte
+        questions.forEach(q => {
+          L.circle([q.lat, q.lng], {
+            radius: q.radius,
+            color: 'orange',
+            fillOpacity: 0.3
+          }).addTo(map).bindPopup(q.question).openPopup();
+        });
+
         // Suivi de la position de l'apprenant en temps réel
         if (navigator.geolocation) {
           navigator.geolocation.watchPosition(pos => {
@@ -52,52 +61,14 @@
             if (userMarker) {
               userMarker.setLatLng([lat, lng]);
             } else {
-              userMarker = L.marker([lat, lng]).addTo(map);
+              userMarker = L.marker([lat, lng], { title: "Votre position" }).addTo(map);
               map.setView([lat, lng], 17);
-            }
-
-            // Calcul de la distance par rapport aux questions
-            let closestDistance = Infinity;
-            let closestQuestion = null;
-
-            questions.forEach(q => {
-              const distance = getDistanceFromLatLonInM(lat, lng, q.lat, q.lng);
-              if (distance < closestDistance) {
-                closestDistance = distance;
-                closestQuestion = q;
-              }
-            });
-
-            // Mise à jour du message en fonction de la distance
-            if (closestDistance < closestQuestion.radius) {
-              document.getElementById('message').innerText = closestQuestion.question;
-            } else if (closestDistance < closestQuestion.radius * 2) {
-              document.getElementById('message').innerText = "Tu brûles !";
-            } else {
-              document.getElementById('message').innerText = "Tu refroidis...";
             }
           }, error => {
             console.error("Erreur de géolocalisation : ", error);
           });
         } else {
           alert("La géolocalisation n'est pas supportée par ce navigateur.");
-        }
-
-        // Fonction pour calculer la distance entre deux points GPS
-        function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
-          const R = 6371000; // Rayon de la Terre en mètres
-          const dLat = deg2rad(lat2 - lat1);
-          const dLon = deg2rad(lon2 - lon1);
-          const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          return R * c;
-        }
-
-        function deg2rad(deg) {
-          return deg * (Math.PI / 180);
         }
       }).catch(error => {
         console.error('Erreur lors du chargement des données du quiz:', error);
