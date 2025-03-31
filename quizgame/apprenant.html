@@ -44,7 +44,7 @@
 
         let userMarker = null;
 
-        // Suivi de la position de l'apprenant
+        // Suivi de la position de l'apprenant en temps réel
         if (navigator.geolocation) {
           navigator.geolocation.watchPosition(pos => {
             const lat = pos.coords.latitude;
@@ -76,7 +76,11 @@
             } else {
               document.getElementById('message').innerText = "Tu refroidis...";
             }
+          }, error => {
+            console.error("Erreur de géolocalisation : ", error);
           });
+        } else {
+          alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
 
         // Fonction pour calculer la distance entre deux points GPS
@@ -101,4 +105,3 @@
   </script>
 </body>
 </html>
-
