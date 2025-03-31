@@ -11,7 +11,7 @@
   <style>
     body { margin: 0; font-family: sans-serif; }
     #map { height: 60vh; width: 100%; }
-    #quizData { height: 150px; font-size: 0.9em; }
+    #questionsInput { height: 150px; font-size: 0.9em; }
     .question-marker { cursor: pointer; }
   </style>
 </head>
@@ -30,7 +30,10 @@
       <input type="text" class="form-control mb-2" id="quizTitle" placeholder="Mon parcours">
       <label class="form-label">Rayon d'activation (m)</label>
       <input type="number" class="form-control mb-3" id="radius" value="30" min="5" max="100">
-      <button id="exportBtn" class="btn btn-primary w-100 mb-2">Enregistrer le quiz</button>
+      <label class="form-label">Liste des questions (format : q1:"Question 1" ; q2:"Question 2" ...)</label>
+      <textarea class="form-control mb-3" id="questionsInput" placeholder='q1:"Question 1" ; q2:"Question 2" ...'></textarea>
+      <button id="generateBtn" class="btn btn-primary w-100 mb-2">Générer les bulles</button>
+      <button id="exportBtn" class="btn btn-success w-100 mb-2">Enregistrer le quiz</button>
       <label class="form-label">JSON exporté</label>
       <textarea id="quizData" class="form-control" readonly></textarea>
     </div>
@@ -51,53 +54,31 @@
 
     let questions = [];
     let questionMarkers = [];
-    let userMarker = null;
 
-    // Suivi de la position du formateur en temps réel
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(pos => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        if (userMarker) {
-          userMarker.setLatLng([lat, lng]);
-        } else {
-          userMarker = L.marker([lat, lng], { draggable: true }).addTo(map);
-          map.setView([lat, lng], 17);
-        }
-      }, error => {
-        console.error("Erreur de géolocalisation : ", error);
-      });
-    } else {
-      alert("La géolocalisation n'est pas supportée par ce navigateur.");
-    }
+    // Génération des bulles sur la carte
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      // Effacer les anciennes bulles
+      questionMarkers.forEach(marker => map.removeLayer(marker));
+      questionMarkers = [];
+      questions = [];
 
-    // Ajout d'une question par clic sur la carte
-    map.on('click', function(e) {
       const radius = parseInt(document.getElementById("radius").value);
-      const questionText = prompt("Entrez votre question :");
-      if (!questionText) return;
+      const questionsInput = document.getElementById("questionsInput").value;
+      const questionsArray = questionsInput.split(';').map(q => q.trim());
 
-      const marker = L.circle([e.latlng.lat, e.latlng.lng], {
-        radius: radius,
-        color: "orange",
-        fillOpacity: 0.3,
-        className: 'question-marker'
-      }).addTo(map).bindPopup(questionText);
+      questionsArray.forEach((q, index) => {
+        const [key, questionText] = q.split(':');
+        if (key && questionText) {
+          const coords = getRandomCoords();
+          const marker = L.circle([coords.lat, coords.lng], {
+            radius: radius,
+            color: 'orange',
+            fillOpacity: 0.3,
+            className: 'question-marker'
+          }).addTo(map).bindPopup(`Q`${{index + 1}:}$`{questionText}`);
 
-      questions.push({ lat: e.latlng.lat, lng: e.latlng.lng, radius, question: questionText });
-      questionMarkers.push(marker);
-
-      // Modification ou suppression de question
-      marker.on('click', () => {
-        const newQuestion = prompt("Modifier la question :", questionText);
-        if (newQuestion) {
-          marker.bindPopup(newQuestion);
-          questions.find(q => q.lat === e.latlng.lat && q.lng === e.latlng.lng).question = newQuestion;
-        } else if (confirm("Voulez-vous supprimer cette question ?")) {
-          const index = questions.findIndex(q => q.lat === e.latlng.lat && q.lng === e.latlng.lng);
-          questions.splice(index, 1);
-          map.removeLayer(marker);
-          questionMarkers.splice(index, 1);
+          questions.push({ lat: coords.lat, lng: coords.lng, radius, question: questionText });
+          questionMarkers.push(marker);
         }
       });
     });
@@ -112,6 +93,15 @@
       // Note: Cette partie doit être gérée manuellement ou via un backend
       console.log("Données du quiz à sauvegarder :", data);
     });
+
+    // Fonction pour générer des coordonnées aléatoires autour d'un point central
+    function getRandomCoords() {
+      const centerLat = 47.2173;
+      const centerLng = -1.5534;
+      const lat = centerLat + (Math.random() - 0.5) * 0.02; // Variation de 0.02 degrés
+      const lng = centerLng + (Math.random() - 0.5) * 0.02; // Variation de 0.02 degrés
+      return { lat, lng };
+    }
   </script>
 </body>
 </html>
