@@ -78,7 +78,7 @@
           // Ajout des questions sur la carte
           questions.forEach(q => {
             const bubble = L.circle([q.lat, q.lng], {
-              radius: 50, // Rayon de la bulle
+              radius: 20, // Rayon de la bulle
               color: 'orange',
               fillOpacity: 0.3,
               interactive: false // Désactive l'interaction directe avec la bulle
@@ -108,7 +108,7 @@
             bubbles.forEach(b => {
               const bubbleLatLng = b.bubble.getLatLng();
               const distance = map.distance(L.latLng(lat, lng), bubbleLatLng);
-              if (distance <= 50) { // 50 mètres de rayon
+              if (distance <= 10) { // 10 mètres de rayon
                 messageBox.textContent = b.question;
                 inBubble = true;
               }
