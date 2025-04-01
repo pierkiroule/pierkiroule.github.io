@@ -2,10 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>QuizGPS Admin</title>
+  <title>QuizGPS Admin avec MapLibre</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
     #map { height: 60vh; }
     textarea { font-size: 0.9em; }
@@ -44,9 +45,36 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([48.515, -2.775], 15); // Initialiser avec une position par défaut
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json', // Utiliser un style de carte gratuit
+      center: [48.515, -2.775],
+      zoom: 15,
+      pitch: 0, // Désactiver l'inclinaison pour une vue à plat
+      bearing: 0 // Initialiser la rotation à 0
+    });
+
+    // Ajouter une source de tuiles OpenStreetMap
+    map.on('load', function () {
+      map.addSource('openstreetmap', {
+        'type': 'raster',
+        'tiles': [
+          'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        ],
+        'tileSize': 256
+      });
+
+      map.addLayer({
+        'id': 'openstreetmap',
+        'type': 'raster',
+        'source': 'openstreetmap',
+        'paint': {}
+      });
+    });
+
     let userMarker = null;
 
     // Suivi de la position en temps réel
@@ -60,17 +88,17 @@
         document.getElementById('gps-accuracy').textContent = accuracy.toFixed(2);
 
         // Mettre à jour la position uniquement si la précision est suffisante
-        if (accuracy < 50) {
+        if (accuracy < 100) {
           if (!userMarker) {
-            userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Vous êtes ici").openPopup();
+            userMarker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
           } else {
-            userMarker.setLatLng([lat, lng]);
+            userMarker.setLngLat([lng, lat]);
           }
 
           // Centrer la carte sur la position actuelle
-          map.setView([lat, lng], 16);
+          map.setCenter([lng, lat]);
         } else {
-          alert("La précision GPS est insuffisante. Veuillez vous déplacer dans une zone plus dégagée.");
+          alert("La précision GPS est insuffisante. Veuillez vous déplacer dans une zone plus dégagée ou recalibrez manuellement.");
         }
       }, err => {
         alert("Erreur de géolocalisation : " + err.message);
@@ -79,10 +107,17 @@
       alert("Géolocalisation non supportée.");
     }
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 22,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+    // Suivi de l'orientation de l'appareil
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', event => {
+        if (event.alpha !== null) {
+          // Utiliser l'angle alpha pour faire pivoter la carte
+          map.setBearing(360 - event.alpha);
+        }
+      });
+    } else {
+      alert("L'orientation de l'appareil n'est pas supportée.");
+    }
 
     let questionList = [];
     let currentIndex = 0;
@@ -105,11 +140,10 @@
       const radius = parseInt(document.getElementById("radius").value);
       const questionText = questionList[currentIndex];
 
-      const marker = L.circle(e.latlng, {
-        radius: radius,
-        color: 'orange',
-        fillOpacity: 0.4
-      }).addTo(map);
+      const marker = new maplibregl.Marker({
+        draggable: true,
+        color: 'orange'
+      }).setLngLat(e.lngLat).addTo(map);
 
       const popupContent = document.createElement('div');
       const input = document.createElement('textarea');
@@ -129,11 +163,12 @@
       popupContent.appendChild(saveBtn);
       popupContent.appendChild(deleteBtn);
 
-      marker.bindPopup(popupContent).openPopup();
+      const popup = new maplibregl.Popup({ offset: 25 }).setDOMContent(popupContent);
+      marker.setPopup(popup);
 
       const questionObj = {
-        lat: e.latlng.lat,
-        lng: e.latlng.lng,
+        lat: e.lngLat.lat,
+        lng: e.lngLat.lng,
         radius: radius,
         question: questionText
       };
@@ -144,11 +179,11 @@
 
       saveBtn.onclick = () => {
         questions[thisIndex].question = input.value;
-        marker.closePopup();
+        marker.getPopup().remove();
       };
 
       deleteBtn.onclick = () => {
-        map.removeLayer(marker);
+        marker.remove();
         questions.splice(thisIndex, 1);
         questionMarkers.splice(thisIndex, 1);
       };
