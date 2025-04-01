@@ -78,12 +78,38 @@
         map.touchZoomRotate.enable();
         map.touchZoomRotate.enableRotation();
         map.dragPan.enable();
+        window.addEventListener('resize', () => map.resize());
 
-        questions.forEach(q => {
+        questions.forEach((q, index) => {
           const marker = new maplibregl.Marker({ color: 'orange' })
             .setLngLat([q.lng, q.lat])
             .addTo(map);
-          bubbles.push({ marker, question: q.question, lat: q.lat, lng: q.lng, radius: q.radius || 30, visible: false });
+
+          const radius = q.radius || 30;
+          const circleId = `circle-${index}`;
+
+          const circleFeature = turf.circle([q.lng, q.lat], radius, {
+            steps: 64,
+            units: 'meters'
+          });
+
+          map.addSource(circleId, {
+            type: 'geojson',
+            data: circleFeature
+          });
+
+          map.addLayer({
+            id: circleId,
+            type: 'fill',
+            source: circleId,
+            layout: {},
+            paint: {
+              'fill-color': '#ffa500',
+              'fill-opacity': 0.15
+            }
+          });
+
+          bubbles.push({ marker, question: q.question, lat: q.lat, lng: q.lng, radius, visible: false });
         });
 
         map.on('click', e => {
