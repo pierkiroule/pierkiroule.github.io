@@ -34,6 +34,7 @@
     <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
     <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
     <div id="load-indicator">Textes en cours de chargement...</div>
+    <div id="gps-accuracy">Précision GPS : <span id="accuracy-value">Inconnue</span> mètres</div>
   </div>
 
   <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
@@ -94,7 +95,9 @@
           navigator.geolocation.watchPosition(pos => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
+            const accuracy = pos.coords.accuracy;
             document.getElementById('gps-indicator').textContent = 'Capté';
+            document.getElementById('accuracy-value').textContent = accuracy.toFixed(2);
 
             if (userMarker) {
               userMarker.setLatLng([lat, lng]);
