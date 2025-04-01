@@ -78,12 +78,12 @@
           // Ajout des questions sur la carte
           questions.forEach(q => {
             const bubble = L.circle([q.lat, q.lng], {
-              radius: 20, // Rayon de la bulle
+              radius: 50, // Rayon de la bulle
               color: 'orange',
               fillOpacity: 0.3,
               interactive: false // Désactive l'interaction directe avec la bulle
             }).addTo(map);
-            bubbles.push({ bubble, question: q.question });
+            bubbles.push({ bubble, question: q.question, visible: false });
           });
         }
 
@@ -104,17 +104,25 @@
             }
 
             // Vérifier si le joueur est dans une zone de bulle
-            let inBubble = false;
             bubbles.forEach(b => {
               const bubbleLatLng = b.bubble.getLatLng();
               const distance = map.distance(L.latLng(lat, lng), bubbleLatLng);
-              if (distance <= 10) { // 10 mètres de rayon
+              if (distance <= 20) { // 20 mètres de rayon
+                if (!b.visible) {
+                  b.bubble.setStyle({ fillOpacity: 0.3, opacity: 1 });
+                  b.visible = true;
+                }
                 messageBox.textContent = b.question;
-                inBubble = true;
+              } else {
+                if (b.visible) {
+                  b.bubble.setStyle({ fillOpacity: 0, opacity: 0 });
+                  b.visible = false;
+                }
               }
             });
 
             // Si le joueur n'est dans aucune bulle, effacer le message
+            const inBubble = bubbles.some(b => b.visible);
             if (!inBubble) {
               messageBox.textContent = "Cliquez sur les bulles pour voir les questions...";
             }
