@@ -12,6 +12,7 @@
     body { margin: 0; font-family: sans-serif; }
     #map { height: 80vh; width: 100%; }
     #message { padding: 1em; font-size: 1.8em; background: #ffe; }
+    #indicators { display: flex; justify-content: space-between; padding: 1em; }
   </style>
 </head>
 <body class="container-fluid">
@@ -20,8 +21,19 @@
     <p class="mb-0">Trouve les énigmes cachées sur la carte !</p>
   </header>
 
+  <div id="indicators">
+    <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
+    <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
+  </div>
+
   <div id="map"></div>
   <div id="message">Cliquez sur les bulles pour voir les questions...</div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="toggleBubbles">
+    <label class="form-check-label" for="toggleBubbles">
+      Afficher/Masquer les bulles
+    </label>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
@@ -34,6 +46,8 @@
       .then(response => response.json())
       .then(data => {
         const questions = data.questions;
+        const bubbleCountIndicator = document.getElementById('bubble-count-indicator');
+        bubbleCountIndicator.textContent = questions.length;
 
         // Initialisation de la carte
         const map = L.map('map').setView([47.2173, -1.5534], 15); // Ajustez le niveau de zoom ici
@@ -43,14 +57,16 @@
         }).addTo(map);
 
         let userMarker = null;
+        let bubbles = [];
 
         // Ajout des questions sur la carte
         questions.forEach(q => {
-          L.circle([q.lat, q.lng], {
+          const bubble = L.circle([q.lat, q.lng], {
             radius: 50, // Ajustez le rayon ici pour une meilleure visibilité
             color: 'orange',
             fillOpacity: 0.3
           }).addTo(map).bindPopup(q.question);
+          bubbles.push(bubble);
         });
 
         // Suivi de la position de l'apprenant en temps réel
@@ -58,6 +74,7 @@
           navigator.geolocation.watchPosition(pos => {
             const lat = pos.coords.latitude;
             const lng = pos.coords.longitude;
+            document.getElementById('gps-indicator').textContent = 'Capté';
             if (userMarker) {
               userMarker.setLatLng([lat, lng]);
             } else {
@@ -66,10 +83,23 @@
             }
           }, error => {
             console.error("Erreur de géolocalisation : ", error);
+            document.getElementById('gps-indicator').textContent = 'Non capté';
           });
         } else {
           alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
+
+        // Gestion de la visibilité des bulles
+        document.getElementById('toggleBubbles').addEventListener('change', function() {
+          const isChecked = this.checked;
+          bubbles.forEach(bubble => {
+            if (isChecked) {
+              bubble.addTo(map);
+            } else {
+              bubble.removeFrom(map);
+            }
+          });
+        });
       }).catch(error => {
         console.error('Erreur lors du chargement des données du quiz:', error);
       });
