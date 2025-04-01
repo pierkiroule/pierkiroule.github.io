@@ -37,6 +37,10 @@
 
       <label class="form-label">Résultat JSON</label>
       <textarea id="quizData" class="form-control" rows="8" readonly></textarea>
+
+      <div id="gps-status" class="mt-2">
+        Précision GPS : <span id="gps-accuracy">Inconnue</span> mètres
+      </div>
     </div>
   </div>
 
@@ -50,15 +54,24 @@
       navigator.geolocation.watchPosition(pos => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+        const accuracy = pos.coords.accuracy;
 
-        if (!userMarker) {
-          userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Vous êtes ici").openPopup();
+        // Afficher la précision du GPS
+        document.getElementById('gps-accuracy').textContent = accuracy.toFixed(2);
+
+        // Mettre à jour la position uniquement si la précision est suffisante
+        if (accuracy < 50) {
+          if (!userMarker) {
+            userMarker = L.marker([lat, lng]).addTo(map).bindPopup("Vous êtes ici").openPopup();
+          } else {
+            userMarker.setLatLng([lat, lng]);
+          }
+
+          // Centrer la carte sur la position actuelle
+          map.setView([lat, lng], 16);
         } else {
-          userMarker.setLatLng([lat, lng]);
+          alert("La précision GPS est insuffisante. Veuillez vous déplacer dans une zone plus dégagée.");
         }
-
-        // Centrer la carte sur la position actuelle
-        map.setView([lat, lng], 16);
       }, err => {
         alert("Erreur de géolocalisation : " + err.message);
       });
