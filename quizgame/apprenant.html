@@ -2,13 +2,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Chasse au Trésor GPS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
-    body { margin: 0; font-family: sans-serif; }
-    #map { height: 70vh; width: 100%; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    #map { height: calc(100vh - 250px); width: 100%; }
     #message-box {
       height: 20vh;
       overflow-y: auto;
@@ -17,87 +17,94 @@
       border: 1px solid #ccc;
       margin-bottom: 1em;
     }
-    #indicators { display: flex; justify-content: space-between; padding: 1em; flex-wrap: wrap; }
+    #indicators { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 1em; font-size: 0.9em; }
     #load-indicator { color: red; font-weight: bold; }
     #load-indicator.loaded { color: green; }
-    #calibrateBtn { margin: 0.5em auto; display: block; }
+    .floating-btn {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body class="container-fluid">
   <header class="bg-primary text-white p-3 mb-3">
-    <h1 class="h3">Chasse au Trésor GPS</h1>
+    <h1 class="h4">Chasse au Trésor GPS</h1>
     <p class="mb-0">Trouvez les énigmes cachées sur la carte !</p>
   </header>  <div id="indicators">
-    <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
-    <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
-    <div id="load-indicator">Textes en cours de chargement...</div>
-    <div id="gps-accuracy">Précision GPS : <span id="accuracy-value">Inconnue</span> mètres</div>
-  </div><button id="calibrateBtn" class="btn btn-secondary">Me localiser manuellement</button>
+    <div>GPS : <span id="gps-indicator">Non capté</span></div>
+    <div>Bulles : <span id="bubble-count-indicator">0</span></div>
+    <div id="load-indicator">Chargement...</div>
+    <div>Précision : <span id="accuracy-value">Inconnue</span> m</div>
+  </div>  <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
+  <div id="map"></div><button id="calibrateBtn" class="btn btn-secondary btn-sm floating-btn">Me localiser</button> <button id="recenterBtn" class="btn btn-primary btn-sm floating-btn" style="bottom: 20px;">Recentrer</button>
 
-  <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
-  <div id="map"></div>  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>  <script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>  <script>
     const hospitalCoords = [48.515, -2.775];
     let manualCalibration = false;
+    let map, userMarker = null;
 
     fetch('/quizgame/quiz_data.json')
       .then(response => response.json())
       .then(data => {
         const questions = data.questions;
         document.getElementById('bubble-count-indicator').textContent = questions.length;
-        const loadIndicator = document.getElementById('load-indicator');
-        loadIndicator.textContent = "Textes chargés avec succès !";
-        loadIndicator.classList.add('loaded');
+        document.getElementById('load-indicator').textContent = "Textes chargés";
+        document.getElementById('load-indicator').classList.add('loaded');
 
-        let map;
-        let userMarker = null;
-        let bubbles = [];
         const messageBox = document.getElementById('message-box');
+        let bubbles = [];
 
-        function initMap() {
-          map = new maplibregl.Map({
-            container: 'map',
-            style: {
-              version: 8,
-              sources: {
-                osm: {
-                  type: 'raster',
-                  tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                  tileSize: 256,
-                  attribution: '© OpenStreetMap contributors'
-                }
-              },
-              layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
-            },
-            center: hospitalCoords,
-            zoom: 15
-          });
-
-          questions.forEach(q => {
-            const bubble = new maplibregl.Marker({ color: 'orange' })
-              .setLngLat([q.lng, q.lat])
-              .addTo(map);
-            bubbles.push({ bubble, question: q.question, visible: false });
-          });
-
-          map.on('click', e => {
-            if (manualCalibration) {
-              if (!userMarker) {
-                userMarker = new maplibregl.Marker({ color: 'blue' }).setLngLat(e.lngLat).addTo(map);
-              } else {
-                userMarker.setLngLat(e.lngLat);
+        map = new maplibregl.Map({
+          container: 'map',
+          style: {
+            version: 8,
+            sources: {
+              osm: {
+                type: 'raster',
+                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                tileSize: 256,
+                attribution: '© OpenStreetMap contributors'
               }
-              map.setCenter(e.lngLat);
-              manualCalibration = false;
+            },
+            layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+          },
+          center: hospitalCoords,
+          zoom: 15
+        });
+
+        map.addControl(new maplibregl.NavigationControl());
+        map.touchZoomRotate.enable();
+        map.dragPan.enable();
+
+        questions.forEach(q => {
+          const bubble = new maplibregl.Marker({ color: 'orange' })
+            .setLngLat([q.lng, q.lat])
+            .addTo(map);
+          bubbles.push({ bubble, question: q.question, visible: false });
+        });
+
+        map.on('click', e => {
+          if (manualCalibration) {
+            if (!userMarker) {
+              userMarker = new maplibregl.Marker({ color: 'blue' }).setLngLat(e.lngLat).addTo(map);
+            } else {
+              userMarker.setLngLat(e.lngLat);
             }
-          });
-        }
+            map.setCenter(e.lngLat);
+            manualCalibration = false;
+          }
+        });
 
         document.getElementById('calibrateBtn').addEventListener('click', () => {
           manualCalibration = true;
           alert("Cliquez sur la carte pour vous positionner manuellement.");
         });
 
-        initMap();
+        document.getElementById('recenterBtn').addEventListener('click', () => {
+          if (userMarker) map.setCenter(userMarker.getLngLat());
+        });
 
         if (navigator.geolocation) {
           navigator.geolocation.watchPosition(pos => {
@@ -116,57 +123,40 @@
             }
 
             let closestBubble = null;
-            let minDistance = Infinity;
-
             bubbles.forEach(b => {
-              const bubbleLngLat = b.bubble.getLngLat();
-              const distance = turf.distance([lng, lat], [bubbleLngLat.lng, bubbleLngLat.lat], { units: 'meters' });
-              if (distance <= 20) {
-                closestBubble = b;
-                minDistance = distance;
-              }
+              const d = turf.distance([lng, lat], [b.bubble.getLngLat().lng, b.bubble.getLngLat().lat], { units: 'meters' });
+              if (d <= 20) closestBubble = b;
             });
 
             if (closestBubble) {
               messageBox.textContent = closestBubble.question;
               if (!closestBubble.visible) {
-                closestBubble.bubble.setLngLat(closestBubble.bubble.getLngLat());
                 closestBubble.visible = true;
               }
             } else {
               messageBox.textContent = "Approchez-vous des bulles pour voir les questions...";
-              bubbles.forEach(b => {
-                if (b.visible) {
-                  b.bubble.setLngLat(b.bubble.getLngLat());
-                  b.visible = false;
-                }
-              });
+              bubbles.forEach(b => b.visible = false);
             }
 
-          }, error => {
-            console.error("Erreur de géolocalisation : ", error);
+          }, err => {
+            console.warn("Erreur GPS", err);
             document.getElementById('gps-indicator').textContent = 'Non capté';
           }, {
             enableHighAccuracy: true,
             timeout: 10000,
             maximumAge: 0
           });
-        } else {
-          alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
 
         if (window.DeviceOrientationEvent) {
-          window.addEventListener('deviceorientation', event => {
-            if (event.alpha !== null) {
-              map.setBearing(360 - event.alpha);
-            }
+          window.addEventListener('deviceorientation', e => {
+            if (e.alpha !== null) map.setBearing(360 - e.alpha);
           });
         }
-
-      }).catch(error => {
-        console.error('Erreur lors du chargement des données du quiz:', error);
-        const loadIndicator = document.getElementById('load-indicator');
-        loadIndicator.textContent = "Erreur de chargement des textes.";
+      })
+      .catch(err => {
+        console.error("Erreur de chargement", err);
+        document.getElementById('load-indicator').textContent = "Erreur de chargement";
       });
   </script></body>
 </html>
