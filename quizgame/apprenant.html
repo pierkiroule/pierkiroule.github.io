@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
+<!DOCTYPE html><html lang="fr">
 <head>
   <meta charset="UTF-8">
   <title>Chasse au Trésor GPS</title>
@@ -18,42 +17,33 @@
       border: 1px solid #ccc;
       margin-bottom: 1em;
     }
-    #indicators { display: flex; justify-content: space-between; padding: 1em; }
+    #indicators { display: flex; justify-content: space-between; padding: 1em; flex-wrap: wrap; }
     #load-indicator { color: red; font-weight: bold; }
     #load-indicator.loaded { color: green; }
+    #calibrateBtn { margin: 0.5em auto; display: block; }
   </style>
 </head>
 <body class="container-fluid">
   <header class="bg-primary text-white p-3 mb-3">
     <h1 class="h3">Chasse au Trésor GPS</h1>
     <p class="mb-0">Trouvez les énigmes cachées sur la carte !</p>
-  </header>
-
-  <div id="indicators">
+  </header>  <div id="indicators">
     <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
     <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
     <div id="load-indicator">Textes en cours de chargement...</div>
     <div id="gps-accuracy">Précision GPS : <span id="accuracy-value">Inconnue</span> mètres</div>
-  </div>
+  </div><button id="calibrateBtn" class="btn btn-secondary">Me localiser manuellement</button>
 
   <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
-  <div id="map"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // Coordonnées du Centre Hospitalier de Saint-Brieuc
+  <div id="map"></div>  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>  <script>
     const hospitalCoords = [48.515, -2.775];
+    let manualCalibration = false;
 
-    // Charger les données du quiz
     fetch('/quizgame/quiz_data.json')
       .then(response => response.json())
       .then(data => {
         const questions = data.questions;
-        const bubbleCountIndicator = document.getElementById('bubble-count-indicator');
-        bubbleCountIndicator.textContent = questions.length;
-
-        // Indicateur de chargement des textes
+        document.getElementById('bubble-count-indicator').textContent = questions.length;
         const loadIndicator = document.getElementById('load-indicator');
         loadIndicator.textContent = "Textes chargés avec succès !";
         loadIndicator.classList.add('loaded');
@@ -63,51 +53,52 @@
         let bubbles = [];
         const messageBox = document.getElementById('message-box');
 
-        // Fonction pour initialiser la carte
         function initMap() {
           map = new maplibregl.Map({
             container: 'map',
-            style: 'https://demotiles.maplibre.org/style.json',
+            style: {
+              version: 8,
+              sources: {
+                osm: {
+                  type: 'raster',
+                  tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                  tileSize: 256,
+                  attribution: '© OpenStreetMap contributors'
+                }
+              },
+              layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
+            },
             center: hospitalCoords,
-            zoom: 15,
-            pitch: 0, // Désactiver l'inclinaison pour une vue à plat
-            bearing: 0 // Initialiser la rotation à 0
+            zoom: 15
           });
 
-          // Ajouter une source de tuiles OpenStreetMap
-          map.on('load', function () {
-            map.addSource('openstreetmap', {
-              'type': 'raster',
-              'tiles': [
-                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
-              ],
-              'tileSize': 256
-            });
-
-            map.addLayer({
-              'id': 'openstreetmap',
-              'type': 'raster',
-              'source': 'openstreetmap',
-              'paint': {}
-            });
-          });
-
-          // Ajout des questions sur la carte
           questions.forEach(q => {
-            const bubble = new maplibregl.Marker({
-              color: 'orange',
-              draggable: false
-            }).setLngLat([q.lng, q.lat]).addTo(map);
+            const bubble = new maplibregl.Marker({ color: 'orange' })
+              .setLngLat([q.lng, q.lat])
+              .addTo(map);
             bubbles.push({ bubble, question: q.question, visible: false });
+          });
+
+          map.on('click', e => {
+            if (manualCalibration) {
+              if (!userMarker) {
+                userMarker = new maplibregl.Marker({ color: 'blue' }).setLngLat(e.lngLat).addTo(map);
+              } else {
+                userMarker.setLngLat(e.lngLat);
+              }
+              map.setCenter(e.lngLat);
+              manualCalibration = false;
+            }
           });
         }
 
-        // Initialiser la carte sur les coordonnées de l'hôpital
+        document.getElementById('calibrateBtn').addEventListener('click', () => {
+          manualCalibration = true;
+          alert("Cliquez sur la carte pour vous positionner manuellement.");
+        });
+
         initMap();
 
-        // Suivi de la position de l'apprenant en temps réel
         if (navigator.geolocation) {
           navigator.geolocation.watchPosition(pos => {
             const lat = pos.coords.latitude;
@@ -116,37 +107,37 @@
             document.getElementById('gps-indicator').textContent = 'Capté';
             document.getElementById('accuracy-value').textContent = accuracy.toFixed(2);
 
-            if (userMarker) {
-              userMarker.setLngLat([lng, lat]);
-            } else {
-              userMarker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
+            if (!manualCalibration) {
+              if (userMarker) {
+                userMarker.setLngLat([lng, lat]);
+              } else {
+                userMarker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
+              }
             }
 
-            // Vérifier si le joueur est dans une zone de bulle
             let closestBubble = null;
             let minDistance = Infinity;
 
             bubbles.forEach(b => {
               const bubbleLngLat = b.bubble.getLngLat();
               const distance = turf.distance([lng, lat], [bubbleLngLat.lng, bubbleLngLat.lat], { units: 'meters' });
-              if (distance <= 20) { // 20 mètres de rayon
+              if (distance <= 20) {
                 closestBubble = b;
                 minDistance = distance;
               }
             });
 
-            // Mettre à jour l'affichage du texte
             if (closestBubble) {
               messageBox.textContent = closestBubble.question;
               if (!closestBubble.visible) {
-                closestBubble.bubble.setLngLat(closestBubble.bubble.getLngLat()); // Forcer le rafraîchissement du marqueur
+                closestBubble.bubble.setLngLat(closestBubble.bubble.getLngLat());
                 closestBubble.visible = true;
               }
             } else {
               messageBox.textContent = "Approchez-vous des bulles pour voir les questions...";
               bubbles.forEach(b => {
                 if (b.visible) {
-                  b.bubble.setLngLat(b.bubble.getLngLat()); // Forcer le rafraîchissement du marqueur
+                  b.bubble.setLngLat(b.bubble.getLngLat());
                   b.visible = false;
                 }
               });
@@ -155,28 +146,27 @@
           }, error => {
             console.error("Erreur de géolocalisation : ", error);
             document.getElementById('gps-indicator').textContent = 'Non capté';
+          }, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
           });
         } else {
           alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
 
-        // Suivi de l'orientation de l'appareil
         if (window.DeviceOrientationEvent) {
           window.addEventListener('deviceorientation', event => {
             if (event.alpha !== null) {
-              // Utiliser l'angle alpha pour faire pivoter la carte
               map.setBearing(360 - event.alpha);
             }
           });
-        } else {
-          alert("L'orientation de l'appareil n'est pas supportée.");
         }
+
       }).catch(error => {
         console.error('Erreur lors du chargement des données du quiz:', error);
         const loadIndicator = document.getElementById('load-indicator');
         loadIndicator.textContent = "Erreur de chargement des textes.";
       });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>
-</body>
+  </script></body>
 </html>
