@@ -8,7 +8,7 @@
   <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
     html, body { margin: 0; padding: 0; height: 100%; }
-    #map { height: calc(100vh - 250px); width: 100%; }
+    #map { height: calc(100vh - 250px); width: 100%; touch-action: auto; }
     #message-box {
       height: 20vh;
       overflow-y: auto;
@@ -76,13 +76,14 @@
 
         map.addControl(new maplibregl.NavigationControl());
         map.touchZoomRotate.enable();
+        map.touchZoomRotate.enableRotation();
         map.dragPan.enable();
 
         questions.forEach(q => {
-          const bubble = new maplibregl.Marker({ color: 'orange' })
+          const marker = new maplibregl.Marker({ color: 'orange' })
             .setLngLat([q.lng, q.lat])
             .addTo(map);
-          bubbles.push({ bubble, question: q.question, visible: false });
+          bubbles.push({ marker, question: q.question, lat: q.lat, lng: q.lng, radius: q.radius || 30, visible: false });
         });
 
         map.on('click', e => {
@@ -124,15 +125,13 @@
 
             let closestBubble = null;
             bubbles.forEach(b => {
-              const d = turf.distance([lng, lat], [b.bubble.getLngLat().lng, b.bubble.getLngLat().lat], { units: 'meters' });
-              if (d <= 20) closestBubble = b;
+              const d = turf.distance([lng, lat], [b.lng, b.lat], { units: 'meters' });
+              if (d <= b.radius) closestBubble = b;
             });
 
             if (closestBubble) {
               messageBox.textContent = closestBubble.question;
-              if (!closestBubble.visible) {
-                closestBubble.visible = true;
-              }
+              if (!closestBubble.visible) closestBubble.visible = true;
             } else {
               messageBox.textContent = "Approchez-vous des bulles pour voir les questions...";
               bubbles.forEach(b => b.visible = false);
@@ -153,6 +152,7 @@
             if (e.alpha !== null) map.setBearing(360 - e.alpha);
           });
         }
+
       })
       .catch(err => {
         console.error("Erreur de chargement", err);
