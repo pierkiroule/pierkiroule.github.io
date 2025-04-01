@@ -33,11 +33,10 @@
   <div id="indicators">
     <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
     <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
-    <div id="distance-indicator">Distance : <span id="distance-text">Calcul en cours...</span></div>
     <div id="load-indicator">Textes en cours de chargement...</div>
   </div>
 
-  <div id="message-box">Cliquez sur les bulles pour voir les questions...</div>
+  <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
@@ -104,27 +103,33 @@
             }
 
             // Vérifier si le joueur est dans une zone de bulle
+            let closestBubble = null;
+            let minDistance = Infinity;
+
             bubbles.forEach(b => {
               const bubbleLatLng = b.bubble.getLatLng();
               const distance = map.distance(L.latLng(lat, lng), bubbleLatLng);
               if (distance <= 20) { // 20 mètres de rayon
-                if (!b.visible) {
-                  b.bubble.setStyle({ fillOpacity: 0.3, opacity: 1 });
-                  b.visible = true;
-                }
-                messageBox.textContent = b.question;
-              } else {
+                closestBubble = b;
+                minDistance = distance;
+              }
+            });
+
+            // Mettre à jour l'affichage du texte
+            if (closestBubble) {
+              messageBox.textContent = closestBubble.question;
+              if (!closestBubble.visible) {
+                closestBubble.bubble.setStyle({ fillOpacity: 0.3, opacity: 1 });
+                closestBubble.visible = true;
+              }
+            } else {
+              messageBox.textContent = "Approchez-vous des bulles pour voir les questions...";
+              bubbles.forEach(b => {
                 if (b.visible) {
                   b.bubble.setStyle({ fillOpacity: 0, opacity: 0 });
                   b.visible = false;
                 }
-              }
-            });
-
-            // Si le joueur n'est dans aucune bulle, effacer le message
-            const inBubble = bubbles.some(b => b.visible);
-            if (!inBubble) {
-              messageBox.textContent = "Cliquez sur les bulles pour voir les questions...";
+              });
             }
 
           }, error => {
