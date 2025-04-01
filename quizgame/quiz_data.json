@@ -2,34 +2,22 @@
   "title": "Mon Quiz",
   "questions": [
     {
-      "lat": 48.494400523434294,
-      "lng": -2.7644371611972445,
-      "radius": 5,
-      "question": "L’écoute active suffit-elle à créer une relation de confiance avec un patient ?"
+      "lat": 47.22209911295862,
+      "lng": -1.5672968198668993,
+      "radius": 30,
+      "question": "Pop"
     },
     {
-      "lat": 48.49233938342973,
-      "lng": -2.764394259657384,
-      "radius": 5,
-      "question": "Peut-on vraiment être à l’écoute quand on a des objectifs éducatifs à atteindre ?"
+      "lat": 47.211251009387546,
+      "lng": -1.558030497885712,
+      "radius": 30,
+      "question": "Pip"
     },
     {
-      "lat": 48.494869598765376,
-      "lng": -2.765938715092387,
-      "radius": 5,
-      "question": "Faut-il toujours reformuler ce que dit le patient, au risque de paraître artificiel ?"
-    },
-    {
-      "lat": 48.49425837853774,
-      "lng": -2.76415830118816,
-      "radius": 5,
-      "question": "Le soignant peut-il écouter activement s’il n’est pas lui-même écouté dans son institution ?"
-    },
-    {
-      "lat": 48.49329178267267,
-      "lng": -2.7662604766413517,
-      "radius": 5,
-      "question": "L’écoute active peut-elle être enseignée, ou relève-t-elle avant tout d’un savoir-être ?"
+      "lat": 47.22688090535776,
+      "lng": -1.5467907925196236,
+      "radius": 30,
+      "question": "Poup"
     }
   ]
 }
