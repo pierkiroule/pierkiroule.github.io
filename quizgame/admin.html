@@ -75,6 +75,7 @@
     map.touchZoomRotate.enable();
     map.touchZoomRotate.enableRotation();
     map.dragPan.enable();
+    window.addEventListener('resize', () => map.resize());
 
     let userMarker = null;
     let manualCalibration = false;
