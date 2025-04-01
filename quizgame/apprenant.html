@@ -10,10 +10,18 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { margin: 0; font-family: sans-serif; }
-    #map { height: 80vh; width: 100%; }
-    #message { padding: 1em; font-size: 1.8em; background: #ffe; }
+    #map { height: 70vh; width: 100%; }
+    #message-box {
+      height: 20vh;
+      overflow-y: auto;
+      padding: 1em;
+      background: #ffe;
+      border: 1px solid #ccc;
+      margin-bottom: 1em;
+    }
     #indicators { display: flex; justify-content: space-between; padding: 1em; }
-    .popup-content { font-size: 2em; }
+    #load-indicator { color: red; font-weight: bold; }
+    #load-indicator.loaded { color: green; }
   </style>
 </head>
 <body class="container-fluid">
@@ -26,16 +34,11 @@
     <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
     <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
     <div id="distance-indicator">Distance : <span id="distance-text">Calcul en cours...</span></div>
+    <div id="load-indicator">Textes en cours de chargement...</div>
   </div>
 
+  <div id="message-box">Cliquez sur les bulles pour voir les questions...</div>
   <div id="map"></div>
-  <div id="message">Cliquez sur les bulles pour voir les questions...</div>
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" id="toggleBubbles">
-    <label class="form-check-label" for="toggleBubbles">
-      Afficher/Masquer les bulles
-    </label>
-  </div>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
     integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
@@ -54,9 +57,15 @@
         const bubbleCountIndicator = document.getElementById('bubble-count-indicator');
         bubbleCountIndicator.textContent = questions.length;
 
+        // Indicateur de chargement des textes
+        const loadIndicator = document.getElementById('load-indicator');
+        loadIndicator.textContent = "Textes chargés avec succès !";
+        loadIndicator.classList.add('loaded');
+
         let map;
         let userMarker = null;
         let bubbles = [];
+        const messageBox = document.getElementById('message-box');
 
         // Fonction pour initialiser la carte
         function initMap() {
@@ -69,21 +78,13 @@
           // Ajout des questions sur la carte
           questions.forEach(q => {
             const bubble = L.circle([q.lat, q.lng], {
-              radius: 50, // Ajustez le rayon ici pour une meilleure visibilité
+              radius: 50, // Rayon de la bulle
               color: 'orange',
-              fillOpacity: 0.3
-            }).addTo(map).bindPopup(`<div class="popup-content">${q.question}</div>`, {
-              className: 'custom-popup'
-            });
-            bubbles.push(bubble);
+              fillOpacity: 0.3,
+              interactive: false // Désactive l'interaction directe avec la bulle
+            }).addTo(map);
+            bubbles.push({ bubble, question: q.question });
           });
-
-          // Rendre les bulles invisibles après 5 secondes
-          setTimeout(() => {
-            bubbles.forEach(bubble => {
-              bubble.setStyle({ fillOpacity: 0, opacity: 0 });
-            });
-          }, 5000);
         }
 
         // Initialiser la carte sur les coordonnées de l'hôpital
@@ -102,24 +103,20 @@
               userMarker = L.marker([lat, lng], { title: "Votre position" }).addTo(map);
             }
 
-            // Calculer la distance par rapport à la bulle la plus proche
-            let minDistance = Infinity;
-            bubbles.forEach(bubble => {
-              const bubbleLatLng = bubble.getLatLng();
+            // Vérifier si le joueur est dans une zone de bulle
+            let inBubble = false;
+            bubbles.forEach(b => {
+              const bubbleLatLng = b.bubble.getLatLng();
               const distance = map.distance(L.latLng(lat, lng), bubbleLatLng);
-              if (distance < minDistance) {
-                minDistance = distance;
+              if (distance <= 50) { // 50 mètres de rayon
+                messageBox.textContent = b.question;
+                inBubble = true;
               }
             });
 
-            // Mettre à jour l'indicateur de distance
-            const distanceText = document.getElementById('distance-text');
-            if (minDistance < 50) {
-              distanceText.textContent = "Vous êtes très proche !";
-            } else if (minDistance < 100) {
-              distanceText.textContent = "Vous êtes proche !";
-            } else {
-              distanceText.textContent = `À ${Math.round(minDistance)} mètres`;
+            // Si le joueur n'est dans aucune bulle, effacer le message
+            if (!inBubble) {
+              messageBox.textContent = "Cliquez sur les bulles pour voir les questions...";
             }
 
           }, error => {
@@ -129,20 +126,10 @@
         } else {
           alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
-
-        // Gestion de la visibilité des bulles
-        document.getElementById('toggleBubbles').addEventListener('change', function() {
-          const isChecked = this.checked;
-          bubbles.forEach(bubble => {
-            if (isChecked) {
-              bubble.setStyle({ fillOpacity: 0.3, opacity: 1 });
-            } else {
-              bubble.setStyle({ fillOpacity: 0, opacity: 0 });
-            }
-          });
-        });
       }).catch(error => {
         console.error('Erreur lors du chargement des données du quiz:', error);
+        const loadIndicator = document.getElementById('load-indicator');
+        loadIndicator.textContent = "Erreur de chargement des textes.";
       });
   </script>
 </body>
