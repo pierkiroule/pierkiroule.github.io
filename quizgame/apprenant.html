@@ -43,9 +43,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>
 
   <script>
-    // Coordonnées du Centre Hospitalier de Saint-Brieuc
-    const hospitalCoords = ol.proj.fromLonLat([-2.775, 48.515]);
-
     // Charger les données du quiz
     fetch('/quizgame/quiz_data.json')
       .then(response => response.json())
@@ -74,22 +71,21 @@
               })
             ],
             view: new ol.View({
-              center: hospitalCoords,
+              center: ol.proj.fromLonLat([-2.775, 48.515]), // Centre initial sur Saint-Brieuc
               zoom: 15,
               rotation: 0 // Initialiser la rotation à 0
             })
           });
 
           // Ajout des questions sur la carte
+          const vectorSource = new ol.source.Vector();
           questions.forEach(q => {
             const bubble = new ol.Feature(new ol.geom.Point(ol.proj.fromLonLat([q.lng, q.lat])));
             bubble.set('question', q.question);
             bubbles.push({ bubble, question: q.question, visible: false });
           });
 
-          const vectorSource = new ol.source.Vector({
-            features: bubbles.map(b => b.bubble)
-          });
+          vectorSource.addFeatures(bubbles.map(b => b.bubble));
 
           const vectorLayer = new ol.layer.Vector({
             source: vectorSource,
@@ -104,7 +100,7 @@
           map.addLayer(vectorLayer);
         }
 
-        // Initialiser la carte sur les coordonnées de l'hôpital
+        // Initialiser la carte
         initMap();
 
         // Suivi de la position de l'apprenant en temps réel
@@ -123,6 +119,9 @@
               userMarker = new ol.Feature(new ol.geom.Point(userLocation));
               vectorSource.addFeature(userMarker);
             }
+
+            // Centrer la carte sur la position de l'utilisateur
+            map.getView().setCenter(userLocation);
 
             // Vérifier si le joueur est dans une zone de bulle
             let closestBubble = null;
