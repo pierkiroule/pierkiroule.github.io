@@ -1,14 +1,15 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <title>Chasse au Trésor GPS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
   <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    #map { height: calc(100vh - 250px); width: 100%; touch-action: auto; }
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 70vh; width: 100%; }
     #message-box {
       height: 20vh;
       overflow-y: auto;
@@ -17,122 +18,97 @@
       border: 1px solid #ccc;
       margin-bottom: 1em;
     }
-    #indicators { display: flex; flex-wrap: wrap; justify-content: space-between; padding: 1em; font-size: 0.9em; }
+    #indicators { display: flex; justify-content: space-between; padding: 1em; }
     #load-indicator { color: red; font-weight: bold; }
     #load-indicator.loaded { color: green; }
-    .floating-btn {
-      position: fixed;
-      bottom: 80px;
-      right: 20px;
-      z-index: 1000;
-    }
   </style>
 </head>
 <body class="container-fluid">
   <header class="bg-primary text-white p-3 mb-3">
-    <h1 class="h4">Chasse au Trésor GPS</h1>
+    <h1 class="h3">Chasse au Trésor GPS</h1>
     <p class="mb-0">Trouvez les énigmes cachées sur la carte !</p>
-  </header>  <div id="indicators">
-    <div>GPS : <span id="gps-indicator">Non capté</span></div>
-    <div>Bulles : <span id="bubble-count-indicator">0</span></div>
-    <div id="load-indicator">Chargement...</div>
-    <div>Précision : <span id="accuracy-value">Inconnue</span> m</div>
-  </div>  <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
-  <div id="map"></div><button id="calibrateBtn" class="btn btn-secondary btn-sm floating-btn">Me localiser</button> <button id="recenterBtn" class="btn btn-primary btn-sm floating-btn" style="bottom: 20px;">Recentrer</button>
+  </header>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>  <script>
+  <div id="indicators">
+    <div id="gps-status">GPS : <span id="gps-indicator">Non capté</span></div>
+    <div id="bubble-count">Bulles chargées : <span id="bubble-count-indicator">0</span></div>
+    <div id="load-indicator">Textes en cours de chargement...</div>
+    <div id="gps-accuracy">Précision GPS : <span id="accuracy-value">Inconnue</span> mètres</div>
+  </div>
+
+  <div id="message-box">Approchez-vous des bulles pour voir les questions...</div>
+  <div id="map"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf/turf.min.js"></script>
+
+  <script>
+    // Coordonnées du Centre Hospitalier de Saint-Brieuc
     const hospitalCoords = [48.515, -2.775];
-    let manualCalibration = false;
-    let map, userMarker = null;
 
+    // Charger les données du quiz
     fetch('/quizgame/quiz_data.json')
       .then(response => response.json())
       .then(data => {
         const questions = data.questions;
-        document.getElementById('bubble-count-indicator').textContent = questions.length;
-        document.getElementById('load-indicator').textContent = "Textes chargés";
-        document.getElementById('load-indicator').classList.add('loaded');
+        const bubbleCountIndicator = document.getElementById('bubble-count-indicator');
+        bubbleCountIndicator.textContent = questions.length;
 
-        const messageBox = document.getElementById('message-box');
+        // Indicateur de chargement des textes
+        const loadIndicator = document.getElementById('load-indicator');
+        loadIndicator.textContent = "Textes chargés avec succès !";
+        loadIndicator.classList.add('loaded');
+
+        let map;
+        let userMarker = null;
         let bubbles = [];
+        const messageBox = document.getElementById('message-box');
 
-        map = new maplibregl.Map({
-          container: 'map',
-          style: {
-            version: 8,
-            sources: {
-              osm: {
-                type: 'raster',
-                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                tileSize: 256,
-                attribution: '© OpenStreetMap contributors'
-              }
-            },
-            layers: [{ id: 'osm', type: 'raster', source: 'osm' }]
-          },
-          center: hospitalCoords,
-          zoom: 15
-        });
-
-        map.addControl(new maplibregl.NavigationControl());
-        map.touchZoomRotate.enable();
-        map.touchZoomRotate.enableRotation();
-        map.dragPan.enable();
-        window.addEventListener('resize', () => map.resize());
-
-        questions.forEach((q, index) => {
-          const marker = new maplibregl.Marker({ color: 'orange' })
-            .setLngLat([q.lng, q.lat])
-            .addTo(map);
-
-          const radius = q.radius || 30;
-          const circleId = `circle-${index}`;
-
-          const circleFeature = turf.circle([q.lng, q.lat], radius, {
-            steps: 64,
-            units: 'meters'
+        // Fonction pour initialiser la carte
+        function initMap() {
+          map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://demotiles.maplibre.org/style.json',
+            center: hospitalCoords,
+            zoom: 15,
+            pitch: 0, // Désactiver l'inclinaison pour une vue à plat
+            bearing: 0 // Initialiser la rotation à 0
           });
 
-          map.addSource(circleId, {
-            type: 'geojson',
-            data: circleFeature
+          // Ajouter une source de tuiles OpenStreetMap
+          map.on('load', function () {
+            map.addSource('openstreetmap', {
+              'type': 'raster',
+              'tiles': [
+                'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+              ],
+              'tileSize': 256
+            });
+
+            map.addLayer({
+              'id': 'openstreetmap',
+              'type': 'raster',
+              'source': 'openstreetmap',
+              'paint': {}
+            });
           });
 
-          map.addLayer({
-            id: circleId,
-            type: 'fill',
-            source: circleId,
-            layout: {},
-            paint: {
-              'fill-color': '#ffa500',
-              'fill-opacity': 0.15
-            }
+          // Ajout des questions sur la carte
+          questions.forEach(q => {
+            const bubble = new maplibregl.Marker({
+              color: 'orange',
+              draggable: false
+            }).setLngLat([q.lng, q.lat]).addTo(map);
+            bubbles.push({ bubble, question: q.question, visible: false });
           });
+        }
 
-          bubbles.push({ marker, question: q.question, lat: q.lat, lng: q.lng, radius, visible: false });
-        });
+        // Initialiser la carte sur les coordonnées de l'hôpital
+        initMap();
 
-        map.on('click', e => {
-          if (manualCalibration) {
-            if (!userMarker) {
-              userMarker = new maplibregl.Marker({ color: 'blue' }).setLngLat(e.lngLat).addTo(map);
-            } else {
-              userMarker.setLngLat(e.lngLat);
-            }
-            map.setCenter(e.lngLat);
-            manualCalibration = false;
-          }
-        });
-
-        document.getElementById('calibrateBtn').addEventListener('click', () => {
-          manualCalibration = true;
-          alert("Cliquez sur la carte pour vous positionner manuellement.");
-        });
-
-        document.getElementById('recenterBtn').addEventListener('click', () => {
-          if (userMarker) map.setCenter(userMarker.getLngLat());
-        });
-
+        // Suivi de la position de l'apprenant en temps réel
         if (navigator.geolocation) {
           navigator.geolocation.watchPosition(pos => {
             const lat = pos.coords.latitude;
@@ -141,48 +117,66 @@
             document.getElementById('gps-indicator').textContent = 'Capté';
             document.getElementById('accuracy-value').textContent = accuracy.toFixed(2);
 
-            if (!manualCalibration) {
-              if (userMarker) {
-                userMarker.setLngLat([lng, lat]);
-              } else {
-                userMarker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
-              }
+            if (userMarker) {
+              userMarker.setLngLat([lng, lat]);
+            } else {
+              userMarker = new maplibregl.Marker().setLngLat([lng, lat]).addTo(map);
             }
 
+            // Vérifier si le joueur est dans une zone de bulle
             let closestBubble = null;
+            let minDistance = Infinity;
+
             bubbles.forEach(b => {
-              const d = turf.distance([lng, lat], [b.lng, b.lat], { units: 'meters' });
-              if (d <= b.radius) closestBubble = b;
+              const bubbleLngLat = b.bubble.getLngLat();
+              const distance = turf.distance([lng, lat], [bubbleLngLat.lng, bubbleLngLat.lat], { units: 'meters' });
+              if (distance <= 20) { // 20 mètres de rayon
+                closestBubble = b;
+                minDistance = distance;
+              }
             });
 
+            // Mettre à jour l'affichage du texte
             if (closestBubble) {
               messageBox.textContent = closestBubble.question;
-              if (!closestBubble.visible) closestBubble.visible = true;
+              if (!closestBubble.visible) {
+                closestBubble.bubble.setLngLat(closestBubble.bubble.getLngLat()); // Forcer le rafraîchissement du marqueur
+                closestBubble.visible = true;
+              }
             } else {
               messageBox.textContent = "Approchez-vous des bulles pour voir les questions...";
-              bubbles.forEach(b => b.visible = false);
+              bubbles.forEach(b => {
+                if (b.visible) {
+                  b.bubble.setLngLat(b.bubble.getLngLat()); // Forcer le rafraîchissement du marqueur
+                  b.visible = false;
+                }
+              });
             }
 
-          }, err => {
-            console.warn("Erreur GPS", err);
+          }, error => {
+            console.error("Erreur de géolocalisation : ", error);
             document.getElementById('gps-indicator').textContent = 'Non capté';
-          }, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
           });
+        } else {
+          alert("La géolocalisation n'est pas supportée par ce navigateur.");
         }
 
+        // Suivi de l'orientation de l'appareil
         if (window.DeviceOrientationEvent) {
-          window.addEventListener('deviceorientation', e => {
-            if (e.alpha !== null) map.setBearing(360 - e.alpha);
+          window.addEventListener('deviceorientation', event => {
+            if (event.alpha !== null) {
+              // Utiliser l'angle alpha pour faire pivoter la carte
+              map.setBearing(360 - event.alpha);
+            }
           });
+        } else {
+          alert("L'orientation de l'appareil n'est pas supportée.");
         }
-
-      })
-      .catch(err => {
-        console.error("Erreur de chargement", err);
-        document.getElementById('load-indicator').textContent = "Erreur de chargement";
+      }).catch(error => {
+        console.error('Erreur lors du chargement des données du quiz:', error);
+        const loadIndicator = document.getElementById('load-indicator');
+        loadIndicator.textContent = "Erreur de chargement des textes.";
       });
-  </script></body>
+  </script>
+</body>
 </html>
