@@ -16,6 +16,13 @@
       right: 20px;
       z-index: 1000;
     }
+    .overlay-text {
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 1em;
+    }
   </style>
 </head>
 <body class="container-fluid">
@@ -75,6 +82,14 @@
       })
     });
     map.addLayer(vectorLayer);
+
+    // Ajouter un overlay pour le texte
+    const textOverlay = new ol.Overlay({
+      element: document.createElement('div'),
+      positioning: 'center-center',
+      stopEvent: false
+    });
+    map.addOverlay(textOverlay);
 
     let userMarker;
     let manualCalibration = false;
@@ -175,6 +190,12 @@
       if (currentIndex >= questionList.length) {
         placingQuestion = false;
       }
+
+      // Mettre à jour l'overlay avec le texte de la question
+      const textElement = textOverlay.getElement();
+      textElement.innerHTML = questionText;
+      textElement.className = 'overlay-text';
+      textOverlay.setPosition(coordinate);
     });
 
     document.getElementById("exportBtn").addEventListener("click", () => {
