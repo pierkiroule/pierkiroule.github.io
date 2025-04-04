@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cache d'URLs avec OpenLayers</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v8.0.0/ol.css">
+  <script src="https://cdn.jsdelivr.net/npm/ol@v8.0.0/dist/ol.js"></script>
+  <style>
+    #map { height: 60vh; width: 100%; }
+    textarea { font-size: 0.9em; }
+    .floating-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .overlay-text {
+      color: white;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    @media (max-width: 768px) {
+      #map { height: 50vh; }
+      .floating-btn { bottom: 10px; }
+    }
+  </style>
+</head>
+<body class="container-fluid">
+  <header class="bg-primary text-white p-3 mb-3">
+    <h1 class="h4">Cache d'URLs</h1>
+    <p class="mb-0">Collez vos URLs, cliquez sur la carte pour les placer</p>
+  </header>
+  <div class="row">
+    <div class="col-md-8 col-sm-12">
+      <div id="map"></div>
+    </div>
+    <div class="col-md-4 col-sm-12">
+      <label class="form-label">Titre du cache</label>
+      <input type="text" class="form-control mb-2" id="cacheTitle" placeholder="Mon cache" aria-label="Titre du cache">
+      <label class="form-label">Rayon d'activation (m)</label>
+      <input type="number" class="form-control mb-2" id="radius" value="30" min="5" max="100" aria-label="Rayon d'activation">
+      <label class="form-label">URLs (une par ligne)</label>
+      <textarea class="form-control mb-2" id="urlsInput" rows="5" placeholder="URL 1\nURL 2" aria-label="Liste des URLs"></textarea>
+      <button id="startBtn" class="btn btn-primary w-100 mb-2">Commencer le positionnement</button>
+      <button id="calibrateBtn" class="btn btn-secondary w-100 mb-2">Me localiser manuellement</button>
+      <button id="exportBtn" class="btn btn-success w-100 mb-2">Exporter en JSON</button>
+      <button id="lockBtn" class="btn btn-warning w-100 mb-2">Verrouiller les positions</button>
+      <label class="form-label">Résultat JSON</label>
+      <textarea id="cacheData" class="form-control" rows="8" readonly aria-label="Résultat JSON"></textarea>
+      <div id="gps-status" class="mt-2">
+        Précision GPS : <span id="gps-accuracy">Inconnue</span> mètres
+      </div>
+      <div id="url-links" aria-live="polite"></div>
+    </div>
+  </div>
+  <button id="recenterBtn" class="btn btn-primary btn-sm floating-btn" aria-label="Recentrer la carte">Recentrer</button>
+
+  <script>
+    // Créer la carte
+    const map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.OSM() // Utilise OpenStreetMap comme couche de base
+        })
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([2.3522, 48.8566]), // Centre la carte sur Paris
+        zoom: 12,
+        rotation: 0 // Initialiser la rotation à 0
+      })
+    });
+
+    // Ajouter une couche vectorielle pour les URLs
+    const vectorSource = new ol.source.Vector();
+    const vectorLayer = new ol.layer.Vector({
+      source: vectorSource,
+      style: new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1],
+          src: 'https://openlayers.org/en/latest/examples/data/icon.png'
+        })
+      })
+    });
+    map.addLayer(vectorLayer);
+
+    // Ajouter un overlay pour le texte
+    const textOverlay = new ol.Overlay({
+      element: document.createElement('div'),
+      positioning: 'center-center',
+      stopEvent: false
+    });
+    map.addOverlay(textOverlay);
+
+    let userMarker;
+    let manualCalibration = false;
+    let placingUrl = false;
+    let urlsLocked = false;
+    let urlList = [], currentIndex = 0, urls = [];
+
+    // Géolocalisation
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(pos => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        document.getElementById('gps-accuracy').textContent = accuracy.toFixed(2);
+
+        if (accuracy < 100 && !manualCalibration) {
+          const userLocation = ol.proj.fromLonLat([longitude, latitude]);
+          if (!userMarker) {
+            userMarker = new ol.Feature(new ol.geom.Point(userLocation));
+            vectorSource.addFeature(userMarker);
+          } else {
+            userMarker.getGeometry().setCoordinates(userLocation);
+          }
+          map.getView().setCenter(userLocation);
+        }
+      }, err => alert("Erreur de géolocalisation : " + err.message), {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      });
+    } else {
+      alert("Géolocalisation non supportée.");
+    }
+
+    // Gestion de la rotation
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', event => {
+        if (event.alpha !== null) {
+          map.getView().setRotation(-event.alpha * (Math.PI / 180));
+        }
+      });
+    }
+
+    document.getElementById('startBtn').addEventListener('click', () => {
+      const rawUrls = document.getElementById('urlsInput').value.trim();
+      urlList = rawUrls.split('\n').map(url => url.trim()).filter(url => url);
+      currentIndex = 0;
+      placingUrl = true;
+      alert("Cliquez sur la carte pour placer chaque URL.");
+    });
+
+    document.getElementById('calibrateBtn').addEventListener('click', () => {
+      manualCalibration = true;
+      alert("Cliquez sur la carte pour vous positionner manuellement.");
+    });
+
+    document.getElementById('recenterBtn').addEventListener('click', () => {
+      if (userMarker) map.getView().setCenter(userMarker.getGeometry().getCoordinates());
+    });
+
+    document.getElementById('lockBtn').addEventListener('click', () => {
+      urlsLocked = true;
+      alert("Les positions des URLs ont été verrouillées.");
+    });
+
+    map.on('click', e => {
+      const coordinate = e.coordinate;
+      if (manualCalibration) {
+        if (!userMarker) {
+          userMarker = new ol.Feature(new ol.geom.Point(coordinate));
+          vectorSource.addFeature(userMarker);
+        } else {
+          userMarker.getGeometry().setCoordinates(coordinate);
+        }
+        map.getView().setCenter(coordinate);
+        manualCalibration = false;
+        return;
+      }
+
+      if (!placingUrl || currentIndex >= urlList.length) {
+        return alert("Toutes les URLs ont été placées.");
+      }
+
+      const radius = parseInt(document.getElementById("radius").value);
+      const url = urlList[currentIndex];
+
+      // Ajouter un cercle pour la zone de détection
+      const circle = new ol.geom.Circle(coordinate, radius);
+      const circleFeature = new ol.Feature(circle);
+      circleFeature.setStyle(
+        new ol.style.Style({
+          stroke: new ol.style.Stroke({
+            color: 'blue',
+            width: 2
+          }),
+          fill: new ol.style.Fill({
+            color: 'rgba(0, 0, 255, 0.1)'
+          })
+        })
+      );
+      vectorSource.addFeature(circleFeature);
+
+      const urlFeature = new ol.Feature(new ol.geom.Point(coordinate));
+      urlFeature.set('url', url);
+      urlFeature.set('radius', radius);
+      vectorSource.addFeature(urlFeature);
+
+      urls.push({
+        lat: ol.proj.toLonLat(coordinate)[1],
+        lng: ol.proj.toLonLat(coordinate)[0],
+        radius,
+        url
+      });
+
+      currentIndex++;
+      if (currentIndex >= urlList.length) {
+        placingUrl = false;
+      }
+
+      // Mettre à jour l'overlay avec le texte de l'URL
+      const textElement = textOverlay.getElement();
+      textElement.innerHTML = `<a href="#" class="url-link" data-url="`${{url}">}$`{url}</a>`;
+      textElement.className = 'overlay-text';
+      textOverlay.setPosition(coordinate);
+
+      // Ajouter un lien cliquable dans la liste des URLs
+      const urlLinksContainer = document.getElementById('url-links');
+      const linkElement = document.createElement('div');
+      linkElement.innerHTML = `<a href="#" class="url-link" data-url="`${{url}">}$`{url}</a>`;
+      urlLinksContainer.appendChild(linkElement);
+    });
+
+    // Écouter les clics sur les liens URL pour ouvrir en popup
+    document.addEventListener('click', e => {
+      if (e.target && e.target.classList.contains('url-link')) {
+        e.preventDefault();
+        const url = e.target.getAttribute('data-url');
+        window.open(url, '_blank', 'width=600,height=400');
+      }
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const title = document.getElementById("cacheTitle").value || "Mes URLs";
+      const data = { title, urls };
+      const jsonText = JSON.stringify(data, null, 2);
+      document.getElementById("cacheData").value = jsonText;
+
+      const blob = new Blob([jsonText], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = title.replace(/\s+/g, "_") + ".json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
