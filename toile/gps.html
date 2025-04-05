@@ -89,6 +89,7 @@
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(pos => {
           const { latitude, longitude, accuracy } = pos.coords;
+          console.log("Géolocalisation réussie:", pos.coords);
           document.getElementById('gps-accuracy').textContent = accuracy.toFixed(2);
 
           const userLocation = ol.proj.fromLonLat([longitude, latitude]);
