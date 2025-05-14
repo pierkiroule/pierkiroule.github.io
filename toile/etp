@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Évaluation ETP</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+
+    body {
+
+      font-family: sans-serif;
+
+      background: #f4f4f4;
+
+      padding: 2em;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+    }
+
+    .form-section {
+
+      background: white;
+
+      padding: 2em;
+
+      border-radius: 10px;
+
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+      width: 100%;
+
+      max-width: 600px;
+
+      margin-bottom: 2em;
+
+    }
+
+    .question {
+
+      margin-bottom: 1.2em;
+
+    }
+
+    select {
+
+      width: 100%;
+
+      padding: 0.4em;
+
+      margin-top: 0.4em;
+
+    }
+
+    button {
+
+      padding: 0.6em 1.2em;
+
+      font-size: 16px;
+
+      background: #007bff;
+
+      color: white;
+
+      border: none;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+    }
+
+    .radar-container {
+
+      background: white;
+
+      padding: 1em;
+
+      border-radius: 10px;
+
+      width: 100%;
+
+      max-width: 600px;
+
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+
+
+<div class="form-section">
+
+  <h2>Évaluez vos compétences en ETP</h2>
+
+  <form id="etpForm">
+
+    <div class="question" data-label="Expliquer l’ETP">1. Expliquer ce qu’est l’ETP<br>
+
+      <select name="q1" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1 - Pas du tout acquis</option>
+
+        <option value="2">2 - Peu acquis</option>
+
+        <option value="3">3 - Moyennement acquis</option>
+
+        <option value="4">4 - Bien acquis</option>
+
+        <option value="5">5 - Totalement acquis</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Diagnostic éducatif">2. Réaliser un diagnostic éducatif<br>
+
+      <select name="q2" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Objectifs adaptés">3. Formuler des objectifs adaptés<br>
+
+      <select name="q3" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Animation séance">4. Animer une séance ETP<br>
+
+      <select name="q4" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Outils pédagogiques">5. Utiliser des outils pédagogiques<br>
+
+      <select name="q5" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Posture éducative">6. Adopter une posture éducative<br>
+
+      <select name="q6" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Évaluation compétences">7. Évaluer les compétences<br>
+
+      <select name="q7" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Travail en équipe">8. Travailler en équipe<br>
+
+      <select name="q8" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Éthique & déontologie">9. Respecter l’éthique<br>
+
+      <select name="q9" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <div class="question" data-label="Conception séquence">10. Concevoir une séquence<br>
+
+      <select name="q10" required>
+
+        <option value="" disabled selected>Choisir une note</option>
+
+        <option value="1">1</option><option value="2">2</option>
+
+        <option value="3">3</option><option value="4">4</option><option value="5">5</option>
+
+      </select>
+
+    </div>
+
+    <button type="submit">Valider</button>
+
+  </form>
+
+</div>
+
+
+
+<div class="radar-container">
+
+  <canvas id="etpRadar" width="400" height="400"></canvas>
+
+</div>
+
+
+
+<script>
+
+document.getElementById('etpForm').addEventListener('submit', function (e) {
+
+  e.preventDefault();
+
+
+
+  const labels = [];
+
+  const data = [];
+
+
+
+  document.querySelectorAll('.question').forEach(q => {
+
+    labels.push(q.getAttribute('data-label'));
+
+    data.push(parseInt(q.querySelector('select').value));
+
+  });
+
+
+
+  const ctx = document.getElementById('etpRadar').getContext('2d');
+
+  if (window.radarChart) window.radarChart.destroy();
+
+
+
+  window.radarChart = new Chart(ctx, {
+
+    type: 'radar',
+
+    data: {
+
+      labels: labels,
+
+      datasets: [{
+
+        label: 'Votre profil de compétences ETP',
+
+        data: data,
+
+        backgroundColor: 'rgba(0, 123, 255, 0.2)',
+
+        borderColor: 'rgba(0, 123, 255, 1)',
+
+        pointBackgroundColor: 'rgba(0, 123, 255, 1)'
+
+      }]
+
+    },
+
+    options: {
+
+      responsive: true,
+
+      scales: {
+
+        r: {
+
+          min: 0,
+
+          max: 5,
+
+          ticks: {
+
+            stepSize: 1
+
+          },
+
+          pointLabels: {
+
+            font: { size: 12 }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  });
+
+});
+
+</script>
+
+
+
+</body>
+
+</html>
+
