@@ -21,7 +21,6 @@
       Pseudo (surnom ou initiales, facultatif) :<br>
       <input type="text" name="pseudo" maxlength="20">
     </div>
-    <!-- Génération dynamique JS plus bas -->
     <div id="questions"></div>
     <div class="question">
       Commentaire libre (facultatif) :<br>
@@ -35,7 +34,7 @@
 </div>
 
 <script type="module">
-  // Firebase config (reprends la tienne)
+  // Firebase config
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
   const firebaseConfig = {
@@ -49,7 +48,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // 20 items adjectifs (modifie ici si besoin)
+  // 20 items adjectifs
   const items = [
     "Intéressant", "Stimulant", "Formateur", "Respectueux", "Bienveillant", "Structurant", "Ouvert à la diversité", "Facilitant la prise de parole",
     "Équitable dans le temps de parole", "Clair dans ses objectifs", "Utile pour la pratique", "Adapté aux besoins du groupe", "Créatif dans la recherche de solutions",
@@ -87,6 +86,8 @@
     }
     // Envoi Firestore
     await addDoc(collection(db, "intervision_eval"), data);
+    // Masquer le formulaire
+    document.querySelector('.form-section').style.display = 'none';
     // Affichage radar
     showRadar(data.notes);
   });
