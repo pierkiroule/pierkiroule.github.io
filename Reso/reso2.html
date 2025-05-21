@@ -1,0 +1,65 @@
+<!-- Bulle photo audio flottante et rebondissante -->
+<style>
+  .bubble-voice {
+    position: fixed;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-image: url('https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/Reso/39243998%20(1).jpeg');
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    z-index: 999;
+    cursor: pointer;
+    transition: box-shadow 0.4s ease;
+  }
+
+  .bubble-voice:hover {
+    box-shadow: 0 0 15px rgba(0, 100, 150, 0.4);
+  }
+</style>
+
+<div class="bubble-voice" id="voiceBubble" title="Écouter Pier•°"></div>
+<audio id="voiceAudio" src="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/Reso/My%20Recording_117.mp3"></audio>
+
+<script>
+  const bubble = document.getElementById('voiceBubble');
+  const audio = document.getElementById('voiceAudio');
+
+  // Mouvement rebondissant
+  let posX = 100, posY = 100;
+  let velX = 0.3, velY = 0.2;
+
+  function animateBubble() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    posX += velX;
+    posY += velY;
+
+    if (posX <= 0 || posX >= w - 80) velX *= -1;
+    if (posY <= 0 || posY >= h - 80) velY *= -1;
+
+    bubble.style.left = posX + 'px';
+    bubble.style.top = posY + 'px';
+
+    requestAnimationFrame(animateBubble);
+  }
+
+  animateBubble();
+
+  // Clic audio
+  bubble.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.currentTime = 0;
+      audio.play();
+    } else {
+      audio.pause();
+    }
+  });
+
+  // Pause audio en quittant la page
+  window.addEventListener('beforeunload', () => {
+    audio.pause();
+  });
+</script>
