@@ -108,6 +108,42 @@
         opacity: 0;
       }
     }
+
+  #resonance-animation {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    max-height: 40vh;
+    height: auto;
+    background: white;
+    color: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    border-top: 1px solid #ccc;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    transition: opacity 1s ease;
+    padding: 2vh 0;
+  }
+
+  .resonance-letter {
+    font-size: 8vw;
+    opacity: 0;
+    transform: scale(2);
+    transition: all 1s ease;
+  }
+
+  .resonance-text {
+    font-size: 1em;
+    max-width: 80vw;
+    opacity: 0;
+    margin-top: 0.5em;
+    transition: opacity 1s ease;
+  }
   </style>
 </head>
 <body>
@@ -198,40 +234,6 @@
     }
   </script>
 
-  <style>
-  #resonance-animation {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: white;
-    color: #111;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 9999;
-    transition: opacity 1s ease;
-  }
-  .resonance-letter {
-    font-size: 15vw;
-    opacity: 0;
-    transform: scale(5);
-    transition: all 1s ease;
-  }
-  .resonance-text {
-    font-size: 1.2em;
-    max-width: 80vw;
-    opacity: 0;
-    margin-top: 1em;
-    transition: opacity 1s ease;
-  }
-</style>
-
-<div id="resonance-animation">
-  <div class="resonance-letter" id="resonance-letter">R</div>
-  <div class="resonance-text" id="resonance-text">Résonance — L’art de vibrer ensemble.</div>
-</div>
 
 <script>
   const lettres = [
