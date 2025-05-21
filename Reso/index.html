@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <title>Collectif RÉSONANCE</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
       background: white;
       font-family: 'Helvetica Neue', sans-serif;
       overflow: hidden;
@@ -37,7 +37,13 @@
       font-size: 0.8em;
       color: #bbb;
       cursor: pointer;
-      transition: transform 0.3s;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .morse-letter.active {
+      color: #004466;
+      text-shadow: 0 0 20px rgba(0, 100, 150, 0.4);
+      transform: scale(1.1);
     }
     .morse-code {
       font-size: 1.5em;
@@ -50,7 +56,7 @@
       opacity: 0.1;
       background: white;
       animation: float 60s infinite ease-in-out;
-      transition: transform 0.5s ease;
+      transition: all 0.5s ease;
     }
     .keyword {
       font-size: 1em;
@@ -58,48 +64,96 @@
       opacity: 0.3;
       background: none;
     }
+    .animated {
+      opacity: 0.6 !important;
+      background: #def !important;
+      color: #669 !important;
+      transform: scale(1.2) !important;
+    }
     @keyframes float {
       0% { transform: translateY(0); }
       50% { transform: translateY(-50vh); }
       100% { transform: translateY(0); }
     }
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #99ccff;
+      opacity: 0.8;
+      animation: rise 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rise {
+      to {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="title">Collectif RÉSONANCE</div>
-  <div class="intro">Autorisez-vous à fermer les yeux et ouvrir vos oreilles...</div>  <div class="morse-container">
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/blobiflowers.mp3">R<br><span class="morse-code">.-.</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/forest.mp3">E<br><span class="morse-code">.</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/or.mp3">S<br><span class="morse-code">...</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/expedrum.mp3">O<br><span class="morse-code">---</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/neig.mp3">N<br><span class="morse-code">-.</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/flamant.mp3">A<br><span class="morse-code">.-</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/celmuzic1.mp3">N<br><span class="morse-code">-.</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/celmuzic2.mp3">C<br><span class="morse-code">-.-.</span></div>
-    <div class="morse-letter" data-sound="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/boumy.mp3">E<br><span class="morse-code">.</span></div>
-  </div>  <script>
-    let currentAudio = null;
+  <div class="intro">Autorisez-vous à fermer les yeux et ouvrir vos oreilles...</div>
+
+  <div class="morse-container">
+    <div class="morse-letter" data-sound="blobiflowers.mp3">R<br><span class="morse-code">.-.</span></div>
+    <div class="morse-letter" data-sound="forest.mp3">E<br><span class="morse-code">.</span></div>
+    <div class="morse-letter" data-sound="or.mp3">S<br><span class="morse-code">...</span></div>
+    <div class="morse-letter" data-sound="expedrum.mp3">O<br><span class="morse-code">---</span></div>
+    <div class="morse-letter" data-sound="neig.mp3">N<br><span class="morse-code">-.</span></div>
+    <div class="morse-letter" data-sound="flamant.mp3">A<br><span class="morse-code">.-</span></div>
+    <div class="morse-letter" data-sound="celmuzic1.mp3">N<br><span class="morse-code">-.</span></div>
+    <div class="morse-letter" data-sound="celmuzic2.mp3">C<br><span class="morse-code">-.-.</span></div>
+    <div class="morse-letter" data-sound="boumy.mp3">E<br><span class="morse-code">.</span></div>
+  </div>
+
+  <audio id="gong" src="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/bubble-pop-2-293341.mp3"></audio>
+
+  <script>
     const letters = document.querySelectorAll('.morse-letter');
-    const allFloaters = [];
+    const gong = document.getElementById('gong');
+    let currentAudio = null;
+    const floaters = [];
+
+    function animateFloaters() {
+      floaters.forEach(el => {
+        el.classList.add('animated');
+        setTimeout(() => el.classList.remove('animated'), 2000);
+      });
+    }
+
+    function spawnParticles(x, y) {
+      for (let i = 0; i < 12; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = `${x + Math.random() * 40 - 20}px`;
+        p.style.top = `${y + Math.random() * 20 - 10}px`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
+    }
 
     letters.forEach(letter => {
-      const audio = new Audio(letter.dataset.sound);
-      letter.addEventListener('click', () => {
+      const sound = new Audio(`https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/${letter.dataset.sound}`);
+      letter.addEventListener('click', e => {
         if (currentAudio) {
           currentAudio.pause();
           currentAudio.currentTime = 0;
         }
-        audio.currentTime = 0;
-        audio.play();
-        currentAudio = audio;
+        sound.currentTime = 0;
+        sound.play();
+        gong.currentTime = 0;
+        gong.play();
+        currentAudio = sound;
 
-        // Animer les bulles et mots clés au clic
-        allFloaters.forEach(el => {
-          el.style.transform = `scale(${1 + Math.random() * 0.5}) translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px)`;
-          setTimeout(() => {
-            el.style.transform = "translate(0,0)";
-          }, 500);
-        });
+        letters.forEach(l => l.classList.remove('active'));
+        letter.classList.add('active');
+        setTimeout(() => letter.classList.remove('active'), 1500);
+
+        animateFloaters();
+        spawnParticles(e.pageX, e.pageY);
       });
     });
 
@@ -111,18 +165,19 @@
       bubble.style.width = size + 'px';
       bubble.style.height = size + 'px';
       bubble.style.left = Math.random() * 100 + 'vw';
-      bubble.style.top = Math.random() * 5000 + 'px';
+      bubble.style.top = Math.random() * 6000 + 'px';
       document.body.appendChild(bubble);
-      allFloaters.push(bubble);
+      floaters.push(bubble);
     }
     for (let i = 0; i < 10; i++) {
       const word = document.createElement('div');
       word.className = 'keyword';
       word.innerText = keywords[i % keywords.length];
       word.style.left = Math.random() * 100 + 'vw';
-      word.style.top = Math.random() * 5000 + 'px';
+      word.style.top = Math.random() * 6000 + 'px';
       document.body.appendChild(word);
-      allFloaters.push(word);
+      floaters.push(word);
     }
-  </script></body>
+  </script>
+</body>
 </html>
