@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Collectif RÉSONANCE</title>
   <style>
     body {
@@ -98,18 +99,18 @@
   <div class="intro">Autorisez-vous à fermer les yeux et ouvrir vos oreilles...</div>
 
   <div class="morse-container">
-    <div class="morse-letter" data-sound="blobiflowers.mp3">R<br><span class="morse-code">.-.</span></div>
-    <div class="morse-letter" data-sound="forest.mp3">E<br><span class="morse-code">.</span></div>
-    <div class="morse-letter" data-sound="or.mp3">S<br><span class="morse-code">...</span></div>
-    <div class="morse-letter" data-sound="expedrum.mp3">O<br><span class="morse-code">---</span></div>
-    <div class="morse-letter" data-sound="neig.mp3">N<br><span class="morse-code">-.</span></div>
-    <div class="morse-letter" data-sound="flamant.mp3">A<br><span class="morse-code">.-</span></div>
-    <div class="morse-letter" data-sound="celmuzic1.mp3">N<br><span class="morse-code">-.</span></div>
-    <div class="morse-letter" data-sound="celmuzic2.mp3">C<br><span class="morse-code">-.-.</span></div>
-    <div class="morse-letter" data-sound="boumy.mp3">E<br><span class="morse-code">.</span></div>
+    <div class="morse-letter" data-sound="cellmp3/blobiflowers.mp3">R<br><span class="morse-code">.-.</span></div>
+    <div class="morse-letter" data-sound="cellmp3/forest.mp3">E<br><span class="morse-code">.</span></div>
+    <div class="morse-letter" data-sound="cellmp3/or.mp3">S<br><span class="morse-code">...</span></div>
+    <div class="morse-letter" data-sound="cellmp3/expedrum.mp3">O<br><span class="morse-code">---</span></div>
+    <div class="morse-letter" data-sound="cellmp3/neig.mp3">N<br><span class="morse-code">-.</span></div>
+    <div class="morse-letter" data-sound="cellmp3/flamant.mp3">A<br><span class="morse-code">.-</span></div>
+    <div class="morse-letter" data-sound="cellmp3/celmuzic1.mp3">N<br><span class="morse-code">-.</span></div>
+    <div class="morse-letter" data-sound="cellmp3/celmuzic2.mp3">C<br><span class="morse-code">-.-.</span></div>
+    <div class="morse-letter" data-sound="cellmp3/boumy.mp3">E<br><span class="morse-code">.</span></div>
   </div>
 
-  <audio id="gong" src="https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/bubble-pop-2-293341.mp3"></audio>
+  <audio id="gong" src="cellmp3/bubble-pop-2-293341.mp3"></audio>
 
   <script>
     const letters = document.querySelectorAll('.morse-letter');
@@ -136,7 +137,7 @@
     }
 
     letters.forEach(letter => {
-      const sound = new Audio(`https://github.com/pierkiroule/pierkiroule.github.io/raw/refs/heads/master/cellmp3/${letter.dataset.sound}`);
+      const sound = new Audio(letter.dataset.sound);
       letter.addEventListener('click', e => {
         if (currentAudio) {
           currentAudio.pause();
