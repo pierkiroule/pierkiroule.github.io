@@ -12,10 +12,10 @@
     }
     .bubble-voice {
       position: fixed;
-      width: 280px;
-      height: 280px;
+      width: 180px;
+      height: 180px;
       border-radius: 50%;
-      opacity: 0.8;
+      opacity: 0.3;
       background-image: url('https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/Reso/39243998%20(1).jpeg');
       background-size: cover;
       background-position: center;
@@ -157,8 +157,8 @@
       const h = window.innerHeight;
       posX += velX;
       posY += velY;
-      if (posX <= 0 || posX >= w - 280) velX *= -1;
-      if (posY <= 0 || posY >= h - 280) velY *= -1;
+      if (posX <= 0 || posX >= w - 180) velX *= -1;
+      if (posY <= 0 || posY >= h - 180) velY *= -1;
       bubble.style.left = posX + 'px';
       bubble.style.top = posY + 'px';
       requestAnimationFrame(animateBubble);
