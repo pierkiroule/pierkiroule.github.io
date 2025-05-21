@@ -197,5 +197,84 @@
       floaters.push(word);
     }
   </script>
+
+  <style>
+  #resonance-animation {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    color: #111;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+    transition: opacity 1s ease;
+  }
+  .resonance-letter {
+    font-size: 15vw;
+    opacity: 0;
+    transform: scale(5);
+    transition: all 1s ease;
+  }
+  .resonance-text {
+    font-size: 1.2em;
+    max-width: 80vw;
+    opacity: 0;
+    margin-top: 1em;
+    transition: opacity 1s ease;
+  }
+</style>
+
+<div id="resonance-animation">
+  <div class="resonance-letter" id="resonance-letter">R</div>
+  <div class="resonance-text" id="resonance-text">Résonance — L’art de vibrer ensemble.</div>
+</div>
+
+<script>
+  const lettres = [
+    { l: "R", t: "Résonance — L’art de vibrer ensemble." },
+    { l: "É", t: "Écoute — Disponibilité sensorielle et attention au monde." },
+    { l: "S", t: "Sens — Ce que nous cherchons à tisser." },
+    { l: "O", t: "Ondes — Nos matières premières : sons, souffles, silences." },
+    { l: "N", t: "Nids — Espaces poétiques, partagés, refuges." },
+    { l: "A", t: "Altérité — Travailler avec l’autre et l’imprévu." },
+    { l: "N", t: "Néotopies — Utopies concrètes et fictions agissantes." },
+    { l: "C", t: "Création — Improvisation, déconstruction, expérimentation." },
+    { l: "E", t: "Échos — Traces et résonances à venir." },
+  ];
+
+  const anim = document.getElementById("resonance-animation");
+  const letter = document.getElementById("resonance-letter");
+  const text = document.getElementById("resonance-text");
+
+  let index = 0;
+  function showNext() {
+    if (index >= lettres.length) {
+      anim.style.opacity = 0;
+      setTimeout(() => anim.remove(), 1500);
+      return;
+    }
+
+    letter.style.opacity = 0;
+    text.style.opacity = 0;
+
+    setTimeout(() => {
+      letter.textContent = lettres[index].l;
+      text.textContent = lettres[index].t;
+      letter.style.transform = 'scale(1)';
+      letter.style.opacity = 1;
+      text.style.opacity = 1;
+      index++;
+      setTimeout(showNext, 2800);
+    }, 800);
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(showNext, 500); // Lancer après le chargement complet
+  });
+</script>
 </body>
 </html>
