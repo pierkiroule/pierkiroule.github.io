@@ -214,8 +214,8 @@
     posX += velX;
     posY += velY;
 
-    if (posX <= 0 || posX >= w - 80) velX *= -1;
-    if (posY <= 0 || posY >= h - 80) velY *= -1;
+    if (posX <= 0 || posX >= w - 280) velX *= -1;
+    if (posY <= 0 || posY >= h - 280) velY *= -1;
 
     bubble.style.left = posX + 'px';
     bubble.style.top = posY + 'px';
