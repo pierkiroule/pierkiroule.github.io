@@ -2,52 +2,81 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<title>Quiz Bretagne – ETP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kahoot ETP Bretagne – Mobile</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #006994, #00b7ff);
-    padding: 20px;
-    color: white;
+    font-family: sans-serif;
+    background: linear-gradient(160deg, #0077aa, #00c6ff);
+    margin: 0;
+    padding: 10px;
+    color: #fff;
   }
+
   h1 {
     text-align: center;
-    margin-bottom: 10px;
+    font-size: 1.6rem;
+    margin: 10px 0;
   }
+
+  .intro {
+    text-align: center;
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 12px;
+  }
+
   .question {
     background: rgba(0,0,0,0.25);
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    border-radius: 14px;
   }
+
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
   .answers button {
     display: block;
     width: 100%;
-    margin: 6px 0;
-    padding: 10px;
+    margin: 8px 0;
+    padding: 14px;
     border: none;
     cursor: pointer;
+    border-radius: 10px;
+    font-size: 1rem;
     background: #ffffff;
-    border-radius: 6px;
-    font-size: 16px;
+    color: #333;
+    transition: transform 0.1s ease, background 0.2s;
   }
-  .answers button:hover {
-    background: #ffe58b;
+
+  .answers button:active {
+    transform: scale(0.97);
   }
+
   #scoreBox {
     display: none;
-    margin-top: 20px;
+    margin: 20px auto;
     padding: 20px;
     background: rgba(0,0,0,0.35);
-    border-radius: 10px;
+    border-radius: 14px;
     text-align: center;
+    max-width: 350px;
+  }
+
+  #scoreText {
+    font-size: 1.3rem;
+    margin-top: 10px;
   }
 </style>
 </head>
 <body>
 
-<h1>🎉 Quiz Bretagne ETP – Brise-Glace 🎉</h1>
-<p style="text-align:center;">Humour breton 🌊 mais vraies réponses ETP ✔️</p>
+<h1>🎉 Quiz Bretagne ETP 🎉</h1>
+<p class="intro">Humour breton 🌊 mais vraies réponses ETP ✔️</p>
 
 <div id="quiz"></div>
 
@@ -58,30 +87,72 @@
 
 <script>
 const questions = [
-  {
-    q: "L’ETP, c’est surtout…",
-    a: ["💃 Une danse de fest-noz", "🧚 Un entraînement pour devenir korrigan", "🌿 Un accompagnement pour mieux vivre avec sa maladie", "🥐 Une thérapie au kouign-amann"],
-    correct: 2
-  },
-  {
-    q: "Première étape d’un programme ETP ?",
-    a: ["🌬️ Vérifier la météo d’Ouessant", "📋 Le bilan initial", "🌭 Commander une galette-saucisse", "🐦 Saluer les goélands"],
-    correct: 1
-  },
-  {
-    q: "Le but principal de l’ETP ?",
-    a: ["⚡ Préparer aux tempêtes", "🧭 Aider à être autonome", "🥏 Gagner au palet", "🗼 Connaître tous les phares du Finistère"],
-    correct: 1
-  },
-  {
-    q: "Un bon objectif ETP doit être…",
-    a: ["🌫️ Flou comme un phare dans le brouillard", "🔮 Décidé par un druide", "🎯 Précis et utile au quotidien", "🏴 Écrit en breton ancien"],
-    correct: 2
-  },
-  {
-    q: "La posture éducative, c’est…",
-    a: ["💃 Une danse bretonne", "🤝 Une attitude du quotidien", "🥁 Un pas de gavotte", "🪁 Une figure de cerf-volant"],
-    correct: 1
+  { q:"L’ETP, c’est surtout…", a:["💃 Fest-noz","🧚 Korrigan school","🌿 Mieux vivre avec sa maladie","🥐 Thérapie kouign-amann"], correct:2 },
+  { q:"Première étape d’un programme ETP ?", a:["🌬️ Météo Ouessant","📋 Bilan initial","🌭 Galette-saucisse","🐦 Saluer les goélands"], correct:1 },
+  { q:"Le but principal de l’ETP ?", a:["⚡ Tempêtes","🧭 Autonomie","🥏 Palet","🗼 Tous les phares"], correct:1 },
+  { q:"Un bon objectif ETP doit être…", a:["🌫️ Flou","🔮 Décidé par un druide","🎯 Utile au quotidien","🏴 En breton ancien"], correct:2 },
+  { q:"La posture éducative, c’est…", a:["💃 Danse","🤝 Attitude du quotidien","🥁 Gavotte","🪁 Cerf-volant"], correct:1 },
+  { q:"Le bilan initial sert à…", a:["📍 Saint-Malo ou Quimper ?","🧠 Comprendre le vécu","🥞 Tester crêpes","🌦️ Résistance au crachin"], correct:1 },
+  { q:"Le bilan final sert à…", a:["🍻 Cidre","🌟 Ce que la personne a appris","🎯 Bouchon","🎶 Fest-noz"], correct:1 },
+  { q:"L’info en ETP doit être…", a:["🌊 Identique","💬 Adaptée au patient","🏴 Only breton","🎶 Biniou"], correct:1 },
+  { q:"Séance ETP réussie ?", a:["🗣️ Monologue","🤝 Participation du patient","😴 Sieste","💃 Gavotte"], correct:1 },
+  { q:"L’ETP vise surtout…", a:["🧱 Obéissance","🧭 Autonomie","🧕 Dressage bigoudène","🕺 Cercle celtique"], correct:1 }
+];
+
+let score = 0;
+
+function loadQuiz() {
+  const quiz = document.getElementById('quiz');
+  quiz.innerHTML = "";
+
+  questions.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = "question";
+
+    card.innerHTML = `
+      <h3>${index+1}. ${item.q}</h3>
+      <div class="answers"></div>
+    `;
+
+    const answersDiv = card.querySelector(".answers");
+
+    item.a.forEach((ans, i) => {
+      const btn = document.createElement("button");
+      btn.textContent = ans;
+      btn.onclick = () => selectAnswer(index, i, btn);
+      answersDiv.appendChild(btn);
+    });
+
+    quiz.appendChild(card);
+  });
+}
+
+function selectAnswer(qIndex, aIndex, btn) {
+  const correct = questions[qIndex].correct;
+
+  if (aIndex === correct) {
+    score++;
+    btn.style.background = "#8eff80";
+  } else {
+    btn.style.background = "#ff8b8b";
+  }
+
+  [...btn.parentNode.children].forEach(b => b.disabled = true);
+  if (document.querySelectorAll("button:not([disabled])").length === 0) showScore();
+}
+
+function showScore() {
+  const box = document.getElementById("scoreBox");
+  document.getElementById("scoreText").textContent =
+    `Score : ${score} / ${questions.length} 🌟`;
+  box.style.display = "block";
+}
+
+loadQuiz();
+</script>
+
+</body>
+</html>    correct: 1
   },
   {
     q: "Le bilan initial sert surtout à…",
