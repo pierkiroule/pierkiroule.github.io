@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mon premier entretien de compréhension en ETP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border-soft: #1f2937;
+      --danger: #f97373;
+      --ok: #4ade80;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1e293b, #020617 60%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 12px 40px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #020617, #020617, #020617);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      padding: 16px 14px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.85);
+    }
+
+    .title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      margin-bottom: 12px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+
+    .pill span {
+      font-size: 0.9rem;
+    }
+
+    .header-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .sections {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .section {
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      font-size: 0.9rem;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .section-sub {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .section-chevron {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      transition: transform 0.2s ease;
+    }
+
+    .section-chevron.open {
+      transform: rotate(90deg);
+    }
+
+    .section-body {
+      padding: 8px 10px 10px;
+      border-top: 1px solid var(--border-soft);
+      font-size: 0.84rem;
+    }
+
+    .section-body p {
+      margin: 4px 0;
+      line-height: 1.4;
+    }
+
+    .section-body strong {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    ul {
+      padding-left: 18px;
+      margin: 4px 0;
+    }
+
+    li {
+      margin-bottom: 2px;
+    }
+
+    .label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .quote-box {
+      border-radius: 10px;
+      border: 1px dashed rgba(148, 163, 184, 0.4);
+      padding: 6px 8px;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .quote-box code {
+      font-family: inherit;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 6px;
+      padding: 2px 4px;
+      display: inline-block;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .chip {
+      font-size: 0.74rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+    }
+
+    .role-box {
+      border-radius: 10px;
+      padding: 6px 8px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 4px;
+    }
+
+    .role-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .check-item input {
+      margin-top: 2px;
+    }
+
+    .score-box {
+      margin-top: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .score-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .score-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--danger);
+    }
+
+    .score-text {
+      font-weight: 600;
+    }
+
+    .score-helper {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn span {
+      font-size: 0.9rem;
+    }
+
+    .helper-note {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    @media (min-width: 700px) {
+      .card {
+        padding: 18px 18px 18px;
+      }
+
+      .title {
+        font-size: 1.45rem;
+      }
+
+      .subtitle {
+        font-size: 0.95rem;
+      }
+
+      .section-title {
+        font-size: 0.95rem;
+      }
+
+      .section-body {
+        font-size: 0.86rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <div class="header-row">
+        <div>
+          <div class="title">
+            🎯 Mon premier entretien de compréhension en ETP
+          </div>
+          <div class="subtitle">
+            Fiche outil – Jeu de rôle soignant-éducateur / soigné · Bases d’un BEP
+          </div>
+        </div>
+        <div class="pill">
+          <span>👂</span>
+          <span>Écoute active & 4 R de Cungi</span>
+        </div>
+      </div>
+      <div class="tagline">
+        Objectif : apprendre à mener un premier bilan éducatif partagé simple, clair
+        et centré sur le projet de vie du patient.
+      </div>
+
+      <div class="sections">
+
+        <!-- Section 1 : Objectif -->
+        <div class="section" data-section="objectif">
+          <div class="section-header">
+            <div class="section-header-left">
+              <div class="section-icon">1</div>
+              <div>
+                <div class="section-title">Objectif du premier entretien</div>
+                <div class="section-sub">Comprendre avant d’expliquer</div>
+              </div>
+            </div>
+            <div class="section-chevron open">▶</div>
+          </div>
+          <div class="section-body">
+            <p class="label">Ce que vise ce premier BEP</p>
+            <ul>
+              <li>Comprendre ce que la personne sait, croit et ressent.</li>
+              <li>Explorer ses représentations, peurs et attentes.</li>
+              <li>Repérer son projet de vie et ses valeurs centrales.</li>
+              <li>Transformer cela en besoin d’apprentissage puis objectif éducatif prioritaire.</li>
+            </ul>
+            <div class="quote-box">
+              <code>Fil rouge : comprendre → reformuler → clarifier → prioriser.</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2 : Trame du BEP -->
+        <div class="section" data-section="trame">
+          <div class="section-header">
+            <div class="section-header-left">
+              <div class="section-icon">2</div>
+              <div>
+                <div class="section-title">Trame simple du BEP débutant</div>
+                <div class="section-sub">Étapes pour structurer l’entretien</div>
+              </div>
+            </div>
+            <div class="section-chevron open">▶</div>
+          </div>
+          <div class="section-body">
+            <p class="label">Étape 1 · Accueil – Mise en confiance</p>
+            <ul>
+              <li>Posture basse, rythme lent, regard ouvert.</li>
+              <li>Exemple : “Qu’attendez-vous de ce rendez-vous ?”</li>
+            </ul>
+
+            <p class="label">Étape 2 · Écoute active</p>
+            <ul>
+              <li>Reformulations simples.</li>
+              <li>Silences, temps de pensée.</li>
+              <li>Validation émotionnelle : “C’est normal d’être inquiet·e.”</li>
+              <li>Ne pas corriger trop tôt.</li>
+            </ul>
+
+            <p class="label">Étape 3 · Les 4 R de Cungi</p>
+            <ul>
+              <li><strong>Reformuler</strong> : vérifier que l’on a bien compris.</li>
+              <li><strong>Résumer</strong> : 1–2 phrases pour clarifier.</li>
+              <li><strong>Recontextualiser</strong> : relier à la vie réelle du patient.</li>
+              <li><strong>Renforcer</strong> : valoriser ses forces et ce qui est déjà en place.</li>
+            </ul>
+
+            <p class="label">Étape 4 · Projet de vie & valeurs</p>
+            <ul>
+              <li>“Qu’est-ce qui compte le plus pour vous en ce moment ?”</li>
+              <li>“Qu’aimeriez-vous pouvoir continuer à faire malgré ce souci de santé ?”</li>
+            </ul>
+
+            <p class="label">Étape 5 · Besoin d’apprentissage</p>
+            <p>Valeur → difficulté → besoin.</p>
+            <ul>
+              <li>Ex : valeur = être en forme pour ses enfants.</li>
+              <li>Inquiétude = peur du traitement.</li>
+              <li>→ <strong>Besoin</strong> : comprendre le rôle et l’usage du traitement.</li>
+            </ul>
+
+            <p class="label">Étape 6 · Objectif éducatif prioritaire</p>
+            <p>Formule simple :</p>
+            <div class="quote-box">
+              <code>“À la fin du programme, j’aimerais savoir… + verbe d’action + contexte.”</code>
+            </div>
+
+            <p class="label">Étape 7 · Clôture</p>
+            <ul>
+              <li>Reprendre ce qui a été compris ensemble.</li>
+              <li>Ouvrir sur la suite : “On va avancer à votre rythme.”</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Section 3 : Rôle des acteurs -->
+        <div class="section" data-section="roles">
+          <div class="section-header">
+            <div class="section-header-left">
+              <div class="section-icon">3</div>
+              <div>
+                <div class="section-title">Jeu de rôle : qui fait quoi ?</div>
+                <div class="section-sub">Soignant-éducateur / soigné</div>
+              </div>
+            </div>
+            <div class="section-chevron open">▶</div>
+          </div>
+          <div class="section-body">
+            <div class="chips">
+              <div class="chip">🩺 Soignant-éducateur</div>
+              <div class="chip">🧍 Soigné (ex. Lina)</div>
+            </div>
+
+            <div class="role-box">
+              <div class="role-title">Rôle du soignant-éducateur</div>
+              <ul>
+                <li>Accompagner, pas “faire la leçon”.</li>
+                <li>Laisser le patient dérouler son histoire.</li>
+                <li>Explorer les valeurs et le projet de vie.</li>
+                <li>Utiliser les 4 R pour structurer l’échange.</li>
+                <li>Co-construire un objectif éducatif prioritaire simple.</li>
+              </ul>
+            </div>
+
+            <div class="role-box">
+              <div class="role-title">Rôle du soigné (patient standardisé)</div>
+              <ul>
+                <li>Exprimer ses peurs, ses doutes, ses incompréhensions.</li>
+                <li>Dire ce qui compte dans sa vie quotidienne.</li>
+                <li>Valider ou corriger les reformulations du soignant.</li>
+                <li>Exprimer ce qu’il aimerait mieux comprendre ou savoir faire.</li>
+              </ul>
+            </div>
+
+            <p class="helper-note">
+              💡 Astuce jeu de rôle : alternez les rôles (soignant / soigné) et terminez par un
+              bref débrief en binôme.
+            </p>
+          </div>
+        </div>
+
+        <!-- Section 4 : Auto-évaluation -->
+        <div class="section" data-section="auto-eval">
+          <div class="section-header">
+            <div class="section-header-left">
+              <div class="section-icon">4</div>
+              <div>
+                <div class="section-title">Auto-évaluation du soignant-éducateur</div>
+                <div class="section-sub">Indicateurs de justesse</div>
+              </div>
+            </div>
+            <div class="section-chevron open">▶</div>
+          </div>
+          <div class="section-body">
+            <p class="label">Coche ce qui a été présent dans ton entretien</p>
+
+            <div class="checklist" id="checklist">
+              <label class="check-item">
+                <input type="checkbox" data-category="posture" />
+                <span>J’ai laissé le patient parler sans l’interrompre trop tôt.</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="posture" />
+                <span>J’ai utilisé des silences et un rythme adapté.</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="4r" />
+                <span>J’ai reformulé plusieurs fois et le patient m’a confirmé “oui, c’est ça”.</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="4r" />
+                <span>J’ai fait au moins un résumé court (1–2 phrases).</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="4r" />
+                <span>J’ai relié ses propos à son quotidien concret (travail, famille, etc.).</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="4r" />
+                <span>J’ai valorisé au moins une force ou ressource du patient.</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="projet" />
+                <span>J’ai identifié au moins une valeur centrale ou un projet de vie (ce qui compte pour lui/elle).</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="besoin" />
+                <span>J’ai transformé cette valeur en un besoin d’apprentissage formulé avec ses mots.</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="objectif" />
+                <span>Nous avons formulé ensemble un <strong>objectif éducatif prioritaire</strong> simple et concret.</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" data-category="cloture" />
+                <span>En fin d’entretien, le patient semblait se sentir compris et plus au clair sur la suite.</span>
+              </label>
+            </div>
+
+            <div class="score-box" id="scoreBox">
+              <div class="score-main">
+                <div class="score-dot" id="scoreDot"></div>
+                <div class="score-text" id="scoreText">0 / 10 items validés</div>
+              </div>
+              <div class="score-helper" id="scoreHelper">
+                Plus tu coches d’items, plus ton entretien est proche d’un BEP juste et partagé.
+              </div>
+              <button class="btn" id="resetBtn">
+                <span>↺</span> Réinitialiser
+              </button>
+            </div>
+
+            <p class="helper-note">
+              ✅ Indicateur final : le patient peut dire en une phrase ce qu’il souhaite apprendre
+              en priorité, et tu peux redire cette phrase sans la déformer.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Gestion ouverture/fermeture sections
+    document.querySelectorAll(".section").forEach(function (section) {
+      var header = section.querySelector(".section-header");
+      var body = section.querySelector(".section-body");
+      var chevron = section.querySelector(".section-chevron");
+
+      header.addEventListener("click", function (e) {
+        // Empêcher clic sur boutons internes de fermer la section
+        if (e.target.closest("button")) return;
+
+        var isHidden = body.style.display === "none";
+        body.style.display = isHidden ? "block" : "none";
+        chevron.classList.toggle("open", isHidden);
+      });
+    });
+
+    // Initialiser : tout ouvert par défaut
+    document.querySelectorAll(".section-body").forEach(function (body) {
+      body.style.display = "block";
+    });
+    document.querySelectorAll(".section-chevron").forEach(function (ch) {
+      ch.classList.add("open");
+    });
+
+    // Auto-évaluation
+    var checklist = document.getElementById("checklist");
+    var scoreText = document.getElementById("scoreText");
+    var scoreHelper = document.getElementById("scoreHelper");
+    var scoreDot = document.getElementById("scoreDot");
+    var resetBtn = document.getElementById("resetBtn");
+
+    function updateScore() {
+      var checkboxes = checklist.querySelectorAll("input[type='checkbox']");
+      var total = checkboxes.length;
+      var checked = 0;
+
+      checkboxes.forEach(function (cb) {
+        if (cb.checked) checked++;
+      });
+
+      scoreText.textContent = checked + " / " + total + " items validés";
+
+      var ratio = checked / total;
+      if (ratio === 0) {
+        scoreDot.style.background = "var(--danger)";
+        scoreHelper.textContent =
+          "Tu peux t’entraîner à laisser plus de place à la parole du patient.";
+      } else if (ratio < 0.5) {
+        scoreDot.style.background = "#facc15";
+        scoreHelper.textContent =
+          "Bon début. Concentre-toi sur les reformulations et la recherche des valeurs.";
+      } else if (ratio < 0.9) {
+        scoreDot.style.background = "#4ade80";
+        scoreHelper.textContent =
+          "C’est bien engagé. Continue à affiner la transformation valeur → besoin → objectif.";
+      } else {
+        scoreDot.style.background = "#22c55e";
+        scoreHelper.textContent =
+          "Excellent. Ton entretien ressemble à un BEP juste, partagé et déjà thérapeutique.";
+      }
+    }
+
+    checklist.addEventListener("change", updateScore);
+
+    resetBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var checkboxes = checklist.querySelectorAll("input[type='checkbox']");
+      checkboxes.forEach(function (cb) {
+        cb.checked = false;
+      });
+      updateScore();
+    });
+
+    updateScore();
+  </script>
+</body>
+                  </html>
