@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz ETP – Vrai / Faux</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --good: #22c55e;
+      --bad: #f97316;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --card: rgba(15, 23, 42, 0.96);
+      --radius: 18px;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1d4ed8 0, #020617 40%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.98));
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 18px 18px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Bubbles décor */
+    .bubble {
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(0);
+      opacity: 0.3;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      animation: float 18s linear infinite alternate;
+    }
+
+    .bubble.b1 {
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, transparent 70%);
+      top: -80px;
+      right: -60px;
+      animation-delay: -4s;
+    }
+    .bubble.b2 {
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle at 30% 30%, #22c55e, transparent 70%);
+      bottom: -60px;
+      left: -80px;
+      animation-delay: -9s;
+    }
+
+    @keyframes float {
+      0% { transform: translate3d(0,0,0) scale(1); }
+      50% { transform: translate3d(10px,-10px,0) scale(1.05); }
+      100% { transform: translate3d(-6px,6px,0) scale(1.02); }
+    }
+
+    .app-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title span.icon {
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .score-badge {
+      background: rgba(15, 118, 110, 0.3);
+      border: 1px solid rgba(45, 212, 191, 0.4);
+      color: #a5f3fc;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(12px);
+    }
+
+    .score-badge span {
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 8px 0 14px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      border-radius: 999px;
+      transition: width 0.35s ease-out;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px 14px 18px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.8);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+      animation: pop-in 0.4s ease-out;
+    }
+
+    @keyframes pop-in {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .qn-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 10px;
+    }
+
+    .qn-number {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .competence {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .question-text {
+      font-size: 0.98rem;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hint span {
+      font-size: 0.9rem;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out, background 0.2s;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.8);
+      background: linear-gradient(145deg, #0f172a, #0b1120);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .btn span.icon {
+      font-size: 1.1rem;
+    }
+
+    .btn-true {
+      background: radial-gradient(circle at 10% 0, rgba(34, 197, 94, 0.35), #0f172a);
+      border-color: rgba(34, 197, 94, 0.6);
+    }
+
+    .btn-false {
+      background: radial-gradient(circle at 90% 0, rgba(248, 113, 113, 0.35), #0f172a);
+      border-color: rgba(248, 113, 113, 0.6);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.95);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 5px 15px rgba(15, 23, 42, 0.9);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+
+    .feedback {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 1.4em;
+    }
+
+    .feedback.correct {
+      color: var(--good);
+    }
+
+    .feedback.incorrect {
+      color: var(--bad);
+    }
+
+    .feedback-emoji {
+      font-size: 1.2rem;
+    }
+
+    .shake {
+      animation: shake 0.3s ease-in-out;
+    }
+
+    .pulse {
+      animation: pulse 0.4s ease-out;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+      100% { transform: scale(1.02); box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+    }
+
+    /* Écran final */
+    .result-card {
+      text-align: center;
+      padding: 10px 4px 0;
+    }
+
+    .result-score {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .result-message {
+      font-size: 0.98rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 11px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.78rem;
+      margin-bottom: 8px;
+    }
+
+    .btn-restart {
+      margin-top: 6px;
+      width: 100%;
+    }
+
+    @media (max-width: 400px) {
+      .title {
+        font-size: 1.05rem;
+      }
+      .competence {
+        display: none;
+      }
+      .question-text {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="app-inner">
+      <header class="header">
+        <div>
+          <div class="title">
+            <span class="icon">🧭</span>
+            <span>Quiz ETP – Vrai / Faux</span>
+          </div>
+          <div class="subtitle">Posture du soignant&nbsp;éducateur & parcours ETP</div>
+        </div>
+        <div class="score-badge">
+          <span>Score :</span>
+          <span id="scoreDisplay">0 / 20</span>
+        </div>
+      </header>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <main id="quizArea">
+        <!-- Question injectée en JS -->
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      // Compétence 1 : Comprendre le cadre de l’ETP
+      {
+        text: "L’ETP vise à aider le patient à développer des compétences d’auto-soins et d’adaptation, pas seulement l’observance.",
+        answer: true,
+        competence: "Cadre de l’ETP",
+      },
+      {
+        text: "L’ETP est née uniquement d’une logique de réduction des coûts hospitaliers.",
+        answer: false,
+        competence: "Cadre de l’ETP",
+      },
+      {
+        text: "La loi HPST de 2009 rend l’ETP obligatoire pour tous les patients atteints de maladie chronique.",
+        answer: false,
+        competence: "Cadre de l’ETP",
+      },
+      {
+        text: "La finalité principale de l’ETP est de rendre le patient totalement indépendant des soignants.",
+        answer: false,
+        competence: "Cadre de l’ETP",
+      },
+
+      // Compétence 2 : Co-construire le parcours éducatif
+      {
+        text: "L’ETP s’adresse seulement aux adultes ayant une maladie chronique.",
+        answer: false,
+        competence: "Parcours éducatif",
+      },
+      {
+        text: "Un parcours d’ETP peut associer le patient et son entourage, si le patient l’accepte.",
+        answer: true,
+        competence: "Parcours éducatif",
+      },
+      {
+        text: "Les objectifs d’ETP sont définis uniquement par l’équipe, puis annoncés au patient.",
+        answer: false,
+        competence: "Parcours éducatif",
+      },
+      {
+        text: "En ETP, parler de parcours éducatif, c’est reconnaître un accompagnement qui s’inscrit dans la durée et dans la vie réelle du patient, au-delà d’un atelier ponctuel.",
+        answer: true,
+        competence: "Parcours éducatif",
+      },
+
+      // Compétence 3 : Adopter une posture relationnelle ajustée
+      {
+        text: "Décéntrer, c’est suspendre son propre modèle pour essayer de voir la situation depuis le monde du patient.",
+        answer: true,
+        competence: "Posture relationnelle",
+      },
+      {
+        text: "En ETP, une compétence du patient combine savoirs, savoir-faire et décisions adaptées à son contexte de vie.",
+        answer: true,
+        competence: "Posture relationnelle",
+      },
+      {
+        text: "La posture du « sauveur » renforce souvent l’autonomie du patient.",
+        answer: false,
+        competence: "Posture relationnelle",
+      },
+      {
+        text: "Reconnaître l’intention positive derrière un comportement « problématique » aide à construire l’alliance.",
+        answer: true,
+        competence: "Posture relationnelle",
+      },
+
+      // Compétence 4 : Communiquer et gérer résistances / réactances
+      {
+        text: "Le réflexe correcteur, c’est la capacité à écouter sans vouloir convaincre le patient.",
+        answer: false,
+        competence: "Communication & réactance",
+      },
+      {
+        text: "Répondre par « oui, mais… » aide toujours le patient à se sentir entendu.",
+        answer: false,
+        competence: "Communication & réactance",
+      },
+      {
+        text: "Chez Cungi, la réactance décrit une opposition active au changement quand la liberté perçue du patient est menacée.",
+        answer: true,
+        competence: "Communication & réactance",
+      },
+      {
+        text: "La « méthode du petit vélo » chez Cungi consiste à foncer dans la séance sans prendre de recul.",
+        answer: false,
+        competence: "Communication & réactance",
+      },
+
+      // Compétence 5 : Penser de façon globale et réflexive
+      {
+        text: "L’approche biopsychosociale invite à relier dimensions corporelles, psychiques et sociales du vécu du patient.",
+        answer: true,
+        competence: "Approche globale",
+      },
+      {
+        text: "Travailler les compétences en ETP revient uniquement à transmettre des connaissances médicales.",
+        answer: false,
+        competence: "Approche globale",
+      },
+      {
+        text: "Chez Bruner, distinguer « paysage de l’action » et « paysage de l’identité » aide à écouter à la fois ce que fait le patient et ce que cela signifie pour lui.",
+        answer: true,
+        competence: "Approche globale",
+      },
+      {
+        text: "Avec la zone proximale de développement de Vygotski, le soignant ajuste son aide pour rester entre assistance et autonomie, dans une zone d’apprentissage possible.",
+        answer: true,
+        competence: "Approche globale",
+      },
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    const total = questions.length;
+
+    const quizArea = document.getElementById("quizArea");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const progressFill = document.getElementById("progressFill");
+
+    function updateScore() {
+      scoreDisplay.textContent = `${score} / ${total}`;
+    }
+
+    function updateProgress() {
+      const percent = ((currentIndex) / total) * 100;
+      progressFill.style.width = `${percent}%`;
+    }
+
+    function createQuestionCard(q, index) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "question-card";
+
+      const header = document.createElement("div");
+      header.className = "qn-header";
+
+      const num = document.createElement("div");
+      num.className = "qn-number";
+      num.textContent = `Question ${index + 1} / ${total}`;
+
+      const comp = document.createElement("div");
+      comp.className = "competence";
+      comp.textContent = q.competence;
+
+      header.appendChild(num);
+      header.appendChild(comp);
+
+      const text = document.createElement("div");
+      text.className = "question-text";
+      text.textContent = q.text;
+
+      const hint = document.createElement("div");
+      hint.className = "hint";
+      hint.innerHTML = `<span>💡</span><span>Réponds Vrai ou Faux en pensant à la posture éducative.</span>`;
+
+      const answers = document.createElement("div");
+      answers.className = "answers";
+
+      const btnTrue = document.createElement("button");
+      btnTrue.className = "btn btn-true";
+      btnTrue.innerHTML = `<span class="icon">✅</span><span>Vrai</span>`;
+
+      const btnFalse = document.createElement("button");
+      btnFalse.className = "btn btn-false";
+      btnFalse.innerHTML = `<span class="icon">❌</span><span>Faux</span>`;
+
+      answers.appendChild(btnTrue);
+      answers.appendChild(btnFalse);
+
+      const feedback = document.createElement("div");
+      feedback.className = "feedback";
+      feedback.innerHTML = "&nbsp;";
+
+      wrapper.appendChild(header);
+      wrapper.appendChild(text);
+      wrapper.appendChild(hint);
+      wrapper.appendChild(answers);
+      wrapper.appendChild(feedback);
+
+      function lockButtons() {
+        btnTrue.disabled = true;
+        btnFalse.disabled = true;
+      }
+
+      function handleAnswer(chosen) {
+        const isCorrect = chosen === q.answer;
+        lockButtons();
+
+        if (isCorrect) {
+          score++;
+          updateScore();
+          feedback.classList.add("correct");
+          feedback.classList.remove("incorrect");
+          feedback.innerHTML = `<span class="feedback-emoji">🎯</span><span>Bonne réponse !</span>`;
+          wrapper.classList.add("pulse");
+        } else {
+          feedback.classList.add("incorrect");
+          feedback.classList.remove("correct");
+          feedback.innerHTML = `<span class="feedback-emoji">🤔</span><span>Pas tout à fait…</span>`;
+          wrapper.classList.add("shake");
+        }
+
+        setTimeout(() => {
+          currentIndex++;
+          if (currentIndex < total) {
+            renderQuestion();
+          } else {
+            renderResult();
+          }
+        }, 900);
+      }
+
+      btnTrue.addEventListener("click", () => handleAnswer(true));
+      btnFalse.addEventListener("click", () => handleAnswer(false));
+
+      return wrapper;
+    }
+
+    function renderQuestion() {
+      quizArea.innerHTML = "";
+      updateProgress();
+      const q = questions[currentIndex];
+      const card = createQuestionCard(q, currentIndex);
+      quizArea.appendChild(card);
+    }
+
+    function renderResult() {
+      updateProgress();
+      quizArea.innerHTML = "";
+
+      const card = document.createElement("div");
+      card.className = "question-card result-card";
+
+      const emoji = document.createElement("div");
+      emoji.style.fontSize = "2.2rem";
+      emoji.style.marginBottom = "6px";
+
+      let msg;
+      if (score === total) {
+        emoji.textContent = "🌟";
+        msg = "Alliance éducative au top, posture pleinement résonante.";
+      } else if (score >= total * 0.75) {
+        emoji.textContent = "✨";
+        msg = "Très bonne base ETP, quelques réglages fins possibles.";
+      } else if (score >= total * 0.5) {
+        emoji.textContent = "🌱";
+        msg = "Bon début : matière à discussions et super support de débrief.";
+      } else {
+        emoji.textContent = "🧩";
+        msg = "Parfait pour lancer un échange sur les idées reçues en ETP.";
+      }
+
+      const resultScore = document.createElement("div");
+      resultScore.className = "result-score";
+      resultScore.textContent = `${score} / ${total}`;
+
+      const resultMsg = document.createElement("div");
+      resultMsg.className = "result-message";
+      resultMsg.textContent = msg;
+
+      const pill = document.createElement("div");
+      pill.className = "pill";
+      pill.innerHTML = `<span>🧑‍⚕️</span><span>Compétences : cadre, parcours, posture, communication, approche globale.</span>`;
+
+      const tagline = document.createElement("div");
+      tagline.className = "tagline";
+      tagline.textContent = "Peut servir de brise-glace pour un atelier soignants : on vote, on débat, on réajuste ensemble.";
+
+      const restartBtn = document.createElement("button");
+      restartBtn.className = "btn btn-restart";
+      restartBtn.innerHTML = `<span class="icon">🔁</span><span>Rejouer le quiz</span>`;
+      restartBtn.addEventListener("click", () => {
+        score = 0;
+        currentIndex = 0;
+        updateScore();
+        renderQuestion();
+      });
+
+      card.appendChild(emoji);
+      card.appendChild(resultScore);
+      card.appendChild(resultMsg);
+      card.appendChild(pill);
+      card.appendChild(tagline);
+      card.appendChild(restartBtn);
+
+      quizArea.appendChild(card);
+    }
+
+    // Init
+    updateScore();
+    renderQuestion();
+  </script>
+</body>
+</html>
+```0
