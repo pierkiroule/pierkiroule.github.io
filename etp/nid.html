@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Le Nid Gelé – StoryQuiz</title>
+
+<style>
+    body {
+        margin: 0;
+        background: #f6f5f3;
+        font-family: "Segoe UI", sans-serif;
+        color: #333;
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
+
+    header {
+        padding: 40px 20px;
+        text-align: center;
+        background: linear-gradient(135deg, #dce8f1, #f4f6fa);
+        border-bottom: 2px solid #e1e4e8;
+    }
+
+    h1 {
+        font-size: 2.4rem;
+        font-weight: 700;
+        margin: 0;
+        color: #2e4255;
+    }
+
+    .sub {
+        font-size: 1.2rem;
+        color: #556270;
+    }
+
+    .container {
+        max-width: 850px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.6s ease;
+    }
+
+    .card.visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .story-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+        color: #2c3950;
+    }
+
+    /* ---------- IMAGE STYLE PRO ---------- */
+    .img-wrap {
+        width: 100%;
+        margin: 20px 0 25px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #e8e8e8;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    .img-wrap img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    /* ------------------------------------------------ */
+
+    .question {
+        margin-top: 15px;
+        font-weight: 600;
+    }
+
+    .answers button {
+        display: block;
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px;
+        font-size: 1rem;
+        background: #eef0f3;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.25s;
+        text-align: left;
+    }
+
+    .answers button:hover {
+        background: #dfe6ee;
+    }
+
+    .correct {
+        background: #b5dfc8 !important;
+        color: #1b3d25;
+    }
+
+    .message {
+        display: none;
+        margin-top: 12px;
+        padding: 12px 15px;
+        background: #eef7ff;
+        border-left: 4px solid #7bb1e0;
+        border-radius: 6px;
+        font-size: 0.95rem;
+    }
+</style>
+
+</head>
+<body>
+
+<header>
+    <h1>Le Nid Gelé</h1>
+    <div class="sub">Un hypno•° StoryQuiz pour réchauffer le deuil</div>
+</header>
+
+<div class="container">
+
+    <!-- SCÈNE 1 -->
+    <div class="card">
+        <div class="story-title">🌨️ Scène 1 — Le jour où le nid a gelé</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/1.webp" alt="Nid gelé 1">
+        </div>
+
+        <p>Un matin, un nid jusque-là souple et vivant s’est couvert de glace. Une vague de froid l’a figé d’un seul coup.</p>
+
+        <div class="question">Quand un nid gèle soudainement, cela signifie :</div>
+        <div class="answers">
+            <button data-correct="true">A. Qu’il s’est passé quelque chose de trop fort</button>
+            <button>B. Qu’il était fragile</button>
+            <button>C. Qu’il doit être jeté</button>
+        </div>
+        <div class="message">Un deuil commence souvent par un choc. C’est normal que tout se fige.</div>
+    </div>
+
+    <!-- SCÈNE 2 -->
+    <div class="card">
+        <div class="story-title">❄️ Scène 2 — La glace qui envahit</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/2.webp" alt="Glace">
+        </div>
+
+        <p>La glace rend le nid rigide. Certaines brindilles se tendent. D’autres se fissurent.</p>
+
+        <div class="question">Quand la glace reste longtemps, le nid :</div>
+        <div class="answers">
+            <button data-correct="true">A. Se bloque</button>
+            <button>B. Se réchauffe seul</button>
+            <button>C. Devient plus solide</button>
+        </div>
+        <div class="message">Le deuil peut se bloquer lorsque la douleur dure trop longtemps.</div>
+    </div>
+
+    <!-- SCÈNE 3 -->
+    <div class="card">
+        <div class="story-title">🧊 Scène 3 — Les images prises dans la glace</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/3.webp" alt="Image gelée">
+        </div>
+
+        <p>Au centre du nid, une scène trop forte est restée prise dans la glace. Elle tourne sans arrêt.</p>
+
+        <div class="question">Ces images coincées dans le gel :</div>
+        <div class="answers">
+            <button>A. Ne servent à rien</button>
+            <button data-correct="true">B. Maintiennent le nid gelé</button>
+            <button>C. Disparaissent vite</button>
+        </div>
+        <div class="message">Les images traumatiques peuvent figer tout le processus de deuil.</div>
+    </div>
+
+    <!-- SCÈNE 4 -->
+    <div class="card">
+        <div class="story-title">🔥 Scène 4 — L’arrivée d’une chaleur douce</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/4.webp" alt="Chaleur douce">
+        </div>
+
+        <p>Une chaleur douce approche du nid. Elle ne casse rien. Elle aide simplement la glace à se détendre.</p>
+
+        <div class="question">Dans la vraie vie, cette chaleur douce, c’est :</div>
+        <div class="answers">
+            <button>A. Oublier la personne</button>
+            <button data-correct="true">C. Parler, être accompagné, hypnose</button>
+            <button>B. Faire semblant d’aller bien</button>
+        </div>
+        <div class="message">Le soutien, les rituels et l’hypnose aident à relâcher la glace.</div>
+    </div>
+
+    <!-- SCÈNE 5 -->
+    <div class="card">
+        <div class="story-title">💧 Scène 5 — Le dégel commence</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/5.webp" alt="Dégel">
+        </div>
+
+        <p>La glace devient souple. Quelques petites gouttes glissent le long des brindilles.</p>
+
+        <div class="question">Quand la glace commence à fondre :</div>
+        <div class="answers">
+            <button>B. Tout est fichu</button>
+            <button data-correct="true">C. Le nid se remet doucement en mouvement</button>
+            <button>A. Il redevient comme avant</button>
+        </div>
+        <div class="message">Le deuil avance par petites ouvertures, jamais d’un seul coup.</div>
+    </div>
+
+    <!-- SCÈNE 6 -->
+    <div class="card">
+        <div class="story-title">🌿 Scène 6 — Le nid se transforme</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/6.webp" alt="Transformation nid">
+        </div>
+
+        <p>Le nid change. Il retrouve de la souplesse et de la couleur.</p>
+
+        <div class="question">Le lien avec la personne disparue doit :</div>
+        <div class="answers">
+            <button>A. Disparaître</button>
+            <button data-correct="true">C. Se transformer</button>
+            <button>B. Rester figé</button>
+        </div>
+        <div class="message">Le lien se transforme : il ne disparaît pas.</div>
+    </div>
+
+    <!-- SCÈNE 7 -->
+    <div class="card">
+        <div class="story-title">🪶 Scène 7 — Réorganiser les brindilles</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/7.webp" alt="Brindilles réorganisées">
+        </div>
+
+        <p>Certaines brindilles sont rangées, d’autres replacées. Le nid respire mieux.</p>
+
+        <div class="question">Trier autour du nid, c’est :</div>
+        <div class="answers">
+            <button>A. Oublier</button>
+            <button>B. Jeter</button>
+            <button data-correct="true">C. Réorganiser pour respirer</button>
+        </div>
+        <div class="message">Réorganiser aide à avancer.</div>
+    </div>
+
+    <!-- SCÈNE 8 -->
+    <div class="card">
+        <div class="story-title">🌞 Scène 8 — Le nid retrouve sa vie</div>
+
+        <div class="img-wrap">
+            <img src="./imgnid/8.webp" alt="Nid vivant">
+        </div>
+
+        <p>Le nid n’est plus gelé : il est vivant, souple, habité différemment.</p>
+
+        <div class="question">Quand demander de l’aide ?</div>
+        <div class="answers">
+            <button data-correct="true">A. Quand la glace reste longtemps</button>
+            <button>B. Jamais</button>
+            <button>C. Seulement si on insiste</button>
+        </div>
+        <div class="message">Chercher de l’aide tôt protège du deuil compliqué.</div>
+    </div>
+
+</div>
+
+<script>
+    const cards = document.querySelectorAll('.card');
+    const reveal = () => {
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 80) {
+                card.classList.add('visible');
+            }
+        });
+    };
+    window.addEventListener('scroll', reveal);
+    reveal();
+
+    document.querySelectorAll('.answers button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const allBtns = btn.parentNode.querySelectorAll('button');
+            allBtns.forEach(b => b.style.opacity = "0.5");
+            btn.style.opacity = "1";
+
+            if (btn.dataset.correct) btn.classList.add('correct');
+
+            const msg = btn.closest('.card').querySelector('.message');
+            msg.style.display = 'block';
+        });
+    });
+</script>
+
+</body>
+</html>
