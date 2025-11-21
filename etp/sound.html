@@ -2,252 +2,243 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Bulles Réseau Responsive</title>
+<title>Deuil – Approche Hypnose + ETP</title>
 
 <style>
 body{
-  margin:0;
-  padding:0;
-  overflow:hidden;
-  background:#0e0e16;
-  font-family:Georgia;
-  color:white;
-  touch-action:none;
+    font-family: Georgia, serif;
+    margin:0;
+    padding:20px;
+    background:#f7f4f1;
+    color:#2c2c2c;
 }
-/* Canvas réseau + particules */
-#canvas{
-  position:absolute;
-  inset:0;
-  z-index:1;
+h1{
+    text-align:center;
+    margin-bottom:10px;
 }
-
-/* Bulles dragables */
-.bulle{
-  position:absolute;
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.12);
-  border:1px solid rgba(255,255,255,0.25);
-  backdrop-filter:blur(4px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:white;
-  z-index:2;
-  user-select:none;
-  touch-action:none;
-  transition:background .2s;
+p.intro{
+    text-align:center;
+    color:#555;
+    max-width:600px;
+    margin:0 auto 20px auto;
 }
-.bulle:active{
-  background:rgba(255,255,255,0.25);
+.accordion{
+    max-width:900px;
+    margin:0 auto;
 }
-
-/* texte bulles */
-.bulle span{
-  font-size:14px;
-  text-align:center;
-  padding:5px;
+.item{
+    border-radius:8px;
+    margin-bottom:12px;
+    background:white;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+    overflow:hidden;
 }
-
-/* Popup texte */
-#panel{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  max-height:45vh;
-  overflow:auto;
-  padding:20px;
-  display:none;
-  background:rgba(0,0,0,0.65);
-  backdrop-filter:blur(6px);
-  z-index:5;
+.title{
+    padding:16px;
+    cursor:pointer;
+    background:#eee3d8;
+    font-size:18px;
+    font-weight:bold;
 }
-#panel h2{
-  margin-top:0;
+.title:hover{
+    background:#e2d5c6;
 }
-
-/* Responsive mobile : bulles plus petites */
-@media(max-width:600px){
-  .bulle{
-    width:90px;
-    height:90px;
-  }
-  .bulle span{
-    font-size:12px;
-  }
+.content{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .4s ease;
+    padding:0 16px;
+}
+.content.open{
+    padding:16px;
+    max-height:600px; /* auto impossible en anim */
+}
+.content p{
+    margin:8px 0;
+    line-height:1.6;
+}
+.content ul{
+    margin:10px 0;
+    padding-left:20px;
 }
 </style>
-</head>
 
+</head>
 <body>
 
-<canvas id="canvas"></canvas>
+<h1>Comprendre le Deuil – Modèle Hypnose & ETP</h1>
+<p class="intro">
+Une lecture claire et pédagogique du processus de deuil :  
+du “trou attracteur” au “nid-acteur-réseau”.
+</p>
 
-<!-- Bulles -->
-<div class="bulle" data-id="0" style="top:40%; left:10%;"><span>Rupture</span></div>
-<div class="bulle" data-id="1" style="top:20%; left:40%;"><span>Attraction</span></div>
-<div class="bulle" data-id="2" style="top:55%; left:50%;"><span>Oscillation</span></div>
-<div class="bulle" data-id="3" style="top:30%; left:70%;"><span>Hypnose</span></div>
-<div class="bulle" data-id="4" style="top:70%; left:20%;"><span>Tissage</span></div>
+<div class="accordion">
 
-<div id="panel"></div>
+    <!-- 1 -->
+    <div class="item">
+        <div class="title">1. La rupture : le trou attracteur</div>
+        <div class="content">
+            <p>Le deuil commence par une effraction : une rupture brutale dans la continuité de la vie.</p>
+            <p>Cette rupture crée un <strong>trou attracteur</strong> :</p>
+            <ul>
+                <li>Vacuum émotionnel : choc, sidération.</li>
+                <li>Vacuum temporel : perte de temporalité, “temps arrêté”.</li>
+                <li>Vacuum relationnel : les liens semblent lointains.</li>
+                <li>Vacuum corporel : vide dans la poitrine, sensations confuses.</li>
+            </ul>
+            <p>Hartmut Rosa appelle cela une <strong>dissonance</strong> : le monde ne répond plus comme avant.</p>
+        </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="item">
+        <div class="title">2. La gravité de la perte : l’attraction du vide</div>
+        <div class="content">
+            <p>Le trou n’est pas un simple “manque”.  
+            Il exerce une <strong>force gravitationnelle</strong> :</p>
+            <ul>
+                <li>Il aspire l’attention et les pensées.</li>
+                <li>Il renvoie sans cesse au même point (souvenirs, regrets).</li>
+                <li>Il fatigue psychiquement et physiquement.</li>
+            </ul>
+            <p>Quand l’attraction devient trop forte, on parle de <strong>deuil compliqué</strong> (Rando).</p>
+        </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="item">
+        <div class="title">3. L’oscillation : comprendre le double processus</div>
+        <div class="content">
+            <p>Le deuil sain oscille entre deux mouvements :</p>
+            <ul>
+                <li><strong>Orientation vers la perte</strong> : chagrin, souvenirs, confrontation à la douleur.</li>
+                <li><strong>Orientation vers la restauration</strong> : activités, rôles, réajustements, réinvestissement.</li>
+            </ul>
+            <p>Cette oscillation est <strong>nécessaire</strong> et non pathologique.</p>
+            <p>Trop de perte → risque d’enlisement.  
+               Trop de restauration → risque de déni.</p>
+            <p>L’équilibre se fait par une alternance naturelle.</p>
+        </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="item">
+        <div class="title">4. L’hypnose : moduler la gravité du vide</div>
+        <div class="content">
+            <p>L’hypnose aide à approcher la perte <strong>sans être englouti</strong>.</p>
+            <ul>
+                <li>Créer un espace sécurisé.</li>
+                <li>Moduler la distance émotionnelle.</li>
+                <li>Réactiver les appuis corporels (respiration, ancrage).</li>
+                <li>Laisser émerger des images symboliques qui organisent le chaos.</li>
+            </ul>
+            <p>L’état hypnotique facilite la <strong>résonance intérieure</strong> et restaure un minimum de continuité.</p>
+        </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="item">
+        <div class="title">5. Tisser le nid : reconstruire un espace habitable</div>
+        <div class="content">
+            <p>Avec Bachelard, le nid est un espace intime et protecteur.  
+               Dans le deuil, “tisser un nid” signifie :</p>
+            <ul>
+                <li>Choisir et intégrer certains souvenirs.</li>
+                <li>Créer des rituels personnels (lettres, lieux, objets).</li>
+                <li>S’appuyer sur les liens sociaux et les proches.</li>
+                <li>Accueillir les émotions brutes sans s’y perdre.</li>
+                <li>Réhabiter peu à peu le corps.</li>
+            </ul>
+            <p>Le trou n’est pas comblé, mais <strong>enveloppé</strong>.</p>
+        </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="item">
+        <div class="title">6. Le nid et la résonance retrouvée</div>
+        <div class="content">
+            <p>Une fois tissé, le nid transforme la relation au vide.</p>
+            <ul>
+                <li>Il contient la douleur.</li>
+                <li>Il permet d’entrer et sortir de la tristesse.</li>
+                <li>Il stabilise l’identité en transition.</li>
+                <li>Il maintient un lien interne avec l’absent sans enfermer.</li>
+            </ul>
+            <p>La dissonance devient <strong>consonance fragile mais vivante</strong>.</p>
+        </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="item">
+        <div class="title">7. Le nid comme acteur-réseau</div>
+        <div class="content">
+            <p>Avec Latour, le nid devient un <strong>actant psychique</strong> :</p>
+            <ul>
+                <li>Il relie passé, présent et futur.</li>
+                <li>Il réassocie corps, émotions et pensées.</li>
+                <li>Il régule l’intensité émotionnelle.</li>
+                <li>Il restaure la capacité de résonance avec le monde.</li>
+            </ul>
+            <p>Le deuil devient une <strong>écologie intérieure</strong> en transformation.</p>
+        </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="item">
+        <div class="title">8. L’ETP : cartes, repères et navigation</div>
+        <div class="content">
+            <p>L’Éducation Thérapeutique fournit :</p>
+            <ul>
+                <li>Des repères compréhensibles (modèles, phases, trajectoires).</li>
+                <li>Des outils pour identifier ses besoins et ressources.</li>
+                <li>Des stratégies d’auto-régulation émotionnelle.</li>
+                <li>Des rituels d’intégration.</li>
+            </ul>
+            <p>L’ETP aide la personne à devenir actrice de sa reconstruction.</p>
+        </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="item">
+        <div class="title">9. Alliance Hypnose + ETP : une écologie du deuil</div>
+        <div class="content">
+            <p><strong>Hypnose :</strong> travaille la texture du vécu, l’imaginaire, les sensations.</p>
+            <p><strong>ETP :</strong> apporte la compréhension et les compétences pour agir.</p>
+            <p>Ensemble :</p>
+            <ul>
+                <li>elles restaurent la résonance intérieure et relationnelle ;</li>
+                <li>elles soutiennent l’identité en transformation ;</li>
+                <li>elles rendent le processus plus habitable.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="item">
+        <div class="title">10. Synthèse : du trou attracteur au nid-acteur-réseau</div>
+        <div class="content">
+            <p>Ce modèle met en lumière trois grandes étapes :</p>
+            <ul>
+                <li><strong>Trou attracteur</strong> : effraction, vide, dissonance.</li>
+                <li><strong>Tissage du nid</strong> : symbolisation, liens, rituels.</li>
+                <li><strong>Nid-acteur-réseau</strong> : structure vivante, résonance retrouvée, identité réinventée.</li>
+            </ul>
+            <p>Le deuil ne se résout pas.  
+            <strong>Il se transforme.</strong></p>
+        </div>
+    </div>
+
+</div>
 
 <script>
-//-----------------------------
-// TEXTES
-//-----------------------------
-const textes=[
-`<h2>Rupture</h2><p>Le trou dissonant. Le monde ne répond plus.</p>`,
-`<h2>Attraction</h2><p>Le vide attire et aspire l’énergie.</p>`,
-`<h2>Oscillation</h2><p>Perte ↔ restauration. Mouvement vital.</p>`,
-`<h2>Hypnose</h2><p>Modulation du vide. Résonance intérieure.</p>`,
-`<h2>Tissage</h2><p>Nid = souvenirs, rituels, liens, corps.</p>`
-];
-
-//-----------------------------
-// AFFICHAGE TEXTE
-//-----------------------------
-const panel=document.getElementById("panel");
-document.querySelectorAll(".bulle").forEach(b=>{
-  b.addEventListener("click",()=>{
-    const id=b.dataset.id;
-    panel.innerHTML=textes[id];
-    panel.style.display="block";
+document.querySelectorAll(".title").forEach(t=>{
+  t.addEventListener("click",()=>{
+    const c=t.nextElementSibling;
+    const open=c.classList.contains("open");
+    document.querySelectorAll(".content").forEach(x=>x.classList.remove("open"));
+    if(!open){ c.classList.add("open"); }
   });
 });
-
-//-----------------------------
-// DRAG + COLLISION
-//-----------------------------
-let active=null, offsetX=0, offsetY=0;
-
-function startDrag(e,bulle){
-  active=bulle;
-  const rect=bulle.getBoundingClientRect();
-  const x=e.touches?e.touches[0].clientX:e.clientX;
-  const y=e.touches?e.touches[0].clientY:e.clientY;
-  offsetX=x-rect.left;
-  offsetY=y-rect.top;
-}
-
-function move(e){
-  if(!active) return;
-  const x=e.touches?e.touches[0].clientX:e.clientX;
-  const y=e.touches?e.touches[0].clientY:e.clientY;
-  active.style.left=(x-offsetX)+"px";
-  active.style.top=(y-offsetY)+"px";
-
-  resolveCollisions();
-}
-
-function endDrag(){
-  active=null;
-}
-
-document.querySelectorAll(".bulle").forEach(b=>{
-  b.addEventListener("mousedown",e=>startDrag(e,b));
-  b.addEventListener("touchstart",e=>startDrag(e,b));
-});
-window.addEventListener("mousemove",move);
-window.addEventListener("touchmove",move);
-window.addEventListener("mouseup",endDrag);
-window.addEventListener("touchend",endDrag);
-
-// Empêcher chevauchements
-function resolveCollisions(){
-  const bulles=[...document.querySelectorAll(".bulle")];
-  for(let i=0;i<bulles.length;i++){
-    for(let j=i+1;j<bulles.length;j++){
-      const a=bulles[i], b=bulles[j];
-      const ra=a.offsetWidth/2, rb=b.offsetWidth/2;
-      const ax=a.offsetLeft+ra, ay=a.offsetTop+ra;
-      const bx=b.offsetLeft+rb, by=b.offsetTop+rb;
-      const dx=bx-ax, dy=by-ay;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      const minDist=ra+rb+5;
-      if(dist<minDist){
-        const angle=Math.atan2(dy,dx);
-        const overlap=minDist-dist;
-        a.style.left=(a.offsetLeft - Math cos(angle)*overlap/2)+"px";
-        a.style.top =(a.offsetTop  - Math sin(angle)*overlap/2)+"px";
-        b.style.left=(b.offsetLeft + Math cos(angle)*overlap/2)+"px";
-        b.style.top =(b.offsetTop  + Math sin(angle)*overlap/2)+"px";
-      }
-    }
-  }
-}
-
-//-----------------------------
-// CANVAS RÉSEAU + PARTICULES
-//-----------------------------
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-
-function resize(){
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-}
-resize();
-window.addEventListener("resize",resize);
-
-// particules
-const particles=[];
-for(let i=0;i<60;i++){
-  particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    vx:(Math.random()-0.5)*0.2,
-    vy:(Math.random()-0.5)*0.2,
-    r:1+Math.random()*2
-  });
-}
-
-function drawParticles(){
-  ctx.fillStyle="rgba(255,255,255,0.5)";
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
-    p.x+=p.vx;
-    p.y+=p.vy;
-    if(p.x<0||p.x>canvas.width) p.vx*=-1;
-    if(p.y<0||p.y>canvas.height) p.vy*=-1;
-  });
-}
-
-// Lignes entre bulles
-function drawLinks(){
-  const bulles=[...document.querySelectorAll(".bulle")];
-  for(let i=0;i<bulles.length;i++){
-    for(let j=i+1;j<bulles.length;j++){
-      const a=bulles[i].getBoundingClientRect();
-      const b=bulles[j].getBoundingClientRect();
-      const ax=a.left+a.width/2, ay=a.top+a.height/2;
-      const bx=b.left+b.width/2, by=b.top+b.height/2;
-      const dx=bx-ax, dy=by-ay;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-
-      if(dist<300){
-        ctx.strokeStyle=`rgba(255,255,255,${1-dist/300})`;
-        ctx.lineWidth=1;
-        ctx.beginPath();
-        ctx.moveTo(ax,ay);
-        ctx.lineTo(bx,by);
-        ctx.stroke();
-      }
-    }
-  }
-}
-
-function loop(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawParticles();
-  drawLinks();
-  requestAnimationFrame(loop);
-}
-loop();
 </script>
 
 </body>
