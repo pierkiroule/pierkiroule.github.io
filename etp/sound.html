@@ -2,51 +2,55 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Bulles Sonores du Deuil</title>
+<title>Bulles Réseau Responsive</title>
 
 <style>
 body{
   margin:0;
   padding:0;
-  background: radial-gradient(circle,#0f1016,#2d2241);
-  font-family:Georgia;
   overflow:hidden;
-  color:#fff;
-  text-shadow:0 0 6px rgba(0,0,0,.6);
+  background:#0e0e16;
+  font-family:Georgia;
+  color:white;
+  touch-action:none;
 }
-h1{
-  text-align:center;
-  margin-top:15px;
-  font-size:22px;
-  color:#f0e8ff;
+/* Canvas réseau + particules */
+#canvas{
+  position:absolute;
+  inset:0;
+  z-index:1;
 }
+
+/* Bulles dragables */
 .bulle{
   position:absolute;
-  width:110px;
-  height:110px;
+  width:120px;
+  height:120px;
   border-radius:50%;
   background:rgba(255,255,255,0.12);
+  border:1px solid rgba(255,255,255,0.25);
   backdrop-filter:blur(4px);
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#fff;
-  cursor:pointer;
-  animation:flotte 10s infinite ease-in-out;
-  border:1px solid rgba(255,255,255,0.2);
+  color:white;
+  z-index:2;
   user-select:none;
+  touch-action:none;
+  transition:background .2s;
 }
-.bulle:hover{
-  background:rgba(255,255,255,0.20);
-  transform:scale(1.1);
-}
-
-@keyframes flotte{
-  0%{transform:translateY(0px);}
-  50%{transform:translateY(-20px);}
-  100%{transform:translateY(0px);}
+.bulle:active{
+  background:rgba(255,255,255,0.25);
 }
 
+/* texte bulles */
+.bulle span{
+  font-size:14px;
+  text-align:center;
+  padding:5px;
+}
+
+/* Popup texte */
 #panel{
   position:absolute;
   bottom:0;
@@ -54,78 +58,196 @@ h1{
   right:0;
   max-height:45vh;
   overflow:auto;
-  background:rgba(0,0,0,0.65);
   padding:20px;
   display:none;
+  background:rgba(0,0,0,0.65);
   backdrop-filter:blur(6px);
+  z-index:5;
 }
-#panel h2{margin-top:0;}
+#panel h2{
+  margin-top:0;
+}
 
+/* Responsive mobile : bulles plus petites */
+@media(max-width:600px){
+  .bulle{
+    width:90px;
+    height:90px;
+  }
+  .bulle span{
+    font-size:12px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<h1>Bulles Sonores du Deuil</h1>
+<canvas id="canvas"></canvas>
 
 <!-- Bulles -->
-<div class="bulle" style="top:90px; left:40px;"  data-id="0">Rupture</div>
-<div class="bulle" style="top:180px; left:240px;" data-id="1">Attraction</div>
-<div class="bulle" style="top:300px; left:80px;" data-id="2">Oscillation</div>
-<div class="bulle" style="top:350px; left:260px;" data-id="3">Hypnose</div>
-<div class="bulle" style="top:140px; left:150px;" data-id="4">Tissage</div>
-<div class="bulle" style="top:260px; left:350px;" data-id="5">Nid</div>
-<div class="bulle" style="top:200px; left:450px;" data-id="6">Acteur</div>
-<div class="bulle" style="top:60px;  left:330px;" data-id="7">ETP</div>
-<div class="bulle" style="top:400px; left:420px;" data-id="8">Alliance</div>
-<div class="bulle" style="top:30px;  left:480px;" data-id="9">Modèle</div>
+<div class="bulle" data-id="0" style="top:40%; left:10%;"><span>Rupture</span></div>
+<div class="bulle" data-id="1" style="top:20%; left:40%;"><span>Attraction</span></div>
+<div class="bulle" data-id="2" style="top:55%; left:50%;"><span>Oscillation</span></div>
+<div class="bulle" data-id="3" style="top:30%; left:70%;"><span>Hypnose</span></div>
+<div class="bulle" data-id="4" style="top:70%; left:20%;"><span>Tissage</span></div>
 
-<!-- Texte -->
 <div id="panel"></div>
 
 <script>
-// Contenu des bulles (ta synthèse des messages clés)
+//-----------------------------
+// TEXTES
+//-----------------------------
 const textes=[
-`<h2>Rupture & trou attracteur</h2><p>Le deuil commence par une effraction qui ouvre un vide multidimensionnel. Le monde ne répond plus : dissonance.</p>`,
-`<h2>Gravité de la perte</h2><p>Le trou attire l'attention et l'énergie psychique. Risque d'engloutissement si l'attraction devient trop forte.</p>`,
-`<h2>Oscillation</h2><p>Le deuil sain alterne entre perte et restauration. L’oscillation restaure la résonance.</p>`,
-`<h2>Hypnose</h2><p>L’hypnose modère l’attraction, réintègre les sensations et soutient la symbolisation.</p>`,
-`<h2>Tissage du nid</h2><p>Souvenirs, rituels, liens, sensations : tisser un espace habitable autour du vide.</p>`,
-`<h2>Nid & résonance</h2><p>Le nid contient, protège, soutient l’identité et permet la circulation entre douleur et ouverture.</p>`,
-`<h2>Nid acteur-réseau</h2><p>Il régule, relie, restaure la puissance d’agir : une écologie intérieure vivante.</p>`,
-`<h2>ETP</h2><p>L’ETP donne repères, compétences, outils pour naviguer dans l’oscillation.</p>`,
-`<h2>Alliance Hypnose + ETP</h2><p>Hypnose = expérience. ETP = compréhension. Ensemble : écologie du deuil.</p>`,
-`<h2>Modèle intégratif</h2><p>Trois phases : trou attracteur → tissage du nid → nid-acteur-réseau. Transformation et résonance restaurée.</p>`
+`<h2>Rupture</h2><p>Le trou dissonant. Le monde ne répond plus.</p>`,
+`<h2>Attraction</h2><p>Le vide attire et aspire l’énergie.</p>`,
+`<h2>Oscillation</h2><p>Perte ↔ restauration. Mouvement vital.</p>`,
+`<h2>Hypnose</h2><p>Modulation du vide. Résonance intérieure.</p>`,
+`<h2>Tissage</h2><p>Nid = souvenirs, rituels, liens, corps.</p>`
 ];
 
-// Synthétiseur WebAudio (sons des bulles)
-let audioContext=new (window.AudioContext||window.webkitAudioContext)();
-
-// Jouer une note quand on clique
-function joueNote(freq){
-  const osc=audioContext.createOscillator();
-  const gain=audioContext.createGain();
-  osc.type="sine";
-  osc.frequency.value=freq;
-  osc.connect(gain);
-  gain.connect(audioContext.destination);
-  gain.gain.setValueAtTime(0.25,audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.0001,audioContext.currentTime+0.9);
-  osc.start();
-  osc.stop(audioContext.currentTime+1);
-}
-
-// Interaction avec les bulles
+//-----------------------------
+// AFFICHAGE TEXTE
+//-----------------------------
+const panel=document.getElementById("panel");
 document.querySelectorAll(".bulle").forEach(b=>{
   b.addEventListener("click",()=>{
     const id=b.dataset.id;
-    document.getElementById("panel").innerHTML=textes[id];
-    document.getElementById("panel").style.display="block";
-    
-    // Son selon la bulle
-    const base=120; // fréquence de base
-    joueNote(base + id*35);
+    panel.innerHTML=textes[id];
+    panel.style.display="block";
   });
 });
+
+//-----------------------------
+// DRAG + COLLISION
+//-----------------------------
+let active=null, offsetX=0, offsetY=0;
+
+function startDrag(e,bulle){
+  active=bulle;
+  const rect=bulle.getBoundingClientRect();
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  const y=e.touches?e.touches[0].clientY:e.clientY;
+  offsetX=x-rect.left;
+  offsetY=y-rect.top;
+}
+
+function move(e){
+  if(!active) return;
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  const y=e.touches?e.touches[0].clientY:e.clientY;
+  active.style.left=(x-offsetX)+"px";
+  active.style.top=(y-offsetY)+"px";
+
+  resolveCollisions();
+}
+
+function endDrag(){
+  active=null;
+}
+
+document.querySelectorAll(".bulle").forEach(b=>{
+  b.addEventListener("mousedown",e=>startDrag(e,b));
+  b.addEventListener("touchstart",e=>startDrag(e,b));
+});
+window.addEventListener("mousemove",move);
+window.addEventListener("touchmove",move);
+window.addEventListener("mouseup",endDrag);
+window.addEventListener("touchend",endDrag);
+
+// Empêcher chevauchements
+function resolveCollisions(){
+  const bulles=[...document.querySelectorAll(".bulle")];
+  for(let i=0;i<bulles.length;i++){
+    for(let j=i+1;j<bulles.length;j++){
+      const a=bulles[i], b=bulles[j];
+      const ra=a.offsetWidth/2, rb=b.offsetWidth/2;
+      const ax=a.offsetLeft+ra, ay=a.offsetTop+ra;
+      const bx=b.offsetLeft+rb, by=b.offsetTop+rb;
+      const dx=bx-ax, dy=by-ay;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const minDist=ra+rb+5;
+      if(dist<minDist){
+        const angle=Math.atan2(dy,dx);
+        const overlap=minDist-dist;
+        a.style.left=(a.offsetLeft - Math cos(angle)*overlap/2)+"px";
+        a.style.top =(a.offsetTop  - Math sin(angle)*overlap/2)+"px";
+        b.style.left=(b.offsetLeft + Math cos(angle)*overlap/2)+"px";
+        b.style.top =(b.offsetTop  + Math sin(angle)*overlap/2)+"px";
+      }
+    }
+  }
+}
+
+//-----------------------------
+// CANVAS RÉSEAU + PARTICULES
+//-----------------------------
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+
+// particules
+const particles=[];
+for(let i=0;i<60;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    vx:(Math.random()-0.5)*0.2,
+    vy:(Math.random()-0.5)*0.2,
+    r:1+Math.random()*2
+  });
+}
+
+function drawParticles(){
+  ctx.fillStyle="rgba(255,255,255,0.5)";
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+    p.x+=p.vx;
+    p.y+=p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1;
+    if(p.y<0||p.y>canvas.height) p.vy*=-1;
+  });
+}
+
+// Lignes entre bulles
+function drawLinks(){
+  const bulles=[...document.querySelectorAll(".bulle")];
+  for(let i=0;i<bulles.length;i++){
+    for(let j=i+1;j<bulles.length;j++){
+      const a=bulles[i].getBoundingClientRect();
+      const b=bulles[j].getBoundingClientRect();
+      const ax=a.left+a.width/2, ay=a.top+a.height/2;
+      const bx=b.left+b.width/2, by=b.top+b.height/2;
+      const dx=bx-ax, dy=by-ay;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+
+      if(dist<300){
+        ctx.strokeStyle=`rgba(255,255,255,${1-dist/300})`;
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(ax,ay);
+        ctx.lineTo(bx,by);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawParticles();
+  drawLinks();
+  requestAnimationFrame(loop);
+}
+loop();
 </script>
 
 </body>
