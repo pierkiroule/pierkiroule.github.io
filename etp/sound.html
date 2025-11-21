@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Bulles Sonores du Deuil</title>
+
+<style>
+body{
+  margin:0;
+  padding:0;
+  background: radial-gradient(circle,#0f1016,#2d2241);
+  font-family:Georgia;
+  overflow:hidden;
+  color:#fff;
+  text-shadow:0 0 6px rgba(0,0,0,.6);
+}
+h1{
+  text-align:center;
+  margin-top:15px;
+  font-size:22px;
+  color:#f0e8ff;
+}
+.bulle{
+  position:absolute;
+  width:110px;
+  height:110px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(4px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  cursor:pointer;
+  animation:flotte 10s infinite ease-in-out;
+  border:1px solid rgba(255,255,255,0.2);
+  user-select:none;
+}
+.bulle:hover{
+  background:rgba(255,255,255,0.20);
+  transform:scale(1.1);
+}
+
+@keyframes flotte{
+  0%{transform:translateY(0px);}
+  50%{transform:translateY(-20px);}
+  100%{transform:translateY(0px);}
+}
+
+#panel{
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  max-height:45vh;
+  overflow:auto;
+  background:rgba(0,0,0,0.65);
+  padding:20px;
+  display:none;
+  backdrop-filter:blur(6px);
+}
+#panel h2{margin-top:0;}
+
+</style>
+</head>
+<body>
+
+<h1>Bulles Sonores du Deuil</h1>
+
+<!-- Bulles -->
+<div class="bulle" style="top:90px; left:40px;"  data-id="0">Rupture</div>
+<div class="bulle" style="top:180px; left:240px;" data-id="1">Attraction</div>
+<div class="bulle" style="top:300px; left:80px;" data-id="2">Oscillation</div>
+<div class="bulle" style="top:350px; left:260px;" data-id="3">Hypnose</div>
+<div class="bulle" style="top:140px; left:150px;" data-id="4">Tissage</div>
+<div class="bulle" style="top:260px; left:350px;" data-id="5">Nid</div>
+<div class="bulle" style="top:200px; left:450px;" data-id="6">Acteur</div>
+<div class="bulle" style="top:60px;  left:330px;" data-id="7">ETP</div>
+<div class="bulle" style="top:400px; left:420px;" data-id="8">Alliance</div>
+<div class="bulle" style="top:30px;  left:480px;" data-id="9">Modèle</div>
+
+<!-- Texte -->
+<div id="panel"></div>
+
+<script>
+// Contenu des bulles (ta synthèse des messages clés)
+const textes=[
+`<h2>Rupture & trou attracteur</h2><p>Le deuil commence par une effraction qui ouvre un vide multidimensionnel. Le monde ne répond plus : dissonance.</p>`,
+`<h2>Gravité de la perte</h2><p>Le trou attire l'attention et l'énergie psychique. Risque d'engloutissement si l'attraction devient trop forte.</p>`,
+`<h2>Oscillation</h2><p>Le deuil sain alterne entre perte et restauration. L’oscillation restaure la résonance.</p>`,
+`<h2>Hypnose</h2><p>L’hypnose modère l’attraction, réintègre les sensations et soutient la symbolisation.</p>`,
+`<h2>Tissage du nid</h2><p>Souvenirs, rituels, liens, sensations : tisser un espace habitable autour du vide.</p>`,
+`<h2>Nid & résonance</h2><p>Le nid contient, protège, soutient l’identité et permet la circulation entre douleur et ouverture.</p>`,
+`<h2>Nid acteur-réseau</h2><p>Il régule, relie, restaure la puissance d’agir : une écologie intérieure vivante.</p>`,
+`<h2>ETP</h2><p>L’ETP donne repères, compétences, outils pour naviguer dans l’oscillation.</p>`,
+`<h2>Alliance Hypnose + ETP</h2><p>Hypnose = expérience. ETP = compréhension. Ensemble : écologie du deuil.</p>`,
+`<h2>Modèle intégratif</h2><p>Trois phases : trou attracteur → tissage du nid → nid-acteur-réseau. Transformation et résonance restaurée.</p>`
+];
+
+// Synthétiseur WebAudio (sons des bulles)
+let audioContext=new (window.AudioContext||window.webkitAudioContext)();
+
+// Jouer une note quand on clique
+function joueNote(freq){
+  const osc=audioContext.createOscillator();
+  const gain=audioContext.createGain();
+  osc.type="sine";
+  osc.frequency.value=freq;
+  osc.connect(gain);
+  gain.connect(audioContext.destination);
+  gain.gain.setValueAtTime(0.25,audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001,audioContext.currentTime+0.9);
+  osc.start();
+  osc.stop(audioContext.currentTime+1);
+}
+
+// Interaction avec les bulles
+document.querySelectorAll(".bulle").forEach(b=>{
+  b.addEventListener("click",()=>{
+    const id=b.dataset.id;
+    document.getElementById("panel").innerHTML=textes[id];
+    document.getElementById("panel").style.display="block";
+    
+    // Son selon la bulle
+    const base=120; // fréquence de base
+    joueNote(base + id*35);
+  });
+});
+</script>
+
+</body>
+</html>
