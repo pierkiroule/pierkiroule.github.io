@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>DeuilQCM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        /* ---------- RESET SIMPLE ---------- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ---------- THEME GLOBAL (BLACK) ---------- */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #202020 0%, #050505 50%, #000000 100%);
+            color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        /* ---------- CONTAINER MOBILE FIRST ---------- */
+        .app {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            border-radius: 18px;
+            padding: 16px 14px 20px;
+            background: rgba(10, 10, 10, 0.85);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #f1c40f;
+            text-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            margin-top: 4px;
+            color: #bbbbbb;
+        }
+
+        /* ---------- PROGRESSION ---------- */
+        .progress {
+            margin: 12px 0 10px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #aaaaaa;
+        }
+
+        .progress-bar {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            border-radius: 999px;
+            overflow: hidden;
+            background: #1b1b1b;
+            margin-left: 10px;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 0%;
+            background: linear-gradient(90deg, #00e0ff, #f1c40f);
+        }
+
+        /* ---------- CARTE QUESTION ---------- */
+        .card {
+            border-radius: 16px;
+            background: linear-gradient(135deg, #121212, #050505);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px 12px 14px;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .question-index {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            color: #999;
+            margin-bottom: 4px;
+            letter-spacing: 0.08em;
+        }
+
+        /* ---------- LISTE OPTIONS ---------- */
+        .options {
+            list-style: none;
+            margin-top: 10px;
+        }
+
+        .option {
+            margin-bottom: 8px;
+        }
+
+        .option label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.01);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.08s, border 0.15s;
+        }
+
+        .option input[type="radio"] {
+            accent-color: #00e0ff;
+            width: 18px;
+            height: 18px;
+        }
+
+        .option label:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateY(-1px);
+        }
+
+        .option.selected label {
+            border-color: #00e0ff;
+            box-shadow: 0 0 0 1px rgba(0, 224, 255, 0.4);
+        }
+
+        /* ---------- BOUTONS ---------- */
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00e0ff, #2ecc71);
+            color: #050505;
+            box-shadow: 0 8px 20px rgba(0, 224, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(0, 224, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #1c1c1c;
+            color: #cccccc;
+        }
+
+        .btn-secondary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary[disabled],
+        .btn-primary[disabled] {
+            opacity: 0.4;
+            cursor: default;
+            box-shadow: none;
+        }
+
+        /* ---------- FEEDBACK ---------- */
+        .feedback {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .feedback.correct {
+            border-color: rgba(46, 204, 113, 0.7);
+            background: radial-gradient(circle at top, rgba(46, 204, 113, 0.22), rgba(0, 0, 0, 0.4));
+        }
+
+        .feedback.incorrect {
+            border-color: rgba(231, 76, 60, 0.7);
+            background: radial-gradient(circle at top, rgba(231, 76, 60, 0.18), rgba(0, 0, 0, 0.4));
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-strong {
+            font-weight: 600;
+        }
+
+        .feedback ul {
+            margin-top: 6px;
+            padding-left: 18px;
+        }
+
+        .feedback li {
+            margin-bottom: 3px;
+        }
+
+        /* ---------- SCORE FINAL ---------- */
+        .result {
+            text-align: center;
+            margin-top: 14px;
+        }
+
+        .score-main {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #f1c40f;
+        }
+
+        .score-detail {
+            font-size: 0.9rem;
+            color: #bbbbbb;
+        }
+
+        /* ---------- MEDIA QUERIES ---------- */
+        @media (min-width: 600px) {
+            .app {
+                padding: 18px 18px 22px;
+            }
+
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .question-text {
+                font-size: 1.05rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <header>
+        <div class="title">DeuilQCM</div>
+        <div class="subtitle">Les auteurs incontournables du travail de deuil</div>
+    </header>
+
+    <div class="progress">
+        <span id="progressLabel">Question 1 / 10</span>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <main class="card">
+        <div class="question-index" id="questionIndex">Auteur & modèle</div>
+        <div class="question-text" id="questionText"></div>
+
+        <ul class="options" id="optionsList">
+            <!-- options injectées en JS -->
+        </ul>
+
+        <div class="actions">
+            <button class="btn-secondary" id="btnPrev" disabled>Précédent</button>
+            <button class="btn-primary" id="btnValidate">Valider</button>
+        </div>
+
+        <div class="feedback" id="feedback" style="display:none;"></div>
+    </main>
+
+    <section class="result" id="result" style="display:none;">
+        <div class="score-main" id="scoreMain"></div>
+        <div class="score-detail" id="scoreDetail"></div>
+    </section>
+</div>
+
+<script>
+    // ---------- DONNÉES QCM ----------
+    const questions = [
+        {
+            question: "Qui a introduit la notion de « travail du deuil » ?",
+            options: ["John Bowlby", "Sigmund Freud", "Colin Murray Parkes", "Elisabeth Kübler-Ross"],
+            correctIndex: 1,
+            author: "Sigmund Freud (1856-1939)",
+            bullets: [
+                "Médecin neurologue, fondateur de la psychanalyse.",
+                "Dans « Deuil et mélancolie » (1917), il décrit le deuil comme un travail psychique actif.",
+                "L’idée d’un « travail du deuil » reste la base historique de la clinique du deuil."
+            ]
+        },
+        {
+            question: "Quel auteur explique le deuil à partir de la théorie de l’attachement ?",
+            options: ["Robert Neimeyer", "John Bowlby", "J. William Worden", "Michel Hanus"],
+            correctIndex: 1,
+            author: "John Bowlby (1907-1990)",
+            bullets: [
+                "Psychiatre et psychanalyste britannique, fondateur de la théorie de l’attachement.",
+                "Le deuil est compris comme une désorganisation du système d’attachement.",
+                "Il décrit les réactions de séparation et la réorganisation progressive du lien."
+            ]
+        },
+        {
+            question: "Qui propose les cinq étapes (déni, colère, marchandage, dépression, acceptation) ?",
+            options: ["Marie-Frédérique Bacqué", "Elisabeth Kübler-Ross", "Colin Murray Parkes", "George Bonanno"],
+            correctIndex: 1,
+            author: "Elisabeth Kübler-Ross (1926-2004)",
+            bullets: [
+                "Psychiatre suisse-américaine, pionnière de la réflexion sur la fin de vie.",
+                "Ses cinq étapes décrivent à l’origine la réaction des patients en phase terminale.",
+                "Modèle populaire mais non linéaire et pas universel pour tous les deuils."
+            ]
+        },
+        {
+            question: "Qui propose les quatre tâches du deuil (accepter, ressentir, s’ajuster, relocaliser) ?",
+            options: ["George Bonanno", "J. William Worden", "Michel Hanus", "Therese Rando"],
+            correctIndex: 1,
+            author: "J. William Worden (1939-2023)",
+            bullets: [
+                "Psychologue clinicien américain, spécialiste du deuil.",
+                "Propose quatre tâches actives : accepter, ressentir, s’ajuster, relocaliser le lien.",
+                "Modèle souple et clinique, très utile pour guider l’accompagnement."
+            ]
+        },
+        {
+            question: "Quel modèle explique que le deuil oscille entre orientation vers la perte et vers la restauration ?",
+            options: ["Théorie de la reconstruction de sens", "Modèle dual (Dual Process Model)", "Modèle transitionnel", "Modèle du lien continu"],
+            correctIndex: 1,
+            author: "Margaret Stroebe & Henk Schut",
+            bullets: [
+                "Psychologues néerlandais, auteurs du Dual Process Model (1999, 2010).",
+                "Le deuil oscille entre la confrontation à la perte et la restauration de la vie quotidienne.",
+                "C’est aujourd’hui l’un des modèles scientifiques les plus reconnus."
+            ]
+        },
+        {
+            question: "Quel auteur montre, à partir de recherches, que la résilience est fréquente après un deuil ?",
+            options: ["Sigmund Freud", "George Bonanno", "Christophe Fauré", "Colin Murray Parkes"],
+            correctIndex: 1,
+            author: "George Bonanno (né en 1959)",
+            bullets: [
+                "Psychologue américain, professeur à Columbia University.",
+                "Étudie les trajectoires de deuil sur le long terme.",
+                "Montre que la résilience est fréquente et que le deuil n’est pas toujours pathologique."
+            ]
+        },
+        {
+            question: "Pour quel auteur le deuil est-il avant tout un travail de reconstruction du sens ?",
+            options: ["Robert Neimeyer", "John Bowlby", "Elisabeth Kübler-Ross", "Michel Hanus"],
+            correctIndex: 0,
+            author: "Robert Neimeyer (né en 1954)",
+            bullets: [
+                "Psychologue américain, figure majeure de la recherche sur le deuil.",
+                "Développe la « Meaning Reconstruction Theory ».",
+                "Le deuil consiste à reconstruire sens, identité et narration de vie après la perte."
+            ]
+        },
+        {
+            question: "Qui a théorisé l’idée de « lien continu » avec le défunt, plutôt que de rupture définitive ?",
+            options: ["Elisabeth Kübler-Ross", "Klass, Silverman & Nickman", "Colin Murray Parkes", "Therese Rando"],
+            correctIndex: 1,
+            author: "Dennis Klass, Phyllis Silverman & Steven Nickman",
+            bullets: [
+                "Chercheurs américains, auteurs de l’ouvrage « Continuing Bonds » (1996).",
+                "Ils montrent que le lien avec le défunt ne disparaît pas, il se transforme.",
+                "Ce concept a profondément modifié la vision du deuil et des pratiques d’accompagnement."
+            ]
+        },
+        {
+            question: "Quelle auteure francophone est associée à la notion de « deuil blanc » ?",
+            options: ["Sandrine Neau", "Marie-Frédérique Bacqué", "Christophe Fauré", "Michel Hanus"],
+            correctIndex: 1,
+            author: "Marie-Frédérique Bacqué (née en 1959)",
+            bullets: [
+                "Psychologue française, professeure à l’Université de Strasbourg.",
+                "Spécialiste du deuil, de la mort et de la clinique contemporaine.",
+                "Le « deuil blanc » désigne le deuil de ce qui n’a pas eu lieu (infertilité, futur impossible…)."
+            ]
+        },
+        {
+            question: "Qui parle du deuil comme d’un réaménagement identitaire profond ?",
+            options: ["Colin Murray Parkes", "Michel Hanus", "Viktor Frankl", "George Bonanno"],
+            correctIndex: 1,
+            author: "Michel Hanus (1937-2019)",
+            bullets: [
+                "Psychiatre et psychanalyste français, spécialiste du deuil.",
+                "Montre que le deuil implique un réaménagement du sentiment d’identité.",
+                "Insiste sur les effets de la perte dans les différentes étapes de la vie."
+            ]
+        }
+    ];
+
+    // ---------- ÉTAT ----------
+    let currentIndex = 0;
+    let score = 0;
+    const userAnswers = new Array(questions.length).fill(null);
+
+    // ---------- ELEMENTS DOM ----------
+    const questionText = document.getElementById("questionText");
+    const questionIndexLabel = document.getElementById("questionIndex");
+    const optionsList = document.getElementById("optionsList");
+    const progressLabel = document.getElementById("progressLabel");
+    const progressFill = document.getElementById("progressFill");
+    const feedbackBox = document.getElementById("feedback");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnValidate = document.getElementById("btnValidate");
+    const resultBox = document.getElementById("result");
+    const scoreMain = document.getElementById("scoreMain");
+    const scoreDetail = document.getElementById("scoreDetail");
+
+    // ---------- FONCTIONS ----------
+    function renderQuestion(index) {
+        const q = questions[index];
+        questionText.textContent = q.question;
+        questionIndexLabel.textContent = "Question " + (index + 1);
+        progressLabel.textContent = "Question " + (index + 1) + " / " + questions.length;
+
+        const percent = ((index) / questions.length) * 100;
+        progressFill.style.width = percent + "%";
+
+        optionsList.innerHTML = "";
+        feedbackBox.style.display = "none";
+        feedbackBox.className = "feedback";
+
+        q.options.forEach(function (opt, i) {
+            const li = document.createElement("li");
+            li.className = "option";
+
+            const label = document.createElement("label");
+            const input = document.createElement("input");
+            input.type = "radio";
+            input.name = "option";
+            input.value = i;
+
+            if (userAnswers[index] === i) {
+                input.checked = true;
+                li.classList.add("selected");
+            }
+
+            input.addEventListener("change", function () {
+                document
+                    .querySelectorAll(".option")
+                    .forEach(function (el) {
+                        el.classList.remove("selected");
+                    });
+                li.classList.add("selected");
+            });
+
+            const span = document.createElement("span");
+            span.textContent = opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            li.appendChild(label);
+            optionsList.appendChild(li);
+        });
+
+        btnPrev.disabled = index === 0;
+        btnValidate.textContent = index === questions.length - 1 ? "Valider la réponse" : "Valider";
+    }
+
+    function getSelectedOption() {
+        const radios = document.querySelectorAll('input[name="option"]');
+        let selectedIndex = null;
+        radios.forEach(function (r) {
+            if (r.checked) {
+                selectedIndex = parseInt(r.value, 10);
+            }
+        });
+        return selectedIndex;
+    }
+
+    function showFeedback(isCorrect, q, selectedIndex) {
+        feedbackBox.style.display = "block";
+        feedbackBox.classList.add(isCorrect ? "correct" : "incorrect");
+
+        const correctLabel = q.options[q.correctIndex];
+
+        let html = "";
+        html += "<div class='feedback-title'>" +
+            (isCorrect ? "✔ Bonne réponse" : "✖ Réponse incorrecte") +
+            "</div>";
+        html += "<div><span class='feedback-strong'>Bonne réponse :</span> " + correctLabel + "</div>";
+        html += "<div style='margin-top:6px;'><span class='feedback-strong'>" + q.author + "</span></div>";
+
+        html += "<ul>";
+        q.bullets.forEach(function (b) {
+            html += "<li>" + b + "</li>";
+        });
+        html += "</ul>";
+
+        feedbackBox.innerHTML = html;
+    }
+
+    function showResult() {
+        resultBox.style.display = "block";
+        scoreMain.textContent = score + " / " + questions.length;
+        let message = "";
+        const ratio = score / questions.length;
+
+        if (ratio === 1) {
+            message = "HypnoChampion du deuil : niveau expert !";
+        } else if (ratio >= 0.7) {
+            message = "Très bon niveau. Les grands auteurs du deuil te sont familiers.";
+        } else if (ratio >= 0.4) {
+            message = "Base acquise. Quelques révisions possibles sur certains auteurs.";
+        } else {
+            message = "Bon début. À approfondir pour consolider le socle théorique.";
+        }
+
+        scoreDetail.textContent = message;
+    }
+
+    // ---------- LISTENERS ----------
+    btnValidate.addEventListener("click", function () {
+        const selected = getSelectedOption();
+        if (selected === null) {
+            alert("Choisis une réponse avant de valider.");
+            return;
+        }
+
+        const q = questions[currentIndex];
+        const wasAlreadyAnswered = userAnswers[currentIndex] !== null;
+
+        userAnswers[currentIndex] = selected;
+        const isCorrect = selected === q.correctIndex;
+
+        if (!wasAlreadyAnswered && isCorrect) {
+            score++;
+        }
+        if (wasAlreadyAnswered) {
+            // si on change une bonne réponse en mauvaise, on ajuste le score
+            const previous = userAnswers[currentIndex];
+            // ce cas est géré très simplement :
+            // on recalcule le score complet
+            score = userAnswers.reduce(function (acc, ans, idx) {
+                if (ans !== null && ans === questions[idx].correctIndex) {
+                    return acc + 1;
+                }
+                return acc;
+            }, 0);
+        }
+
+        showFeedback(isCorrect, q, selected);
+
+        if (currentIndex === questions.length - 1) {
+            progressFill.style.width = "100%";
+            showResult();
+            btnValidate.disabled = true;
+        } else {
+            // passage auto à la question suivante après un court délai ?
+            // ici, on laissera le formateur décider -> bouton "Précédent / Valider"
+        }
+    });
+
+    btnPrev.addEventListener("click", function () {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderQuestion(currentIndex);
+        }
+    });
+
+    // ---------- INIT ----------
+    renderQuestion(currentIndex);
+</script>
+</body>
+</html>
