@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modèle Hypnose & Deuil 3D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        .parallax-container {
+            position: relative;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            perspective: 1px;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 40px;
+            transition: opacity 0.3s ease;
+        }
+
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            transition: all 1.5s ease;
+        }
+
+        .bg-gradient-1 { background: radial-gradient(circle at 30% 50%, #1a3a52, #0a0a0a); }
+        .bg-gradient-2 { background: radial-gradient(circle at 50% 50%, #2d4a3e, #0a0a0a); }
+        .bg-gradient-3 { background: radial-gradient(circle at 70% 50%, #4a3a2d, #0a0a0a); }
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 300;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero .subtitle {
+            font-size: 1.8em;
+            font-weight: 200;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease 0.3s forwards;
+            color: #aaa;
+        }
+
+        .hero .intro {
+            max-width: 700px;
+            margin-top: 40px;
+            font-size: 1.1em;
+            line-height: 1.8;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease 0.6s forwards;
+            color: #ccc;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            font-size: 2em;
+            opacity: 0;
+            animation: bounce 2s infinite, fadeInUp 1s ease 0.9s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .section {
+            position: relative;
+            min-height: 120vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 40px;
+            z-index: 5;
+        }
+
+        .content-card {
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            transition: all 0.8s ease;
+        }
+
+        .content-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .dimension-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: inline-block;
+            transform: scale(0);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .content-card.visible .dimension-icon {
+            transform: scale(1);
+        }
+
+        .dimension-title {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .section-morphose .dimension-title { color: #5dade2; }
+        .section-semiose .dimension-title { color: #58d68d; }
+        .section-ontose .dimension-title { color: #f39c12; }
+
+        .essence, .techniques, .metaphore {
+            margin-bottom: 40px;
+        }
+
+        .section-subtitle {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .technique-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 3px solid;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .section-morphose .technique-item { border-left-color: #5dade2; }
+        .section-semiose .technique-item { border-left-color: #58d68d; }
+        .section-ontose .technique-item { border-left-color: #f39c12; }
+
+        .technique-item:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .quote {
+            font-style: italic;
+            color: #aaa;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .arrow {
+            font-size: 1.5em;
+            color: #666;
+        }
+
+        .synthese {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 40px;
+            text-align: center;
+        }
+
+        .synthese-card {
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .flow-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-item {
+            font-size: 1.3em;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: popIn 0.5s ease forwards;
+        }
+
+        .flow-item:nth-child(1) { animation-delay: 0.2s; background: rgba(93, 173, 226, 0.2); }
+        .flow-item:nth-child(2) { animation-delay: 0.4s; }
+        .flow-item:nth-child(3) { animation-delay: 0.6s; background: rgba(88, 214, 141, 0.2); }
+        .flow-item:nth-child(4) { animation-delay: 0.8s; }
+        .flow-item:nth-child(5) { animation-delay: 1s; background: rgba(243, 156, 18, 0.2); }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .final-quote {
+            font-size: 1.5em;
+            line-height: 1.8;
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5em; }
+            .hero .subtitle { font-size: 1.3em; }
+            .content-card { padding: 40px 30px; }
+            .dimension-title { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-layer bg-gradient-1" id="bgLayer"></div>
+    
+    <div class="floating-particles" id="particles"></div>
+
+    <div class="parallax-container" id="container">
+        <div class="hero">
+            <h1>🕳️🪺 MODÈLE HYPNOSE & DEUIL EN 3D</h1>
+            <div class="subtitle">Transformer un TROU intérieur en NID habitable</div>
+            <p class="intro">
+                Ce modèle aide à comprendre comment l'hypnose accompagne un deuil, 
+                particulièrement un <strong>deuil blanc</strong> – celui de ce qui n'a pas eu lieu, de ce qui ne sera jamais.
+                <br><br>
+                Il repose sur trois mouvements naturels qui, articulés ensemble, 
+                font émerger la transe et permettent la transformation. Pierre-Henri Garnier
+            </p>
+            <div class="scroll-indicator">↓</div>
+        </div>
+
+        <!-- MORPHOSE -->
+        <section class="section section-morphose">
+            <div class="content-card" data-section="morphose">
+                <div class="dimension-icon">🟦</div>
+                <h2 class="dimension-title">DIMENSION 1 — MORPHOSE<br>Donner forme au TROU</h2>
+                
+                <div class="essence">
+                    <h3 class="section-subtitle">🎯 L'essence</h3>
+                    <p class="section-text">
+                        Le vécu du deuil est souvent diffus, intense, envahissant.<br>
+                        La morphose consiste à lui donner une <strong>forme claire, visible, manipulable</strong>.
+                    </p>
+                    <p class="section-text">
+                        Quand le patient peut « voir » son TROU intérieur, il peut enfin respirer.
+                    </p>
+                </div>
+
+                <div class="techniques">
+                    <h3 class="section-subtitle">🧰 Techniques hypnotiques</h3>
+                    <div class="technique-item">
+                        <strong>Induction simple</strong> : respiration, focalisation progressive
+                    </div>
+                    <div class="technique-item">
+                        <strong>Externalisation</strong> : <span class="quote">« Laisse venir l'image du TROU... ce vide, ce qui manque. »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Ajustement de distance</strong> : <span class="quote">« À quelle distance cela devient-il respirable pour toi ? »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Transformation sensorielle</strong> : lisser un bord, adoucir une couleur, éclairer une zone sombre
+                    </div>
+                </div>
+
+                <div class="metaphore">
+                    <h3 class="section-subtitle">💠 Métaphore du tissage virtuel</h3>
+                    <p class="section-text">
+                        Le TROU devient une forme creusée,<br>
+                        la première « pièce » d'une construction intérieure à venir.
+                    </p>
+                    <p class="section-text">
+                        <strong>👉 La morphose crée l'entrée dans l'hypnose :</strong><br>
+                        la personne quitte le mental pour entrer dans sa perception intérieure.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SÉMIOSE -->
+        <section class="section section-semiose">
+            <div class="content-card" data-section="semiose">
+                <div class="dimension-icon">🟩</div>
+                <h2 class="dimension-title">DIMENSION 2 — SÉMIOSE<br>Tisser des BRINDILLES autour du TROU</h2>
+                
+                <div class="essence">
+                    <h3 class="section-subtitle">🎯 L'essence</h3>
+                    <p class="section-text">
+                        Une fois la forme clarifiée, on introduit des <strong>symboles</strong> :<br>
+                        petites ressources, souvenirs apaisants, qualités oubliées, liens significatifs.
+                    </p>
+                    <p class="section-text">
+                        Le TROU devient alors le centre d'un début de nid.
+                    </p>
+                </div>
+
+                <div class="techniques">
+                    <h3 class="section-subtitle">🧰 Techniques hypnotiques</h3>
+                    <div class="technique-item">
+                        <strong>Appel aux ressources</strong> : <span class="quote">« Autour de toi, imagine 2 ou 3 petites brindilles qui représentent une force, un souvenir doux, un lien précieux. »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Objets-symboles simples</strong> : une lumière, une branche, une pierre chaude
+                    </div>
+                    <div class="technique-item">
+                        <strong>Tissage symbolique</strong> : <span class="quote">« Dépose délicatement ces brindilles autour du TROU. »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Émergence d'un mot juste</strong> : <span class="quote">« S'il y a un mot qui vient accompagner ce geste, laisse-le simplement apparaître. »</span>
+                    </div>
+                </div>
+
+                <div class="metaphore">
+                    <h3 class="section-subtitle">💠 Métaphore du tissage virtuel</h3>
+                    <p class="section-text">
+                        Brindille après brindille, la personne tisse un <strong>nid symbolique</strong>,<br>
+                        une structure qui entoure le manque et commence à le transformer.
+                    </p>
+                    <p class="section-text">
+                        <strong>👉 La sémiose installe la transe :</strong><br>
+                        le patient quitte le langage narratif pour manipuler des symboles vivants.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ONTOSE -->
+        <section class="section section-ontose">
+            <div class="content-card" data-section="ontose">
+                <div class="dimension-icon">🟧</div>
+                <h2 class="dimension-title">DIMENSION 3 — ONTOSE<br>Transformer le NID en espace habitable</h2>
+                
+                <div class="essence">
+                    <h3 class="section-subtitle">🎯 L'essence</h3>
+                    <p class="section-text">
+                        L'ontose correspond au moment où le NID symbolique <strong>prend sens</strong>.<br>
+                        Le TROU ne disparaît pas — il devient un <strong>centre porteur</strong>, un lieu de continuité intérieure.
+                    </p>
+                    <p class="section-text">
+                        C'est là que s'opère la transformation profonde.
+                    </p>
+                </div>
+
+                <div class="techniques">
+                    <h3 class="section-subtitle">🧰 Techniques hypnotiques</h3>
+                    <div class="technique-item">
+                        <strong>Contenant symbolique</strong> : <span class="quote">« Le nid rend ce TROU habitable. »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Présence symbolique</strong> : <span class="quote">« Au centre, tu peux déposer une petite lumière douce. »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Micro-futurisation</strong> : <span class="quote">« Observe un léger mouvement en toi... comme une place nouvelle qui s'ouvre. »</span>
+                    </div>
+                    <div class="technique-item">
+                        <strong>Ancrages de retour</strong> : 3 sensations corporelles, 3 respirations conscientes, 3 repères dans l'ici et maintenant
+                    </div>
+                </div>
+
+                <div class="metaphore">
+                    <h3 class="section-subtitle">💠 Métaphore du tissage virtuel</h3>
+                    <p class="section-text">
+                        Le nid devient un <strong>lieu intérieur</strong> :<br>
+                        stable, sensible, protecteur.
+                    </p>
+                    <p class="section-text">
+                        <strong>👉 L'ontose crée la transformation hypnotique :</strong><br>
+                        la personne réorganise son vécu et retrouve du sens.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SYNTHÈSE -->
+        <section class="synthese">
+            <div class="synthese-card">
+                <h2 style="font-size: 2.5em; margin-bottom: 30px;">🌟 SYNTHÈSE : LE TISSAGE EN 3D</h2>
+                
+                <div class="flow-diagram">
+                    <div class="flow-item"><strong>MORPHOSE</strong><br>Je vois le TROU</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item"><strong>SÉMIOSE</strong><br>J'entoure avec mes ressources</div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item"><strong>ONTOSE</strong><br>Le NID devient habitable</div>
+                </div>
+
+                <p style="font-size: 1.2em; line-height: 1.8; margin: 40px 0; color: #ddd;">
+                    <strong>🧲 Principe clé :</strong><br>
+                    L'hypnose n'est pas une technique ajoutée.<br>
+                    Elle émerge naturellement du passage : <strong>forme → symbole → sens</strong>.
+                </p>
+
+                <div class="final-quote">
+                    <strong>🪶 Dans le deuil, on ne comble pas le TROU.</strong><br>
+                    On le forme, on le tisse, on l'habite.<br>
+                    De ce mouvement naît l'hypnose.
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Gestion du scroll parallaxe et des backgrounds
+        const container = document.getElementById('container');
+        const bgLayer = document.getElementById('bgLayer');
+        const cards = document.querySelectorAll('.content-card');
+
+        container.addEventListener('scroll', () => {
+            const scrolled = container.scrollTop;
+            const windowHeight = window.innerHeight;
+
+            // Changement de background selon la position
+            if (scrolled < windowHeight * 1.5) {
+                bgLayer.className = 'bg-layer bg-gradient-1';
+            } else if (scrolled < windowHeight * 3.5) {
+                bgLayer.className = 'bg-layer bg-gradient-2';
+            } else {
+                bgLayer.className = 'bg-layer bg-gradient-3';
+            }
+
+            // Animation des cartes au scroll
+            cards.forEach(card => {
+                const cardTop = card.getBoundingClientRect().top;
+                const cardBottom = card.getBoundingClientRect().bottom;
+
+                if (cardTop < windowHeight * 0.8 && cardBottom > 0) {
+                    card.classList.add('visible');
+                }
+            });
+        });
+
+        // Génération de particules flottantes
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Vérification initiale de la visibilité
+        window.addEventListener('load', () => {
+            container.dispatchEvent(new Event('scroll'));
+        });
+    </script>
+</body>
+</html>
