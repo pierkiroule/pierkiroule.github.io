@@ -1,1 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quiz Transnumériste</title>
 
+<style>
+  body {
+    margin:0; padding:1rem;
+    font-family: system-ui, sans-serif;
+    background:#000; color:#f2f2f2;
+    line-height:1.6;
+  }
+  .container {max-width:650px; margin:auto;}
+
+  .card {
+    background:#111; border:1px solid #333;
+    padding:1.5rem; border-radius:12px; margin-top:1rem;
+  }
+
+  h1 {text-align:center; font-weight:600;}
+  p {text-align:center;}
+
+  button {
+    width:100%; padding:0.8rem; margin-top:1rem;
+    background:#1b4332; color:white; border:none;
+    border-radius:10px; cursor:pointer; font-size:1rem;
+  }
+  button:active {background:#0f291f;}
+
+  .option {
+    background:#181818; border:1px solid #333;
+    padding:0.9rem; border-radius:10px;
+    margin:0.4rem 0; cursor:pointer;
+  }
+  .option:hover {background:#222;}
+  .option.disabled {opacity:0.5; pointer-events:none;}
+
+  .correct {background:#0a422f !important; border-color:#2ecc71 !important;}
+  .wrong   {background:#4c0a0a !important; border-color:#e74c3c !important;}
+
+  .explain {
+    background:#141414; border:1px solid #444;
+    padding:1rem; border-radius:10px; margin-top:1rem;
+  }
+  .ex-line {margin:0.3rem 0; font-size:0.95rem;}
+  .ex-title {font-weight:600; color:#2ecc71; margin-bottom:0.6rem;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Intro -->
+  <div class="card" id="intro">
+    <h1>🌿 Quiz Transnumériste</h1>
+    <p>10 pratiques alternatives qui redonnent du sens au numérique.</p>
+    <button onclick="start()">Commencer</button>
+  </div>
+
+  <!-- Quiz -->
+  <div class="card" id="quiz" style="display:none;">
+    <h1 id="qnum"></h1>
+    <p id="question"></p>
+    <div id="options"></div>
+    <div id="explain" style="display:none;"></div>
+    <button id="next" onclick="nextQ()" style="display:none;">Question suivante</button>
+  </div>
+
+  <!-- Résultat -->
+  <div class="card" id="result" style="display:none;">
+    <h1 id="res-title"></h1>
+    <p id="score" style="font-size:1.5rem;"></p>
+    <button onclick="restart()">↻ Recommencer</button>
+  </div>
+
+</div>
+
+<script>
+/* --- 10 QUESTIONS + RÉPONSES DÉTAILLÉES --- */
+const quiz = [
+{
+q:"Quelle pratique propose de ralentir nos usages numériques pour retrouver du discernement ?",
+a:["Machine Learning","Slow Tech","Réalité augmentée","Big Data"],
+c:1,
+exp:{
+concept:"Ralentir pour retrouver une perception fine.",
+pourquoi:"Le temps humain redevient maître du rythme.",
+transnu:"La lenteur ouvre la voie à la résonance.",
+appli:"Limiter flux, animations et interruptions."
+}
+},
+{
+q:"Quelle approche minimise l’impact écologique du numérique ?",
+a:["Design addictif","Sobriété numérique","Ultra-HD","Cloud massif"],
+c:1,
+exp:{
+concept:"Réduire le superflu tout en gardant l’essentiel.",
+pourquoi:"Moins d’énergie, moins de charge mentale.",
+transnu:"Aligner le numérique sur les limites du vivant.",
+appli:"Code léger, images compressées."
+}
+},
+{
+q:"Quel concept valorise la qualité du lien plutôt que la quantité d’interactions ?",
+a:["Hyperconnectivité","Résonance","Scrolling infini","Réseaux massifs"],
+c:1,
+exp:{
+concept:"Chercher une relation vivante et juste.",
+pourquoi:"La qualité relationnelle augmente l’engagement réel.",
+transnu:"Le sens naît d’une connexion incarnée.",
+appli:"Transitions lentes, feedback doux."
+}
+},
+{
+q:"Quelle pratique s’inspire du vivant pour concevoir la technologie ?",
+a:["Transhumanisme","Biomimétisme","Gamification","Blockchain"],
+c:1,
+exp:{
+concept:"Observer les solutions éprouvées du vivant.",
+pourquoi:"Le vivant optimise énergie et coopération depuis toujours.",
+transnu:"Ré-aligner la technique sur les logiques biologiques.",
+appli:"Cycles, économie d’effort, symbioses numériques."
+}
+},
+{
+q:"Quel design rend la technologie apaisée et non intrusive ?",
+a:["Calm Technology","Design hypnotique","Notifications rouges","Auto-play"],
+c:0,
+exp:{
+concept:"La technologie reste en arrière-plan.",
+pourquoi:"On réduit la charge cognitive.",
+transnu:"Créer un espace mental respirant.",
+appli:"Limiter alertes, effets, agitation visuelle."
+}
+},
+{
+q:"Quelle démarche vise à “faire mieux avec moins” ?",
+a:["Design frugal","Maximalisme","Dark UX","Trackers"],
+c:0,
+exp:{
+concept:"Simplifier pour renforcer l’usage réel.",
+pourquoi:"Moins de bruit, plus de sens.",
+transnu:"Construire des interfaces légères et signifiantes.",
+appli:"UI minimaliste, code court."
+}
+},
+{
+q:"Quelle approche remet le corps au centre du numérique ?",
+a:["Interaction somatique","Automatisation totale","VR saturée","Interfaces sans gestes"],
+c:0,
+exp:{
+concept:"Le corps participe à l’interaction.",
+pourquoi:"Le geste stabilise l’attention.",
+transnu:"Le numérique redevient incarné.",
+appli:"Gestes doux, micro-mouvements, respiration."
+}
+},
+{
+q:"Quel principe favorise des interfaces lentes et respirantes ?",
+a:["Design du calme","Scroll infini","Rouge dopamine","Pop-ups agressifs"],
+c:0,
+exp:{
+concept:"Laisser de l’air dans l’interface.",
+pourquoi:"Moins de bruit visuel, plus de présence.",
+transnu:"Créer des bulles de résonance.",
+appli:"Transitions lentes, espaces vides assumés."
+}
+},
+{
+q:"Quelle culture propose un numérique au service du vivant ?",
+a:["Startup Nation","Transnumérisme","Technophobie","Technosolutionnisme"],
+c:1,
+exp:{
+concept:"Une voie entre fascination et rejet.",
+pourquoi:"On remet du sens, du corps et du lien.",
+transnu:"C’est le cadre global : numérique vivant.",
+appli:"Tech frugale, relationnelle, incarnée."
+}
+},
+{
+q:"Quelle pratique encourage des solutions locales, simples et robustes ?",
+a:["Low-tech numérique","Data centers géants","Ultra-cloud","VR intégrale"],
+c:0,
+exp:{
+concept:"Moins dépendre des infrastructures lourdes.",
+pourquoi:"Automonie + robustesse + sobriété.",
+transnu:"Rendre le numérique habitable et situé.",
+appli:"Outils légers, réparables, compréhensibles."
+}
+}
+];
+
+let i=0, score=0;
+
+function start(){
+  document.getElementById("intro").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  loadQ();
+}
+
+function loadQ(){
+  const d = quiz[i];
+  document.getElementById("qnum").textContent = "Question "+(i+1)+"/10";
+  document.getElementById("question").textContent = d.q;
+
+  const opts = document.getElementById("options");
+  opts.innerHTML = "";
+
+  d.a.forEach((t,idx)=>{
+    const div=document.createElement("div");
+    div.className="option";
+    div.textContent=t;
+    div.onclick=()=>select(idx,div);
+    opts.appendChild(div);
+  });
+
+  document.getElementById("explain").style.display="none";
+  document.getElementById("next").style.display="none";
+}
+
+function select(idx,el){
+  const d = quiz[i];
+  const options = document.querySelectorAll(".option");
+  options.forEach(o=>o.classList.add("disabled"));
+
+  const correct = d.c;
+  if(idx===correct){el.classList.add("correct"); score++}
+  else{
+    el.classList.add("wrong");
+    options[correct].classList.add("correct");
+  }
+
+  showExplain(d.exp);
+  document.getElementById("next").style.display="block";
+}
+
+function showExplain(exp){
+  const box=document.getElementById("explain");
+  box.style.display="block";
+  box.innerHTML=`
+    <div class="explain">
+      <div class="ex-title">✔ Pourquoi c’est transnumériste</div>
+      <div class="ex-line"><strong>Concept :</strong> ${exp.concept}</div>
+      <div class="ex-line"><strong>Enjeu :</strong> ${exp.pourquoi}</div>
+      <div class="ex-line"><strong>Logique transnumériste :</strong> ${exp.transnu}</div>
+      <div class="ex-line"><strong>Application :</strong> ${exp.appli}</div>
+    </div>
+  `;
+}
+
+function nextQ(){
+  i++;
+  if(i<quiz.length) loadQ();
+  else showResult();
+}
+
+function showResult(){
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("result").style.display="block";
+  document.getElementById("score").textContent = score+"/10";
+
+  let msg = score>=8 ? "🎋 Résonant" :
+            score>=5 ? "🌿 Éveillé" :
+            score>=3 ? "🍃 Curieux" : "🌱 Germinant";
+
+  document.getElementById("res-title").textContent = msg;
+}
+
+function restart(){
+  i=0; score=0;
+  document.getElementById("result").style.display="none";
+  document.getElementById("intro").style.display="block";
+}
+</script>
+
+</body>
+</html>
