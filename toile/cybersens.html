@@ -1,120 +1,395 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radar de mes CyberSensations</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar de CyberSensations</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<style>
-    body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #f5f5f5;
-        font-family: Arial, sans-serif;
-        flex-direction: column;
-        gap: 15px;
-    }
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffe3ec, #e2f3ff);
+            overflow: hidden;
+        }
 
-    h1 {
-        font-size: 20px;
-        color: #444;
-        text-align: center;
-        margin: 0;
-    }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 26px;
+            color: #444;
+            text-align: center;
+            font-weight: bold;
+            text-shadow: 0 2px 3px rgba(255,255,255,0.6);
+        }
 
-    .radar {
-        width: 340px;
-        height: 340px;
-        border-radius: 50%;
-        background: radial-gradient(circle, #ffffff, #e8e8e8);
-        position: relative;
-        box-shadow: 0 5px 18px rgba(0,0,0,0.15);
-        overflow: visible;
-    }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #ffffffd9;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
 
-    .sensation {
-        position: absolute;
-        padding: 6px 10px;
-        background: white;
-        border-radius: 12px;
-        font-size: 13px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        cursor: pointer;
-        user-select: none;
-        transition: transform .15s, background .2s, color .2s;
-    }
+        .target-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            border-radius: 50%;
+            overflow: visible;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
 
-    .sensation.active {
-        background: #ff2f78;
-        color: white;
-        transform: scale(1.15);
-    }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 1;
+            opacity: 0.9;
+        }
 
-    .message {
-        min-height: 30px;
-        font-size: 14px;
-        color: #444;
-        text-align: center;
-        padding: 5px;
-        width: 90%;
-        max-width: 360px;
-    }
-</style>
+        .circle1 { background-color: #ff99c8; width: 8%; height: 8%; top: 46%; left: 46%; }
+        .circle2 { background-color: #fcf6bd; width: 20%; height: 20%; top: 40%; left: 40%; }
+        .circle3 { background-color: #d0f4de; width: 35%; height: 35%; top: 32.5%; left: 32.5%; }
+        .circle4 { background-color: #a9def9; width: 55%; height: 55%; top: 22.5%; left: 22.5%; }
+        .circle5 { background-color: #e4c1f9; width: 75%; height: 75%; top: 12.5%; left: 12.5%; }
+
+        .label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 12px;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            z-index: 7;
+            padding: 5px 8px;
+            background-color: rgba(255, 255, 255, 0.75);
+            border-radius: 6px;
+            transition: transform 0.2s ease, background 0.2s ease;
+            backdrop-filter: blur(3px);
+        }
+
+        .label:hover {
+            transform: scale(1.15);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .label.selected {
+            background-color: #ff2f92;
+            color: white;
+            transform: scale(1.2);
+        }
+
+        #canvas, #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        #particle-canvas {
+            z-index: 8;
+        }
+
+        .menu-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .menu-horizontal input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .menu-horizontal input:focus {
+            border-color: #ff2f92;
+            outline: none;
+        }
+
+        .menu-horizontal button {
+            padding: 10px 20px;
+            background-color: #ff2f92;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .menu-horizontal button:hover {
+            transform: scale(1.05);
+            background-color: #e11d74;
+        }
+
+        .note-input {
+            width: 100%;
+            height: 80px;
+            padding: 8px;
+            border: none;
+            resize: none;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 8px;
+            background-color: #ffffffa8;
+        }
+    </style>
 </head>
 
 <body>
+    <h1>⭐ Mon Radar de CyberSensations ⭐</h1>
 
-<h1>⭐ Le Radar de mes CyberSensations</h1>
+    <div class="main-container">
+        <textarea id="userNotes" class="note-input" placeholder="Notes... sensations du moment, situation, humeur..."></textarea>
 
-<div class="radar" id="radar">
-    <div class="sensation" style="top: 8%; left: 40%;" 
-         data-msg="Ton corps se contracte. Tension présente face au smartphone.">
-         Tendu·e
+        <div class="target-container" id="target-container">
+            <canvas id="canvas"></canvas>
+            <canvas id="particle-canvas"></canvas>
+
+            <div class="circle circle5"></div>
+            <div class="circle circle4"></div>
+            <div class="circle circle3"></div>
+            <div class="circle circle2"></div>
+            <div class="circle circle1"></div>
+        </div>
+
+        <div class="menu-horizontal">
+            <input type="text" id="editKeyword" placeholder="Modifier">
+            <button onclick="updateKeyword()">Modifier</button>
+            <button onclick="deleteKeyword()">Supprimer</button>
+
+            <input type="text" id="newKeyword" placeholder="Ajouter une sensation">
+            <button onclick="addKeyword()">Ajouter</button>
+
+            <button onclick="captureAndDownload()">Télécharger</button>
+            <button onclick="resetKeywords()">Réinitialiser</button>
+        </div>
     </div>
 
-    <div class="sensation" style="top: 32%; left: 4%;"
-         data-msg="Ta respiration se raccourcit. Apnée numérique.">
-         Souffle court
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <div class="sensation" style="bottom: 15%; left: 12%;"
-         data-msg="Ton attention se trouble. Trop d'info ?">
-         Tête floue
-    </div>
+    <script>
+        let keywords = [
+            { text: "Tendu·e", x: null, y: null },
+            { text: "Souffle court", x: null, y: null },
+            { text: "Tête floue", x: null, y: null },
+            { text: "Vidé·e", x: null, y: null },
+            { text: "Agité·e", x: null, y: null },
+            { text: "Boosté·e", x: null, y: null },
+            { text: "Stable / OK", x: null, y: null },
+            { text: "Main chaude", x: null, y: null },
+            { text: "Picotements", x: null, y: null },
+            { text: "Engourdi·e", x: null, y: null }
+        ];
 
-    <div class="sensation" style="bottom: 22%; right: 20%;"
-         data-msg="Tu te sens vidé·e. Le scroll pompe ton énergie.">
-         Vidé·e
-    </div>
+        let selectedKeywordIndex = null;
+        let particles = [];
 
-    <div class="sensation" style="top: 45%; right: 6%;"
-         data-msg="Ton système s’emballe. Surstimulation.">
-         Agité·e
-    </div>
+        const canvas = document.getElementById('canvas');
+        const particleCanvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        const particleCtx = particleCanvas.getContext('2d');
 
-    <div class="sensation" style="bottom: 45%; left: 40%;"
-         data-msg="Tu es plutôt stable. Usage équilibré.">
-         Stable / ok
-    </div>
-</div>
+        function renderKeywords() {
+            const container = document.getElementById('target-container');
+            const centerX = container.offsetWidth / 2;
+            const centerY = container.offsetHeight / 2;
+            const radius = Math.min(centerX, centerY) * 0.35;
 
-<div class="message" id="message">Clique une cyberSensations.</div>
+            container.querySelectorAll('.label').forEach(e => e.remove());
 
-<script>
-    const items = document.querySelectorAll(".sensation");
-    const messageBox = document.getElementById("message");
+            keywords.forEach((word, index) => {
+                const labelWidth = 80;
+                const labelHeight = 22;
 
-    items.forEach(item => {
-        item.addEventListener("click", () => {
-            items.forEach(i => i.classList.remove("active"));
-            item.classList.add("active");
-            messageBox.textContent = item.dataset.msg;
-        });
-    });
-</script>
+                if (word.x === null || word.y === null) {
+                    const angleStep = (2 * Math.PI) / keywords.length;
+                    const angle = index * angleStep - Math.PI / 2;
+                    word.x = centerX + radius * Math.cos(angle) - labelWidth / 2;
+                    word.y = centerY + radius * Math.sin(angle) - labelHeight / 2;
+                }
+
+                const label = document.createElement('div');
+                label.className = 'label draggable';
+                label.style.left = `${word.x}px`;
+                label.style.top = `${word.y}px`;
+                label.textContent = word.text;
+                label.dataset.index = index;
+
+                label.addEventListener('click', () => selectKeyword(index));
+
+                if (index === selectedKeywordIndex) label.classList.add('selected');
+
+                container.appendChild(label);
+            });
+
+            resizeCanvas();
+            initDragAndDrop();
+        }
+
+        function selectKeyword(index) {
+            selectedKeywordIndex = index;
+            document.getElementById('editKeyword').value = keywords[index].text;
+
+            document.querySelectorAll('.label').forEach(l => l.classList.remove('selected'));
+            const selectedLabel = document.querySelector(`.label[data-index='${index}']`);
+            selectedLabel.classList.add('selected');
+
+            createParticles(selectedLabel);
+        }
+
+        function initDragAndDrop() {
+            interact('.draggable').draggable({
+                inertia: true,
+                modifiers: [
+                    interact.modifiers.restrictRect({ restriction: '#target-container', endOnly: true })
+                ],
+                listeners: {
+                    move(event) {
+                        const target = event.target;
+                        const index = parseInt(target.dataset.index);
+                        keywords[index].x += event.dx;
+                        keywords[index].y += event.dy;
+                        target.style.left = `${keywords[index].x}px`;
+                        target.style.top = `${keywords[index].y}px`;
+                        resizeCanvas();
+                    }
+                }
+            });
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            particleCanvas.width = particleCanvas.parentElement.offsetWidth;
+            particleCanvas.height = particleCanvas.parentElement.offsetHeight;
+            drawLines(ctx);
+        }
+
+        function drawLines(ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = '#ff2f92';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 6]);
+
+            const positions = keywords.map(k => ({ x: k.x + 40, y: k.y + 12 }));
+
+            positions.forEach((pos, i) => {
+                const next = positions[(i + 1) % positions.length];
+                ctx.moveTo(pos.x, pos.y);
+                ctx.lineTo(next.x, next.y);
+            });
+
+            ctx.stroke();
+        }
+
+        function createParticles(label) {
+            const rect = label.getBoundingClientRect();
+            const containerRect = document.getElementById('target-container').getBoundingClientRect();
+            const x = rect.left - containerRect.left + rect.width / 2;
+            const y = rect.top - containerRect.top + rect.height / 2;
+
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    life: 50,
+                    size: Math.random() * 14 + 8,
+                    opacity: 0.85
+                });
+            }
+
+            animateParticles();
+        }
+
+        function animateParticles() {
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            particles = particles.filter(p => p.life > 0);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.opacity -= 0.02;
+                p.life--;
+
+                particleCtx.font = `${p.size}px Arial`;
+                particleCtx.fillStyle = `rgba(255,105,180,${p.opacity})`;
+                particleCtx.fillText("✨", p.x, p.y);
+            });
+
+            if (particles.length > 0) requestAnimationFrame(animateParticles);
+        }
+
+        // Fonctions Ajouter / Modifier / Supprimer
+        function addKeyword() {
+            const input = document.getElementById('newKeyword');
+            if (input.value.trim()) {
+                keywords.push({ text: input.value.trim(), x: null, y: null });
+                input.value = '';
+                renderKeywords();
+            }
+        }
+
+        function updateKeyword() {
+            const newText = document.getElementById('editKeyword').value.trim();
+            if (newText && selectedKeywordIndex !== null) {
+                keywords[selectedKeywordIndex].text = newText;
+                renderKeywords();
+            }
+        }
+
+        function deleteKeyword() {
+            if (selectedKeywordIndex !== null) {
+                keywords.splice(selectedKeywordIndex, 1);
+                selectedKeywordIndex = null;
+                document.getElementById('editKeyword').value = '';
+                renderKeywords();
+            }
+        }
+
+        function resetKeywords() {
+            keywords.forEach(k => { k.x = null; k.y = null; });
+            renderKeywords();
+        }
+
+        // Capture PNG
+        function captureAndDownload() {
+            const buttons = document.querySelector('.menu-horizontal');
+            buttons.style.visibility = 'hidden';
+
+            html2canvas(document.querySelector('.main-container'), { scale: 2 })
+                .then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `cybersensations_${Date.now()}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    buttons.style.visibility = 'visible';
+                });
+        }
+
+        window.addEventListener('resize', renderKeywords);
+        document.addEventListener('DOMContentLoaded', renderKeywords);
+    </script>
 
 </body>
 </html>
