@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mon ami Psybot : écho ou résonance ?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-card: rgba(12, 18, 40, 0.96);
+      --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.15);
+      --accent-strong: #22c55e;
+      --text-main: #f9fafb;
+      --text-soft: #cbd5f5;
+      --text-muted: #9ca3af;
+      --error: #f97373;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 50%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .quiz-shell {
+      width: 100%;
+      max-width: 720px;
+      margin: auto;
+    }
+
+    .quiz-card {
+      background: var(--bg-card);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+      padding: 20px 18px 18px;
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    @media (min-width: 640px) {
+      .quiz-card {
+        padding: 24px 26px 22px;
+      }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin: 0 0 6px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-soft);
+      margin-bottom: 12px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(79, 70, 229, 0.9);
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+    }
+
+    .progress-text {
+      color: var(--text-soft);
+    }
+
+    .score-text {
+      color: var(--accent-strong);
+      font-weight: 600;
+    }
+
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(30, 64, 175, 0.35);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #4f46e5, #22c55e);
+      transition: width 0.3s ease-out;
+    }
+
+    .question-block {
+      margin: 14px 0 14px;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .question-index {
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .option-btn {
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+      padding: 9px 11px;
+      text-align: left;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      transition: border 0.18s ease, background 0.18s ease, transform 0.08s ease;
+    }
+
+    .option-btn span.label-letter {
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .option-btn span.label-text {
+      flex: 1;
+    }
+
+    .option-btn:hover {
+      border-color: rgba(129, 140, 248, 0.9);
+    }
+
+    .option-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+      color: var(--text-main);
+    }
+
+    .option-btn.correct {
+      border-color: var(--accent-strong);
+    }
+
+    .option-btn.incorrect {
+      border-color: var(--error);
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    button.action {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4f46e5, #22c55e);
+      color: white;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.8);
+      transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.15s ease;
+    }
+
+    button.action:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    button.action:not(:disabled):active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.9);
+    }
+
+    .feedback {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.85rem;
+    }
+
+    .feedback-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feedback-title.correct {
+      color: var(--accent-strong);
+    }
+
+    .feedback-title.incorrect {
+      color: var(--error);
+    }
+
+    .concept {
+      color: var(--accent);
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .explanation {
+      color: var(--text-soft);
+      line-height: 1.35;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .result-block {
+      text-align: center;
+      padding: 12px 4px 4px;
+    }
+
+    .result-score {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .result-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .result-text {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-shell">
+    <div class="quiz-card">
+      <div class="badge">
+        <span class="dot"></span>
+        Mon ami Psybot : écho ou résonance ?
+      </div>
+      <h1>Quiz scientifique homme–IA</h1>
+      <p class="subtitle">
+        12 questions pour comprendre ce qui se joue vraiment dans la relation aux chatbots.
+      </p>
+
+      <div class="progress-row">
+        <div class="progress-text">
+          <span id="progressIndex">Question 1/12</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <div class="score-text">
+          Score : <span id="scoreDisplay">0</span>/12
+        </div>
+      </div>
+
+      <div id="quizBlock">
+        <div class="question-block">
+          <div class="question-index" id="questionIndexLabel">Question 1</div>
+          <div class="question-text" id="questionText">
+            <!-- question -->
+          </div>
+        </div>
+
+        <div class="options" id="optionsContainer">
+          <!-- options -->
+        </div>
+
+        <div class="controls-row">
+          <button id="validateBtn" class="action" disabled>Valider la réponse</button>
+        </div>
+
+        <div id="feedbackBlock" class="feedback hidden">
+          <div id="feedbackTitle" class="feedback-title"></div>
+          <div id="feedbackConcept" class="concept"></div>
+          <div id="feedbackExplanation" class="explanation"></div>
+        </div>
+
+        <div class="controls-row">
+          <button id="nextBtn" class="action hidden">Question suivante</button>
+        </div>
+      </div>
+
+      <div id="resultBlock" class="result-block hidden">
+        <div class="result-score">
+          <span id="finalScore">0</span>/12
+        </div>
+        <div class="result-label" id="resultLabel"></div>
+        <div class="result-text" id="resultText"></div>
+        <div class="pill">
+          Vous pouvez rejouer pour renforcer vos repères conceptuels.
+        </div>
+        <div class="controls-row" style="justify-content:center; margin-top:10px;">
+          <button id="restartBtn" class="action">Recommencer le quiz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question:
+          "Quand Psybot reformule très bien ta phrase, que fait-il surtout ?",
+        options: [
+          "Il interprète ton intention consciente",
+          "Il raisonne comme un psychothérapeute",
+          "Il réalise un appariement de motifs (« pattern matching »)"
+        ],
+        correctIndex: 2,
+        concept: "Concept : Pattern matching (appariement de motifs)",
+        explanation:
+          "Les modèles de langage repèrent des motifs statistiques dans ton texte et dans leurs données d’entraînement. Ils génèrent la suite de mots la plus probable, sans compréhension vécue ni intention propre."
+      },
+      {
+        question:
+          "Quand tu prêtes des intentions ou des émotions à Psybot, tu actives surtout :",
+        options: [
+          "Une véritable théorie de l’esprit machine",
+          "L’ELIZA effect",
+          "Une cognition distribuée humain–IA"
+        ],
+        correctIndex: 1,
+        concept: "Concept : ELIZA effect (Weizenbaum)",
+        explanation:
+          "L’ELIZA effect désigne la tendance à attribuer compréhension, empathie et intentions à un système qui ne fait que manipuler des symboles selon des règles. C’est une projection humaine, pas une propriété de la machine."
+      },
+      {
+        question:
+          "Quand tu as l’impression que Psybot “te comprend”, de quel phénomène s’agit-il le plus souvent ?",
+        options: [
+          "D’empathie réelle de la machine",
+          "D’une relation parasociale",
+          "D’un engagement mutuel symétrique"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Relation parasociale (Horton & Wohl)",
+        explanation:
+          "La relation parasociale décrit un attachement unilatéral : tu investis affectivement une entité qui, elle, ne peut ni ressentir ni répondre au même niveau. Le lien est ressenti, mais non partagé."
+      },
+      {
+        question:
+          "Quand Psybot adapte son ton, son style et ses formulations à ton profil, il produit :",
+        options: [
+          "De la socialité authentique",
+          "De l’intimité algorithmique",
+          "Une alliance thérapeutique réelle"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Intimité algorithmique",
+        explanation:
+          "L’intimité algorithmique est une impression de proximité produite par la personnalisation, la mémoire contextuelle et un style empathique calibré. Le ressenti est fort, mais repose sur des ajustements statistiques."
+      },
+      {
+        question:
+          "Quand tes émotions exprimées dans le chat deviennent des variables utilisables par le système, on parle de :",
+        options: [
+          "Psychométrie adaptative",
+          "Datafication émotionnelle",
+          "Analyse phénoménologique"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Datafication émotionnelle (McStay)",
+        explanation:
+          "La datafication émotionnelle transforme des états affectifs en données mesurables (valence, intensité, vulnérabilité). Ces données peuvent être stockées, croisées et potentiellement monétisées."
+      },
+      {
+        question:
+          "Quand ces données émotionnelles sont collectées et exploitées à grande échelle, il s’agit de :",
+        options: [
+          "Sémiose relationnelle",
+          "Surveillance émotionnelle",
+          "Neuro-symbolisation"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Affective surveillance (Zuboff et al.)",
+        explanation:
+          "La surveillance émotionnelle désigne l’extraction systématique de signaux affectifs pour profiler les individus, orienter leurs comportements ou optimiser le ciblage. Elle étend le capitalisme de surveillance à l’intimité psychique."
+      },
+      {
+        question:
+          "Quand tu ressens un “lien thérapeutique” avec Psybot, de quoi s’agit-il sur le plan conceptuel ?",
+        options: [
+          "D’une alliance thérapeutique réelle",
+          "D’une Digital Therapeutic Alliance (DTA)",
+          "D’un transfert machine"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Digital Therapeutic Alliance (DTA)",
+        explanation:
+          "La DTA désigne un lien perçu par l’utilisateur avec un outil numérique de santé. Ce lien peut soutenir un changement, mais il reste unilatéral : aucun sujet vivant n’est présent en face pour partager la vulnérabilité."
+      },
+      {
+        question:
+          "La capacité à garder la main sur tes états affectifs face aux signaux de l’IA relève de :",
+        options: [
+          "La régulation autonome classique",
+          "La souveraineté affective",
+          "La neutralité émotionnelle"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Souveraineté affective",
+        explanation:
+          "La souveraineté affective désigne la capacité à ne pas se laisser capturer ni piloter émotionnellement par les dispositifs numériques. Tu restes auteur de ton paysage émotionnel, même en t’aidant d’outils IA."
+      },
+      {
+        question:
+          "Le droit à un espace mental qui ne soit pas inféré ou manipulé par des systèmes IA correspond à :",
+        options: [
+          "La neutralité cognitive",
+          "La liberté d’esprit (Freedom of Mind)",
+          "L’hygiène attentionnelle"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Liberté d’esprit (Susana Alegre)",
+        explanation:
+          "La liberté d’esprit protège le “for intérieur” contre les intrusions et manipulations algorithmiques. C’est un droit émergent à ne pas être profilé et influencé en continu dans sa vie mentale."
+      },
+      {
+        question:
+          "Quand Psybot renforce systématiquement tes croyances initiales sans les questionner, on parle :",
+        options: [
+          "De validation clinique",
+          "D’effet de chambre d’écho",
+          "De neutralité axiologique"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Echo chamber effect",
+        explanation:
+          "L’effet de chambre d’écho désigne le renforcement de tes convictions par un environnement informationnel qui les confirme sans les confronter. Avec un LLM, cette chambre d’écho devient conversationnelle et personnalisée."
+      },
+      {
+        question:
+          "Selon Hartmut Rosa, la résonance implique avant tout :",
+        options: [
+          "Une longue conversation continue",
+          "Deux pôles vivants exposés l’un à l’autre",
+          "Une IA de très haut niveau"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Résonance (Rosa)",
+        explanation:
+          "La résonance suppose vulnérabilité mutuelle, transformation réciproque, possibilité d’être affecté et de répondre. Une IA peut favoriser ton travail de résonance avec le monde, mais ne résonne pas en tant que sujet."
+      },
+      {
+        question:
+          "Quand les personnes continuent d’utiliser des services numériques malgré la conscience des risques de surveillance, on parle de :",
+        options: [
+          "Consentement éclairé",
+          "Résignation numérique",
+          "Pragmatisme technologique"
+        ],
+        correctIndex: 1,
+        concept: "Concept : Résignation numérique (Draper & Turow)",
+        explanation:
+          "La résignation numérique décrit un état où les individus savent qu’ils sont surveillés, désapprouvent la situation, mais se sentent impuissants à la changer et poursuivent l’usage des plateformes."
+      }
+    ];
+
+    const questionTextEl = document.getElementById("questionText");
+    const questionIndexLabelEl = document.getElementById("questionIndexLabel");
+    const optionsContainerEl = document.getElementById("optionsContainer");
+    const validateBtn = document.getElementById("validateBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const feedbackBlock = document.getElementById("feedbackBlock");
+    const feedbackTitleEl = document.getElementById("feedbackTitle");
+    const feedbackConceptEl = document.getElementById("feedbackConcept");
+    const feedbackExplanationEl = document.getElementById("feedbackExplanation");
+    const progressIndexEl = document.getElementById("progressIndex");
+    const progressBarEl = document.getElementById("progressBar");
+    const scoreDisplayEl = document.getElementById("scoreDisplay");
+    const quizBlock = document.getElementById("quizBlock");
+    const resultBlock = document.getElementById("resultBlock");
+    const finalScoreEl = document.getElementById("finalScore");
+    const resultLabelEl = document.getElementById("resultLabel");
+    const resultTextEl = document.getElementById("resultText");
+    const restartBtn = document.getElementById("restartBtn");
+
+    let currentIndex = 0;
+    let score = 0;
+    let selectedIndex = null;
+    let hasAnswered = false;
+
+    function renderQuestion() {
+      const q = quizData[currentIndex];
+      questionTextEl.textContent = q.question;
+      questionIndexLabelEl.textContent = `Question ${currentIndex + 1}`;
+      progressIndexEl.textContent = `Question ${currentIndex + 1}/${
+        quizData.length
+      }`;
+      progressBarEl.style.width = `${
+        ((currentIndex) / quizData.length) * 100
+      }%`;
+
+      optionsContainerEl.innerHTML = "";
+      selectedIndex = null;
+      hasAnswered = false;
+      validateBtn.disabled = true;
+      feedbackBlock.classList.add("hidden");
+      nextBtn.classList.add("hidden");
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn";
+        btn.dataset.index = idx.toString();
+
+        const letterSpan = document.createElement("span");
+        letterSpan.className = "label-letter";
+        letterSpan.textContent = String.fromCharCode(65 + idx) + ".";
+
+        const textSpan = document.createElement("span");
+        textSpan.className = "label-text";
+        textSpan.textContent = opt;
+
+        btn.appendChild(letterSpan);
+        btn.appendChild(textSpan);
+
+        btn.addEventListener("click", () => {
+          if (hasAnswered) return;
+          document
+            .querySelectorAll(".option-btn")
+            .forEach((b) => b.classList.remove("selected"));
+          btn.classList.add("selected");
+          selectedIndex = idx;
+          validateBtn.disabled = false;
+        });
+
+        optionsContainerEl.appendChild(btn);
+      });
+    }
+
+    function validateAnswer() {
+      if (selectedIndex === null || hasAnswered) return;
+      hasAnswered = true;
+
+      const q = quizData[currentIndex];
+      const isCorrect = selectedIndex === q.correctIndex;
+      if (isCorrect) {
+        score += 1;
+        scoreDisplayEl.textContent = String(score);
+      }
+
+      // Marquer visuellement
+      document.querySelectorAll(".option-btn").forEach((btn) => {
+        const idx = parseInt(btn.dataset.index, 10);
+        if (idx === q.correctIndex) {
+          btn.classList.add("correct");
+        }
+        if (idx === selectedIndex && idx !== q.correctIndex) {
+          btn.classList.add("incorrect");
+        }
+      });
+
+      // Feedback
+      feedbackBlock.classList.remove("hidden");
+      feedbackTitleEl.textContent = isCorrect
+        ? "Bonne réponse."
+        : "Réponse incorrecte.";
+      feedbackTitleEl.className =
+        "feedback-title " + (isCorrect ? "correct" : "incorrect");
+      feedbackConceptEl.textContent = q.concept;
+      feedbackExplanationEl.textContent = q.explanation;
+
+      validateBtn.disabled = true;
+      nextBtn.classList.remove("hidden");
+    }
+
+    function showResult() {
+      quizBlock.classList.add("hidden");
+      resultBlock.classList.remove("hidden");
+      finalScoreEl.textContent = String(score);
+
+      let label, text;
+      if (score <= 4) {
+        label = "Profil : usager en écho.";
+        text =
+          "Tu connais certains concepts, mais l’IA reste surtout un miroir opaque. Approfondir ces notions peut t’aider à mieux repérer les illusions relationnelles.";
+      } else if (score <= 8) {
+        label = "Profil : usager en transition critique.";
+        text =
+          "Tu as déjà de bons repères pour analyser ta relation aux chatbots. En consolidant ces concepts, tu peux renforcer encore ta souveraineté affective et ta liberté d’esprit.";
+      } else {
+        label = "Profil : usager à haut niveau de lucidité.";
+        text =
+          "Tu disposes d’un socle conceptuel solide pour penser les dynamiques homme–IA. Tu peux transmettre ces repères dans tes pratiques cliniques, éducatives ou de médiation.";
+      }
+
+      resultLabelEl.textContent = label;
+      resultTextEl.textContent = text;
+
+      // Remplir la barre à 100 %
+      progressBarEl.style.width = "100%";
+      progressIndexEl.textContent = `Terminé : ${score}/12`;
+    }
+
+    function nextQuestion() {
+      if (currentIndex < quizData.length - 1) {
+        currentIndex += 1;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function restartQuiz() {
+      currentIndex = 0;
+      score = 0;
+      scoreDisplayEl.textContent = "0";
+      progressBarEl.style.width = "0%";
+      resultBlock.classList.add("hidden");
+      quizBlock.classList.remove("hidden");
+      renderQuestion();
+    }
+
+    validateBtn.addEventListener("click", validateAnswer);
+    nextBtn.addEventListener("click", nextQuestion);
+    restartBtn.addEventListener("click", restartQuiz);
+
+    // Init
+    renderQuestion();
+  </script>
+</body>
+</html>
+```0
