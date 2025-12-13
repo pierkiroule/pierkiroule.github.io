@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<title>Eko — Lost in the Flow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+:root {
+  --bg-dark: #07080c;
+  --bg-mid: #12141a;
+  --card: #111318;
+  --card-hover: #181b22;
+  --accent: #ff2e63;
+  --accent-glow: rgba(255, 46, 99, 0.3);
+  --soft: #9aa0a6;
+  --text: #f1f1f1;
+  --border: #222;
+}
+
+* { 
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(circle at top, var(--bg-mid), var(--bg-dark));
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+#app {
+  width: 100%;
+  max-width: 820px;
+  position: relative;
+  z-index: 2;
+  animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+}
+
+h1 {
+  font-size: clamp(28px, 5vw, 38px);
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text), var(--soft));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--soft);
+  margin-bottom: 32px;
+  padding-left: 2px;
+}
+
+.story-wrapper {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.story-text {
+  line-height: 1.8;
+  margin-bottom: 28px;
+  white-space: pre-line;
+  font-size: 16px;
+  color: #e8e8e8;
+}
+
+.story-text em {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 600;
+}
+
+.story-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.question {
+  font-size: 17px;
+  color: var(--accent);
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.choices-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 16px 18px;
+  background: var(--card-hover);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  line-height: 1.5;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.choice:hover {
+  background: #202432;
+  border-color: rgba(255, 46, 99, 0.3);
+  transform: translateX(4px);
+}
+
+.choice:hover::before {
+  transform: scaleY(1);
+}
+
+.choice:active {
+  transform: translateX(2px) scale(0.98);
+}
+
+.choice-icon {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+#slamBox {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  animation: fadeIn 0.5s ease;
+}
+
+#slamBox h3 {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  color: var(--soft);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#slam {
+  font-size: 15px;
+  line-height: 1.9;
+  white-space: pre-line;
+  color: #e8e8e8;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border-left: 3px solid var(--accent);
+  min-height: 60px;
+}
+
+#slam:empty::before {
+  content: "Ton slam se construit au fil de tes choix...";
+  color: var(--soft);
+  font-style: italic;
+  opacity: 0.5;
+}
+
+.slam-line {
+  margin-bottom: 12px;
+  animation: lineAppear 0.4s ease;
+}
+
+@keyframes lineAppear {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#footer {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--soft);
+  text-align: center;
+  font-style: italic;
+}
+
+.final-slam {
+  background: linear-gradient(135deg, rgba(255, 46, 99, 0.1), rgba(255, 46, 99, 0.05));
+  padding: 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 46, 99, 0.2);
+  margin-bottom: 24px;
+}
+
+.final-slam-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: var(--accent);
+  text-align: center;
+  font-weight: 600;
+}
+
+.final-slam-text {
+  font-size: 16px;
+  line-height: 2;
+  white-space: pre-line;
+  color: var(--text);
+}
+
+button#restart {
+  width: 100%;
+  margin-top: 24px;
+  background: var(--accent);
+  border: none;
+  padding: 16px 24px;
+  color: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+button#restart:hover {
+  background: #ff3d72;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px var(--accent-glow);
+}
+
+button#restart:active {
+  transform: translateY(0);
+}
+
+.progress-indicator {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+}
+
+.progress-dot.completed {
+  background: var(--soft);
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 24px 20px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+
+  .choice {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .story-text {
+    font-size: 15px;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.choice-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.choice:hover .choice-icon {
+  animation: none;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div class="card" id="card">
+    <h1>🎧 Eko — Lost in the Flow</h1>
+    <h2>Une histoire dont tu es le héros</h2>
+
+    <div class="progress-indicator" id="progress"></div>
+
+    <div id="story"></div>
+
+    <div id="slamBox">
+      <h3>🎤 Ton slam se construit</h3>
+      <div id="slam"></div>
+    </div>
+
+    <div id="footer">
+      Chaque choix construit ton histoire.
+    </div>
+  </div>
+</div>
+
+<script>
+const chapters = [
+  {
+    text: `Tokyo. 3h22 du matin.
+
+La salle vibre encore. Dix mille personnes viennent de crier ton nom. <em>Eko. Eko. Eko.</em>
+
+Tu es dans ta loge. Seul. Le silence est écrasant après tout ce bruit.
+
+Ton téléphone vibre. Encore. Et encore.
+
+<strong>347 notifications.</strong>
+
+Des captures d'écran de ton set. Des montages vidéo déjà en ligne. Des commentaires qui défilent plus vite que tu ne peux lire.
+
+"Il est incroyable."
+"Meilleur DJ de sa génération."
+"Eko ne dort jamais."
+
+Tu souris. Mais quelque chose te serre la poitrine.
+
+Tu scrolles. Pour calmer l'adrénaline, tu te dis. Mais ton cœur bat encore plus vite.
+
+Ton manager entre : "Vol dans 3 heures. Berlin demain soir. T'as dormi ?"`,
+    question: "Comment tu te sens vraiment ?",
+    choices: [
+      "Épuisé, mais j'peux pas montrer que j'suis fatigué.",
+      "Tout le monde m'attend. J'ai pas le droit de ralentir.",
+      "J'sais même plus si j'ai envie d'y aller."
+    ]
+  },
+  {
+    text: `Dans l'avion, tu mets ton casque.
+
+Mais même avec le son à fond, t'entends ce truc dans ta tête. Une petite voix qui murmure.
+
+<em>"Et si tu disparaissais ?"</em>
+
+Pas physiquement. Mais… si tu arrêtais de poster. Si tu fermais tout. Combien de temps avant qu'ils t'oublient ?
+
+Tu regardes Instagram. Un compte parodie ton style. Avec une IA. Les commentaires :
+
+"Même vibe, mais plus clean."
+"On a même plus besoin de l'original."
+
+Tu fermes l'app. Tu la rouvres 30 secondes après.
+
+Ta main tremble un peu. Depuis quelques jours, ça arrive. Juste avant les drops. Comme si ton corps t'envoyait un signal.
+
+Mais t'as pas le temps d'écouter ton corps.`,
+    question: "Qu'est-ce qui te fait le plus flipper ?",
+    choices: [
+      "Devenir remplaçable. Juste un style qu'on peut copier.",
+      "Réaliser que j'suis accro à la validation des autres.",
+      "Sentir que mon corps lâche et que j'peux rien y faire."
+    ]
+  },
+  {
+    text: `Berlin. Le Berghain. La foule est déjà en transe.
+
+Tu te mets aux platines. Le premier beat part. Parfait. Le deuxième. Impeccable.
+
+Mais toi, t'es ailleurs.
+
+Tes mains bougent par automatisme. Muscle memory. Les transitions se font toutes seules.
+
+Mais <strong>tu n'es plus là</strong>.
+
+Tu te regardes de l'extérieur. Comme si quelqu'un d'autre jouait à ta place.
+
+Le drop arrive. La foule explose.
+
+Toi, tu sens… rien.
+
+Juste un vide immense. Comme si tu t'étais éteint de l'intérieur.
+
+Après le set, dans le silence de ta chambre d'hôtel, tu fixes le plafond. Ton cœur bat trop vite. Tes mains tremblent encore.
+
+<em>Tu ne peux plus continuer comme ça.</em>`,
+    question: "Qu'est-ce que tu fais maintenant ?",
+    choices: [
+      "J'appelle quelqu'un. J'ai besoin de parler à un humain.",
+      "J'éteins mon téléphone. Je coupe tout. Maintenant.",
+      "Je reste là. Dans ce silence. Pour la première fois."
+    ]
+  },
+  {
+    text: `Tu coupes ton téléphone.
+
+Les premières heures sont les pires. Ton pouce cherche l'écran par réflexe. Ta main se crispe. L'angoisse monte.
+
+<em>Et si je rate quelque chose ?
+Et si on m'oublie ?
+Et si je disparais ?</em>
+
+Mais tu tiens bon.
+
+Le deuxième jour, le silence devient moins lourd.
+
+Le troisième jour, tu entends un oiseau dehors. Un putain d'oiseau.
+
+Et tu pleures. Pas de tristesse. De soulagement.
+
+Le monde existe encore. Sans écran. Sans notifications. Sans que tu sois "on".
+
+Tu respires. Lentement. Profondément.
+
+Pour la première fois depuis des mois, <strong>tu respires vraiment</strong>.
+
+Ton corps te parle enfin. Et tu l'écoutes.`,
+    question: "Qu'est-ce que tu comprends maintenant ?",
+    choices: [
+      "J'ai confondu exister et être visible.",
+      "Mon corps m'a supplié d'arrêter, mais j'l'ai ignoré.",
+      "J'peux pas vibrer tout le temps. Personne peut."
+    ]
+  },
+  {
+    text: `Trois semaines plus tard. Amsterdam. Petit club. 300 personnes max.
+
+Tu reviens. Mais différemment.
+
+Le set est plus lent. Plus espacé. Tu laisses respirer entre les morceaux.
+
+Entre deux tracks, tu fermes les yeux. Cinq secondes. Juste pour sentir.
+
+Le public retient son souffle.
+
+Puis expire avec toi.
+
+Ce n'est plus un show. C'est une <em>respiration collective</em>.
+
+Après, une fille s'approche. Les yeux rouges.
+
+"Merci," elle dit. "On sentait que t'étais vraiment là."
+
+Tu réalises un truc simple. Puissant.
+
+<strong>Ce n'était pas le flow qui t'avait quitté.
+C'était toi qui t'étais quitté toi-même.</strong>`,
+    question: "Comment tu veux vivre maintenant ?",
+    choices: [
+      "Je choisis les rythmes qui me respectent.",
+      "Je veux créer, pas performer pour exister.",
+      "Je vibre quand j'ai quelque chose à dire. Pas pour remplir le vide."
+    ]
+  },
+  {
+    text: `Six mois plus tard.
+
+Tu joues toujours. Mais tu t'arrêtes aussi.
+
+Quand ta mâchoire se serre : tu poses.
+Quand ton souffle se coupe : tu respires.
+Quand le silence appelle : tu écoutes.
+
+Tu as moins de dates. Moins d'abonnés. Moins de buzz.
+
+Mais quand tu joues, <em>les gens pleurent</em>.
+
+Parce que tu es là. Vraiment là.
+
+Tu as compris la différence entre le <strong>flow</strong> et la <strong>résonance</strong>.
+
+Le flow te pousse. Te surfe. T'emporte jusqu'à ce que tu te perdes.
+
+La résonance, elle, <em>te ramène à toi</em>.
+
+Elle vient du silence. Du repos. De l'écoute.
+
+Tu as appris à choisir.
+
+Quand vibrer.
+Avec qui.
+Et pourquoi.`,
+    question: "Qu'est-ce que tu retiens de tout ça ?",
+    choices: [
+      "Le vrai flow, c'est savoir quand s'arrêter.",
+      "Mon corps est mon meilleur instrument. Si j'l'écoute pas, j'perds tout.",
+      "La vraie force, c'est de dire non au bruit pour entendre l'essentiel."
+    ]
+  }
+];
+
+let index = 0;
+let slam = [];
+
+const storyDiv = document.getElementById("story");
+const slamDiv = document.getElementById("slam");
+const progressDiv = document.getElementById("progress");
+
+function updateProgress() {
+  progressDiv.innerHTML = chapters.map((_, i) => 
+    `<div class="progress-dot ${i < index ? 'completed' : i === index ? 'active' : ''}"></div>`
+  ).join('');
+}
+
+function renderChapter() {
+  updateProgress();
+
+  if (index >= chapters.length) {
+    storyDiv.innerHTML = `
+      <div class="story-wrapper">
+        <div class="final-slam">
+          <div class="final-slam-title">🎧 TON SLAM FINAL</div>
+          <div class="final-slam-text">${slam.join("\n\n")}</div>
+        </div>
+        <div class="story-text" style="text-align: center; margin-top: 20px;">
+          <strong>Merci d'avoir fait le voyage avec Eko.</strong>
+          
+          Ce slam, c'est le tien. Il raconte ta vérité.
+          
+          Partage-le avec quelqu'un qui en a besoin.
+        </div>
+        <button id="restart">🔄 Recommencer l'histoire</button>
+      </div>
+    `;
+    document.getElementById("footer").textContent = "Chaque histoire est unique.";
+    document.getElementById("restart").onclick = () => {
+      index = 0;
+      slam = [];
+      slamDiv.innerHTML = '';
+      document.getElementById("footer").textContent = "Chaque choix construit ton histoire.";
+      renderChapter();
+    };
+    return;
+  }
+
+  const chapter = chapters[index];
+  const choicesHtml = chapter.choices.map(choice => `
+    <button class="choice" data-choice="${choice}">
+      <span class="choice-icon">➜</span>
+      <span>${choice}</span>
+    </button>
+  `).join('');
+
+  storyDiv.innerHTML = `
+    <div class="story-wrapper">
+      <div class="story-text">${chapter.text}</div>
+      <div class="question">${chapter.question}</div>
+      <div class="choices-wrapper">
+        ${choicesHtml}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll(".choice").forEach(btn => {
+    btn.onclick = () => {
+      const choice = btn.dataset.choice;
+      slam.push(choice);
+      
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'slam-line';
+      lineDiv.textContent = choice;
+      slamDiv.appendChild(lineDiv);
+      
+      index++;
+      renderChapter();
+    };
+  });
+}
+
+renderChapter();
+</script>
+</body>
+</html>
