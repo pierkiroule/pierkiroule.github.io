@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métaphores structurantes en ETP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .card-subtitle {
+            color: #667eea;
+            font-style: italic;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .metaphor-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .metaphor-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .metaphor-item:last-child {
+            border-bottom: none;
+        }
+
+        .metaphor-item:hover {
+            color: #667eea;
+        }
+
+        .metaphor-item::before {
+            content: '→';
+            margin-right: 10px;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .criteria-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .criteria-box h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .criteria-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .criteria-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+        }
+
+        .criteria-item::before {
+            content: '✓';
+            font-size: 1.5em;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .key-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .key-message h2 {
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .quote {
+            font-size: 1.2em;
+            font-style: italic;
+            line-height: 1.6;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            border-left: 5px solid white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            font-style: italic;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+
+        .usage-example {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .usage-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Animer avec les métaphores en ETP</h1>
+            <p class="subtitle">Simples • Opérationnelles • Testées terrain</p>
+        </header>
+
+        <div class="filter-section">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">Toutes</button>
+                <button class="filter-btn" data-category="positionnement">Positionnement</button>
+                <button class="filter-btn" data-category="equilibre">Équilibre</button>
+                <button class="filter-btn" data-category="parcours">Parcours</button>
+                <button class="filter-btn" data-category="territoire">Territoire</button>
+                <button class="filter-btn" data-category="ressources">Ressources</button>
+                <button class="filter-btn" data-category="regulation">Régulation</button>
+                <button class="filter-btn" data-category="comprehension">Compréhension</button>
+                <button class="filter-btn" data-category="transmission">Transmission</button>
+                <button class="filter-btn" data-category="protection">Protection</button>
+                <button class="filter-btn" data-category="decision">Décision</button>
+            </div>
+        </div>
+
+        <div class="cards-grid" id="cardsContainer"></div>
+
+        <div class="criteria-box">
+            <h2>✓ Critères de pertinence ETP</h2>
+            <p style="margin-bottom: 20px;">Une métaphore est pertinente si elle :</p>
+            <div class="criteria-list">
+                <div class="criteria-item">Parle au patient</div>
+                <div class="criteria-item">Réduit la peur de l'évaluation</div>
+                <div class="criteria-item">Déclenche la parole</div>
+                <div class="criteria-item">Se dessine sur un A4</div>
+                <div class="criteria-item">S'utilise sans explication longue</div>
+            </div>
+        </div>
+
+        <div class="key-message">
+            <h2>💡 Message clé formateur</h2>
+            <div class="quote">
+                En ETP, la métaphore n'explique pas à la place du patient.<br>
+                Elle lui donne un appui pour penser.
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeBtn">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const metaphors = [
+            {
+                category: 'positionnement',
+                icon: '🌡️',
+                title: 'Positionnement',
+                subtitle: 'Pour se situer',
+                items: ['Thermomètre', 'Échelle', 'Curseur', 'Jauge', 'Feu tricolore'],
+                examples: {
+                    'Thermomètre': 'Utilisez pour évaluer l\'intensité d\'un symptôme ou d\'une émotion sur une échelle de 0 à 10.',
+                    'Feu tricolore': 'Vert = ça va bien / Orange = vigilance / Rouge = besoin d\'aide immédiate'
+                }
+            },
+            {
+                category: 'equilibre',
+                icon: '⚖️',
+                title: 'Équilibre',
+                subtitle: 'Pour penser les ajustements',
+                items: ['Balance', 'Bascule', 'Plateau', 'Funambule', 'Niveau à bulle'],
+                examples: {
+                    'Balance': 'Mettre en regard bénéfices et contraintes d\'un traitement',
+                    'Funambule': 'Trouver son équilibre entre contrôle et lâcher-prise'
+                }
+            },
+            {
+                category: 'parcours',
+                icon: '🛤️',
+                title: 'Parcours',
+                subtitle: 'Pour penser le temps',
+                items: ['Chemin', 'Ligne du temps', 'Escalier', 'Sentier', 'Étapes'],
+                examples: {
+                    'Escalier': 'Visualiser les progrès marche par marche, pas à pas',
+                    'Chemin': 'Retracer le parcours de vie avec la maladie'
+                }
+            },
+            {
+                category: 'territoire',
+                icon: '🗺️',
+                title: 'Territoire',
+                subtitle: 'Pour organiser les savoirs',
+                items: ['Carte', 'Paysage', 'Carte mentale', 'Îles', 'Zones (connues / floues / inconnues)'],
+                examples: {
+                    'Carte': 'Cartographier ce que je sais, ce que je découvre, ce qui reste à explorer',
+                    'Îles': 'Chaque île = un domaine de connaissance (alimentation, traitement, activité...)'
+                }
+            },
+            {
+                category: 'ressources',
+                icon: '🎒',
+                title: 'Ressources',
+                subtitle: 'Pour identifier l\'utile',
+                items: ['Sac à dos', 'Boîte à outils', 'Trousse', 'Panier', 'Réserves'],
+                examples: {
+                    'Sac à dos': 'Qu\'est-ce que j\'emporte avec moi dans mon quotidien avec la maladie ?',
+                    'Boîte à outils': 'Identifier mes stratégies personnelles qui fonctionnent'
+                }
+            },
+            {
+                category: 'regulation',
+                icon: '🔥',
+                title: 'Régulation',
+                subtitle: 'Pour gérer les variations',
+                items: ['Feu', 'Volume', 'Robinet', 'Curseur de lumière', 'Météo'],
+                examples: {
+                    'Robinet': 'Ouvrir ou fermer le flux selon les besoins (stress, activité...)',
+                    'Météo': 'Observer les variations comme la météo intérieure'
+                }
+            },
+            {
+                category: 'comprehension',
+                icon: '💡',
+                title: 'Compréhension',
+                subtitle: 'Pour clarifier',
+                items: ['Brouillard / éclaircie', 'Loupe', 'Phare', 'Fenêtre', 'Lampe'],
+                examples: {
+                    'Brouillard': 'Zones encore floues vs zones qui s\'éclaircissent',
+                    'Loupe': 'Zoomer sur un aspect précis pour mieux comprendre'
+                }
+            },
+            {
+                category: 'transmission',
+                icon: '🪞',
+                title: 'Transmission',
+                subtitle: 'Pour vérifier l\'appropriation',
+                items: ['Miroir', 'Messager', 'Prof à un ami', 'Chaîne', 'Relais'],
+                examples: {
+                    'Prof à un ami': 'Expliquer avec ses propres mots comme si on l\'enseignait',
+                    'Miroir': 'Refléter ce qui a été compris pour vérifier'
+                }
+            },
+            {
+                category: 'protection',
+                icon: '🛡️',
+                title: 'Protection',
+                subtitle: 'Pour sécuriser',
+                items: ['Bouclier', 'Ceinture', 'Casque', 'Filet', 'Parapluie'],
+                examples: {
+                    'Bouclier': 'Mes protections face aux difficultés',
+                    'Filet': 'Mon réseau de sécurité (personnes, structures...)'
+                }
+            },
+            {
+                category: 'decision',
+                icon: '🧭',
+                title: 'Décision',
+                subtitle: 'Pour choisir',
+                items: ['Boussole', 'Feux de signalisation', 'Carrefour', 'Panneaux', 'GPS'],
+                examples: {
+                    'Boussole': 'Mes valeurs qui guident mes choix',
+                    'Carrefour': 'Visualiser plusieurs options possibles'
+                }
+            }
+        ];
+
+        const cardsContainer = document.getElementById('cardsContainer');
+        const modal = document.getElementById('modal');
+        const modalBody = document.getElementById('modalBody');
+        const closeBtn = document.getElementById('closeBtn');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+
+        function renderCards(filter = 'all') {
+            cardsContainer.innerHTML = '';
+            
+            metaphors
+                .filter(m => filter === 'all' || m.category === filter)
+                .forEach(metaphor => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.dataset.category = metaphor.category;
+                    
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="card-icon">${metaphor.icon}</div>
+                            <div class="card-title">${metaphor.title}</div>
+                        </div>
+                        <div class="card-subtitle">${metaphor.subtitle}</div>
+                        <ul class="metaphor-list">
+                            ${metaphor.items.map(item => `<li class="metaphor-item">${item}</li>`).join('')}
+                        </ul>
+                    `;
+                    
+                    card.addEventListener('click', () => showModal(metaphor));
+                    cardsContainer.appendChild(card);
+                });
+        }
+
+        function showModal(metaphor) {
+            modalBody.innerHTML = `
+                <h2 class="modal-title">${metaphor.icon} ${metaphor.title}</h2>
+                <p class="modal-subtitle">${metaphor.subtitle}</p>
+                <h3 style="color: #667eea; margin-top: 20px; margin-bottom: 10px;">Métaphores :</h3>
+                <ul style="list-style: none; padding: 0;">
+                    ${metaphor.items.map(item => `
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; color: #555;">
+                            → ${item}
+                        </li>
+                    `).join('')}
+                </ul>
+                ${Object.keys(metaphor.examples).length > 0 ? `
+                    <h3 style="color: #667eea; margin-top: 25px; margin-bottom: 15px;">Exemples d'utilisation :</h3>
+                    ${Object.entries(metaphor.examples).map(([key, value]) => `
+                        <div class="usage-example">
+                            <div class="usage-title">${key}</div>
+                            <div>${value}</div>
+                        </div>
+                    `).join('')}
+                ` : ''}
+            `;
+            modal.classList.add('active');
+        }
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderCards(btn.dataset.category);
+            });
+        });
+
+        renderCards();
+    </script>
+</body>
+</html>
