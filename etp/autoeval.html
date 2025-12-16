@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Auto-évaluation ETP — 4 dimensions</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#141621;
+      --muted:#9aa3b2;
+      --text:#eef1f6;
+      --line:#23263a;
+      --ok:#35d07f;
+      --warn:#ffb020;
+      --bad:#ff5a6a;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 20% 0%, #1a1d2f 0%, var(--bg) 60%);
+      color:var(--text);
+    }
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+    header{
+      display:flex;gap:12px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    h1{font-size:18px;margin:0;font-weight:700}
+    .sub{color:var(--muted);font-size:13px;margin-top:6px}
+    .actions{display:flex;gap:10px;align-items:center}
+    button{
+      background:#1f2440;border:1px solid #2b315a;color:var(--text);
+      padding:10px 12px;border-radius:12px;cursor:pointer;font-weight:600;
+    }
+    button:hover{filter:brightness(1.06)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap:14px;
+    }
+    @media (max-width: 960px){
+      .grid{grid-template-columns: 1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .dim-head{
+      display:flex;align-items:center;justify-content:space-between;
+      padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line);
+      gap:12px;
+    }
+    .dim-title{font-weight:800}
+    .dim-tag{
+      font-size:12px;color:var(--muted);
+      padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.03);
+      white-space:nowrap;
+    }
+    .items{display:flex;flex-direction:column;gap:10px}
+    .item{
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.18);
+      border-radius:12px;
+      padding:10px;
+    }
+    .item-top{
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .label{
+      display:flex;flex-direction:column;gap:4px;min-width:260px;flex:1;
+    }
+    .has{font-size:13px;font-weight:700}
+    .terrain{font-size:12px;color:var(--muted)}
+    .scoreBox{
+      display:flex;align-items:center;gap:10px;min-width:210px;
+    }
+    input[type="range"]{width:160px}
+    .score{
+      width:44px;text-align:center;font-weight:800;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      border-radius:10px;padding:6px 8px;
+    }
+    .hint{font-size:11px;color:var(--muted);margin-top:6px}
+
+    /* Histogram */
+    .hist{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .barRow{
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.18);
+      border-radius:12px;
+      padding:12px;
+    }
+    .barTop{
+      display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .barName{font-weight:800}
+    .barVal{color:var(--muted);font-size:13px}
+    .barTrack{
+      height:14px;border-radius:999px;background:#0f1120;border:1px solid rgba(255,255,255,0.10);
+      overflow:hidden;
+    }
+    .barFill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--bad), var(--warn), var(--ok));
+      border-right:1px solid rgba(255,255,255,0.25);
+      transition: width .2s ease;
+    }
+    .prio{
+      margin-top:10px;
+      border-top:1px dashed rgba(255,255,255,0.14);
+      padding-top:10px;
+    }
+    .prioTitle{
+      font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    }
+    .pill{
+      font-size:11px;
+      padding:4px 8px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .prioList{display:flex;flex-direction:column;gap:6px}
+    .prioItem{
+      display:flex;justify-content:space-between;gap:10px;align-items:flex-start;
+      border:1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      padding:8px 10px;border-radius:10px;
+    }
+    .prioText{font-size:12px}
+    .prioScore{
+      font-weight:900;
+      padding:2px 8px;border-radius:999px;
+      border:1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.22);
+      color: var(--text);
+      white-space:nowrap;
+    }
+    .empty{
+      color:var(--muted);font-size:12px;
+      padding:10px;border:1px dashed rgba(255,255,255,0.12);
+      border-radius:10px;background: rgba(255,255,255,0.02);
+    }
+    footer{margin-top:14px;color:var(--muted);font-size:12px}
+    a{color:#b9c7ff}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Auto-évaluation ETP — Savoirs / Savoir-faire / Savoir-être / Savoir-devenir</h1>
+        <div class="sub">Note chaque item de 0 à 10. Histogramme = moyenne par dimension. Les items &lt; 7 apparaissent comme priorités sur chaque barre.</div>
+      </div>
+      <div class="actions">
+        <button id="btnReset" type="button">Réinitialiser</button>
+        <button id="btnDemo" type="button">Remplir (démo)</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card" id="formCard">
+        <!-- Form generated by JS -->
+      </section>
+
+      <aside class="card">
+        <div class="dim-head">
+          <div class="dim-title">Résultats</div>
+          <div class="dim-tag">Seuil prioritaire : &lt; 7/10</div>
+        </div>
+        <div class="hist" id="hist"></div>
+        <footer>
+          Astuce : tu peux modifier la liste d’items dans le tableau <code>MODEL</code> du script.
+        </footer>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // 0..10
+    const THRESHOLD = 7;
+
+    // Modèle : langage HAS + langage terrain
+    const MODEL = [
+      {
+        key: "savoirs",
+        name: "Savoirs",
+        tag: "Connaissances mobilisables",
+        items: [
+          { id:"sv1", has:"Cadre et finalités de l’ETP", terrain:"Expliquer clairement au patient pourquoi on fait de l’ETP" },
+          { id:"sv2", has:"Différence information / éducation", terrain:"Ne pas confondre expliquer une maladie et aider à apprendre à vivre avec" },
+          { id:"sv3", has:"Notion de compétence du patient", terrain:"Repérer ce que le patient sait faire au quotidien" },
+          { id:"sv4", has:"Diagnostic éducatif partagé", terrain:"Comprendre la situation du patient avant d’agir" },
+          { id:"sv5", has:"Objectifs éducatifs", terrain:"Savoir ce que le patient va apprendre concrètement" },
+          { id:"sv6", has:"Principes d’évaluation en ETP", terrain:"Vérifier si quelque chose a changé pour le patient" }
+        ]
+      },
+      {
+        key: "savoirfaire",
+        name: "Savoir-faire",
+        tag: "Mise en œuvre de la démarche éducative",
+        items: [
+          { id:"sf1", has:"Conduire un entretien éducatif", terrain:"Poser des questions ouvertes sur le vécu et le quotidien" },
+          { id:"sf2", has:"Identifier besoins, ressources et freins", terrain:"Repérer ce qui aide et ce qui complique la vie du patient" },
+          { id:"sf3", has:"Co-construire des objectifs éducatifs", terrain:"Définir avec le patient un objectif atteignable" },
+          { id:"sf4", has:"Concevoir une séance ETP", terrain:"Préparer une activité simple, adaptée au public" },
+          { id:"sf5", has:"Animer une séance individuelle ou collective", terrain:"Faire participer les patients, pas seulement parler" },
+          { id:"sf6", has:"Utiliser des outils éducatifs adaptés", terrain:"Employer papier, objets, métaphores, situations concrètes" },
+          { id:"sf7", has:"Évaluer les compétences du patient", terrain:"Observer, questionner, utiliser une auto-évaluation simple" },
+          { id:"sf8", has:"Tracer l’activité ETP", terrain:"Noter l’essentiel de ce qui a été fait et appris" }
+        ]
+      },
+      {
+        key: "savoiretre",
+        name: "Savoir-être",
+        tag: "Posture éducative et relationnelle",
+        items: [
+          { id:"se1", has:"Posture collaborative", terrain:"Travailler avec le patient, pas à sa place" },
+          { id:"se2", has:"Attitude non jugeante", terrain:"Accueillir les choix du patient même s’ils diffèrent des attentes" },
+          { id:"se3", has:"Respect de l’autonomie", terrain:"Accepter qu’un patient n’adhère pas immédiatement" },
+          { id:"se4", has:"Adaptation au rythme et au niveau de compréhension", terrain:"Ajuster son discours et ses outils" },
+          { id:"se5", has:"Gestion des émotions en séance", terrain:"Rester contenant face à l’anxiété, la colère ou le découragement" },
+          { id:"se6", has:"Reconnaissance du savoir expérientiel", terrain:"Valoriser ce que le patient a appris par l’expérience" }
+        ]
+      },
+      {
+        key: "savoirdevenir",
+        name: "Savoir-devenir",
+        tag: "Développement professionnel continu",
+        items: [
+          { id:"sd1", has:"Réflexivité sur la pratique", terrain:"Se demander après coup ce qui a fonctionné ou non" },
+          { id:"sd2", has:"Ajustement de la posture éducative", terrain:"Modifier sa façon de faire au fil des séances" },
+          { id:"sd3", has:"Montée en compétence en animation", terrain:"Gagner en aisance avec les groupes" },
+          { id:"sd4", has:"Capacité d’innovation pédagogique", terrain:"Tester de nouveaux outils simples" },
+          { id:"sd5", has:"Inscription dans une dynamique d’équipe", terrain:"Partager ses pratiques et s’inspirer des autres" },
+          { id:"sd6", has:"Contribution à l’amélioration du programme", terrain:"Proposer des ajustements concrets" }
+        ]
+      }
+    ];
+
+    // --- Storage helpers
+    const LS_KEY = "etp_eval_v1";
+    function loadScores(){
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return {};
+        return JSON.parse(raw) || {};
+      }catch(e){ return {}; }
+    }
+    function saveScores(scores){
+      localStorage.setItem(LS_KEY, JSON.stringify(scores));
+    }
+
+    // --- Rendering
+    const formCard = document.getElementById("formCard");
+    const hist = document.getElementById("hist");
+    const scores = loadScores(); // { itemId: number }
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function scoreColor(v){
+      if(v < THRESHOLD) return "var(--bad)";
+      if(v < 8.5) return "var(--warn)";
+      return "var(--ok)";
+    }
+
+    function renderForm(){
+      formCard.innerHTML = "";
+      MODEL.forEach(dim => {
+        const dimEl = document.createElement("div");
+        dimEl.className = "card";
+        dimEl.style.padding = "12px";
+        dimEl.style.marginBottom = "12px";
+        dimEl.style.background = "rgba(0,0,0,0.10)";
+
+        dimEl.innerHTML = `
+          <div class="dim-head">
+            <div class="dim-title">${dim.name}</div>
+            <div class="dim-tag">${dim.tag}</div>
+          </div>
+          <div class="items" id="items_${dim.key}"></div>
+        `;
+
+        const itemsWrap = dimEl.querySelector(`#items_${dim.key}`);
+
+        dim.items.forEach(it => {
+          const v = clamp(Number(scores[it.id] ?? 7), 0, 10);
+
+          const itemEl = document.createElement("div");
+          itemEl.className = "item";
+          itemEl.innerHTML = `
+            <div class="item-top">
+              <div class="label">
+                <div class="has">${it.has}</div>
+                <div class="terrain">→ ${it.terrain}</div>
+              </div>
+              <div class="scoreBox">
+                <input type="range" min="0" max="10" step="1" value="${v}" data-item="${it.id}" />
+                <div class="score" id="score_${it.id}" style="border-color: rgba(255,255,255,0.12);">
+                  ${v}
+                </div>
+              </div>
+            </div>
+            <div class="hint">0 = pas acquis • 10 = acquis / maîtrisé</div>
+          `;
+          itemsWrap.appendChild(itemEl);
+        });
+
+        formCard.appendChild(dimEl);
+      });
+
+      // attach listeners
+      formCard.querySelectorAll('input[type="range"]').forEach(r => {
+        r.addEventListener("input", (e) => {
+          const id = e.target.getAttribute("data-item");
+          const v = clamp(Number(e.target.value), 0, 10);
+          scores[id] = v;
+          const box = document.getElementById(`score_${id}`);
+          if(box) box.textContent = v;
+          saveScores(scores);
+          renderHistogram();
+        });
+      });
+    }
+
+    function computeDimension(dim){
+      const values = dim.items.map(it => clamp(Number(scores[it.id] ?? 7), 0, 10));
+      const avg = values.length ? (values.reduce((a,b)=>a+b,0) / values.length) : 0;
+
+      const low = dim.items
+        .map(it => ({
+          ...it,
+          v: clamp(Number(scores[it.id] ?? 7), 0, 10)
+        }))
+        .filter(x => x.v < THRESHOLD)
+        .sort((a,b)=>a.v - b.v);
+
+      return { avg, low, values };
+    }
+
+    function renderHistogram(){
+      hist.innerHTML = "";
+
+      MODEL.forEach(dim => {
+        const { avg, low } = computeDimension(dim);
+        const pct = (avg / 10) * 100;
+
+        const row = document.createElement("div");
+        row.className = "barRow";
+        row.innerHTML = `
+          <div class="barTop">
+            <div class="barName">${dim.name}</div>
+            <div class="barVal">Moyenne : <b>${avg.toFixed(1)}</b> / 10</div>
+          </div>
+          <div class="barTrack" aria-label="Histogramme ${dim.name}">
+            <div class="barFill" style="width:${pct}%;"></div>
+          </div>
+          <div class="prio">
+            <div class="prioTitle">
+              <span>Axes d’amélioration prioritaires (items &lt; ${THRESHOLD})</span>
+              <span class="pill">${low.length} item(s)</span>
+            </div>
+            <div class="prioList" id="prio_${dim.key}"></div>
+          </div>
+        `;
+
+        const list = row.querySelector(`#prio_${dim.key}`);
+        if(low.length === 0){
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "Aucune priorité (tout est ≥ seuil).";
+          list.appendChild(empty);
+        }else{
+          low.forEach(x => {
+            const li = document.createElement("div");
+            li.className = "prioItem";
+            li.innerHTML = `
+              <div class="prioText">
+                <div style="font-weight:800;font-size:12px">${x.has}</div>
+                <div style="color:var(--muted);font-size:12px">→ ${x.terrain}</div>
+              </div>
+              <div class="prioScore" style="border-color: rgba(255,255,255,0.14); background: rgba(0,0,0,0.22);">
+                ${x.v}/10
+              </div>
+            `;
+            list.appendChild(li);
+          });
+        }
+
+        hist.appendChild(row);
+      });
+    }
+
+    // Buttons
+    document.getElementById("btnReset").addEventListener("click", () => {
+      for(const dim of MODEL){
+        for(const it of dim.items){
+          delete scores[it.id];
+        }
+      }
+      saveScores(scores);
+      renderForm();
+      renderHistogram();
+    });
+
+    document.getElementById("btnDemo").addEventListener("click", () => {
+      // demo: some variance with a few priorities
+      MODEL.forEach(dim => {
+        dim.items.forEach((it, idx) => {
+          let v = 8;
+          if(idx % 5 === 0) v = 6;
+          if(dim.key === "savoirfaire" && idx % 4 === 0) v = 5;
+          if(dim.key === "savoirs" && idx === 0) v = 7;
+          scores[it.id] = v;
+        });
+      });
+      saveScores(scores);
+      renderForm();
+      renderHistogram();
+    });
+
+    // Init
+    renderForm();
+    renderHistogram();
+  </script>
+</body>
+</html>
+```0
