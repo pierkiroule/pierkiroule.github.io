@@ -202,10 +202,26 @@
       fill: rgba(184,192,230,.9);
       font-size: 10px;
     }
+    .qrcode{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding:12px 0 6px;
+}
+
+.qrcode img{
+  width:80px;
+  height:80px;
+  object-fit:contain;
+  opacity:0.9;
+}
   </style>
 </head>
 
 <body>
+  <div class="qrcode">
+  <img src="qrcode.png" alt="QR code" />
+  </div>
   <div class="wrap">
     <div class="card">
       <header>
