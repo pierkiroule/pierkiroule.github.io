@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Guide Jedi ETP – Ta première AEC</title>
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #1e1e2f, #0b0b14);
+  color:#f2f2f2;
+}
+#app{
+  max-width:800px;
+  margin:auto;
+  padding:40px 20px;
+}
+.card{
+  background:rgba(255,255,255,0.06);
+  border-radius:16px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  min-height:380px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+h1,h2{
+  margin-top:0;
+}
+p{
+  font-size:1.1em;
+  line-height:1.5;
+}
+.choices{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:20px;
+}
+button{
+  flex:1;
+  min-width:200px;
+  padding:12px 16px;
+  border-radius:12px;
+  border:none;
+  background:#6dd5fa;
+  color:#002;
+  font-size:1em;
+  cursor:pointer;
+  transition:transform 0.1s, background 0.2s;
+}
+button:hover{
+  transform:scale(1.03);
+  background:#9be7ff;
+}
+.progress{
+  margin-top:20px;
+  font-size:0.9em;
+  opacity:0.7;
+  text-align:right;
+}
+.small{
+  font-size:0.95em;
+  opacity:0.85;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div class="card">
+    <div id="content"></div>
+    <div class="choices" id="choices"></div>
+    <div class="progress" id="progress"></div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    text: `
+    <h1>Guide Jedi ETP</h1>
+    <h2>Ta première Action Éducative Ciblée</h2>
+    <p>
+    Tu sors de la formation 40h.<br>
+    La Force ETP est là.<br>
+    Mais elle demande un premier geste.
+    </p>
+    <p class="small">
+    Ce guide t’aide à agir concrètement.
+    </p>
+    `,
+    choices: [
+      { label: "Commencer l’aventure", next: 1 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 1 — Résister à la tentation</h2>
+    <p>
+    Tu pourrais vouloir créer un programme complet.<br>
+    Mais ce n’est pas encore le moment.
+    </p>
+    <p>
+    Ta mission : <strong>UNE action. UNE fois.</strong>
+    </p>
+    `,
+    choices: [
+      { label: "Je choisis une action ponctuelle", next: 2 },
+      { label: "Je veux tout structurer", next: 99 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 2 — Choisir une situation réelle</h2>
+    <p>
+    Regarde ton quotidien.<br>
+    Où les patients bloquent-ils souvent ?
+    </p>
+    <p class="small">
+    Ex : mauvaise réaction en cas de crise, oubli d’un geste clé, incompréhension d’un moment critique.
+    </p>
+    `,
+    choices: [
+      { label: "J’ai une situation concrète", next: 3 },
+      { label: "Je ne vois rien de précis", next: 98 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 3 — Cibler UNE compétence</h2>
+    <p>
+    Pose-toi une seule question :
+    </p>
+    <p><strong>« Qu’est-ce que le patient devra savoir FAIRE après ? »</strong></p>
+    <p class="small">
+    Pas comprendre. Pas connaître. Faire.
+    </p>
+    `,
+    choices: [
+      { label: "J’ai UNE compétence claire", next: 4 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 4 — Fixer l’objectif</h2>
+    <p>
+    Complète mentalement :
+    </p>
+    <p><strong>« À la fin de la séance, le patient sera capable de… »</strong></p>
+    <p class="small">
+    Si tu écris plus d’une phrase, simplifie encore.
+    </p>
+    `,
+    choices: [
+      { label: "Objectif formulé", next: 5 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 5 — Choisir le format le plus simple</h2>
+    <p>
+    Décide rapidement :
+    </p>
+    <ul>
+      <li>individuel ou petit groupe</li>
+      <li>20 à 60 minutes</li>
+      <li>dans ton lieu habituel</li>
+    </ul>
+    <p class="small">
+    Si c’est compliqué à organiser, ce n’est plus une AEC.
+    </p>
+    `,
+    choices: [
+      { label: "Format simple validé", next: 6 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 6 — Préparer la séance (vite)</h2>
+    <p>
+    Structure minimale :
+    </p>
+    <ol>
+      <li>Accroche (partir du vécu)</li>
+      <li>Exploration (faire dire / faire faire)</li>
+      <li>Apport ciblé (UN message)</li>
+      <li>Projection (« la prochaine fois… »)</li>
+    </ol>
+    `,
+    choices: [
+      { label: "Séance prête", next: 7 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 7 — Choisir UN outil</h2>
+    <p>
+    Le plus simple possible :
+    </p>
+    <ul>
+      <li>schéma papier</li>
+      <li>objet réel</li>
+      <li>fiche mémo co-écrite</li>
+    </ul>
+    <p class="small">
+    L’outil soutient l’apprentissage. Il ne fait pas le travail.
+    </p>
+    `,
+    choices: [
+      { label: "Outil choisi", next: 8 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 8 — Lancer l’AEC</h2>
+    <p>
+    Annonce clairement :
+    </p>
+    <ul>
+      <li>le thème</li>
+      <li>l’objectif</li>
+      <li>la durée</li>
+    </ul>
+    <p>
+    Puis fais la séance.<br>
+    Même imparfaite.
+    </p>
+    `,
+    choices: [
+      { label: "AEC réalisée", next: 9 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Étape 9 — Évaluer à chaud</h2>
+    <p>
+    Pose 3 questions :
+    </p>
+    <ul>
+      <li>Qu’as-tu appris ?</li>
+      <li>À quoi ça va te servir ?</li>
+      <li>Qu’est-ce qui reste difficile ?</li>
+    </ul>
+    `,
+    choices: [
+      { label: "Retours recueillis", next: 10 }
+    ]
+  },
+
+  {
+    text: `
+    <h2>Mission accomplie</h2>
+    <p>
+    Tu viens de réaliser ta <strong>première Action Éducative Ciblée</strong>.
+    </p>
+    <p>
+    Tu n’as pas créé un programme.<br>
+    Tu as créé de l’expérience.
+    </p>
+    <p class="small">
+    C’est ainsi que naissent les programmes solides.
+    </p>
+    `,
+    choices: [
+      { label: "Recommencer une autre AEC", next: 2 }
+    ]
+  },
+
+  {
+    id:99,
+    text: `
+    <h2>Côté obscur</h2>
+    <p>
+    Tu veux tout structurer trop vite.<br>
+    Résultat : immobilisation.
+    </p>
+    <p class="small">
+    Reviens à une action simple.
+    </p>
+    `,
+    choices: [
+      { label: "Revenir au guide", next: 2 }
+    ]
+  },
+
+  {
+    id:98,
+    text: `
+    <h2>Blocage fréquent</h2>
+    <p>
+    Si rien ne te vient, parle avec :
+    </p>
+    <ul>
+      <li>un patient</li>
+      <li>un collègue</li>
+      <li>ton observation terrain</li>
+    </ul>
+    <p class="small">
+    Le besoin est déjà là.
+    </p>
+    `,
+    choices: [
+      { label: "J’ai maintenant une situation", next: 3 }
+    ]
+  }
+];
+
+let current = 0;
+
+function render(stepIndex){
+  const step = steps.find(s => s.id === stepIndex) || steps[stepIndex];
+  document.getElementById("content").innerHTML = step.text;
+  const choicesDiv = document.getElementById("choices");
+  choicesDiv.innerHTML = "";
+  step.choices.forEach(c => {
+    const b = document.createElement("button");
+    b.textContent = c.label;
+    b.onclick = () => {
+      current = c.next;
+      render(current);
+    };
+    choicesDiv.appendChild(b);
+  });
+  document.getElementById("progress").textContent =
+    "Étape " + (stepIndex+1) + " / Parcours AEC";
+}
+
+render(current);
+</script>
+</body>
+</html>
