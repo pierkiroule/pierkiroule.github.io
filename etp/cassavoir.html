@@ -3,42 +3,61 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ETP · Exercice BEP (Savoirs → Ouverture)</title>
+  <title>ETP · Exercice BEP — Limites du bilan des savoirs</title>
+
   <style>
     :root{
       --bg:#f6f2ea;
       --card:#ffffff;
-      --ink:#111111;
-      --muted:#6b6b6b;
-      --line:rgba(0,0,0,.10);
+      --ink:#111;
+      --muted:#666;
+      --line:rgba(0,0,0,.12);
       --accent:#a33327;
-      --accent2:#1f6feb;
-      --ok:#1a7f37;
-      --warn:#b54708;
-      --shadow:0 12px 30px rgba(0,0,0,.08);
+      --shadow:0 10px 28px rgba(0,0,0,.08);
       --radius:16px;
     }
-    html,body{height:100%;}
+
     body{
       margin:0;
       background:var(--bg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
       color:var(--ink);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
-      line-height:1.35;
+      line-height:1.4;
     }
-    .wrap{max-width:820px;margin:0 auto;padding:18px 14px 60px;}
+
+    .wrap{
+      max-width:820px;
+      margin:0 auto;
+      padding:18px 14px 60px;
+    }
+
     header{
-      position: sticky;top:0;z-index:5;
-      backdrop-filter: blur(10px);
-      background: rgba(246,242,234,.75);
+      position:sticky;
+      top:0;
+      background:rgba(246,242,234,.9);
+      backdrop-filter:blur(8px);
       border-bottom:1px solid var(--line);
-      padding:12px 0;margin-bottom:14px;
+      padding:12px 0;
+      margin-bottom:16px;
+      z-index:5;
     }
-    .title{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;}
-    h1{font-size:18px;margin:0;letter-spacing:.2px;}
-    .sub{margin:6px 0 0;color:var(--muted);font-size:13px;}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background: rgba(255,255,255,.5);font-size:12px;color:var(--muted);}
-    .grid{display:grid;gap:14px;}
+
+    h1{
+      font-size:18px;
+      margin:0;
+    }
+
+    .sub{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
+    .grid{
+      display:grid;
+      gap:16px;
+    }
+
     .card{
       background:var(--card);
       border:1px solid var(--line);
@@ -46,174 +65,227 @@
       box-shadow:var(--shadow);
       padding:14px;
     }
-    h2{margin:0 0 10px;font-size:16px;}
-    .case p{margin:8px 0;}
-    ul{margin:8px 0 0 18px;}
-    li{margin:6px 0;}
+
+    h2{
+      font-size:16px;
+      margin:0 0 10px;
+    }
+
+    ul{
+      margin:6px 0 0 18px;
+    }
+
+    li{
+      margin:6px 0;
+    }
+
     .quote{
-      border-left:4px solid var(--accent);
+      margin-top:10px;
       padding:10px 12px;
-      background: rgba(163,51,39,.06);
+      border-left:4px solid var(--accent);
+      background:rgba(163,51,39,.06);
       border-radius:12px;
-      margin:10px 0 0;
     }
-    .quote b{display:block;margin-bottom:4px;}
+
+    .quote b{
+      display:block;
+      margin-bottom:4px;
+    }
+
     .muted{color:var(--muted);}
-    .task{display:flex;flex-direction:column;gap:10px;}
-    .stepTag{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
-    .badge{
-      display:inline-flex;align-items:center;justify-content:center;
-      width:22px;height:22px;border-radius:7px;
-      background: rgba(0,0,0,.06);border:1px solid var(--line);
-      font-weight:700;font-size:12px;
-    }
-    textarea{
-      width:100%;min-height:140px;resize:vertical;
-      border-radius:14px;border:1px solid var(--line);
-      padding:12px;font-size:14px;background: rgba(0,0,0,.02);
-    }
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-    button{
-      border:none;border-radius:14px;padding:10px 12px;
-      font-size:14px;cursor:pointer;
-      background: var(--ink);color:#fff;
-    }
-    button.secondary{
-      background: transparent;color: var(--ink);
-      border:1px solid var(--line);
-    }
-    .locked{
-      border:1px dashed rgba(0,0,0,.25);
-      background: rgba(255,255,255,.55);
-    }
-    .hidden{display:none !important;}
-    .input{
-      flex:1;min-width:180px;display:flex;gap:8px;align-items:center;
-      border:1px solid var(--line);background: rgba(255,255,255,.6);
-      border-radius:14px;padding:10px 12px;
-    }
-    .input input{width:100%;border:none;outline:none;background:transparent;font-size:14px;}
-    .callout{
-      border:1px solid rgba(181,71,8,.25);
-      background: rgba(181,71,8,.06);
-      border-radius:14px;padding:10px 12px;
+
+    .step{
+      display:flex;
+      align-items:center;
+      gap:10px;
       font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
     }
-    .keyline{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:12px;color:var(--muted);
-      border:1px solid var(--line);border-radius:12px;
-      padding:10px 12px;background: rgba(0,0,0,.02);
+
+    .badge{
+      width:22px;
+      height:22px;
+      border-radius:7px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:12px;
+      background:rgba(0,0,0,.06);
+      border:1px solid var(--line);
+      color:var(--ink);
+    }
+
+    textarea{
+      width:100%;
+      min-height:140px;
+      resize:vertical;
+      border-radius:14px;
+      border:1px solid var(--line);
+      padding:12px;
+      font-size:14px;
+      background:rgba(0,0,0,.02);
+    }
+
+    .callout{
+      border:1px solid rgba(163,51,39,.25);
+      background:rgba(163,51,39,.06);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:13px;
+      margin-bottom:8px;
+    }
+
+    .model{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:12px;
+      color:#333;
+      background:rgba(0,0,0,.02);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
       white-space:pre-wrap;
     }
-    .footerNote{text-align:center;color:var(--muted);font-size:12px;margin-top:10px;}
+
+    .footer{
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:20px;
+    }
   </style>
 </head>
+
 <body>
 <div class="wrap">
+
 <header>
-  <div class="title">
-    <div>
-      <h1>ETP · Exercice groupe (mobile)</h1>
-      <p class="sub">Bilan centré sur les savoirs → ouverture des questions</p>
-    </div>
-    <div class="pill">⏱️ 10–20 min</div>
-  </div>
+  <h1>ETP · Exercice collectif (mobile)</h1>
+  <p class="sub">
+    Illustrer les limites d’un bilan éducatif réduit aux savoirs, puis ouvrir les questions.
+  </p>
 </header>
 
 <div class="grid">
 
-<!-- CAS -->
-<section class="card case">
+<!-- CAS CLINIQUE -->
+<section class="card">
   <h2>Cas clinique (unique)</h2>
   <p><b>Mme L., 62 ans</b></p>
   <ul>
-    <li>BPCO modérée + insuffisance cardiaque</li>
+    <li>BPCO modérée associée à une insuffisance cardiaque</li>
     <li>Hospitalisation récente pour dyspnée</li>
     <li>Traitements inhalés + diurétique</li>
     <li>Retour à domicile</li>
   </ul>
+
   <div class="quote">
-    <b>Phrase patient</b>
-    « Je prends mes médicaments, mais je ne sais jamais si je fais bien. Quand je suis essoufflée, je panique. »
+    <b>Phrase de la patiente</b>
+    « Je prends mes médicaments, mais je ne sais jamais si je fais bien.  
+    Quand je suis essoufflée, je panique. »
   </div>
+
   <p class="muted">
-    Cadre volontairement réducteur : on commence par un <b>bilan des savoirs</b> (connaissances / manques d’informations).
+    Cadre pédagogique volontairement réducteur : on commence par un <b>bilan centré sur les connaissances</b>.
   </p>
 </section>
 
-<!-- CONSIGNE 1 -->
-<section class="card task">
-  <div class="stepTag"><span class="badge">1</span><b>Travail de groupe</b></div>
+<!-- ETAPE 1 -->
+<section class="card">
+  <div class="step"><span class="badge">1</span> Travail de groupe</div>
+
   <div class="callout">
-    Construisez un <b>questionnaire fermé</b> (Oui / Non / Je ne sais pas) visant à repérer rapidement :
+    Construisez un <b>questionnaire fermé</b> (Oui / Non / Je ne sais pas) visant à identifier :
     <ul>
-      <li>ce que la patiente sait</li>
-      <li>ce qu’elle ne sait pas</li>
-      <li>les manques d’informations prioritaires</li>
+      <li>les connaissances présentes</li>
+      <li>les manques d’informations</li>
+      <li>les besoins d’information prioritaires</li>
     </ul>
   </div>
+
   <textarea placeholder="Rédigez ici vos questions fermées…"></textarea>
 </section>
 
-<!-- ZONE VERROUILLÉE 1 -->
-<section class="card locked">
-  <h2>Proposition de questionnaire fermé (réservé formateur)</h2>
-  <p class="muted">Contenu masqué — déblocage par mot de passe</p>
-  <div class="row">
-    <div class="input">
-      <input type="password" id="pass1" placeholder="Mot de passe">
-    </div>
-    <button onclick="unlock('pass1','pom','bloc1')">Débloquer</button>
+<!-- MODELE FERMÉ -->
+<section class="card">
+  <h2>Corrigé — Exemple de questionnaire fermé (bilan des savoirs)</h2>
+
+  <div class="model">
+A. Compréhension de la maladie
+1. Savez-vous ce qu’est une BPCO ?
+2. Savez-vous ce qu’est une insuffisance cardiaque ?
+3. Savez-vous ce qui provoque votre essoufflement ?
+4. Savez-vous faire la différence entre un problème de cœur et de poumons ?
+
+B. Traitements
+5. Savez-vous à quoi sert votre inhalateur principal ?
+6. Savez-vous quand utiliser l’inhalateur de secours ?
+7. Savez-vous à quoi sert le diurétique ?
+8. Savez-vous ce qu’il faut faire en cas d’oubli d’un médicament ?
+
+C. Signes d’alerte
+9. Savez-vous reconnaître une aggravation de votre état ?
+10. Savez-vous quels signes doivent vous faire consulter rapidement ?
+11. Savez-vous quand appeler le 15 / 112 ?
+
+D. Auto-surveillance / prévention
+12. Savez-vous adapter vos efforts à votre souffle ?
+13. Savez-vous comment récupérer après un effort ?
+14. Savez-vous ce qu’il vaut mieux éviter quand vous êtes essoufflée ?
   </div>
-  <div id="bloc1" class="hidden keyline">
-[Contenu modèle – questionnaire fermé]
-  </div>
+
+  <p class="muted">
+    👉 Ce bilan identifie des <b>manques d’informations</b>, mais ne renseigne pas sur la compréhension réelle.
+  </p>
 </section>
 
-<!-- CONSIGNE 2 -->
-<section class="card task">
-  <div class="stepTag"><span class="badge">2</span><b>Deuxième temps</b></div>
+<!-- ETAPE 2 -->
+<section class="card">
+  <div class="step"><span class="badge">2</span> Deuxième temps</div>
+
   <div class="callout">
-    Reprenez chaque question fermée et <b>transformez-la en question ouverte</b>
-    afin de vérifier la <b>compréhension des savoirs</b> (sans explorer encore émotions ou vécu).
+    Transformez chaque question fermée en <b>question ouverte</b> afin d’explorer la
+    <b>compréhension du savoir</b> (sans aborder encore émotions ou vécu).
   </div>
-  <textarea placeholder="Transformations en questions ouvertes…"></textarea>
+
+  <textarea placeholder="Transformez ici vos questions en formulation ouverte…"></textarea>
 </section>
 
-<!-- ZONE VERROUILLÉE 2 -->
-<section class="card locked">
-  <h2>Proposition de questions ouvertes (réservé formateur)</h2>
-  <p class="muted">Contenu masqué — déblocage par mot de passe</p>
-  <div class="row">
-    <div class="input">
-      <input type="password" id="pass2" placeholder="Mot de passe">
-    </div>
-    <button onclick="unlock('pass2','cerise','bloc2')">Débloquer</button>
+<!-- MODELE OUVERT -->
+<section class="card">
+  <h2>Corrigé — Exemple de questions ouvertes (compréhension du savoir)</h2>
+
+  <div class="model">
+1. « Avec vos mots, qu’est-ce que la BPCO ? »
+2. « Comment vous comprenez l’insuffisance cardiaque ? »
+3. « Quand vous êtes essoufflée, qu’est-ce que vous pensez qu’il se passe dans votre corps ? »
+4. « Comment vous faites la différence entre un essoufflement “normal” et un essoufflement inquiétant ? »
+
+5. « Qu’est-ce que vous attendez de votre inhalateur quand vous l’utilisez ? »
+6. « Dans quelles situations vous utilisez l’inhalateur de secours ? »
+7. « Expliquez-moi le rôle du diurétique dans votre traitement. »
+8. « Si vous oubliez un médicament, comment décidez-vous quoi faire ? »
+
+9. « Quels signes vous feraient dire que votre état s’aggrave ? »
+10. « À quel moment vous diriez qu’il faut consulter ou appeler les secours ? »
+
+11. « Comment vous adaptez vos efforts dans la vie quotidienne ? »
+12. « Que faites-vous concrètement pour récupérer quand le souffle monte ? »
   </div>
-  <div id="bloc2" class="hidden keyline">
-[Contenu modèle – questions ouvertes]
-  </div>
+
+  <p class="muted">
+    👉 On reste centré sur le <b>savoir compris</b>, mais on commence déjà à entendre
+    les représentations implicites.
+  </p>
 </section>
 
 </div>
 
-<p class="footerNote">
-Objectif pédagogique : faire ressentir la limite d’un BEP réduit aux savoirs et ouvrir vers les représentations.
-</p>
-
+<div class="footer">
+  Message clé : informer ne suffit pas. Le passage par l’ouverture révèle les limites du bilan des savoirs.
 </div>
 
-<script>
-function unlock(inputId, secret, blocId){
-  const val = document.getElementById(inputId).value.trim().toLowerCase();
-  if(val === secret){
-    document.getElementById(blocId).classList.remove("hidden");
-  } else {
-    alert("Mot de passe incorrect");
-  }
-}
-</script>
-
+</div>
 </body>
 </html>
