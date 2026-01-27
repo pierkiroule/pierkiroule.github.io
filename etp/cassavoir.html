@@ -18,7 +18,6 @@
       --shadow:0 12px 30px rgba(0,0,0,.08);
       --radius:16px;
     }
-
     html,body{height:100%;}
     body{
       margin:0;
@@ -27,60 +26,19 @@
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
       line-height:1.35;
     }
-
-    .wrap{
-      max-width:820px;
-      margin:0 auto;
-      padding:18px 14px 60px;
-    }
-
+    .wrap{max-width:820px;margin:0 auto;padding:18px 14px 60px;}
     header{
-      position: sticky;
-      top: 0;
-      z-index: 5;
+      position: sticky;top:0;z-index:5;
       backdrop-filter: blur(10px);
       background: rgba(246,242,234,.75);
       border-bottom:1px solid var(--line);
-      padding:12px 0;
-      margin-bottom:14px;
+      padding:12px 0;margin-bottom:14px;
     }
-
-    .title{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      justify-content:space-between;
-    }
-
-    h1{
-      font-size:18px;
-      margin:0;
-      letter-spacing:.2px;
-    }
-    .sub{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .pill{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:999px;
-      background: rgba(255,255,255,.5);
-      font-size:12px;
-      color:var(--muted);
-      white-space:nowrap;
-    }
-
-    .grid{
-      display:grid;
-      gap:14px;
-    }
-
+    .title{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;}
+    h1{font-size:18px;margin:0;letter-spacing:.2px;}
+    .sub{margin:6px 0 0;color:var(--muted);font-size:13px;}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background: rgba(255,255,255,.5);font-size:12px;color:var(--muted);}
+    .grid{display:grid;gap:14px;}
     .card{
       background:var(--card);
       border:1px solid var(--line);
@@ -88,19 +46,10 @@
       box-shadow:var(--shadow);
       padding:14px;
     }
-
-    h2{
-      margin:0 0 10px;
-      font-size:16px;
-    }
-
-    h3{
-      margin:0 0 8px;
-      font-size:14px;
-    }
-
+    h2{margin:0 0 10px;font-size:16px;}
     .case p{margin:8px 0;}
-    .muted{color:var(--muted);}
+    ul{margin:8px 0 0 18px;}
+    li{margin:6px 0;}
     .quote{
       border-left:4px solid var(--accent);
       padding:10px 12px;
@@ -108,378 +57,163 @@
       border-radius:12px;
       margin:10px 0 0;
     }
-    .quote b{display:block; margin-bottom:4px;}
-
-    ul{margin:8px 0 0 18px;}
-    li{margin:6px 0;}
-
-    .task{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
-    .stepTag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      color:var(--muted);
-    }
-
+    .quote b{display:block;margin-bottom:4px;}
+    .muted{color:var(--muted);}
+    .task{display:flex;flex-direction:column;gap:10px;}
+    .stepTag{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
     .badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:22px;
-      height:22px;
-      border-radius:7px;
-      background: rgba(0,0,0,.06);
-      border:1px solid var(--line);
-      color:var(--ink);
-      font-weight:700;
-      font-size:12px;
+      display:inline-flex;align-items:center;justify-content:center;
+      width:22px;height:22px;border-radius:7px;
+      background: rgba(0,0,0,.06);border:1px solid var(--line);
+      font-weight:700;font-size:12px;
     }
-
     textarea{
-      width:100%;
-      min-height:140px;
-      resize:vertical;
-      border-radius:14px;
-      border:1px solid var(--line);
-      padding:12px;
-      font-size:14px;
-      background: rgba(0,0,0,.02);
-      outline:none;
+      width:100%;min-height:140px;resize:vertical;
+      border-radius:14px;border:1px solid var(--line);
+      padding:12px;font-size:14px;background: rgba(0,0,0,.02);
     }
-    textarea:focus{
-      border-color: rgba(31,111,235,.45);
-      box-shadow: 0 0 0 4px rgba(31,111,235,.12);
-      background: #fff;
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .input{
-      flex:1;
-      min-width:180px;
-      display:flex;
-      gap:8px;
-      align-items:center;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.6);
-      border-radius:14px;
-      padding:10px 12px;
-    }
-    .input input{
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      font-size:14px;
-    }
-
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
     button{
-      border:none;
-      border-radius:14px;
-      padding:10px 12px;
-      font-size:14px;
-      cursor:pointer;
-      background: var(--ink);
-      color:#fff;
-      box-shadow: 0 10px 22px rgba(0,0,0,.14);
+      border:none;border-radius:14px;padding:10px 12px;
+      font-size:14px;cursor:pointer;
+      background: var(--ink);color:#fff;
     }
     button.secondary{
-      background: transparent;
-      color: var(--ink);
+      background: transparent;color: var(--ink);
       border:1px solid var(--line);
-      box-shadow:none;
     }
-    button:active{transform: translateY(1px);}
-
     .locked{
       border:1px dashed rgba(0,0,0,.25);
       background: rgba(255,255,255,.55);
     }
-
     .hidden{display:none !important;}
-
-    .hint{
-      font-size:12px;
-      color:var(--muted);
-      margin:0;
+    .input{
+      flex:1;min-width:180px;display:flex;gap:8px;align-items:center;
+      border:1px solid var(--line);background: rgba(255,255,255,.6);
+      border-radius:14px;padding:10px 12px;
     }
-
+    .input input{width:100%;border:none;outline:none;background:transparent;font-size:14px;}
     .callout{
-      border:1px solid rgba(26,127,55,.25);
-      background: rgba(26,127,55,.06);
-      border-radius:14px;
-      padding:10px 12px;
-    }
-    .callout.warn{
-      border-color: rgba(181,71,8,.25);
+      border:1px solid rgba(181,71,8,.25);
       background: rgba(181,71,8,.06);
+      border-radius:14px;padding:10px 12px;
+      font-size:13px;
     }
-
     .keyline{
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px 12px;
-      background: rgba(0,0,0,.02);
-      overflow:auto;
+      font-size:12px;color:var(--muted);
+      border:1px solid var(--line);border-radius:12px;
+      padding:10px 12px;background: rgba(0,0,0,.02);
       white-space:pre-wrap;
     }
-
-    .footerNote{
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-      margin-top:10px;
-    }
+    .footerNote{text-align:center;color:var(--muted);font-size:12px;margin-top:10px;}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <div>
-          <h1>ETP · Exercice groupe (mobile)</h1>
-          <p class="sub">Du « bilan des savoirs » (questions fermées) → vers des questions ouvertes centrées sur la compréhension du savoir.</p>
-        </div>
-        <div class="pill" aria-label="durée">
-          <span>⏱️</span>
-          <span>10–20 min</span>
-        </div>
-      </div>
-    </header>
-
-    <div class="grid">
-
-      <!-- CAS CLINIQUE -->
-      <section class="card case" id="case">
-        <h2>Cas clinique (unique)</h2>
-        <p><b>Mme L., 62 ans</b></p>
-        <ul>
-          <li>BPCO modérée + insuffisance cardiaque stabilisée</li>
-          <li>Hospitalisation récente pour dyspnée, retour à domicile</li>
-          <li>Traitement : inhalateurs + diurétique (entre autres)</li>
-          <li>Vit seule, ancienne fumeuse</li>
-        </ul>
-
-        <div class="quote">
-          <b>Phrase patient</b>
-          <span>« Je prends mes médicaments, mais je ne sais jamais si je fais bien. Quand je suis essoufflée, je panique. »</span>
-        </div>
-
-        <p class="muted" style="margin-top:10px;">
-          <b>Cadre de l’exercice :</b> on démarre volontairement par un bilan <u>centré sur les savoirs</u>
-          (identifier manques d’informations). Le groupe verra ensuite comment l’ouvrir.
-        </p>
-      </section>
-
-      <!-- CONSIGNE 1 -->
-      <section class="card task">
-        <div class="stepTag"><span class="badge">1</span><b>Consigne :</b> construire un questionnaire fermé (bilan des savoirs)</div>
-
-        <div class="callout warn">
-          Objectif : produire des <b>questions fermées</b> (Oui / Non / Je ne sais pas) pour repérer rapidement
-          les <b>manques d’informations</b> (maladie, traitement, signes d’alerte, conduites à tenir).
-        </div>
-
-        <p class="hint">
-          Astuce : viser 12–16 questions, regroupées en 3–4 rubriques. Écrire court. Une idée par question.
-        </p>
-
-        <textarea id="groupWork1" placeholder="Écrivez ici vos questions fermées (Oui / Non / Je ne sais pas)…"></textarea>
-
-        <div class="row">
-          <button class="secondary" id="copy1">Copier le travail du groupe</button>
-        </div>
-      </section>
-
-      <!-- ZONE DÉBLOCABLE 1 (Réponse modèle fermée) -->
-      <section class="card locked" id="lockPom">
-        <h2>Déblocage — Proposition de questionnaire fermé (modèle)</h2>
-        <p class="hint">Entrer le mot de passe pour afficher une proposition « bilan des savoirs » : <b>???</b></p>
-
-        <div class="row">
-          <div class="input">
-            <span class="muted">🔒</span>
-            <input id="passPom" type="password" inputmode="text" placeholder="Mot de passe" />
-          </div>
-          <button id="unlockPom">Débloquer</button>
-          <button class="secondary" id="relockPom">Re-verrouiller</button>
-        </div>
-
-        <div id="pomContent" class="hidden" style="margin-top:12px;">
-          <div class="callout">
-            <b>Modèle — Questionnaire fermé (Oui / Non / Je ne sais pas)</b><br/>
-            Finalité : repérer les manques d’informations, rapidement.
-          </div>
-
-          <div class="keyline" id="pomText">
-A. Compréhension maladie / symptômes
-1) Savez-vous ce qu’est une BPCO ?
-2) Savez-vous ce qu’est une insuffisance cardiaque ?
-3) Savez-vous distinguer “souffle” lié aux poumons vs “souffle” lié au cœur ?
-4) Savez-vous citer 2 causes fréquentes d’essoufflement chez vous ?
-
-B. Traitements
-5) Savez-vous à quoi sert votre inhalateur principal ?
-6) Savez-vous quand utiliser l’inhalateur de secours ?
-7) Savez-vous vérifier si la technique d’inhalation est correcte ?
-8) Savez-vous à quoi sert le diurétique (ex: faire uriner pour diminuer la surcharge) ?
-9) Savez-vous quoi faire si vous oubliez une prise ?
-
-C. Signes d’alerte / conduite à tenir
-10) Savez-vous reconnaître 3 signes qui doivent vous faire consulter rapidement ?
-11) Savez-vous dans quel cas appeler le 15 / 112 ?
-12) Savez-vous quoi surveiller à domicile (poids, œdèmes, souffle, etc.) ?
-
-D. Prévention / auto-soins simples
-13) Savez-vous comment doser vos efforts (pacing) quand vous marchez ?
-14) Savez-vous utiliser une position ou technique pour récupérer (ex: lèvres pincées) ?
-15) Savez-vous ce qu’il faut éviter en cas d’essoufflement (ex: arrêter brutalement, s’allonger à plat…) ?
-16) Savez-vous à qui demander de l’aide si les symptômes s’aggravent ?
-          </div>
-
-          <div class="row" style="margin-top:10px;">
-            <button class="secondary" id="copyPom">Copier le modèle</button>
-          </div>
-
-          <p class="footerNote">
-            Cette proposition est volontairement « info-centrée ». Elle sert de point de départ à l’ouverture.
-          </p>
-        </div>
-      </section>
-
-      <!-- CONSIGNE 2 -->
-      <section class="card task">
-        <div class="stepTag"><span class="badge">2</span><b>Consigne :</b> transformer en questions ouvertes (centrées compréhension du savoir)</div>
-
-        <div class="callout">
-          Objectif : reprendre vos questions fermées et les transformer en <b>questions ouvertes</b> pour vérifier
-          la compréhension, avec les mots du patient, sans basculer encore sur le vécu émotionnel.
-        </div>
-
-        <p class="hint">
-          Exemples de structures : « Expliquez-moi… », « Comment vous comprenez… », « Qu’est-ce que ça veut dire pour vous… »,
-          « Comment vous le feriez chez vous… ».
-        </p>
-
-        <textarea id="groupWork2" placeholder="Écrivez ici vos transformations en questions ouvertes…"></textarea>
-
-        <div class="row">
-          <button class="secondary" id="copy2">Copier le travail du groupe</button>
-        </div>
-      </section>
-
-      <!-- ZONE DÉBLOCABLE 2 (Réponse modèle ouverte) -->
-      <section class="card locked" id="lockCerise">
-        <h2>Déblocage — Transformations en questions ouvertes (modèle)</h2>
-        <p class="hint">Entrer le mot de passe pour afficher une proposition : <b>cerise</b></p>
-
-        <div class="row">
-          <div class="input">
-            <span class="muted">🔒</span>
-            <input id="passCerise" type="password" inputmode="text" placeholder="Mot de passe" />
-          </div>
-          <button id="unlockCerise">Débloquer</button>
-          <button class="secondary" id="relockCerise">Re-verrouiller</button>
-        </div>
-
-        <div id="ceriseContent" class="hidden" style="margin-top:12px;">
-          <div class="callout">
-            <b>Modèle — Questions ouvertes centrées “compréhension du savoir”</b><br/>
-            Finalité : vérifier la compréhension, sans rester en “quizz”.
-          </div>
-
-          <div class="keyline" id="ceriseText">
-A. Compréhension maladie / symptômes
-1) “Avec vos mots, c’est quoi une BPCO ?”
-2) “Avec vos mots, qu’est-ce que l’insuffisance cardiaque ?”
-3) “Quand vous dites ‘je suis essoufflée’, comment vous savez si ça vient plutôt des poumons ou du cœur ?”
-4) “Qu’est-ce qui, selon vous, déclenche le plus souvent votre essoufflement ?”
-
-B. Traitements
-5) “Qu’est-ce que vous attendez de votre inhalateur principal ?”
-6) “Dans quelles situations vous utilisez l’inhalateur de secours ? Donnez-moi un exemple récent.”
-7) “Montrez-moi comment vous l’utilisez, étape par étape.”
-8) “Expliquez-moi le rôle du diurétique dans votre traitement.”
-9) “Si une prise est oubliée, comment vous décidez quoi faire ?”
-
-C. Signes d’alerte / conduite à tenir
-10) “Quels signes vous feraient vous dire : ‘là, je dois contacter un soignant’ ?”
-11) “Dans quel scénario vous appelleriez le 15 / 112 ?”
-12) “Qu’est-ce que vous surveillez à la maison pour savoir si ça va (ou pas) ?”
-
-D. Prévention / auto-soins simples
-13) “Comment vous dosez vos efforts quand vous marchez ou montez un escalier ?”
-14) “Qu’est-ce que vous faites concrètement pour récupérer quand le souffle monte ?”
-15) “Qu’est-ce que vous évitez de faire quand vous êtes essoufflée ? Pourquoi ?”
-16) “Si ça s’aggrave à la maison, qui contactez-vous en premier et comment ?”
-          </div>
-
-          <div class="row" style="margin-top:10px;">
-            <button class="secondary" id="copyCerise">Copier le modèle</button>
-          </div>
-
-          <p class="footerNote">
-            Étape suivante (hors de cet exercice) : ouvrir vers représentations/croyances (“qu’est-ce que vous vous dites à ce moment-là ?”).
-          </p>
-        </div>
-      </section>
-
+<div class="wrap">
+<header>
+  <div class="title">
+    <div>
+      <h1>ETP · Exercice groupe (mobile)</h1>
+      <p class="sub">Bilan centré sur les savoirs → ouverture des questions</p>
     </div>
+    <div class="pill">⏱️ 10–20 min</div>
   </div>
+</header>
 
-  <script>
-    function normalize(s){ return (s || "").trim().toLowerCase(); }
+<div class="grid">
 
-    function unlock(passInputId, expected, contentId){
-      const val = normalize(document.getElementById(passInputId).value);
-      const content = document.getElementById(contentId);
-      if(val === expected){
-        content.classList.remove("hidden");
-      }else{
-        alert("Mot de passe incorrect.");
-      }
-    }
+<!-- CAS -->
+<section class="card case">
+  <h2>Cas clinique (unique)</h2>
+  <p><b>Mme L., 62 ans</b></p>
+  <ul>
+    <li>BPCO modérée + insuffisance cardiaque</li>
+    <li>Hospitalisation récente pour dyspnée</li>
+    <li>Traitements inhalés + diurétique</li>
+    <li>Retour à domicile</li>
+  </ul>
+  <div class="quote">
+    <b>Phrase patient</b>
+    « Je prends mes médicaments, mais je ne sais jamais si je fais bien. Quand je suis essoufflée, je panique. »
+  </div>
+  <p class="muted">
+    Cadre volontairement réducteur : on commence par un <b>bilan des savoirs</b> (connaissances / manques d’informations).
+  </p>
+</section>
 
-    function relock(contentId){
-      document.getElementById(contentId).classList.add("hidden");
-    }
+<!-- CONSIGNE 1 -->
+<section class="card task">
+  <div class="stepTag"><span class="badge">1</span><b>Travail de groupe</b></div>
+  <div class="callout">
+    Construisez un <b>questionnaire fermé</b> (Oui / Non / Je ne sais pas) visant à repérer rapidement :
+    <ul>
+      <li>ce que la patiente sait</li>
+      <li>ce qu’elle ne sait pas</li>
+      <li>les manques d’informations prioritaires</li>
+    </ul>
+  </div>
+  <textarea placeholder="Rédigez ici vos questions fermées…"></textarea>
+</section>
 
-    function copyTextFrom(id){
-      const el = document.getElementById(id);
-      const text = el.value !== undefined ? el.value : el.innerText;
-      navigator.clipboard.writeText(text).then(
-        () => alert("Copié."),
-        () => alert("Impossible de copier. Sélectionnez le texte manuellement.")
-      );
-    }
+<!-- ZONE VERROUILLÉE 1 -->
+<section class="card locked">
+  <h2>Proposition de questionnaire fermé (réservé formateur)</h2>
+  <p class="muted">Contenu masqué — déblocage par mot de passe</p>
+  <div class="row">
+    <div class="input">
+      <input type="password" id="pass1" placeholder="Mot de passe">
+    </div>
+    <button onclick="unlock('pass1','pom','bloc1')">Débloquer</button>
+  </div>
+  <div id="bloc1" class="hidden keyline">
+[Contenu modèle – questionnaire fermé]
+  </div>
+</section>
 
-    // Groupe - copier
-    document.getElementById("copy1").addEventListener("click", () => copyTextFrom("groupWork1"));
-    document.getElementById("copy2").addEventListener("click", () => copyTextFrom("groupWork2"));
+<!-- CONSIGNE 2 -->
+<section class="card task">
+  <div class="stepTag"><span class="badge">2</span><b>Deuxième temps</b></div>
+  <div class="callout">
+    Reprenez chaque question fermée et <b>transformez-la en question ouverte</b>
+    afin de vérifier la <b>compréhension des savoirs</b> (sans explorer encore émotions ou vécu).
+  </div>
+  <textarea placeholder="Transformations en questions ouvertes…"></textarea>
+</section>
 
-    // Déblocage POM
-    document.getElementById("unlockPom").addEventListener("click", () => unlock("passPom", "pom", "pomContent"));
-    document.getElementById("relockPom").addEventListener("click", () => relock("pomContent"));
-    document.getElementById("copyPom").addEventListener("click", () => copyTextFrom("pomText"));
+<!-- ZONE VERROUILLÉE 2 -->
+<section class="card locked">
+  <h2>Proposition de questions ouvertes (réservé formateur)</h2>
+  <p class="muted">Contenu masqué — déblocage par mot de passe</p>
+  <div class="row">
+    <div class="input">
+      <input type="password" id="pass2" placeholder="Mot de passe">
+    </div>
+    <button onclick="unlock('pass2','cerise','bloc2')">Débloquer</button>
+  </div>
+  <div id="bloc2" class="hidden keyline">
+[Contenu modèle – questions ouvertes]
+  </div>
+</section>
 
-    // Déblocage CERISE
-    document.getElementById("unlockCerise").addEventListener("click", () => unlock("passCerise", "cerise", "ceriseContent"));
-    document.getElementById("relockCerise").addEventListener("click", () => relock("ceriseContent"));
-    document.getElementById("copyCerise").addEventListener("click", () => copyTextFrom("ceriseText"));
-  </script>
+</div>
+
+<p class="footerNote">
+Objectif pédagogique : faire ressentir la limite d’un BEP réduit aux savoirs et ouvrir vers les représentations.
+</p>
+
+</div>
+
+<script>
+function unlock(inputId, secret, blocId){
+  const val = document.getElementById(inputId).value.trim().toLowerCase();
+  if(val === secret){
+    document.getElementById(blocId).classList.remove("hidden");
+  } else {
+    alert("Mot de passe incorrect");
+  }
+}
+</script>
+
 </body>
 </html>
