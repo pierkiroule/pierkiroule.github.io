@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz ETP - Éducation Thérapeutique du Patient</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            margin-top: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-content {
+            padding: 40px;
+        }
+
+        .question-container {
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .option-letter {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .option-text {
+            font-size: 16px;
+            color: #2d3748;
+            vertical-align: middle;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .explanation {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .explanation-text {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .next-btn {
+            margin-top: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn.show {
+            display: inline-block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .results {
+            text-align: center;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .trophy {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .score-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .score-message {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .score-description {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-content {
+                padding: 20px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .option {
+                padding: 15px;
+            }
+            
+            .option-text {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Quiz ETP</h1>
+            <p>Éducation Thérapeutique du Patient</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="quiz-content">
+            <div id="quizContainer"></div>
+            <div id="resultsContainer" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Quelle est la définition correcte de l'ETP ?",
+                options: [
+                    "Une méthode pour améliorer l'observance des traitements",
+                    "Un ensemble d'actes d'information médicale",
+                    "Un processus continu visant à aider le patient à acquérir ou maintenir des compétences pour gérer sa maladie",
+                    "Un programme de prévention primaire"
+                ],
+                correct: 2,
+                explanation: "L'ETP est définie par l'OMS comme un processus continu, intégré dans les soins et centré sur le patient. Elle vise à aider les patients à acquérir ou maintenir les compétences dont ils ont besoin pour gérer au mieux leur vie avec une maladie chronique."
+            },
+            {
+                question: "La finalité principale de l'ETP est :",
+                options: [
+                    "De normaliser les comportements du patient",
+                    "D'augmenter la compliance thérapeutique",
+                    "De renforcer l'autonomie et la qualité de vie du patient",
+                    "De transmettre des savoirs médicaux exhaustifs"
+                ],
+                correct: 2,
+                explanation: "La finalité de l'ETP n'est pas de normaliser ou de contraindre, mais bien de renforcer l'autonomie du patient et d'améliorer sa qualité de vie en lui donnant les moyens de devenir acteur de sa santé."
+            },
+            {
+                question: "Quelles sont les 4 étapes réglementaires de la démarche ETP ?",
+                options: [
+                    "Diagnostic – Information – Évaluation – Suivi",
+                    "BEP – Programme personnalisé – Mise en œuvre – Évaluation",
+                    "Entretien – Ateliers – Coaching – Bilan",
+                    "Dépistage – Traitement – Éducation – Prévention"
+                ],
+                correct: 1,
+                explanation: "Les 4 étapes de la démarche ETP sont : 1) Bilan Éducatif Partagé (BEP), 2) Élaboration d'un programme personnalisé, 3) Mise en œuvre des séances éducatives, 4) Évaluation des compétences acquises et du déroulement du programme."
+            },
+            {
+                question: "Le BEP a pour objectif principal de :",
+                options: [
+                    "Évaluer les connaissances médicales du patient",
+                    "Identifier la problématique éducative, les besoins, ressources et projets du patient",
+                    "Poser un diagnostic médical",
+                    "Mesurer l'efficacité du programme ETP"
+                ],
+                correct: 1,
+                explanation: "Le Bilan Éducatif Partagé est un moment d'échange permettant d'identifier ce qui est important pour le patient : ses besoins, ses attentes, ses ressources personnelles et son projet de vie. C'est la base pour co-construire un programme adapté."
+            },
+            {
+                question: "Quelle attitude relève de l'écoute active en ETP ?",
+                options: [
+                    "Reformuler pour vérifier la compréhension",
+                    "Donner rapidement des conseils",
+                    "Corriger les croyances du patient",
+                    "Orienter vers la bonne solution"
+                ],
+                correct: 0,
+                explanation: "L'écoute active implique de reformuler les propos du patient pour s'assurer d'avoir bien compris son point de vue, sans jugement ni conseil prématuré. Cette technique favorise l'alliance thérapeutique et la co-construction."
+            },
+            {
+                question: "Le « réflexe correcteur » désigne :",
+                options: [
+                    "La capacité à ajuster un programme éducatif",
+                    "La tendance du soignant à vouloir corriger, expliquer ou conseiller trop vite",
+                    "Une technique de recadrage motivationnel",
+                    "Un outil d'évaluation des compétences"
+                ],
+                correct: 1,
+                explanation: "Le réflexe correcteur est un biais professionnel fréquent : face à une difficulté du patient, le soignant est tenté de corriger, d'expliquer ou de donner la solution immédiatement, ce qui peut freiner l'autonomisation du patient."
+            },
+            {
+                question: "Le cadrage de la demande éducative consiste à :",
+                options: [
+                    "Transformer la plainte en objectif éducatif partagé",
+                    "Refuser les demandes irréalistes du patient",
+                    "Définir le traitement le plus adapté",
+                    "Imposer un objectif prioritaire"
+                ],
+                correct: 0,
+                explanation: "Le cadrage permet de partir de la plainte ou de la demande du patient pour la transformer en objectif éducatif concret, réaliste et partagé. C'est un travail de co-construction essentiel."
+            },
+            {
+                question: "Une synthèse éducative de qualité doit :",
+                options: [
+                    "Être exhaustive et très détaillée",
+                    "Reprendre uniquement les propos du patient",
+                    "Mettre en lien problématique éducative, objectifs, freins/moteurs et parcours proposé",
+                    "Être centrée sur le diagnostic médical"
+                ],
+                correct: 2,
+                explanation: "Une bonne synthèse éducative articule la problématique identifiée, les objectifs co-construits, les freins et moteurs du patient, ainsi que le parcours éducatif proposé. Elle est concise, personnalisée et orientée action."
+            },
+            {
+                question: "Quelle posture est conforme à l'esprit de l'ETP ?",
+                options: [
+                    "Expert prescripteur",
+                    "Sauveur bienveillant",
+                    "Partenaire éducatif",
+                    "Contrôleur des comportements"
+                ],
+                correct: 2,
+                explanation: "La posture de partenaire éducatif respecte l'autonomie du patient et valorise ses compétences. Le soignant n'est ni au-dessus (expert), ni en position de sauvetage, mais aux côtés du patient dans une relation de collaboration."
+            },
+            {
+                question: "Dans une posture ETP ajustée, le soignant :",
+                options: [
+                    "Décide à la place du patient",
+                    "Guide sans imposer et co-construit les objectifs",
+                    "Cherche à convaincre",
+                    "Se centre sur les normes de santé"
+                ],
+                correct: 1,
+                explanation: "La posture ETP repose sur le guidage non directif : le soignant accompagne le patient dans sa réflexion, propose des pistes sans imposer, et co-construit avec lui des objectifs qui ont du sens pour sa vie."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const quizContainer = document.getElementById('quizContainer');
+            const question = quizData[currentQuestion];
+            
+            const progress = ((currentQuestion + 1) / quizData.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                optionsHTML += `
+                    <div class="option" onclick="selectAnswer(${index})">
+                        <span class="option-letter">${letter}</span>
+                        <span class="option-text">${option}</span>
+                    </div>
+                `;
+            });
+
+            quizContainer.innerHTML = `
+                <div class="question-container">
+                    <div class="question-number">Question ${currentQuestion + 1} / ${quizData.length}</div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options">${optionsHTML}</div>
+                    <div class="explanation" id="explanation">
+                        <div class="explanation-title">💡 Explication</div>
+                        <div class="explanation-text">${question.explanation}</div>
+                    </div>
+                    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+                        ${currentQuestion < quizData.length - 1 ? 'Question suivante' : 'Voir les résultats'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answered) return;
+            answered = true;
+
+            const question = quizData[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach((option, index) => {
+                option.classList.add('disabled');
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                }
+                if (index === selectedIndex && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            if (selectedIndex === question.correct) {
+                score++;
+                createConfetti();
+            }
+
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const quizContainer = document.getElementById('quizContainer');
+            
+            quizContainer.style.display = 'none';
+            
+            let trophy = '🏆';
+            let message = '';
+            let description = '';
+            
+            if (score >= 8) {
+                trophy = '🏆';
+                message = 'Excellente maîtrise !';
+                description = 'Vous avez une maîtrise solide de l\'ETP. Vos connaissances sont excellentes !';
+            } else if (score >= 5) {
+                trophy = '🎯';
+                message = 'Bon travail !';
+                description = 'Les bases sont acquises. Quelques points restent à consolider.';
+            } else {
+                trophy = '📚';
+                message = 'À retravailler';
+                description = 'Les notions fondamentales méritent d\'être approfondies. Continuez vos efforts !';
+            }
+
+            resultsContainer.innerHTML = `
+                <div class="trophy">${trophy}</div>
+                <div class="score-display">${score} / ${quizData.length}</div>
+                <div class="score-message">${message}</div>
+                <div class="score-description">${description}</div>
+                <button class="restart-btn" onclick="restartQuiz()">🔄 Recommencer le quiz</button>
+            `;
+            
+            resultsContainer.classList.add('show');
+            createMassiveConfetti();
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            
+            const resultsContainer = document.getElementById('resultsContainer');
+            const quizContainer = document.getElementById('quizContainer');
+            
+            resultsContainer.classList.remove('show');
+            quizContainer.style.display = 'block';
+            
+            loadQuestion();
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#667eea', '#764ba2', '#f093fb', '#4facfe'][Math.floor(Math.random() * 4)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function createMassiveConfetti() {
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#ffd700', '#ff6b6b'][Math.floor(Math.random() * 6)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.width = (Math.random() * 10 + 5) + 'px';
+                    confetti.style.height = confetti.style.width;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 20);
+            }
+        }
+
+        // Chargement de la première question
+        loadQuestion();
+    </script>
+</body>
+</html>
