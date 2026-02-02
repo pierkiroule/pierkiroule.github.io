@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ETP – Séance : Contenance sensorielle via vidéo 360° (Seychelles)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#101a2e;
+      --card2:#0f1730;
+      --text:#e9eefc;
+      --muted:#a9b6d6;
+      --line:rgba(255,255,255,.10);
+      --accent:#78d7ff;
+      --accent2:#9dffbd;
+      --warn:#ffcf6b;
+      --danger:#ff6b8a;
+      --ok:#7CFFB2;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1100px 600px at 20% -10%, rgba(120,215,255,.22), transparent 60%),
+        radial-gradient(900px 520px at 90% 0%, rgba(157,255,189,.16), transparent 55%),
+        radial-gradient(900px 520px at 50% 120%, rgba(255,207,107,.12), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    header{
+      padding:28px 18px 18px;
+      max-width:1050px;
+      margin:0 auto;
+    }
+    .title{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    h1{
+      font-size:22px;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:14px;
+      max-width:78ch;
+    }
+    .toolbar{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+    .btn{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      box-shadow:none;
+      transition: transform .04s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+      font-size:13px;
+    }
+    .btn:hover{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.18); }
+    .btn:active{ transform:translateY(1px); }
+    .btn.primary{
+      background:linear-gradient(135deg, rgba(120,215,255,.18), rgba(157,255,189,.14));
+      border-color:rgba(120,215,255,.35);
+    }
+    .btn.warn{
+      border-color:rgba(255,207,107,.35);
+      background:rgba(255,207,107,.08);
+    }
+    .wrap{
+      max-width:1050px;
+      margin:0 auto;
+      padding:0 18px 48px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:rgba(0,0,0,.14);
+    }
+    .card .hd h2{
+      font-size:15px;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .card .bd{ padding:16px; }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.12);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill b{ color:var(--text); font-weight:600; }
+    .kpi{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .kpi .pill:nth-child(1){ border-color:rgba(120,215,255,.35); }
+    .kpi .pill:nth-child(2){ border-color:rgba(157,255,189,.28); }
+    .kpi .pill:nth-child(3){ border-color:rgba(255,207,107,.28); }
+
+    .section{
+      margin:0 0 16px;
+      padding:0 0 14px;
+      border-bottom:1px dashed rgba(255,255,255,.12);
+    }
+    .section:last-child{ border-bottom:none; padding-bottom:0; }
+    .h3{
+      margin:0 0 10px;
+      font-size:14px;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .muted{ color:var(--muted); }
+    ul{ margin:8px 0 0 18px; padding:0; }
+    li{ margin:6px 0; }
+    .quote{
+      margin:10px 0 0;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(120,215,255,.25);
+      background:rgba(120,215,255,.08);
+      color:var(--text);
+      font-size:13px;
+    }
+    .quote .tag{
+      font-family:var(--mono);
+      font-size:11px;
+      color:rgba(120,215,255,.95);
+      opacity:.95;
+      display:block;
+      margin-bottom:6px;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 740px){
+      .row{ grid-template-columns: 1fr; }
+    }
+    .field{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(0,0,0,.12);
+      padding:10px 12px;
+    }
+    .field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .field input, .field textarea, .field select{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:10px;
+      padding:10px 10px;
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+    }
+    .field textarea{ min-height:92px; resize:vertical; }
+    .small{ font-size:12px; color:var(--muted); margin-top:6px; }
+    .checklist{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+    @media (max-width: 740px){
+      .checklist{ grid-template-columns:1fr; }
+    }
+    .chk{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(0,0,0,.10);
+      padding:10px 12px;
+    }
+    .chk input{ margin-top:3px; }
+    .chk b{ font-weight:600; }
+    .alert{
+      border:1px solid rgba(255,107,138,.28);
+      background:rgba(255,107,138,.08);
+      border-radius:14px;
+      padding:10px 12px;
+      color:var(--text);
+      font-size:13px;
+      margin-top:10px;
+    }
+    .alert b{ color:rgba(255,107,138,1); }
+    .ok{
+      border-color:rgba(124,255,178,.25);
+      background:rgba(124,255,178,.08);
+    }
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(0,0,0,.10);
+      margin-top:10px;
+    }
+    .table th, .table td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-size:13px;
+      vertical-align:top;
+    }
+    .table th{
+      text-align:left;
+      color:var(--muted);
+      font-weight:600;
+      background:rgba(0,0,0,.12);
+    }
+    .table tr:last-child td{ border-bottom:none; }
+    .badge{
+      font-family:var(--mono);
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      display:inline-block;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--muted);
+      margin-right:6px;
+      margin-top:4px;
+    }
+    .footer{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    /* Print */
+    @media print{
+      body{ background:#fff; color:#000; }
+      header, .wrap{ max-width:none; }
+      .btn, .toolbar{ display:none !important; }
+      .card{ box-shadow:none; border:1px solid #ddd; background:#fff; }
+      .card .hd{ background:#fff; }
+      .pill{ background:#fff; }
+      .quote{ background:#f6fbff; }
+      .field, .chk, .table{ background:#fff; }
+      a{ color:#000; text-decoration:none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <div>
+        <h1>ETP – Séance « Contenance sensorielle » via vidéo 360° (Seychelles)</h1>
+        <div class="subtitle">
+          Script prêt à l’emploi : installation, déroulé minute par minute, consignes, sécurité, débrief et traces ETP.
+          Adaptable adulte / ado. Version simple et contenante.
+        </div>
+        <div class="kpi">
+          <span class="pill"><b>Durée</b> 15–20 min</span>
+          <span class="pill"><b>Format</b> individuel ou petit groupe</span>
+          <span class="pill"><b>Support</b> smartphone 360° ou casque</span>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" id="btnPrint">Imprimer</button>
+        <button class="btn" id="btnSave">Sauver la fiche</button>
+        <button class="btn" id="btnLoad">Charger</button>
+        <button class="btn warn" id="btnReset">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- MAIN -->
+      <section class="card">
+        <div class="hd">
+          <h2>1) Déroulé de séance (script)</h2>
+          <span class="pill"><b>Objectif</b> se sentir tenu sans être envahi</span>
+        </div>
+        <div class="bd">
+          <div class="section">
+            <div class="h3">A. Pré-brief (2–3 min) <span class="muted">cadre + sécurité</span></div>
+            <ul>
+              <li>Position assise. Pieds au sol. Dos soutenu.</li>
+              <li>Rappel : arrêt possible à tout moment (mot-clé : <b>STOP</b>).</li>
+              <li>Choix du niveau : smartphone (plus léger) ou casque (plus immersif).</li>
+              <li>Vérifier : pas de nausée, pas d’angoisse aiguë, pas d’état confusionnel.</li>
+            </ul>
+            <div class="quote">
+              <span class="tag">Phrase du soignant</span>
+              « On va utiliser le paysage comme une enveloppe. Tu gardes la main. Si c’est trop, on s’arrête. »
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="h3">B. Installation contenante (3 min) <span class="muted">ancrage corporel</span></div>
+            <ul>
+              <li>Inviter à choisir <b>1 point d’appui</b> (pieds / dos / mains).</li>
+              <li>Respiration simple : <b>inspire 4</b> / <b>expire 6</b> (3 cycles).</li>
+              <li>Rappeler : « on ne cherche rien ». On reçoit.</li>
+            </ul>
+            <div class="quote">
+              <span class="tag">Consigne</span>
+              « Sens tes appuis. Le paysage va faire le tour de toi. Toi, tu restes au centre. »
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="h3">C. Immersion 360° (7–8 min) <span class="muted">scan sensoriel guidé</span></div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="width:120px;">Temps</th>
+                  <th>Guidage</th>
+                  <th style="width:260px;">Indicateur clinique</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge">0:00–1:30</span></td>
+                  <td>
+                    <b>Horizon</b> : suivre doucement la ligne mer/ciel sans bouger vite.
+                    <div class="quote" style="margin-top:8px;">
+                      <span class="tag">Consigne</span>
+                      « Suis l’horizon. Laisse-le t’entourer. »
+                    </div>
+                  </td>
+                  <td>Regard stable / respiration moins haute / épaules qui descendent</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">1:30–3:30</span></td>
+                  <td>
+                    <b>Son</b> : écouter les vagues comme un bercement. Localiser le son (droite/gauche) sans analyser.
+                    <div class="quote" style="margin-top:8px;">
+                      <span class="tag">Consigne</span>
+                      « Écoute comme si la mer respirait à côté de toi. »
+                    </div>
+                  </td>
+                  <td>Moins d’agitation / micro-soupirs / voix plus posée</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">3:30–5:30</span></td>
+                  <td>
+                    <b>Corps</b> : repérer 1 zone « tenue » (ventre, thorax, mains). Noter chaud/froid/poids.
+                    <div class="quote" style="margin-top:8px;">
+                      <span class="tag">Consigne</span>
+                      « Où est-ce que ça se calme un peu, juste un peu ? »
+                    </div>
+                  </td>
+                  <td>Capacité à nommer 1 sensation / posture qui s’installe</td>
+                </tr>
+                <tr>
+                  <td><span class="badge">5:30–7:30</span></td>
+                  <td>
+                    <b>Contrôle doux</b> : micro-mouvements de tête très lents. Tester « je peux bouger sans déborder ».
+                    <div class="quote" style="margin-top:8px;">
+                      <span class="tag">Consigne</span>
+                      « Tourne très lentement. Vérifie que tu restes maître du rythme. »
+                    </div>
+                  </td>
+                  <td>Tolérance vestibulaire / pas de panique / retour au point d’appui</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="alert">
+              <b>Stop immédiat</b> si : nausée, vertige fort, montée d’angoisse, déréalisation marquée, agitation.
+              Revenir aux appuis + regard fixe hors 360° + respiration lente.
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="h3">D. Sortie progressive (2 min) <span class="muted">revenir ici</span></div>
+            <ul>
+              <li>Enlever le casque / baisser le téléphone. Garder les yeux ouverts.</li>
+              <li>Nommer 3 éléments réels de la pièce (ancrage).</li>
+              <li>Boire une gorgée d’eau si possible.</li>
+            </ul>
+            <div class="quote">
+              <span class="tag">Consigne</span>
+              « On revient. Le paysage reste derrière. Toi, tu reviens dans la pièce. »
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="h3">E. Débrief ETP (5 min) <span class="muted">apprentissages transférables</span></div>
+            <ul>
+              <li><b>Qu’est-ce qui t’a tenu ?</b> (horizon / vagues / couleur / appuis)</li>
+              <li><b>Quand c’était trop ?</b> (mouvement, son, proximité, vertige)</li>
+              <li><b>Quel outil tu gardes</b> pour la semaine ? (appuis + respiration + horizon)</li>
+              <li><b>Où et quand l’utiliser</b> (stress, montée, insomnia, agitation)</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIDE -->
+      <aside class="card">
+        <div class="hd">
+          <h2>2) Fiche ETP à renseigner</h2>
+          <span class="pill"><b>Trace</b> séance</span>
+        </div>
+        <div class="bd">
+
+          <div class="row">
+            <div class="field">
+              <label for="date">Date</label>
+              <input id="date" type="date" />
+              <div class="small">Par défaut : aujourd’hui.</div>
+            </div>
+            <div class="field">
+              <label for="duree">Durée (min)</label>
+              <input id="duree" type="number" min="5" max="60" value="20" />
+              <div class="small">15–20 recommandé.</div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <div class="field">
+              <label for="public">Public</label>
+              <select id="public">
+                <option>Adulte</option>
+                <option>Adolescent</option>
+                <option>Groupe</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="support">Support</label>
+              <select id="support">
+                <option>Smartphone 360°</option>
+                <option>Casque VR</option>
+                <option>Écran (fallback)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label>Objectifs travaillés</label>
+            <div class="checklist">
+              <div class="chk"><input type="checkbox" id="obj1" checked /><div><b>Contenance</b><div class="muted">se sentir enveloppé / sécurisé</div></div></div>
+              <div class="chk"><input type="checkbox" id="obj2" checked /><div><b>Régulation</b><div class="muted">baisser l’intensité interne</div></div></div>
+              <div class="chk"><input type="checkbox" id="obj3" /><div><b>Discrimination</b><div class="muted">différencier sensations</div></div></div>
+              <div class="chk"><input type="checkbox" id="obj4" /><div><b>Mise en mots</b><div class="muted">nommer ressenti</div></div></div>
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label for="indicateurs">Indicateurs observés</label>
+            <textarea id="indicateurs" placeholder="Ex : respiration plus lente, épaules qui s’abaissent, regard stable, agitation diminuée..."></textarea>
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label for="ressenti">Ressenti patient (verbatim court)</label>
+            <textarea id="ressenti" placeholder="Ex : 'ça me tient', 'je respire mieux', 'trop quand je tourne la tête'..."></textarea>
+          </div>
+
+          <div class="field" style="margin-top:10px;">
+            <label for="outil">Outil transférable retenu (contrat de tâche)</label>
+            <textarea id="outil" placeholder="Ex : 'appuis + horizon 30s + expire longue 6' (2 fois/jour)"></textarea>
+            <div class="small">Formuler simple, faisable, contextualisé.</div>
+          </div>
+
+          <div class="alert ok">
+            <b>Rappel sécurité</b> : éviter vidéos avec foule, mouvements rapides, drone nerveux, musique intrusive.
+            Préférer nature lente, horizon stable, son doux.
+          </div>
+
+          <div class="footer">
+            Astuce : si la vidéo « Seychelles » n’est pas disponible, prendre un 360° nature avec horizon stable (plage, lac, forêt calme).
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Defaults
+    (function init(){
+      const d = document.getElementById('date');
+      if (d && !d.value) {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth()+1).padStart(2,'0');
+        const dd = String(now.getDate()).padStart(2,'0');
+        d.value = `${yyyy}-${mm}-${dd}`;
+      }
+    })();
+
+    // Persistence
+    const KEY = "etp_360_seychelles_contenance_v1";
+
+    function getState(){
+      const ids = [
+        "date","duree","public","support","obj1","obj2","obj3","obj4",
+        "indicateurs","ressenti","outil"
+      ];
+      const s = {};
+      for (const id of ids){
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.type === "checkbox") s[id] = !!el.checked;
+        else s[id] = el.value ?? "";
+      }
+      return s;
+    }
+
+    function setState(s){
+      if (!s) return;
+      for (const [id, val] of Object.entries(s)){
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.type === "checkbox") el.checked = !!val;
+        else el.value = val;
+      }
+    }
+
+    document.getElementById("btnSave").addEventListener("click", () => {
+      try{
+        localStorage.setItem(KEY, JSON.stringify(getState()));
+        toast("Fiche sauvegardée.");
+      }catch(e){
+        toast("Impossible de sauvegarder (stockage indisponible).");
+      }
+    });
+
+    document.getElementById("btnLoad").addEventListener("click", () => {
+      try{
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return toast("Aucune sauvegarde trouvée.");
+        setState(JSON.parse(raw));
+        toast("Fiche chargée.");
+      }catch(e){
+        toast("Impossible de charger.");
+      }
+    });
+
+    document.getElementById("btnReset").addEventListener("click", () => {
+      if (!confirm("Reset de la fiche à renseigner ?")) return;
+      const keepDate = document.getElementById("date").value;
+      setState({
+        date: keepDate,
+        duree: 20,
+        public: "Adulte",
+        support: "Smartphone 360°",
+        obj1: true, obj2: true, obj3: false, obj4: false,
+        indicateurs: "",
+        ressenti: "",
+        outil: ""
+      });
+      toast("Reset effectué.");
+    });
+
+    document.getElementById("btnPrint").addEventListener("click", () => window.print());
+
+    // Tiny toast
+    function toast(msg){
+      let t = document.getElementById("toast");
+      if (!t){
+        t = document.createElement("div");
+        t.id = "toast";
+        t.style.position = "fixed";
+        t.style.left = "50%";
+        t.style.bottom = "18px";
+        t.style.transform = "translateX(-50%)";
+        t.style.background = "rgba(0,0,0,.72)";
+        t.style.border = "1px solid rgba(255,255,255,.18)";
+        t.style.color = "#fff";
+        t.style.padding = "10px 12px";
+        t.style.borderRadius = "12px";
+        t.style.fontSize = "13px";
+        t.style.boxShadow = "0 10px 30px rgba(0,0,0,.35)";
+        t.style.zIndex = "9999";
+        t.style.maxWidth = "92vw";
+        t.style.textAlign = "center";
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      t.style.opacity = "1";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { t.style.opacity = "0"; }, 1800);
+    }
+  </script>
+</body>
+</html>
