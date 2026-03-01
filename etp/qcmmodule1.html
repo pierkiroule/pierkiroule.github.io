@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz ETP - Module 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .option-btn:hover:not(:disabled) { border-color: #3b82f6; background-color: #eff6ff; }
+        .correct { background-color: #dcfce7 !important; border-color: #22c55e !important; }
+        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="max-w-2xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-xl font-bold">Évaluation ETP : Module 1</h1>
+            <p class="text-blue-100 text-sm mt-1">Devenir soignant éducateur</p>
+            <div id="progress-container" class="mt-4 bg-blue-800 rounded-full h-2 w-full overflow-hidden">
+                <div id="progress-bar" class="bg-white h-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Content -->
+        <div id="quiz-container" class="p-8">
+            <div id="question-box" class="fade-in">
+                <div id="q-number" class="text-blue-600 font-semibold text-sm mb-2">Question 1/20</div>
+                <h2 id="q-text" class="text-xl font-bold text-slate-800 mb-6 leading-tight">Chargement de la question...</h2>
+                
+                <div id="options" class="space-y-3">
+                    <!-- Options injectées ici -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback" class="hidden mt-6 p-4 rounded-lg border text-sm animate-bounce-short">
+                    <p id="feedback-text" class="font-medium"></p>
+                    <p id="rationale-text" class="mt-2 text-slate-600 italic"></p>
+                </div>
+
+                <button id="next-btn" class="hidden w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-lg">
+                    Question suivante
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-container" class="hidden p-8 text-center fade-in">
+            <div class="mb-6">
+                <div class="inline-block p-4 rounded-full bg-blue-50 mb-4">
+                    <svg class="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h2 class="text-3xl font-bold text-slate-800">Quiz terminé !</h2>
+                <p id="score-text" class="text-xl text-slate-600 mt-2">Votre score : 0 / 20</p>
+            </div>
+            <div id="medal-text" class="mb-8 font-semibold text-blue-700 italic"></div>
+            <button onclick="location.reload()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-6 rounded-xl transition-colors">
+                Recommencer le test
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+
+{
+q: "Selon l’OMS, l’Éducation Thérapeutique du Patient (ETP) vise principalement à :",
+options: [
+"Améliorer l’observance des prescriptions médicales.",
+"Permettre au patient d’acquérir ou maintenir des compétences pour gérer sa maladie au quotidien.",
+"Réduire les coûts liés aux hospitalisations évitables.",
+"Transmettre des connaissances biomédicales sur la pathologie."
+],
+correct: 1,
+rationale: "L’ETP développe des compétences d’auto-soins et d’adaptation, centrées sur l’autonomie."
+},
+
+{
+q: "Le Bilan Éducatif Partagé (BEP) permet avant tout de :",
+options: [
+"Évaluer la sévérité clinique de la maladie.",
+"Explorer les besoins, ressources, représentations et projets du patient.",
+"Mesurer la compliance médicamenteuse.",
+"Vérifier les connaissances scientifiques du patient."
+],
+correct: 1,
+rationale: "Le BEP fonde la personnalisation du programme éducatif."
+},
+
+{
+q: "Les compétences d’adaptation correspondent à :",
+options: [
+"La réalisation correcte des gestes techniques.",
+"La capacité à ajuster son mode de vie face aux contraintes de la maladie.",
+"L’adhésion stricte aux protocoles médicaux.",
+"La compréhension des mécanismes physiopathologiques."
+],
+correct: 1,
+rationale: "Les compétences d’adaptation concernent l’ajustement psychologique, social et identitaire."
+},
+
+{
+q: "Dans le modèle transthéorique du changement, la phase de préparation correspond à :",
+options: [
+"Une absence d’intention de changement.",
+"Une ambivalence persistante sans décision.",
+"Une intention de changement à court terme avec planification.",
+"Un maintien durable du nouveau comportement."
+],
+correct: 2,
+rationale: "Le patient se prépare activement au changement."
+},
+
+{
+q: "L’ambivalence dans la contemplation signifie que le patient :",
+options: [
+"Refuse toute discussion.",
+"Voit à la fois les bénéfices et les coûts du changement.",
+"A déjà commencé à modifier son comportement.",
+"A abandonné toute tentative."
+],
+correct: 1,
+rationale: "La contemplation est marquée par le « oui, mais »."
+},
+
+{
+q: "Dans l’entretien motivationnel, la posture du soignant est :",
+options: [
+"Directive et prescriptive.",
+"Confrontante pour lever les résistances.",
+"Partenariale et exploratoire.",
+"Évaluative et normative."
+],
+correct: 2,
+rationale: "L’entretien motivationnel repose sur la collaboration et l’autonomie."
+},
+
+{
+q: "Une reformulation empathique vise à :",
+options: [
+"Corriger les erreurs factuelles.",
+"Valider le vécu émotionnel exprimé.",
+"Rassurer immédiatement.",
+"Interpréter les causes inconscientes."
+],
+correct: 1,
+rationale: "Elle montre que le soignant comprend le ressenti."
+},
+
+{
+q: "La sévérité perçue dans le Health Belief Model renvoie à :",
+options: [
+"La gravité mesurée cliniquement.",
+"La perception subjective des conséquences potentielles.",
+"La fréquence statistique des complications.",
+"Le niveau d’expertise du médecin."
+],
+correct: 1,
+rationale: "Il s’agit d’une perception personnelle du risque."
+},
+
+{
+q: "La vulnérabilité perçue correspond à :",
+options: [
+"Le degré réel d’exposition au risque.",
+"Le sentiment personnel d’être concerné par le risque.",
+"L’âge ou la fragilité biologique.",
+"Le niveau d’anxiété général."
+],
+correct: 1,
+rationale: "C’est la perception d’être soi-même exposé."
+},
+
+{
+q: "Un objectif SMART est pertinent en ETP car il :",
+options: [
+"Impose un cadre strict au patient.",
+"Structure un objectif clair, réaliste et mesurable.",
+"Garantit la réussite du changement.",
+"Remplace la motivation intrinsèque."
+],
+correct: 1,
+rationale: "SMART aide à clarifier et sécuriser les objectifs."
+},
+
+{
+q: "Une question ouverte favorise :",
+options: [
+"Une réponse brève et précise.",
+"L’exploration du vécu et des représentations.",
+"Un gain de temps en consultation.",
+"Un contrôle accru du soignant."
+],
+correct: 1,
+rationale: "Elle élargit l’expression du patient."
+},
+
+{
+q: "Explorer les représentations du patient permet de :",
+options: [
+"Corriger immédiatement les croyances erronées.",
+"Comprendre les logiques qui orientent ses comportements.",
+"Évaluer son niveau intellectuel.",
+"Identifier les erreurs médicales."
+],
+correct: 1,
+rationale: "Les représentations influencent les décisions et conduites."
+},
+
+{
+q: "L’apprentissage chez l’adulte est favorisé par :",
+options: [
+"La répétition magistrale.",
+"L’autorité de l’expert.",
+"Le lien avec l’expérience vécue.",
+"La mémorisation par cœur."
+],
+correct: 2,
+rationale: "L’adulte apprend mieux si cela fait sens pour lui."
+},
+
+{
+q: "Un objectif de sécurité en ETP vise à :",
+options: [
+"Prévenir les complications graves.",
+"Améliorer la qualité de vie.",
+"Optimiser les résultats biologiques.",
+"Réduire la dépendance aux soins."
+],
+correct: 0,
+rationale: "La sécurité constitue le socle minimal."
+},
+
+{
+q: "La posture éducative suppose que le soignant :",
+options: [
+"Transmette son expertise de manière descendante.",
+"Adapte son discours au niveau cognitif du patient.",
+"Co-construise les objectifs avec le patient.",
+"Décide pour le patient en cas d’hésitation."
+],
+correct: 2,
+rationale: "La co-construction est centrale en ETP."
+},
+
+{
+q: "Dans le modèle de deuil, la colère traduit souvent :",
+options: [
+"Un refus définitif des soins.",
+"Une injustice ressentie face à la maladie.",
+"Une absence d’acceptation cognitive.",
+"Une manipulation relationnelle."
+],
+correct: 1,
+rationale: "La colère exprime le vécu d’injustice."
+},
+
+{
+q: "Une compétence d’auto-soins inclut :",
+options: [
+"La capacité à adapter une dose selon des critères définis.",
+"La compréhension théorique du traitement.",
+"L’adhésion morale aux recommandations.",
+"La confiance envers le médecin."
+],
+correct: 0,
+rationale: "Elle concerne les gestes et ajustements concrets."
+},
+
+{
+q: "Le contrat éducatif permet de :",
+options: [
+"Formaliser des objectifs partagés.",
+"Engager juridiquement le patient.",
+"Contrôler l’assiduité.",
+"Valider un niveau de compétence."
+],
+correct: 0,
+rationale: "Il clarifie les engagements mutuels."
+},
+
+{
+q: "La motivation intrinsèque se caractérise par :",
+options: [
+"La recherche d’une récompense extérieure.",
+"Le désir personnel d’agir en cohérence avec ses valeurs.",
+"La peur des sanctions médicales.",
+"La pression familiale."
+],
+correct: 1,
+rationale: "Elle est auto-déterminée."
+},
+
+{
+q: "L’évaluation en ETP a pour finalité principale de :",
+options: [
+"Contrôler les connaissances acquises.",
+"Mesurer l’impact sur les compétences et l’autonomie.",
+"Comparer les patients entre eux.",
+"Valider la conformité réglementaire."
+],
+correct: 1,
+rationale: "L’évaluation porte sur les compétences développées."
+}
+
+];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        const qNumber = document.getElementById('q-number');
+        const qText = document.getElementById('q-text');
+        const optionsEl = document.getElementById('options');
+        const feedback = document.getElementById('feedback');
+        const feedbackText = document.getElementById('feedback-text');
+        const rationaleText = document.getElementById('rationale-text');
+        const nextBtn = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+
+        function loadQuestion() {
+            const data = quizData[currentQuestion];
+            qNumber.textContent = `Question ${currentQuestion + 1}/20`;
+            qText.textContent = data.q;
+            optionsEl.innerHTML = '';
+            feedback.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            answered = false;
+
+            data.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-slate-200 transition-all duration-200 focus:outline-none';
+                btn.textContent = opt;
+                btn.onclick = () => selectOption(index, btn);
+                optionsEl.appendChild(btn);
+            });
+
+            progressBar.style.width = `${(currentQuestion / quizData.length) * 100}%`;
+        }
+
+        function selectOption(index, btn) {
+            if (answered) return;
+            answered = true;
+
+            const correct = quizData[currentQuestion].correct;
+            const allBtns = optionsEl.querySelectorAll('button');
+
+            allBtns.forEach((b, i) => {
+                b.disabled = true;
+                if (i === correct) b.classList.add('correct');
+                else if (i === index) b.classList.add('wrong');
+            });
+
+            feedback.classList.remove('hidden');
+            if (index === correct) {
+                score++;
+                feedback.classList.replace('border-red-200', 'border-green-200');
+                feedback.classList.add('bg-green-50');
+                feedbackText.textContent = "✅ Bravo !";
+                feedbackText.className = "font-bold text-green-700";
+            } else {
+                feedback.classList.replace('border-green-200', 'border-red-200');
+                feedback.classList.add('bg-red-50');
+                feedbackText.textContent = "❌ Dommage...";
+                feedbackText.className = "font-bold text-red-700";
+            }
+
+            rationaleText.textContent = quizData[currentQuestion].rationale;
+            nextBtn.classList.remove('hidden');
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        function showResults() {
+            document.getElementById('question-box').classList.add('hidden');
+            document.getElementById('results-container').classList.remove('hidden');
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('score-text').textContent = `Votre score : ${score} / 20`;
+            
+            const medal = document.getElementById('medal-text');
+            if (score === 20) medal.textContent = "Expertise totale ! Vous êtes prêt pour le Module 2.";
+            else if (score >= 15) medal.textContent = "Très bien ! Les bases sont solides.";
+            else if (score >= 10) medal.textContent = "Pas mal, mais une relecture du document serait bénéfique.";
+            else medal.textContent = "Continuez vos efforts, la posture éducative s'apprend avec le temps.";
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
