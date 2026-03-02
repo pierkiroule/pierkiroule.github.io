@@ -1,844 +1,904 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Générateur de conducteur de séance ETP</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Créer mon jeu de cartes symptômes — ETP</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
-  :root {
-    --green-dark: #1e4d35;
-    --green-mid: #2D6A4F;
-    --green-light: #74b49b;
-    --green-pale: #eef6f1;
-    --green-border: #cde4d5;
-    --ink: #1a2e1a;
-    --ink-mid: #4a5a4a;
-    --ink-light: #7a8a7a;
-    --warn: #c0392b;
-    --warn-bg: #fff8f6;
-    --warn-border: #f0c0b0;
-    --white: #ffffff;
-    --bg: #f4f9f5;
-  }
+:root{
+  --bg:#0f1a14;
+  --surface:#162019;
+  --card-bg:#1c2a20;
+  --border:#2a3d2e;
+  --accent:#5dbf82;
+  --accent-dim:#3a8055;
+  --accent-pale:rgba(93,191,130,.08);
+  --accent-pale2:rgba(93,191,130,.15);
+  --text:#e8f0ea;
+  --text-mid:#9ab09f;
+  --text-dim:#5a7060;
+  --warn:#e07b4a;
+  --warn-pale:rgba(224,123,74,.1);
+  --white:#ffffff;
+  --r:10px;
+}
 
-  body {
-    font-family: 'Lora', Georgia, serif;
-    background: var(--bg);
-    min-height: 100vh;
-    color: var(--ink);
-    line-height: 1.6;
-  }
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.6;
+}
 
-  /* Layout */
-  .shell {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 48px 20px 60px;
-  }
+/* ── Shell ── */
+.shell{
+  max-width:860px;
+  margin:0 auto;
+  padding:48px 24px 80px;
+}
 
-  /* Header */
-  .header {
-    margin-bottom: 36px;
-  }
-  .header-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .header-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--green-mid);
-    flex-shrink: 0;
-  }
-  .header-label {
-    font-family: 'Playfair Display', serif;
-    font-size: 10px;
-    letter-spacing: .15em;
-    text-transform: uppercase;
-    color: var(--green-light);
-  }
-  .header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 30px;
-    line-height: 1.15;
-    color: var(--ink);
-    margin-bottom: 8px;
-  }
-  .header p {
-    font-size: 14px;
-    color: var(--ink-light);
-    font-style: italic;
-  }
+/* ── Header ── */
+.header{
+  margin-bottom:48px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  flex-wrap:wrap;
+}
+.header-left{}
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:var(--accent-pale2);
+  border:1px solid var(--accent-dim);
+  border-radius:20px;
+  padding:4px 13px;
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:14px;
+  font-family:'DM Sans',sans-serif;
+  font-weight:500;
+}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
+h1{
+  font-family:'DM Serif Display',serif;
+  font-size:32px;
+  color:var(--text);
+  line-height:1.15;
+  margin-bottom:8px;
+}
+.header-sub{
+  font-size:14px;
+  color:var(--text-mid);
+  max-width:460px;
+  line-height:1.6;
+}
 
-  /* Card */
-  .card {
-    background: var(--white);
-    border: 1px solid var(--green-border);
-    border-radius: 10px;
-    padding: 34px 36px;
-    box-shadow: 0 6px 32px rgba(45,106,79,.07);
-  }
+/* ── Stepper ── */
+.stepper{
+  display:flex;
+  align-items:center;
+  gap:0;
+  margin-bottom:40px;
+  overflow-x:auto;
+  padding-bottom:4px;
+}
+.step-node{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:7px;
+  flex-shrink:0;
+}
+.step-circle{
+  width:36px;height:36px;
+  border-radius:50%;
+  border:2px solid var(--border);
+  background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;
+  font-size:14px;
+  color:var(--text-dim);
+  transition:all .3s;
+  position:relative;
+  z-index:1;
+}
+.step-node.active .step-circle{
+  border-color:var(--accent);
+  background:var(--accent);
+  color:var(--bg);
+}
+.step-node.done .step-circle{
+  border-color:var(--accent-dim);
+  background:var(--accent-dim);
+  color:var(--white);
+}
+.step-name{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--text-dim);
+  font-weight:500;
+  white-space:nowrap;
+}
+.step-node.active .step-name{color:var(--accent);}
+.step-node.done .step-name{color:var(--accent-dim);}
+.step-line{
+  flex:1;
+  height:2px;
+  background:var(--border);
+  min-width:24px;
+  margin-bottom:23px;
+  transition:background .3s;
+}
+.step-line.done{background:var(--accent-dim);}
 
-  /* Progress */
-  .progress {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 34px;
-  }
-  .progress-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    cursor: default;
-  }
-  .progress-bar {
-    height: 3px;
-    width: 100%;
-    border-radius: 2px;
-    background: #e0ece4;
-    transition: background .4s;
-  }
-  .progress-item.done .progress-bar,
-  .progress-item.active .progress-bar { background: var(--green-mid); }
-  .progress-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 9.5px;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: #b0c4b6;
-    text-align: center;
-    transition: color .4s;
-  }
-  .progress-item.active .progress-name { color: var(--green-mid); font-weight: 700; }
-  .progress-item.done .progress-name { color: var(--green-light); }
+/* ── Panel ── */
+.panel{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:36px 40px;
+  display:none;
+}
+.panel.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-  /* Step title */
-  .step-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 21px;
-    color: var(--ink);
-    margin-bottom: 5px;
-  }
-  .step-sub {
-    font-size: 13px;
-    color: var(--ink-light);
-    font-style: italic;
-    margin-bottom: 26px;
-  }
+.panel-title{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;
+  color:var(--text);
+  margin-bottom:6px;
+}
+.panel-sub{
+  font-size:13.5px;
+  color:var(--text-mid);
+  margin-bottom:28px;
+  font-style:italic;
+}
 
-  /* Label */
-  .label {
-    font-family: 'Playfair Display', serif;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    color: var(--green-light);
-    margin-bottom: 9px;
-    margin-top: 20px;
-    display: block;
-  }
+/* ── Form elements ── */
+label.field-label{
+  display:block;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-mid);
+  font-weight:500;
+  margin-bottom:8px;
+  margin-top:22px;
+}
+label.field-label:first-of-type{margin-top:0;}
 
-  /* Tags */
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-  }
-  .tag {
-    padding: 7px 15px;
-    border-radius: 3px;
-    border: 2px solid var(--green-border);
-    background: var(--white);
-    color: var(--ink-mid);
-    font-family: 'Playfair Display', serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all .2s;
-    outline: none;
-    line-height: 1.3;
-  }
-  .tag:hover { border-color: var(--green-mid); color: var(--green-mid); }
-  .tag.active { border-color: var(--green-mid); background: var(--green-mid); color: var(--white); }
-  .tag.warn { border-color: var(--warn); color: var(--warn); }
+input[type=text],textarea,select{
+  width:100%;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:6px;
+  padding:11px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  color:var(--text);
+  outline:none;
+  transition:border-color .2s;
+  resize:vertical;
+}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent);}
+select option{background:var(--surface);}
+input[type=text]::placeholder,textarea::placeholder{color:var(--text-dim);}
 
-  /* Input / Textarea */
-  input[type="text"], textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 2px solid var(--green-border);
-    border-radius: 4px;
-    font-family: 'Lora', Georgia, serif;
-    font-size: 13px;
-    color: var(--ink);
-    background: var(--white);
-    outline: none;
-    transition: border-color .2s;
-    resize: vertical;
-  }
-  input[type="text"]:focus, textarea:focus { border-color: var(--green-mid); }
-  input[type="text"]::placeholder, textarea::placeholder { color: #b0c4b6; }
+/* ── Chip toggles ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.chip{
+  padding:7px 16px;
+  border-radius:20px;
+  border:1.5px solid var(--border);
+  background:transparent;
+  color:var(--text-mid);
+  font-family:'DM Sans',sans-serif;
+  font-size:13px;
+  cursor:pointer;
+  transition:all .2s;
+  font-weight:400;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+.chip.on{border-color:var(--accent);background:var(--accent-pale2);color:var(--accent);}
 
-  /* Range */
-  .range-wrap { display: flex; align-items: center; gap: 16px; }
-  input[type="range"] { flex: 1; accent-color: var(--green-mid); cursor: pointer; }
-  .range-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    color: var(--green-mid);
-    min-width: 34px;
-    text-align: center;
-  }
+/* ── Info box ── */
+.infobox{
+  background:var(--accent-pale);
+  border:1px solid var(--accent-dim);
+  border-radius:6px;
+  padding:13px 16px;
+  font-size:13px;
+  color:var(--accent);
+  margin-top:18px;
+  line-height:1.6;
+}
+.warnbox{
+  background:var(--warn-pale);
+  border:1px solid var(--warn);
+  border-radius:6px;
+  padding:13px 16px;
+  font-size:13px;
+  color:var(--warn);
+  margin-top:18px;
+  line-height:1.6;
+}
 
-  /* Info box */
-  .infobox {
-    padding: 12px 16px;
-    border-radius: 5px;
-    font-size: 13px;
-    margin-top: 14px;
-    line-height: 1.5;
-  }
-  .infobox.green { background: #edf7f2; border: 1px solid #b7ddc9; color: #1a4a2a; }
-  .infobox.red { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
-  .infobox.blue { background: #f0f4ff; border: 1px solid #c0ccf0; color: #2a3a9a; }
+/* ── Card editor ── */
+.card-editor-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:4px;
+}
+.card-editor-item{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:8px;
+  padding:14px;
+  transition:border-color .2s;
+  cursor:pointer;
+}
+.card-editor-item:hover{border-color:var(--accent-dim);}
+.card-editor-item.selected{border-color:var(--accent);}
+.card-editor-item.disabled{opacity:.35;pointer-events:none;}
 
-  /* Method cards */
-  .method-card {
-    border: 2px solid var(--green-border);
-    border-radius: 7px;
-    padding: 15px 18px;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: all .2s;
-    background: var(--white);
-  }
-  .method-card:hover { border-color: var(--green-mid); }
-  .method-card.active { border-color: var(--green-mid); background: var(--green-pale); }
-  .method-head { display: flex; align-items: center; gap: 11px; }
-  .method-icon { font-size: 20px; color: var(--green-mid); }
-  .method-title { font-family: 'Playfair Display', serif; font-size: 14.5px; color: var(--ink); font-weight: 600; }
-  .method-detail { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .method-col-title {
-    font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
-    margin-bottom: 5px; font-family: 'Playfair Display', serif;
-  }
-  .method-col-title.green { color: var(--green-light); }
-  .method-col-title.red { color: var(--warn); }
-  .method-col-title.grey { color: var(--ink-light); }
-  .method-item { font-size: 12px; color: var(--ink-mid); margin: 2px 0; }
-  .method-indication { grid-column: 1/-1; font-size: 12px; font-style: italic; color: var(--ink-mid); }
+.card-num{
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-dim);
+  margin-bottom:5px;
+  font-weight:500;
+}
+.card-name-input{
+  width:100%;
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--border);
+  border-radius:0;
+  padding:4px 0;
+  font-family:'DM Serif Display',serif;
+  font-size:16px;
+  color:var(--text);
+  outline:none;
+  margin-bottom:8px;
+}
+.card-name-input:focus{border-bottom-color:var(--accent);}
+.card-emoji-row{display:flex;gap:6px;flex-wrap:wrap;}
+.card-emoji-btn{
+  width:28px;height:28px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:transparent;
+  font-size:14px;
+  cursor:pointer;
+  transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.card-emoji-btn:hover,.card-emoji-btn.on{background:var(--accent-pale2);border-color:var(--accent);}
 
-  /* Conductor blocks */
-  .conductor-block {
-    border: 1px solid var(--green-border);
-    border-radius: 6px;
-    padding: 18px;
-    margin-bottom: 14px;
-    background: var(--white);
-  }
-  .conductor-head {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px;
-  }
-  .conductor-name { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--green-mid); font-weight: 600; }
-  .conductor-duration {
-    font-size: 11px; background: var(--green-pale); border: 1px solid var(--green-border);
-    border-radius: 20px; padding: 3px 11px; color: var(--green-mid); font-family: 'Lora', serif;
-  }
-  .conductor-meta { font-size: 12.5px; color: var(--ink-mid); margin-bottom: 3px; }
-  .conductor-question-label {
-    font-size: 10px; text-transform: uppercase; letter-spacing: .09em;
-    color: var(--green-light); margin: 11px 0 6px;
-    font-family: 'Playfair Display', serif;
-  }
+/* ── Preview cards ── */
+.preview-area{
+  margin-top:28px;
+}
+.preview-title{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-dim);
+  font-weight:500;
+  margin-bottom:14px;
+}
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:12px;
+}
+.symptom-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:18px 14px 16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  cursor:default;
+  transition:all .25s;
+  min-height:110px;
+  position:relative;
+}
+.symptom-card:hover{
+  border-color:var(--accent-dim);
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+.symptom-card .card-icon{font-size:26px;line-height:1;}
+.symptom-card .card-label{
+  font-family:'DM Serif Display',serif;
+  font-size:13px;
+  color:var(--text);
+  text-align:center;
+  line-height:1.3;
+}
+.symptom-card .card-cat{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-dim);
+  font-weight:500;
+  text-align:center;
+}
 
-  /* Export card */
-  .export-card {
-    background: var(--green-pale);
-    border: 1px solid var(--green-border);
-    border-radius: 7px;
-    padding: 22px;
-  }
-  .export-title { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--green-dark); font-weight: 700; margin-bottom: 16px; }
-  .export-row { border-bottom: 1px solid var(--green-border); padding-bottom: 9px; margin-bottom: 9px; }
-  .export-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-  .export-row-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--green-light); margin-bottom: 2px; font-family: 'Playfair Display', serif; }
-  .export-row-val { font-size: 13px; color: var(--ink); }
+/* ── Nav ── */
+.nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:32px;
+  padding-top:24px;
+  border-top:1px solid var(--border);
+}
+.btn{
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;
+  font-weight:600;
+  padding:12px 28px;
+  border-radius:6px;
+  cursor:pointer;
+  border:none;
+  transition:all .2s;
+  letter-spacing:.02em;
+}
+.btn-primary{background:var(--accent);color:var(--bg);}
+.btn-primary:hover{background:#6fd498;}
+.btn-primary:disabled{background:var(--border);color:var(--text-dim);cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--text-mid);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--accent-dim);color:var(--accent);}
 
-  /* Feedback rows */
-  .feedback-row {
-    padding: 10px 14px; border-radius: 4px;
-    margin-bottom: 8px; font-size: 13px; line-height: 1.5;
-  }
-  .feedback-row.ok { background: #edf7f2; border: 1px solid #b7ddc9; color: #1a4a2a; }
-  .feedback-row.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
-  .feedback-row.info { background: #f0f4ff; border: 1px solid #c0ccf0; color: #2a3a9a; }
+/* ── Step 4: full preview ── */
+.deck-preview{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:14px;
+}
+.deck-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:22px 14px 18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:11px;
+  transition:all .25s;
+  cursor:pointer;
+}
+.deck-card:hover{
+  border-color:var(--accent);
+  transform:translateY(-3px);
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+.deck-card .di{font-size:32px;}
+.deck-card .dn{
+  font-family:'DM Serif Display',serif;
+  font-size:14px;
+  color:var(--text);
+  text-align:center;
+  line-height:1.3;
+}
+.deck-card .dc{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text-dim);
+  font-weight:500;
+  text-align:center;
+}
+.deck-card .dd{
+  font-size:11px;
+  color:var(--text-mid);
+  text-align:center;
+  line-height:1.4;
+  font-style:italic;
+}
 
-  /* Navigation */
-  .nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #e6f0e8;
-  }
-  .btn {
-    padding: 11px 28px;
-    border-radius: 4px;
-    font-family: 'Playfair Display', serif;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: .04em;
-    cursor: pointer;
-    transition: all .2s;
-    outline: none;
-  }
-  .btn-primary { background: var(--green-mid); color: var(--white); border: none; }
-  .btn-primary:hover { background: var(--green-dark); }
-  .btn-primary:disabled { background: #cde4d5; color: #a0b8a8; cursor: not-allowed; }
-  .btn-secondary { background: var(--white); color: var(--green-mid); border: 2px solid var(--green-mid); }
-  .btn-secondary:hover { background: var(--green-pale); }
-  .btn-ghost { background: transparent; color: var(--ink-light); border: 2px solid var(--green-border); }
-  .btn-ghost:hover { border-color: var(--green-mid); color: var(--green-mid); }
+/* ── Step 5: session tips ── */
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
+.tip-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:18px;
+}
+.tip-icon{font-size:22px;margin-bottom:10px;}
+.tip-title{
+  font-family:'DM Serif Display',serif;
+  font-size:15px;
+  color:var(--text);
+  margin-bottom:6px;
+}
+.tip-body{font-size:13px;color:var(--text-mid);line-height:1.6;}
 
-  /* Print / Export btn */
-  .btn-print { background: var(--green-dark); color: var(--white); border: none; padding: 10px 22px; font-size: 13px; }
-  .btn-print:hover { background: #163a27; }
+/* ── Summary bar ── */
+.summary-bar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:28px;
+}
+.summary-pill{
+  background:var(--accent-pale2);
+  border:1px solid var(--accent-dim);
+  border-radius:20px;
+  padding:5px 14px;
+  font-size:12px;
+  color:var(--accent);
+  font-weight:500;
+}
 
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 11px;
-    color: #a0b0a0;
-    font-style: italic;
-  }
-
-  /* Steps */
-  .step { display: none; }
-  .step.active { display: block; }
-
-  /* Divider */
-  .divider { height: 1px; background: var(--green-border); margin: 20px 0; }
-
-  @media (max-width: 520px) {
-    .card { padding: 22px 18px; }
-    .method-detail { grid-template-columns: 1fr; }
-    .header h1 { font-size: 24px; }
-  }
-
-  @media print {
-    body { background: white; }
-    .card { box-shadow: none; border: 1px solid #ccc; }
-    .nav, .header-badge, .progress, .step-sub, .step:not(.active) { display: none !important; }
-  }
+/* ── Responsive ── */
+@media(max-width:600px){
+  .panel{padding:24px 18px;}
+  .card-editor-grid{grid-template-columns:1fr;}
+  .tips-grid{grid-template-columns:1fr;}
+  h1{font-size:26px;}
+}
 </style>
 </head>
 <body>
 
 <div class="shell">
 
-  <!-- Header -->
   <div class="header">
-    <div class="header-badge">
-      <div class="header-dot"></div>
-      <span class="header-label">ETP · Éducation Thérapeutique du Patient</span>
+    <div class="header-left">
+      <div class="badge"><div class="badge-dot"></div>Outil ETP · Cartes symptômes</div>
+      <h1>Construire mon jeu<br>de cartes symptômes</h1>
+      <p class="header-sub">Un wizard en 5 étapes pour créer un jeu de 15 cartes adapté à votre séance et à votre public.</p>
     </div>
-    <h1>Générateur de conducteur<br>de séance</h1>
-    <p>Un entraîneur de raisonnement pédagogique — pas un modèle à remplir.</p>
   </div>
 
-  <!-- Main card -->
-  <div class="card">
+  <!-- Stepper -->
+  <div class="stepper" id="stepper">
+    <div class="step-node active" data-step="0">
+      <div class="step-circle">1</div>
+      <span class="step-name">Contexte</span>
+    </div>
+    <div class="step-line" id="line-0"></div>
+    <div class="step-node" data-step="1">
+      <div class="step-circle">2</div>
+      <span class="step-name">Pathologie</span>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-node" data-step="2">
+      <div class="step-circle">3</div>
+      <span class="step-name">Cartes</span>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-node" data-step="3">
+      <div class="step-circle">4</div>
+      <span class="step-name">Aperçu</span>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-node" data-step="4">
+      <div class="step-circle">5</div>
+      <span class="step-name">Animer</span>
+    </div>
+  </div>
 
-    <!-- Progress -->
-    <div class="progress" id="progress">
-      <!-- filled by JS -->
+  <!-- ───────────────────────────────────────────
+       ÉTAPE 1 — Contexte
+  ─────────────────────────────────────────────── -->
+  <div class="panel active" id="panel-0">
+    <h2 class="panel-title">Définir le contexte de votre séance</h2>
+    <p class="panel-sub">Ces informations vont orienter la sélection et le nombre de cartes.</p>
+
+    <label class="field-label">Objectif de la séance</label>
+    <div class="chips" id="chips-objectif">
+      <button class="chip" data-g="objectif" data-v="Identifier les symptômes">Identifier les symptômes</button>
+      <button class="chip" data-g="objectif" data-v="Comprendre les causes">Comprendre les causes</button>
+      <button class="chip" data-g="objectif" data-v="Savoir réagir">Savoir réagir</button>
+      <button class="chip" data-g="objectif" data-v="Anticiper et prévenir">Anticiper et prévenir</button>
     </div>
 
-    <!-- Step 1: Intention -->
-    <div class="step" id="step-0">
-      <h2 class="step-title">Clarifier l'intention pédagogique</h2>
-      <p class="step-sub">La clarté de l'intention détermine tout le reste de la séance.</p>
-
-      <span class="label">Moment du parcours</span>
-      <div class="tags" id="tags-parcours">
-        <button class="tag" data-group="parcours" data-val="Diagnostic éducatif">Diagnostic éducatif</button>
-        <button class="tag" data-group="parcours" data-val="Acquisition">Acquisition</button>
-        <button class="tag" data-group="parcours" data-val="Renforcement">Renforcement</button>
-        <button class="tag" data-group="parcours" data-val="Évaluation">Évaluation</button>
-      </div>
-
-      <span class="label">Compétence ciblée</span>
-      <div class="tags" id="tags-competence">
-        <button class="tag" data-group="competence" data-val="Identifier">Identifier</button>
-        <button class="tag" data-group="competence" data-val="Comprendre">Comprendre</button>
-        <button class="tag" data-group="competence" data-val="Agir">Agir</button>
-        <button class="tag" data-group="competence" data-val="Anticiper">Anticiper</button>
-        <button class="tag" data-group="competence" data-val="Communiquer">Communiquer</button>
-      </div>
-
-      <div id="coherence-alert" style="display:none"></div>
+    <label class="field-label">Taille du groupe</label>
+    <div class="chips" id="chips-groupe">
+      <button class="chip" data-g="groupe" data-v="Petit (2–5)">Petit (2–5)</button>
+      <button class="chip" data-g="groupe" data-v="Moyen (6–10)">Moyen (6–10)</button>
+      <button class="chip" data-g="groupe" data-v="Grand (11–15)">Grand (11–15)</button>
     </div>
 
-    <!-- Step 2: Public -->
-    <div class="step" id="step-1">
-      <h2 class="step-title">Définir le public</h2>
-      <p class="step-sub">Le public détermine la durée, la complexité et le nombre de cartes.</p>
-
-      <span class="label">Pathologie / Problématique</span>
-      <input type="text" id="pathologie" placeholder="ex : diabète type 2, asthme, insuffisance cardiaque…" />
-
-      <span class="label">Âge moyen du groupe</span>
-      <input type="text" id="age" placeholder="ex : 45–65 ans" />
-
-      <span class="label">Niveau de littératie</span>
-      <div class="tags">
-        <button class="tag" data-group="litteratie" data-val="Faible">Faible</button>
-        <button class="tag" data-group="litteratie" data-val="Moyen">Moyen</button>
-        <button class="tag" data-group="litteratie" data-val="Élevé">Élevé</button>
-      </div>
-
-      <span class="label">Taille du groupe</span>
-      <div class="range-wrap">
-        <input type="range" id="taille" min="2" max="20" value="8" oninput="updateTaille()" />
-        <span class="range-val" id="taille-val">8</span>
-      </div>
-
-      <div id="public-reco" class="infobox green" style="display:none"></div>
+    <label class="field-label">Niveau de littératie du groupe</label>
+    <div class="chips" id="chips-litteratie">
+      <button class="chip" data-g="litteratie" data-v="Faible">Faible</button>
+      <button class="chip" data-g="litteratie" data-v="Moyen">Moyen</button>
+      <button class="chip" data-g="litteratie" data-v="Élevé">Élevé</button>
     </div>
 
-    <!-- Step 3: Méthode -->
-    <div class="step" id="step-2">
-      <h2 class="step-title">Choisir la méthode d'animation</h2>
-      <p class="step-sub">Chaque méthode a ses forces. Choisissez en cohérence avec votre intention.</p>
+    <div id="context-reco" style="display:none"></div>
 
-      <div id="methods-container">
-        <!-- filled by JS -->
-      </div>
-    </div>
-
-    <!-- Step 4: Conducteur -->
-    <div class="step" id="step-3">
-      <h2 class="step-title">Construire le conducteur</h2>
-      <p class="step-sub">Le squelette est généré. Complétez les questions ouvertes — c'est là que se joue votre posture éducative.</p>
-
-      <div class="conductor-block">
-        <div class="conductor-head">
-          <span class="conductor-name">🔹 Accueil</span>
-          <span class="conductor-duration">10 min</span>
-        </div>
-        <p class="conductor-meta"><em>Objectif :</em> Créer un cadre sécurisant, présenter le dispositif et les cartes</p>
-        <p class="conductor-meta"><em>Consigne :</em> Expliquer le principe des cartes symptômes et les règles du groupe</p>
-        <p class="conductor-question-label">À compléter — Quelle question ouverte allez-vous poser pour lancer la réflexion ?</p>
-        <textarea id="q-accueil" rows="2" placeholder="Votre question d'ouverture…"></textarea>
-      </div>
-
-      <div class="conductor-block">
-        <div class="conductor-head">
-          <span class="conductor-name">🔹 Activité centrale</span>
-          <span class="conductor-duration" id="activite-duration">30–40 min</span>
-        </div>
-        <p class="conductor-meta" id="activite-objectif"><em>Objectif :</em> Travailler la compétence ciblée via les cartes symptômes</p>
-        <p class="conductor-meta" id="activite-methode"><em>Méthode :</em> —</p>
-        <p class="conductor-question-label">À compléter — Quelles questions-clés poserez-vous pendant l'activité ?</p>
-        <textarea id="q-activite" rows="2" placeholder="Vos questions-clés…"></textarea>
-      </div>
-
-      <div class="conductor-block">
-        <div class="conductor-head">
-          <span class="conductor-name">🔹 Synthèse & trace écrite</span>
-          <span class="conductor-duration">15 min</span>
-        </div>
-        <p class="conductor-meta"><em>Objectif :</em> Consolider les apprentissages, produire une trace collective</p>
-        <p class="conductor-meta"><em>Consigne :</em> Reformulation par les participants, constitution d'un document partagé</p>
-        <p class="conductor-question-label">À compléter — Comment allez-vous formuler la question de synthèse finale ?</p>
-        <textarea id="q-synthese" rows="2" placeholder="Votre question de clôture…"></textarea>
-      </div>
-    </div>
-
-    <!-- Step 5: Évaluation -->
-    <div class="step" id="step-4">
-      <h2 class="step-title">Intégrer l'évaluation</h2>
-      <p class="step-sub">Sans évaluation définie à l'avance, on ne sait pas si la compétence a été atteinte.</p>
-
-      <span class="label">Indicateur observable</span>
-      <textarea id="indicateur" rows="2" placeholder="ex : Le patient cite 3 symptômes d'hypoglycémie sans aide…"></textarea>
-
-      <span class="label">Comment évaluer ?</span>
-      <textarea id="eval-methode" rows="2" placeholder="ex : Tour de table final, vote par gommette, reformulation spontanée…"></textarea>
-
-      <span class="label">Reformulation finale attendue des participants</span>
-      <textarea id="reformulation" rows="2" placeholder="ex : « Ce que je retiens de cette séance… »"></textarea>
-    </div>
-
-    <!-- Step 6: Analyse -->
-    <div class="step" id="step-5">
-      <h2 class="step-title">Analyse &amp; Conducteur final</h2>
-
-      <div style="margin-bottom:22px">
-        <span class="label" style="margin-top:0">Assistant critique</span>
-        <div id="feedbacks"></div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="export-card" id="export-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <p class="export-title">Conducteur de séance — Export</p>
-          <button class="btn btn-print" onclick="window.print()">🖨 Imprimer</button>
-        </div>
-        <div id="export-rows"></div>
-      </div>
-    </div>
-
-    <!-- Navigation -->
     <div class="nav">
-      <button class="btn btn-secondary" id="btn-prev" onclick="changeStep(-1)" style="display:none">← Retour</button>
       <div></div>
-      <button class="btn btn-primary" id="btn-next" onclick="changeStep(1)">Continuer →</button>
+      <button class="btn btn-primary" id="next-0" onclick="goTo(1)" disabled>Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────
+       ÉTAPE 2 — Pathologie
+  ─────────────────────────────────────────────── -->
+  <div class="panel" id="panel-1">
+    <h2 class="panel-title">Votre pathologie de référence</h2>
+    <p class="panel-sub">L'exemple proposé est le diabète de type 2. Vous pouvez le garder ou le personnaliser.</p>
+
+    <label class="field-label">Pathologie</label>
+    <input type="text" id="patho-name" value="Diabète de type 2" placeholder="ex : diabète de type 2"/>
+
+    <label class="field-label">Profil du patient type</label>
+    <input type="text" id="patho-profil" value="Adulte, traitement oral ou insuline, suivi ambulatoire" placeholder="ex : adulte, traitement oral…"/>
+
+    <label class="field-label">Catégories de symptômes à couvrir</label>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Cochez les catégories que vous voulez représenter dans le jeu.</p>
+    <div class="chips" id="chips-cats">
+      <button class="chip on" data-g="cats" data-v="Hyperglycémie">Hyperglycémie</button>
+      <button class="chip on" data-g="cats" data-v="Hypoglycémie">Hypoglycémie</button>
+      <button class="chip on" data-g="cats" data-v="Complications">Complications</button>
+      <button class="chip on" data-g="cats" data-v="Bien-être & quotidien">Bien-être & quotidien</button>
+      <button class="chip" data-g="cats" data-v="Signes d'alarme">Signes d'alarme</button>
     </div>
 
-  </div><!-- /card -->
+    <div class="infobox" style="margin-top:20px">
+      💡 Pour 15 cartes : visez 3 à 4 catégories avec 3 à 5 cartes chacune. Trop de catégories fragmente la séance.
+    </div>
 
-  <p class="footer">Intention · Compétence · Méthode · Animation · Évaluation</p>
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="goTo(0)">← Retour</button>
+      <button class="btn btn-primary" onclick="goTo(2)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────
+       ÉTAPE 3 — Créer / éditer les cartes
+  ─────────────────────────────────────────────── -->
+  <div class="panel" id="panel-2">
+    <h2 class="panel-title">Composer votre jeu de 15 cartes</h2>
+    <p class="panel-sub">Chaque carte porte un nom de symptôme. Modifiez, remplacez, choisissez une icône.</p>
+
+    <div id="card-editor-grid" class="card-editor-grid"></div>
+
+    <div id="count-bar" style="margin-top:14px;font-size:13px;color:var(--text-mid);"></div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="goTo(1)">← Retour</button>
+      <button class="btn btn-primary" onclick="goTo(3)">Voir l'aperçu →</button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────
+       ÉTAPE 4 — Aperçu du jeu complet
+  ─────────────────────────────────────────────── -->
+  <div class="panel" id="panel-3">
+    <h2 class="panel-title">Votre jeu de cartes</h2>
+    <p class="panel-sub">Voici les 15 cartes telles qu'elles apparaîtront sur écran pendant la séance. Cliquez pour les retourner.</p>
+
+    <div id="summary-bar" class="summary-bar"></div>
+    <div class="deck-preview" id="deck-preview"></div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="goTo(2)">← Modifier</button>
+      <button class="btn btn-primary" onclick="goTo(4)">Préparer la séance →</button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────
+       ÉTAPE 5 — Conseils d'animation
+  ─────────────────────────────────────────────── -->
+  <div class="panel" id="panel-4">
+    <h2 class="panel-title">Prêt à animer</h2>
+    <p class="panel-sub">Votre jeu est constitué. Voici les points de vigilance pour bien utiliser ces cartes en séance.</p>
+
+    <div id="session-summary" class="summary-bar" style="margin-bottom:20px"></div>
+
+    <div class="tips-grid" id="tips-grid"></div>
+
+    <div class="warnbox" style="margin-top:18px">
+      <strong>⚠ À ne pas faire :</strong> ne commencez pas par définir les symptômes. Laissez d'abord les patients choisir, trier, réagir. La carte est un déclencheur de parole — pas un support de cours.
+    </div>
+
+    <div class="infobox" style="margin-top:14px">
+      ✓ Votre jeu est prêt. Projetez-le sur écran, distribuez la parole, reformulez sans juger.
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="goTo(3)">← Aperçu</button>
+      <button class="btn btn-primary" onclick="launchDeck()">🎴 Lancer la séance</button>
+    </div>
+  </div>
 
 </div><!-- /shell -->
 
+<!-- ── SÉANCE MODE ── -->
+<div id="session-mode" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;">
+  <div style="max-width:980px;margin:0 auto;padding:36px 24px 60px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;">
+      <div>
+        <div class="badge"><div class="badge-dot"></div>Mode séance</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);margin-top:8px;" id="session-title">Jeu de cartes</h2>
+      </div>
+      <button class="btn btn-ghost" onclick="closeSession()">✕ Quitter</button>
+    </div>
+    <p style="font-size:13px;color:var(--text-mid);margin-bottom:28px;font-style:italic;">Cliquez sur une carte pour la révéler. Cliquez à nouveau pour la retourner.</p>
+    <div class="deck-preview" id="session-cards" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;"></div>
+  </div>
+</div>
+
 <script>
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
-const STEPS = ["Intention", "Public", "Méthode", "Conducteur", "Évaluation", "Analyse"];
-
-const COHERENCE = {
-  "Diagnostic éducatif": ["Identifier", "Comprendre"],
-  "Acquisition": ["Comprendre", "Agir"],
-  "Renforcement": ["Agir", "Anticiper", "Communiquer"],
-  "Évaluation": ["Identifier", "Comprendre", "Agir", "Anticiper", "Communiquer"],
+// ── State ──────────────────────────────────────────────────────────────────────
+const state = {
+  step: 0,
+  objectif: null,
+  groupe: null,
+  litteratie: null,
+  cats: ["Hyperglycémie","Hypoglycémie","Complications","Bien-être & quotidien"],
+  cards: [],
 };
 
-const METHODES = [
-  {
-    id: "A", icon: "◈",
-    label: "Tri individuel + tour de table",
-    points: ["Favorise l'expression individuelle", "Repère les représentations initiales"],
-    risques: ["Peut être chronophage", "Risque de conformisme au fil du tour"],
-    indication: "Idéal en phase de diagnostic ou de recueil de représentations.",
-  },
-  {
-    id: "B", icon: "◉",
-    label: "Cartographie collective",
-    points: ["Visualisation partagée", "Co-construction des savoirs"],
-    risques: ["Nécessite un animateur expérimenté", "Peut être dominé par certains"],
-    indication: "Parfait pour l'acquisition et la mise en lien des concepts.",
-  },
-  {
-    id: "C", icon: "◫",
-    label: "Travail en sous-groupes",
-    points: ["Implique tous les participants", "Favorise la discussion entre pairs"],
-    risques: ["Dispersion possible", "Synthèse délicate"],
-    indication: "Recommandé pour le renforcement et les groupes de plus de 8 personnes.",
-  },
-  {
-    id: "D", icon: "◬",
-    label: "Jeu narratif / Externalisation",
-    points: ["Dédramatise la maladie", "Stimule la créativité"],
-    risques: ["Peut déstabiliser certains patients", "Exige une posture souple"],
-    indication: "Indiqué pour travailler l'anticipation ou la communication.",
-  },
+// ── Default cards (diabète type 2) ────────────────────────────────────────────
+const DEFAULT_CARDS = [
+  // Hyperglycémie
+  {name:"Soif intense",      icon:"💧", cat:"Hyperglycémie",      desc:"Polydipsie — besoin excessif de boire"},
+  {name:"Urines fréquentes", icon:"🚽", cat:"Hyperglycémie",      desc:"Polyurie — signe classique d'hyperglycémie"},
+  {name:"Fatigue",           icon:"😴", cat:"Hyperglycémie",      desc:"Asthénie liée à l'hyperglycémie chronique"},
+  {name:"Vision floue",      icon:"👁",  cat:"Hyperglycémie",      desc:"Troubles visuels transitoires"},
+  // Hypoglycémie
+  {name:"Tremblements",      icon:"🫨", cat:"Hypoglycémie",       desc:"Signe neurovégétatif précoce"},
+  {name:"Sueurs froides",    icon:"🥶", cat:"Hypoglycémie",       desc:"Transpiration soudaine sans effort"},
+  {name:"Faim soudaine",     icon:"🍬", cat:"Hypoglycémie",       desc:"Envie impérieuse de manger sucré"},
+  {name:"Palpitations",      icon:"💓", cat:"Hypoglycémie",       desc:"Tachycardie réactionnelle"},
+  // Complications
+  {name:"Fourmillements",    icon:"⚡", cat:"Complications",      desc:"Neuropathie — pieds, mains"},
+  {name:"Plaie qui tarde",   icon:"🩹", cat:"Complications",      desc:"Cicatrisation ralentie"},
+  {name:"Gonflement",        icon:"🦵", cat:"Complications",      desc:"Œdème — retentissement rénal ou vasculaire"},
+  // Bien-être
+  {name:"Irritabilité",      icon:"😤", cat:"Bien-être & quotidien", desc:"Impact émotionnel du diabète"},
+  {name:"Maux de tête",      icon:"🤕", cat:"Bien-être & quotidien", desc:"Céphalées liées aux variations glycémiques"},
+  {name:"Manque d'énergie",  icon:"🔋", cat:"Bien-être & quotidien", desc:"Fatigue quotidienne persistante"},
+  {name:"Troubles du sommeil",icon:"🌙",cat:"Bien-être & quotidien", desc:"Insomnie ou sommeil non récupérateur"},
 ];
 
-// ─── State ────────────────────────────────────────────────────────────────────
+const EMOJIS = ["💧","🚽","😴","👁","🫨","🥶","🍬","💓","⚡","🩹","🦵","😤","🤕","🔋","🌙","❤️","🧠","🦷","🫁","🩺","🏃","🍽️","💊","🔴","⚠️","✨"];
 
-let state = {
-  step: 0,
-  parcours: null,
-  competence: null,
-  pathologie: "",
-  age: "",
-  litteratie: null,
-  taille: 8,
-  methode: null,
-  qAccueil: "",
-  qActivite: "",
-  qSynthese: "",
-  indicateur: "",
-  evalMethode: "",
-  reformulation: "",
-};
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-
+// ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  buildProgress();
-  buildMethods();
-  bindTags();
-  bindTextareas();
-  renderStep();
+  state.cards = DEFAULT_CARDS.map(c => ({...c}));
+  bindChips();
+  buildCardEditor();
+  updateStepperUI();
 });
 
-// ─── Progress ─────────────────────────────────────────────────────────────────
-
-function buildProgress() {
-  const el = document.getElementById("progress");
-  el.innerHTML = STEPS.map((s, i) =>
-    `<div class="progress-item" id="prog-${i}">
-      <div class="progress-bar"></div>
-      <span class="progress-name">${s}</span>
-    </div>`
-  ).join("");
-}
-
-function updateProgress() {
-  STEPS.forEach((_, i) => {
-    const el = document.getElementById(`prog-${i}`);
-    el.className = "progress-item" + (i < state.step ? " done" : i === state.step ? " active" : "");
-  });
-}
-
-// ─── Methods ──────────────────────────────────────────────────────────────────
-
-function buildMethods() {
-  const c = document.getElementById("methods-container");
-  c.innerHTML = METHODES.map(m => `
-    <div class="method-card" id="method-${m.id}" onclick="selectMethod('${m.id}')">
-      <div class="method-head">
-        <span class="method-icon">${m.icon}</span>
-        <span class="method-title">${m.id}. ${m.label}</span>
-      </div>
-      <div class="method-detail" id="method-detail-${m.id}" style="display:none">
-        <div>
-          <p class="method-col-title green">Points forts</p>
-          ${m.points.map(p => `<p class="method-item">✓ ${p}</p>`).join("")}
-        </div>
-        <div>
-          <p class="method-col-title red">Risques</p>
-          ${m.risques.map(r => `<p class="method-item">⚠ ${r}</p>`).join("")}
-        </div>
-        <div style="grid-column:1/-1">
-          <p class="method-col-title grey">Indication</p>
-          <p class="method-indication">${m.indication}</p>
-        </div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function selectMethod(id) {
-  state.methode = id;
-  METHODES.forEach(m => {
-    const card = document.getElementById(`method-${m.id}`);
-    const detail = document.getElementById(`method-detail-${m.id}`);
-    if (m.id === id) {
-      card.classList.add("active");
-      detail.style.display = "grid";
-    } else {
-      card.classList.remove("active");
-      detail.style.display = "none";
-    }
-  });
-  updateNav();
-}
-
-// ─── Tags ─────────────────────────────────────────────────────────────────────
-
-function bindTags() {
-  document.querySelectorAll(".tag").forEach(btn => {
+// ── Chips ─────────────────────────────────────────────────────────────────────
+function bindChips() {
+  document.querySelectorAll(".chip[data-g]").forEach(btn => {
     btn.addEventListener("click", () => {
-      const group = btn.dataset.group;
-      const val = btn.dataset.val;
-      // deselect siblings
-      document.querySelectorAll(`.tag[data-group="${group}"]`).forEach(b => b.classList.remove("active", "warn"));
-      btn.classList.add("active");
-      state[group === "parcours" ? "parcours" : group === "competence" ? "competence" : "litteratie"] = val;
-      if (group === "parcours" || group === "competence") checkCoherence();
-      if (group === "litteratie") updatePublicReco();
-      updateNav();
+      const g = btn.dataset.g;
+      const v = btn.dataset.v;
+
+      if (g === "cats") {
+        btn.classList.toggle("on");
+        const on = [...document.querySelectorAll('.chip[data-g="cats"].on')].map(b => b.dataset.v);
+        state.cats = on;
+      } else {
+        document.querySelectorAll(`.chip[data-g="${g}"]`).forEach(b => b.classList.remove("on"));
+        btn.classList.add("on");
+        if (g === "objectif") state.objectif = v;
+        if (g === "groupe")   state.groupe   = v;
+        if (g === "litteratie") state.litteratie = v;
+      }
+
+      updateContextReco();
+      updateNextBtn();
     });
   });
 }
 
-function checkCoherence() {
-  const alert = document.getElementById("coherence-alert");
-  if (!state.parcours || !state.competence) { alert.style.display = "none"; return; }
-  const allowed = COHERENCE[state.parcours] || [];
-  const incoherent = !allowed.includes(state.competence);
+function updateNextBtn() {
+  const ok = state.objectif && state.groupe && state.litteratie;
+  document.getElementById("next-0").disabled = !ok;
+}
 
-  // color competence tags
-  document.querySelectorAll('.tag[data-group="competence"]').forEach(b => {
-    if (b.classList.contains("active") && incoherent) b.classList.add("warn");
-    else b.classList.remove("warn");
+function updateContextReco() {
+  const el = document.getElementById("context-reco");
+  if (!state.groupe && !state.litteratie) { el.style.display = "none"; return; }
+  const msgs = [];
+  if (state.groupe === "Grand (11–15)") msgs.push("Grand groupe : prévoyez sous-groupes pour l'activité cartes.");
+  if (state.litteratie === "Faible") msgs.push("Littératie faible : noms de symptômes courts, icône grande, lisibilité prioritaire.");
+  if (msgs.length === 0) { el.style.display = "none"; return; }
+  el.className = "infobox";
+  el.style.display = "block";
+  el.innerHTML = "💡 " + msgs.join(" · ");
+}
+
+// ── Card Editor ───────────────────────────────────────────────────────────────
+function buildCardEditor() {
+  const grid = document.getElementById("card-editor-grid");
+  grid.innerHTML = "";
+  state.cards.forEach((card, i) => {
+    const div = document.createElement("div");
+    div.className = "card-editor-item";
+    div.innerHTML = `
+      <div class="card-num">Carte ${i+1} · <span style="color:var(--accent-dim);font-size:10px">${card.cat}</span></div>
+      <input class="card-name-input" type="text" value="${card.name}" placeholder="Nom du symptôme" data-idx="${i}" oninput="updateCardName(${i},this.value)"/>
+      <div class="card-emoji-row" id="emojis-${i}">
+        ${EMOJIS.slice(0,8).map(e => `<button class="card-emoji-btn ${e===card.icon?'on':''}" onclick="setEmoji(${i},'${e}')">${e}</button>`).join("")}
+      </div>
+    `;
+    grid.appendChild(div);
   });
-
-  if (incoherent) {
-    alert.style.display = "block";
-    alert.className = "infobox red";
-    alert.innerHTML = `<strong>⚠ Alerte pédagogique :</strong> La compétence <em>${state.competence}</em> est rarement ciblée en phase de <em>${state.parcours}</em>. Vérifiez votre intention ou choisissez un moment de parcours cohérent.`;
-  } else {
-    alert.style.display = "none";
-  }
+  updateCountBar();
 }
 
-// ─── Range ────────────────────────────────────────────────────────────────────
-
-function updateTaille() {
-  state.taille = +document.getElementById("taille").value;
-  document.getElementById("taille-val").textContent = state.taille;
-  updatePublicReco();
+function updateCardName(i, val) {
+  state.cards[i].name = val;
 }
 
-function updatePublicReco() {
-  const reco = document.getElementById("public-reco");
-  const t = state.taille;
-  const duree = t <= 6 ? "45 min" : t <= 12 ? "60–75 min" : "90 min";
-  const cartes = t <= 6 ? "12–15 cartes" : t <= 12 ? "20–25 cartes" : "30+ cartes";
-  const note = state.litteratie === "Faible" ? " · Consignes simplifiées et illustrées recommandées" : "";
-  reco.style.display = "block";
-  reco.innerHTML = `📋 Pour <strong>${t} personnes</strong> : <strong>${duree}</strong> recommandées · <strong>${cartes}</strong>${note}`;
-}
-
-// ─── Textareas ────────────────────────────────────────────────────────────────
-
-function bindTextareas() {
-  [
-    ["pathologie", "pathologie"],
-    ["age", "age"],
-    ["q-accueil", "qAccueil"],
-    ["q-activite", "qActivite"],
-    ["q-synthese", "qSynthese"],
-    ["indicateur", "indicateur"],
-    ["eval-methode", "evalMethode"],
-    ["reformulation", "reformulation"],
-  ].forEach(([id, key]) => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("input", () => { state[key] = el.value; });
+function setEmoji(i, emoji) {
+  state.cards[i].icon = emoji;
+  document.querySelectorAll(`#emojis-${i} .card-emoji-btn`).forEach(btn => {
+    btn.classList.toggle("on", btn.textContent === emoji);
   });
 }
 
-// ─── Navigation ───────────────────────────────────────────────────────────────
-
-function canNext() {
-  if (state.step === 0) return state.parcours && state.competence;
-  if (state.step === 1) return state.litteratie;
-  if (state.step === 2) return state.methode;
-  return true;
+function updateCountBar() {
+  const el = document.getElementById("count-bar");
+  el.textContent = `${state.cards.length} cartes dans le jeu.`;
 }
 
-function updateNav() {
-  const prev = document.getElementById("btn-prev");
-  const next = document.getElementById("btn-next");
-  prev.style.display = state.step > 0 ? "inline-block" : "none";
-  if (state.step === STEPS.length - 1) {
-    next.style.display = "none";
-  } else {
-    next.style.display = "inline-block";
-    next.textContent = state.step === STEPS.length - 2 ? "Analyser →" : "Continuer →";
-    next.disabled = !canNext();
-  }
-}
+// ── Deck Preview ──────────────────────────────────────────────────────────────
+function buildDeckPreview() {
+  // summary bar
+  const cats = [...new Set(state.cards.map(c => c.cat))];
+  document.getElementById("summary-bar").innerHTML =
+    cats.map(c => `<span class="summary-pill">${c} (${state.cards.filter(x=>x.cat===c).length})</span>`).join("");
 
-function changeStep(dir) {
-  if (dir === 1 && !canNext()) return;
-  state.step = Math.max(0, Math.min(STEPS.length - 1, state.step + dir));
-  renderStep();
-}
-
-function renderStep() {
-  // show/hide steps
-  STEPS.forEach((_, i) => {
-    document.getElementById(`step-${i}`).classList.toggle("active", i === state.step);
+  // cards
+  const grid = document.getElementById("deck-preview");
+  grid.innerHTML = "";
+  state.cards.forEach((card, i) => {
+    const div = document.createElement("div");
+    div.className = "deck-card";
+    div.innerHTML = `
+      <div class="di">${card.icon}</div>
+      <div class="dn">${card.name}</div>
+      <div class="dc">${card.cat}</div>
+      <div class="dd" style="display:none">${card.desc}</div>
+    `;
+    div.addEventListener("click", () => {
+      const dd = div.querySelector(".dd");
+      const dn = div.querySelector(".dn");
+      const visible = dd.style.display !== "none";
+      dd.style.display = visible ? "none" : "block";
+      dn.style.display = visible ? "block" : "none";
+      div.style.borderColor = visible ? "var(--border)" : "var(--accent)";
+    });
+    grid.appendChild(div);
   });
-
-  // Step 3: update conductor details
-  if (state.step === 3) {
-    const m = METHODES.find(m => m.id === state.methode);
-    document.getElementById("activite-objectif").innerHTML =
-      `<em>Objectif :</em> Travailler la compétence « ${state.competence || "…"} » via les cartes symptômes`;
-    document.getElementById("activite-methode").innerHTML =
-      `<em>Méthode :</em> ${m ? m.id + ". " + m.label : "—"}`;
-    const t = state.taille;
-    document.getElementById("activite-duration").textContent =
-      t <= 6 ? "25–30 min" : t <= 12 ? "30–40 min" : "40–50 min";
-    // restore values
-    document.getElementById("q-accueil").value = state.qAccueil;
-    document.getElementById("q-activite").value = state.qActivite;
-    document.getElementById("q-synthese").value = state.qSynthese;
-  }
-
-  // Step 5: restore eval fields
-  if (state.step === 4) {
-    document.getElementById("indicateur").value = state.indicateur;
-    document.getElementById("eval-methode").value = state.evalMethode;
-    document.getElementById("reformulation").value = state.reformulation;
-  }
-
-  // Step 6: build analysis
-  if (state.step === 5) buildAnalysis();
-
-  updateProgress();
-  updateNav();
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-// ─── Analysis ────────────────────────────────────────────────────────────────
+// ── Session Tips ──────────────────────────────────────────────────────────────
+function buildSessionTips() {
+  // summary
+  document.getElementById("session-summary").innerHTML =
+    [state.objectif, state.groupe, state.litteratie].filter(Boolean)
+      .map(v => `<span class="summary-pill">${v}</span>`).join("");
 
-function buildAnalysis() {
-  const m = METHODES.find(m => m.id === state.methode);
-  const feedbacks = [];
-
-  if (!state.competence) feedbacks.push({ type: "warn", msg: "Aucune compétence ciblée — l'objectif reste flou." });
-  if (!state.indicateur) feedbacks.push({ type: "warn", msg: "Pas d'indicateur d'évaluation défini. Comment saurez-vous que la compétence est acquise ?" });
-  if (!state.qAccueil) feedbacks.push({ type: "warn", msg: "La question d'ouverture de l'accueil n'est pas rédigée." });
-  if (!state.qActivite) feedbacks.push({ type: "warn", msg: "Les questions-clés de l'activité centrale manquent." });
-  if (!state.qSynthese) feedbacks.push({ type: "warn", msg: "La question de synthèse finale n'est pas formulée." });
-  if (state.taille > 12 && state.methode === "A")
-    feedbacks.push({ type: "info", msg: `Pour un groupe de ${state.taille} personnes, le tri individuel + tour de table risque d'être très long. Envisagez la méthode C.` });
-  if (state.litteratie === "Faible" && state.methode === "D")
-    feedbacks.push({ type: "info", msg: "Le jeu narratif peut déstabiliser des patients avec un faible niveau de littératie. Veillez à la clarté des consignes." });
-  if (feedbacks.length === 0)
-    feedbacks.push({ type: "ok", msg: "✓ Conducteur complet et cohérent. Bravo !" });
-
-  const fb = document.getElementById("feedbacks");
-  fb.innerHTML = feedbacks.map(f =>
-    `<div class="feedback-row ${f.type}">${f.msg}</div>`
-  ).join("");
-
-  const rows = [
-    ["Parcours", state.parcours || "—"],
-    ["Compétence ciblée", state.competence || "—"],
-    ["Pathologie / Problématique", state.pathologie || "—"],
-    ["Âge", state.age || "—"],
-    ["Niveau de littératie", state.litteratie || "—"],
-    ["Taille du groupe", state.taille + " personnes"],
-    ["Méthode d'animation", m ? m.id + ". " + m.label : "—"],
-    ["Accueil — Question d'ouverture", state.qAccueil || "—"],
-    ["Activité — Questions-clés", state.qActivite || "—"],
-    ["Synthèse — Question finale", state.qSynthese || "—"],
-    ["Indicateur d'évaluation", state.indicateur || "—"],
-    ["Méthode d'évaluation", state.evalMethode || "—"],
-    ["Reformulation attendue", state.reformulation || "—"],
+  const tips = [
+    {
+      icon: "🃏",
+      title: "Lancer l'activité",
+      body: "Posez toutes les cartes sur l'écran. Demandez à chaque participant de choisir la carte qui lui parle le plus. Ne commentez pas le choix."
+    },
+    {
+      icon: "💬",
+      title: "Animer la parole",
+      body: "Pour chaque carte choisie : « Qu'est-ce que vous reconnaissez dans ce symptôme ? » Reformulez sans corriger. La carte est un miroir, pas une leçon."
+    },
+    {
+      icon: "🔗",
+      title: "Faire les liens",
+      body: "Invitez le groupe à regrouper les cartes : « Lesquelles vont ensemble selon vous ? » Ne donnez pas les catégories — laissez émerger."
+    },
+    {
+      icon: "📋",
+      title: "Clore et tracer",
+      body: `Demandez : « Quelle carte retenez-vous aujourd'hui et pourquoi ? » Photographiez l'écran à la fin — c'est la trace collective de la séance.`
+    },
   ];
 
-  document.getElementById("export-rows").innerHTML = rows.map(([label, val]) =>
-    `<div class="export-row">
-      <p class="export-row-label">${label}</p>
-      <p class="export-row-val">${val}</p>
-    </div>`
-  ).join("");
+  document.getElementById("tips-grid").innerHTML = tips.map(t => `
+    <div class="tip-card">
+      <div class="tip-icon">${t.icon}</div>
+      <div class="tip-title">${t.title}</div>
+      <div class="tip-body">${t.body}</div>
+    </div>
+  `).join("");
 }
 
-// Init taille display
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("taille-val").textContent = state.taille;
-  updatePublicReco();
-});
+// ── Session Mode ──────────────────────────────────────────────────────────────
+function launchDeck() {
+  const container = document.getElementById("session-cards");
+  container.innerHTML = "";
+  const title = document.getElementById("patho-name").value || "Diabète de type 2";
+  document.getElementById("session-title").textContent = title + " — " + state.cards.length + " cartes";
+
+  state.cards.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "deck-card";
+    div.style.minHeight = "160px";
+    div.innerHTML = `
+      <div class="di">${card.icon}</div>
+      <div class="dn">${card.name}</div>
+      <div class="dc">${card.cat}</div>
+      <div class="dd" style="display:none;margin-top:6px;">${card.desc}</div>
+    `;
+    div.addEventListener("click", () => {
+      const dd = div.querySelector(".dd");
+      const dn = div.querySelector(".dn");
+      const visible = dd.style.display !== "none";
+      dd.style.display = visible ? "none" : "block";
+      dn.style.display = visible ? "block" : "none";
+      div.style.borderColor = visible ? "var(--border)" : "var(--accent)";
+      div.style.background = visible ? "var(--surface)" : "rgba(93,191,130,.07)";
+    });
+    container.appendChild(div);
+  });
+
+  document.getElementById("session-mode").style.display = "block";
+  window.scrollTo(0,0);
+}
+
+function closeSession() {
+  document.getElementById("session-mode").style.display = "none";
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goTo(step) {
+  // on quitte step 2 → sync cats chips
+  if (state.step === 1) {
+    const on = [...document.querySelectorAll('.chip[data-g="cats"].on')].map(b => b.dataset.v);
+    state.cats = on;
+  }
+
+  document.getElementById(`panel-${state.step}`).classList.remove("active");
+  state.step = step;
+  document.getElementById(`panel-${step}`).classList.add("active");
+
+  if (step === 2) buildCardEditor();
+  if (step === 3) buildDeckPreview();
+  if (step === 4) buildSessionTips();
+
+  updateStepperUI();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function updateStepperUI() {
+  document.querySelectorAll(".step-node").forEach((node, i) => {
+    node.className = "step-node" + (i < state.step ? " done" : i === state.step ? " active" : "");
+  });
+  for (let i = 0; i < 4; i++) {
+    const line = document.getElementById(`line-${i}`);
+    if (line) line.className = "step-line" + (i < state.step ? " done" : "");
+  }
+}
 </script>
 </body>
 </html>
