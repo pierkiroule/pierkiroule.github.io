@@ -3,457 +3,330 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Créer mon jeu de cartes symptômes — ETP</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>Cartes symptômes ETP — Créateur</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
 :root{
-  --bg:#0f1a14;
-  --surface:#162019;
-  --card-bg:#1c2a20;
-  --border:#2a3d2e;
-  --accent:#5dbf82;
-  --accent-dim:#3a8055;
-  --accent-pale:rgba(93,191,130,.08);
-  --accent-pale2:rgba(93,191,130,.15);
-  --text:#e8f0ea;
-  --text-mid:#9ab09f;
-  --text-dim:#5a7060;
-  --warn:#e07b4a;
-  --warn-pale:rgba(224,123,74,.1);
-  --white:#ffffff;
-  --r:10px;
+  --bg:#faf8f5;
+  --surface:#ffffff;
+  --surface2:#f4f1ec;
+  --border:#e2ddd5;
+  --border-focus:#8b6f47;
+  --ink:#1c1714;
+  --ink-mid:#6b5e52;
+  --ink-dim:#a8998c;
+  --accent:#8b6f47;
+  --accent-light:#c4a882;
+  --accent-pale:#f5ede0;
+  --accent-pale2:#ede3d4;
+  --red:#c0392b;
+  --red-pale:#fdf3f2;
+  --green:#2d7a4f;
+  --green-pale:#f0f7f3;
+  --r:8px;
 }
 
 body{
   font-family:'DM Sans',sans-serif;
   background:var(--bg);
-  color:var(--text);
+  color:var(--ink);
   min-height:100vh;
-  line-height:1.6;
+  line-height:1.65;
 }
 
-/* ── Shell ── */
-.shell{
-  max-width:860px;
-  margin:0 auto;
-  padding:48px 24px 80px;
-}
+/* ── Layout ── */
+.shell{max-width:900px;margin:0 auto;padding:52px 28px 80px;}
 
 /* ── Header ── */
-.header{
-  margin-bottom:48px;
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:20px;
-  flex-wrap:wrap;
-}
-.header-left{}
-.badge{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  background:var(--accent-pale2);
-  border:1px solid var(--accent-dim);
-  border-radius:20px;
-  padding:4px 13px;
-  font-size:11px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--accent);
-  margin-bottom:14px;
+.header{margin-bottom:52px;}
+.eyebrow{
   font-family:'DM Sans',sans-serif;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  color:var(--accent-light);
   font-weight:500;
+  margin-bottom:16px;
 }
-.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);}
 h1{
-  font-family:'DM Serif Display',serif;
-  font-size:32px;
-  color:var(--text);
-  line-height:1.15;
-  margin-bottom:8px;
+  font-family:'Fraunces',serif;
+  font-size:38px;
+  font-weight:300;
+  color:var(--ink);
+  line-height:1.1;
+  margin-bottom:10px;
 }
-.header-sub{
-  font-size:14px;
-  color:var(--text-mid);
-  max-width:460px;
-  line-height:1.6;
-}
+h1 em{font-style:italic;color:var(--accent);}
+.header-sub{font-size:15px;color:var(--ink-mid);max-width:480px;}
 
 /* ── Stepper ── */
 .stepper{
-  display:flex;
-  align-items:center;
-  gap:0;
-  margin-bottom:40px;
-  overflow-x:auto;
-  padding-bottom:4px;
+  display:flex;align-items:flex-start;gap:0;
+  margin-bottom:44px;
+  padding-bottom:2px;
 }
-.step-node{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:7px;
-  flex-shrink:0;
-}
-.step-circle{
-  width:36px;height:36px;
-  border-radius:50%;
+.snode{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;}
+.scircle{
+  width:38px;height:38px;border-radius:50%;
   border:2px solid var(--border);
   background:var(--surface);
   display:flex;align-items:center;justify-content:center;
-  font-family:'DM Serif Display',serif;
-  font-size:14px;
-  color:var(--text-dim);
-  transition:all .3s;
-  position:relative;
-  z-index:1;
+  font-family:'Fraunces',serif;font-size:15px;font-weight:500;
+  color:var(--ink-dim);
+  transition:all .35s cubic-bezier(.4,0,.2,1);
 }
-.step-node.active .step-circle{
-  border-color:var(--accent);
-  background:var(--accent);
-  color:var(--bg);
-}
-.step-node.done .step-circle{
-  border-color:var(--accent-dim);
-  background:var(--accent-dim);
-  color:var(--white);
-}
-.step-name{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:var(--text-dim);
-  font-weight:500;
-  white-space:nowrap;
-}
-.step-node.active .step-name{color:var(--accent);}
-.step-node.done .step-name{color:var(--accent-dim);}
-.step-line{
-  flex:1;
-  height:2px;
-  background:var(--border);
-  min-width:24px;
-  margin-bottom:23px;
-  transition:background .3s;
-}
-.step-line.done{background:var(--accent-dim);}
+.snode.active .scircle{border-color:var(--accent);background:var(--accent);color:#fff;}
+.snode.done .scircle{border-color:var(--accent-light);background:var(--accent-pale);color:var(--accent);}
+.snode.done .scircle::after{content:"✓";font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;}
+.snode.done .scircle span{display:none;}
+.sname{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-dim);font-weight:500;white-space:nowrap;transition:color .3s;}
+.snode.active .sname{color:var(--accent);}
+.snode.done .sname{color:var(--accent-light);}
+.sline{flex:1;height:2px;background:var(--border);min-width:20px;margin-bottom:26px;transition:background .4s;}
+.sline.done{background:var(--accent-light);}
 
 /* ── Panel ── */
-.panel{
-  background:var(--card-bg);
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:36px 40px;
-  display:none;
-}
-.panel.active{display:block;animation:fadeUp .3s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px 44px;display:none;}
+.panel.active{display:block;animation:up .28s ease;}
+@keyframes up{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-.panel-title{
-  font-family:'DM Serif Display',serif;
-  font-size:22px;
-  color:var(--text);
-  margin-bottom:6px;
-}
-.panel-sub{
-  font-size:13.5px;
-  color:var(--text-mid);
-  margin-bottom:28px;
-  font-style:italic;
-}
+.ptitle{font-family:'Fraunces',serif;font-size:24px;font-weight:500;color:var(--ink);margin-bottom:5px;}
+.psub{font-size:13.5px;color:var(--ink-mid);margin-bottom:30px;font-style:italic;}
 
-/* ── Form elements ── */
-label.field-label{
-  display:block;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--text-mid);
-  font-weight:500;
-  margin-bottom:8px;
-  margin-top:22px;
+/* ── Field ── */
+.flabel{
+  display:block;font-size:10.5px;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink-mid);font-weight:500;
+  margin-bottom:8px;margin-top:24px;
 }
-label.field-label:first-of-type{margin-top:0;}
+.flabel:first-child{margin-top:0;}
+.fhint{font-size:12px;color:var(--ink-dim);margin-bottom:8px;margin-top:-4px;}
 
 input[type=text],textarea,select{
-  width:100%;
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:6px;
-  padding:11px 14px;
-  font-family:'DM Sans',sans-serif;
-  font-size:14px;
-  color:var(--text);
-  outline:none;
-  transition:border-color .2s;
-  resize:vertical;
+  width:100%;background:var(--surface2);
+  border:1.5px solid var(--border);border-radius:6px;
+  padding:11px 15px;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);
+  outline:none;transition:border-color .2s,background .2s;resize:vertical;
 }
-input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent);}
-select option{background:var(--surface);}
-input[type=text]::placeholder,textarea::placeholder{color:var(--text-dim);}
+input[type=text]:focus,textarea:focus,select:focus{
+  border-color:var(--border-focus);background:#fff;
+}
+input[type=text]::placeholder,textarea::placeholder{color:var(--ink-dim);}
 
-/* ── Chip toggles ── */
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+/* ── Chips ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;}
 .chip{
-  padding:7px 16px;
-  border-radius:20px;
-  border:1.5px solid var(--border);
-  background:transparent;
-  color:var(--text-mid);
-  font-family:'DM Sans',sans-serif;
-  font-size:13px;
-  cursor:pointer;
-  transition:all .2s;
-  font-weight:400;
+  padding:7px 16px;border-radius:20px;
+  border:1.5px solid var(--border);background:var(--surface2);
+  color:var(--ink-mid);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:400;
+  cursor:pointer;transition:all .18s;
 }
 .chip:hover{border-color:var(--accent);color:var(--accent);}
-.chip.on{border-color:var(--accent);background:var(--accent-pale2);color:var(--accent);}
+.chip.on{border-color:var(--accent);background:var(--accent-pale);color:var(--accent);font-weight:500;}
 
-/* ── Info box ── */
-.infobox{
-  background:var(--accent-pale);
-  border:1px solid var(--accent-dim);
-  border-radius:6px;
-  padding:13px 16px;
-  font-size:13px;
-  color:var(--accent);
-  margin-top:18px;
-  line-height:1.6;
-}
-.warnbox{
-  background:var(--warn-pale);
-  border:1px solid var(--warn);
-  border-radius:6px;
-  padding:13px 16px;
-  font-size:13px;
-  color:var(--warn);
-  margin-top:18px;
-  line-height:1.6;
-}
+/* ── Info / warn boxes ── */
+.ibox,.wbox{border-radius:6px;padding:13px 16px;font-size:13px;line-height:1.6;margin-top:16px;}
+.ibox{background:var(--accent-pale);border:1px solid var(--accent-light);color:var(--accent);}
+.wbox{background:var(--red-pale);border:1px solid #e8b4b0;color:var(--red);}
+.gbox{background:var(--green-pale);border:1px solid #a8d4bc;color:var(--green);border-radius:6px;padding:13px 16px;font-size:13px;line-height:1.6;margin-top:16px;}
 
-/* ── Card editor ── */
-.card-editor-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:4px;
-}
-.card-editor-item{
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:8px;
-  padding:14px;
+/* ── Section separator ── */
+.sep{height:1px;background:var(--border);margin:28px 0;}
+
+/* ── Step 1: Contexte ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:580px){.two-col{grid-template-columns:1fr;}}
+
+/* ── Step 2: Catégories ── */
+.cat-list{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.cat-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:8px;padding:13px 16px;
   transition:border-color .2s;
-  cursor:pointer;
 }
-.card-editor-item:hover{border-color:var(--accent-dim);}
-.card-editor-item.selected{border-color:var(--accent);}
-.card-editor-item.disabled{opacity:.35;pointer-events:none;}
+.cat-row:focus-within{border-color:var(--border-focus);}
+.cat-row-icon{font-size:20px;flex-shrink:0;cursor:pointer;}
+.cat-row-inputs{flex:1;display:flex;gap:10px;}
+.cat-row-inputs input{margin:0;background:transparent;border-color:transparent;padding:6px 8px;}
+.cat-row-inputs input:focus{border-color:var(--border-focus);background:#fff;}
+.cat-del{
+  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);
+  background:transparent;color:var(--ink-dim);font-size:15px;
+  cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.cat-del:hover{border-color:var(--red);color:var(--red);background:var(--red-pale);}
+.btn-add-cat{
+  margin-top:10px;padding:9px 18px;border-radius:6px;
+  border:1.5px dashed var(--border);background:transparent;
+  color:var(--ink-mid);font-family:'DM Sans',sans-serif;font-size:13px;
+  cursor:pointer;transition:all .2s;width:100%;
+}
+.btn-add-cat:hover{border-color:var(--accent);color:var(--accent);}
 
-.card-num{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--text-dim);
-  margin-bottom:5px;
-  font-weight:500;
+/* ── Emoji picker ── */
+.emoji-picker-wrap{position:relative;display:inline-block;}
+.emoji-picker-trigger{
+  font-size:20px;width:38px;height:38px;border-radius:6px;
+  border:1.5px solid var(--border);background:var(--surface2);
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
 }
-.card-name-input{
-  width:100%;
-  background:transparent;
-  border:none;
-  border-bottom:1px solid var(--border);
-  border-radius:0;
-  padding:4px 0;
-  font-family:'DM Serif Display',serif;
-  font-size:16px;
-  color:var(--text);
-  outline:none;
-  margin-bottom:8px;
+.emoji-picker-trigger:hover{border-color:var(--accent);}
+.emoji-dropdown{
+  position:absolute;top:44px;left:0;z-index:50;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:8px;padding:10px;
+  display:grid;grid-template-columns:repeat(7,32px);gap:4px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);
 }
-.card-name-input:focus{border-bottom-color:var(--accent);}
-.card-emoji-row{display:flex;gap:6px;flex-wrap:wrap;}
-.card-emoji-btn{
-  width:28px;height:28px;
-  border-radius:6px;
-  border:1px solid var(--border);
-  background:transparent;
-  font-size:14px;
-  cursor:pointer;
-  transition:all .2s;
+.emoji-dropdown button{
+  width:32px;height:32px;border:none;background:transparent;
+  font-size:17px;cursor:pointer;border-radius:4px;transition:background .15s;
+}
+.emoji-dropdown button:hover{background:var(--accent-pale);}
+
+/* ── Step 3: Cartes ── */
+.card-bank{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:620px){.card-bank{grid-template-columns:1fr;}}
+.card-item{
+  background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:8px;padding:14px 16px;
+  display:flex;align-items:flex-start;gap:10px;
+  transition:border-color .2s;
+}
+.card-item:focus-within{border-color:var(--border-focus);}
+.card-emoji-pick{
+  font-size:22px;width:40px;height:40px;flex-shrink:0;
+  border-radius:6px;border:1.5px solid var(--border);
+  background:var(--surface);cursor:pointer;
   display:flex;align-items:center;justify-content:center;
+  transition:all .2s;position:relative;
 }
-.card-emoji-btn:hover,.card-emoji-btn.on{background:var(--accent-pale2);border-color:var(--accent);}
+.card-emoji-pick:hover{border-color:var(--accent);}
+.card-fields{flex:1;display:flex;flex-direction:column;gap:8px;}
+.card-fields input{padding:7px 10px;font-size:13px;}
+.card-cat-select{
+  padding:5px 8px;font-size:12px;
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:4px;color:var(--ink-mid);
+  font-family:'DM Sans',sans-serif;
+}
+.card-del{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid var(--border);background:transparent;
+  color:var(--ink-dim);font-size:13px;cursor:pointer;
+  transition:all .18s;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.card-del:hover{border-color:var(--red);color:var(--red);background:var(--red-pale);}
+.btn-add-card{
+  margin-top:10px;padding:10px;border-radius:6px;
+  border:1.5px dashed var(--border);background:transparent;
+  color:var(--ink-mid);font-family:'DM Sans',sans-serif;font-size:13px;
+  cursor:pointer;transition:all .2s;width:100%;text-align:center;
+}
+.btn-add-card:hover{border-color:var(--accent);color:var(--accent);}
+.card-count{font-size:12px;color:var(--ink-dim);margin-top:6px;}
 
-/* ── Preview cards ── */
-.preview-area{
-  margin-top:28px;
-}
-.preview-title{
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--text-dim);
-  font-weight:500;
-  margin-bottom:14px;
-}
-.cards-grid{
+/* ── Step 4: Aperçu ── */
+.preview-deck{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
   gap:12px;
 }
-.symptom-card{
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:10px;
-  padding:18px 14px 16px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  cursor:default;
-  transition:all .25s;
-  min-height:110px;
-  position:relative;
+.pcard{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:10px;padding:20px 14px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:9px;
+  cursor:pointer;transition:all .22s;min-height:120px;
+  user-select:none;
 }
-.symptom-card:hover{
-  border-color:var(--accent-dim);
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(0,0,0,.3);
+.pcard:hover{border-color:var(--accent-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.07);}
+.pcard.flipped{border-color:var(--accent);background:var(--accent-pale);}
+.pcard .pi{font-size:28px;transition:transform .2s;}
+.pcard:hover .pi{transform:scale(1.1);}
+.pcard .pn{font-family:'Fraunces',serif;font-size:13px;font-weight:500;color:var(--ink);text-align:center;line-height:1.3;}
+.pcard .pc{font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-dim);text-align:center;}
+.pcard .pd{font-size:11px;color:var(--ink-mid);text-align:center;line-height:1.4;font-style:italic;margin-top:2px;}
+.cat-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--accent-pale2);border:1px solid var(--accent-light);
+  border-radius:20px;padding:4px 12px;
+  font-size:11px;color:var(--accent);font-weight:500;margin:3px;
 }
-.symptom-card .card-icon{font-size:26px;line-height:1;}
-.symptom-card .card-label{
-  font-family:'DM Serif Display',serif;
-  font-size:13px;
-  color:var(--text);
-  text-align:center;
-  line-height:1.3;
-}
-.symptom-card .card-cat{
-  font-size:9px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--text-dim);
-  font-weight:500;
-  text-align:center;
-}
+
+/* ── Step 5: Séance ── */
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:580px){.tips-grid{grid-template-columns:1fr;}}
+.tip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:18px 20px;}
+.tip-ico{font-size:22px;margin-bottom:10px;}
+.tip-t{font-family:'Fraunces',serif;font-size:15px;font-weight:500;margin-bottom:5px;color:var(--ink);}
+.tip-b{font-size:13px;color:var(--ink-mid);line-height:1.6;}
 
 /* ── Nav ── */
 .nav{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:32px;
-  padding-top:24px;
-  border-top:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:32px;padding-top:24px;border-top:1px solid var(--border);
 }
 .btn{
-  font-family:'DM Sans',sans-serif;
-  font-size:14px;
-  font-weight:600;
-  padding:12px 28px;
-  border-radius:6px;
-  cursor:pointer;
-  border:none;
-  transition:all .2s;
-  letter-spacing:.02em;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;
+  padding:11px 28px;border-radius:6px;cursor:pointer;border:none;
+  transition:all .2s;letter-spacing:.01em;
 }
-.btn-primary{background:var(--accent);color:var(--bg);}
-.btn-primary:hover{background:#6fd498;}
-.btn-primary:disabled{background:var(--border);color:var(--text-dim);cursor:not-allowed;}
-.btn-ghost{background:transparent;color:var(--text-mid);border:1.5px solid var(--border);}
-.btn-ghost:hover{border-color:var(--accent-dim);color:var(--accent);}
+.btn-p{background:var(--accent);color:#fff;}
+.btn-p:hover{background:#7a6040;}
+.btn-p:disabled{background:var(--border);color:var(--ink-dim);cursor:not-allowed;}
+.btn-g{background:transparent;color:var(--ink-mid);border:1.5px solid var(--border);}
+.btn-g:hover{border-color:var(--accent);color:var(--accent);}
+.btn-launch{background:var(--ink);color:#fff;padding:13px 32px;font-size:15px;}
+.btn-launch:hover{background:#3a2e25;}
 
-/* ── Step 4: full preview ── */
-.deck-preview{
+/* ── Session overlay ── */
+#session-overlay{
+  display:none;position:fixed;inset:0;
+  background:#1c1714;z-index:200;overflow-y:auto;
+}
+.session-shell{max-width:1100px;margin:0 auto;padding:36px 28px 60px;}
+.session-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;gap:16px;flex-wrap:wrap;}
+.session-title{font-family:'Fraunces',serif;font-size:28px;font-weight:300;color:#f5f0e8;}
+.session-title em{font-style:italic;color:#c4a882;}
+.session-close{
+  background:transparent;border:1.5px solid #3a3028;color:#8a7a6a;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  padding:9px 20px;border-radius:6px;cursor:pointer;transition:all .2s;
+  flex-shrink:0;
+}
+.session-close:hover{border-color:#c4a882;color:#c4a882;}
+.session-hint{font-size:13px;color:#7a6a5a;margin-bottom:28px;font-style:italic;}
+.session-deck{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
   gap:14px;
 }
-.deck-card{
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:12px;
-  padding:22px 14px 18px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:11px;
-  transition:all .25s;
-  cursor:pointer;
+.scard{
+  background:#2a2018;border:1.5px solid #3a3028;
+  border-radius:12px;padding:26px 16px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  cursor:pointer;transition:all .25s;min-height:160px;
+  user-select:none;
 }
-.deck-card:hover{
-  border-color:var(--accent);
-  transform:translateY(-3px);
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-}
-.deck-card .di{font-size:32px;}
-.deck-card .dn{
-  font-family:'DM Serif Display',serif;
-  font-size:14px;
-  color:var(--text);
-  text-align:center;
-  line-height:1.3;
-}
-.deck-card .dc{
-  font-size:9px;
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  color:var(--text-dim);
-  font-weight:500;
-  text-align:center;
-}
-.deck-card .dd{
-  font-size:11px;
-  color:var(--text-mid);
-  text-align:center;
-  line-height:1.4;
-  font-style:italic;
-}
+.scard:hover{border-color:#8b6f47;transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.scard.revealed{border-color:#c4a882;background:#2f2618;}
+.scard .si{font-size:34px;transition:transform .2s;}
+.scard:hover .si{transform:scale(1.1);}
+.scard .sn{font-family:'Fraunces',serif;font-size:15px;font-weight:400;color:#e8e0d0;text-align:center;line-height:1.3;}
+.scard .sc{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#5a4a3a;text-align:center;}
+.scard .sd{font-size:11.5px;color:#a89880;text-align:center;line-height:1.5;font-style:italic;}
+.session-cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.scat-pill{background:#2a2018;border:1px solid #3a3028;border-radius:20px;padding:5px 14px;font-size:11px;color:#8b6f47;font-weight:500;}
 
-/* ── Step 5: session tips ── */
-.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;}
-.tip-card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:18px;
-}
-.tip-icon{font-size:22px;margin-bottom:10px;}
-.tip-title{
-  font-family:'DM Serif Display',serif;
-  font-size:15px;
-  color:var(--text);
-  margin-bottom:6px;
-}
-.tip-body{font-size:13px;color:var(--text-mid);line-height:1.6;}
-
-/* ── Summary bar ── */
-.summary-bar{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-bottom:28px;
-}
-.summary-pill{
-  background:var(--accent-pale2);
-  border:1px solid var(--accent-dim);
-  border-radius:20px;
-  padding:5px 14px;
-  font-size:12px;
-  color:var(--accent);
-  font-weight:500;
-}
-
-/* ── Responsive ── */
-@media(max-width:600px){
-  .panel{padding:24px 18px;}
-  .card-editor-grid{grid-template-columns:1fr;}
-  .tips-grid{grid-template-columns:1fr;}
-  h1{font-size:26px;}
+@media(max-width:520px){
+  .panel{padding:26px 20px;}
+  h1{font-size:28px;}
 }
 </style>
 </head>
@@ -461,442 +334,532 @@ input[type=text]::placeholder,textarea::placeholder{color:var(--text-dim);}
 
 <div class="shell">
 
+  <!-- Header -->
   <div class="header">
-    <div class="header-left">
-      <div class="badge"><div class="badge-dot"></div>Outil ETP · Cartes symptômes</div>
-      <h1>Construire mon jeu<br>de cartes symptômes</h1>
-      <p class="header-sub">Un wizard en 5 étapes pour créer un jeu de 15 cartes adapté à votre séance et à votre public.</p>
-    </div>
+    <p class="eyebrow">ETP · Outil de création</p>
+    <h1>Créer mon jeu de<br><em>cartes symptômes</em></h1>
+    <p class="header-sub">Construisez un jeu entièrement personnalisé — pathologie, catégories, symptômes, icônes — prêt à projeter en séance.</p>
   </div>
 
   <!-- Stepper -->
   <div class="stepper" id="stepper">
-    <div class="step-node active" data-step="0">
-      <div class="step-circle">1</div>
-      <span class="step-name">Contexte</span>
-    </div>
-    <div class="step-line" id="line-0"></div>
-    <div class="step-node" data-step="1">
-      <div class="step-circle">2</div>
-      <span class="step-name">Pathologie</span>
-    </div>
-    <div class="step-line" id="line-1"></div>
-    <div class="step-node" data-step="2">
-      <div class="step-circle">3</div>
-      <span class="step-name">Cartes</span>
-    </div>
-    <div class="step-line" id="line-2"></div>
-    <div class="step-node" data-step="3">
-      <div class="step-circle">4</div>
-      <span class="step-name">Aperçu</span>
-    </div>
-    <div class="step-line" id="line-3"></div>
-    <div class="step-node" data-step="4">
-      <div class="step-circle">5</div>
-      <span class="step-name">Animer</span>
-    </div>
+    <div class="snode active" data-s="0"><div class="scircle"><span>1</span></div><span class="sname">Contexte</span></div>
+    <div class="sline" id="l0"></div>
+    <div class="snode" data-s="1"><div class="scircle"><span>2</span></div><span class="sname">Catégories</span></div>
+    <div class="sline" id="l1"></div>
+    <div class="snode" data-s="2"><div class="scircle"><span>3</span></div><span class="sname">Cartes</span></div>
+    <div class="sline" id="l2"></div>
+    <div class="snode" data-s="3"><div class="scircle"><span>4</span></div><span class="sname">Aperçu</span></div>
+    <div class="sline" id="l3"></div>
+    <div class="snode" data-s="4"><div class="scircle"><span>5</span></div><span class="sname">Séance</span></div>
   </div>
 
-  <!-- ───────────────────────────────────────────
+  <!-- ══════════════════════════════════════
        ÉTAPE 1 — Contexte
-  ─────────────────────────────────────────────── -->
-  <div class="panel active" id="panel-0">
-    <h2 class="panel-title">Définir le contexte de votre séance</h2>
-    <p class="panel-sub">Ces informations vont orienter la sélection et le nombre de cartes.</p>
+  ══════════════════════════════════════════ -->
+  <div class="panel active" id="p0">
+    <h2 class="ptitle">Contexte de la séance</h2>
+    <p class="psub">Ces informations guideront la construction du jeu.</p>
 
-    <label class="field-label">Objectif de la séance</label>
-    <div class="chips" id="chips-objectif">
-      <button class="chip" data-g="objectif" data-v="Identifier les symptômes">Identifier les symptômes</button>
-      <button class="chip" data-g="objectif" data-v="Comprendre les causes">Comprendre les causes</button>
-      <button class="chip" data-g="objectif" data-v="Savoir réagir">Savoir réagir</button>
-      <button class="chip" data-g="objectif" data-v="Anticiper et prévenir">Anticiper et prévenir</button>
+    <label class="flabel">Nom de la pathologie ou problématique</label>
+    <input type="text" id="patho" placeholder="ex : insuffisance cardiaque, asthme, lombalgie chronique…"/>
+
+    <label class="flabel">Titre du jeu de cartes <span style="color:var(--ink-dim);font-weight:300">(affiché en séance)</span></label>
+    <input type="text" id="jeu-titre" placeholder="ex : Comment mon corps me parle"/>
+
+    <div class="sep"></div>
+
+    <label class="flabel">Objectif pédagogique de la séance</label>
+    <div class="chips" id="c-objectif">
+      <button class="chip" data-g="objectif" data-v="Identifier">Identifier les symptômes</button>
+      <button class="chip" data-g="objectif" data-v="Comprendre">Comprendre les causes</button>
+      <button class="chip" data-g="objectif" data-v="Agir">Savoir réagir</button>
+      <button class="chip" data-g="objectif" data-v="Anticiper">Anticiper et prévenir</button>
+      <button class="chip" data-g="objectif" data-v="Communiquer">Communiquer avec l'équipe</button>
     </div>
 
-    <label class="field-label">Taille du groupe</label>
-    <div class="chips" id="chips-groupe">
-      <button class="chip" data-g="groupe" data-v="Petit (2–5)">Petit (2–5)</button>
-      <button class="chip" data-g="groupe" data-v="Moyen (6–10)">Moyen (6–10)</button>
-      <button class="chip" data-g="groupe" data-v="Grand (11–15)">Grand (11–15)</button>
+    <div class="two-col" style="margin-top:4px">
+      <div>
+        <label class="flabel">Taille du groupe</label>
+        <div class="chips">
+          <button class="chip" data-g="groupe" data-v="2–5">2 – 5</button>
+          <button class="chip" data-g="groupe" data-v="6–10">6 – 10</button>
+          <button class="chip" data-g="groupe" data-v="11–15">11 – 15</button>
+        </div>
+      </div>
+      <div>
+        <label class="flabel">Littératie en santé</label>
+        <div class="chips">
+          <button class="chip" data-g="litteratie" data-v="Faible">Faible</button>
+          <button class="chip" data-g="litteratie" data-v="Moyenne">Moyenne</button>
+          <button class="chip" data-g="litteratie" data-v="Élevée">Élevée</button>
+        </div>
+      </div>
     </div>
 
-    <label class="field-label">Niveau de littératie du groupe</label>
-    <div class="chips" id="chips-litteratie">
-      <button class="chip" data-g="litteratie" data-v="Faible">Faible</button>
-      <button class="chip" data-g="litteratie" data-v="Moyen">Moyen</button>
-      <button class="chip" data-g="litteratie" data-v="Élevé">Élevé</button>
-    </div>
-
-    <div id="context-reco" style="display:none"></div>
+    <div id="ctx-hint" style="display:none"></div>
 
     <div class="nav">
       <div></div>
-      <button class="btn btn-primary" id="next-0" onclick="goTo(1)" disabled>Continuer →</button>
+      <button class="btn btn-p" id="btn-next-0" onclick="goTo(1)" disabled>Continuer →</button>
     </div>
   </div>
 
-  <!-- ───────────────────────────────────────────
-       ÉTAPE 2 — Pathologie
-  ─────────────────────────────────────────────── -->
-  <div class="panel" id="panel-1">
-    <h2 class="panel-title">Votre pathologie de référence</h2>
-    <p class="panel-sub">L'exemple proposé est le diabète de type 2. Vous pouvez le garder ou le personnaliser.</p>
+  <!-- ══════════════════════════════════════
+       ÉTAPE 2 — Catégories
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="p1">
+    <h2 class="ptitle">Définir les catégories</h2>
+    <p class="psub">Organisez les symptômes en groupes cohérents. 3 à 5 catégories est optimal pour une séance.</p>
 
-    <label class="field-label">Pathologie</label>
-    <input type="text" id="patho-name" value="Diabète de type 2" placeholder="ex : diabète de type 2"/>
+    <label class="flabel">Vos catégories</label>
+    <p class="fhint">Donnez un nom et une couleur symbolique (icône) à chaque catégorie.</p>
 
-    <label class="field-label">Profil du patient type</label>
-    <input type="text" id="patho-profil" value="Adulte, traitement oral ou insuline, suivi ambulatoire" placeholder="ex : adulte, traitement oral…"/>
+    <div class="cat-list" id="cat-list"></div>
+    <button class="btn-add-cat" onclick="addCat()">+ Ajouter une catégorie</button>
 
-    <label class="field-label">Catégories de symptômes à couvrir</label>
-    <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Cochez les catégories que vous voulez représenter dans le jeu.</p>
-    <div class="chips" id="chips-cats">
-      <button class="chip on" data-g="cats" data-v="Hyperglycémie">Hyperglycémie</button>
-      <button class="chip on" data-g="cats" data-v="Hypoglycémie">Hypoglycémie</button>
-      <button class="chip on" data-g="cats" data-v="Complications">Complications</button>
-      <button class="chip on" data-g="cats" data-v="Bien-être & quotidien">Bien-être & quotidien</button>
-      <button class="chip" data-g="cats" data-v="Signes d'alarme">Signes d'alarme</button>
-    </div>
-
-    <div class="infobox" style="margin-top:20px">
-      💡 Pour 15 cartes : visez 3 à 4 catégories avec 3 à 5 cartes chacune. Trop de catégories fragmente la séance.
+    <div class="ibox" style="margin-top:20px">
+      💡 Conseil : nommez les catégories du point de vue du patient, pas du médecin. « Ce que je ressens » plutôt que « Signes cliniques ».
     </div>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="goTo(0)">← Retour</button>
-      <button class="btn btn-primary" onclick="goTo(2)">Continuer →</button>
+      <button class="btn btn-g" onclick="goTo(0)">← Retour</button>
+      <button class="btn btn-p" id="btn-next-1" onclick="goTo(2)">Créer les cartes →</button>
     </div>
   </div>
 
-  <!-- ───────────────────────────────────────────
-       ÉTAPE 3 — Créer / éditer les cartes
-  ─────────────────────────────────────────────── -->
-  <div class="panel" id="panel-2">
-    <h2 class="panel-title">Composer votre jeu de 15 cartes</h2>
-    <p class="panel-sub">Chaque carte porte un nom de symptôme. Modifiez, remplacez, choisissez une icône.</p>
+  <!-- ══════════════════════════════════════
+       ÉTAPE 3 — Cartes
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="p2">
+    <h2 class="ptitle">Composer les cartes</h2>
+    <p class="psub">Ajoutez chaque symptôme : nom, icône, catégorie, et une courte description facultative.</p>
 
-    <div id="card-editor-grid" class="card-editor-grid"></div>
+    <div class="card-bank" id="card-bank"></div>
+    <p class="card-count" id="card-count"></p>
+    <button class="btn-add-card" onclick="addCard()">+ Ajouter une carte</button>
 
-    <div id="count-bar" style="margin-top:14px;font-size:13px;color:var(--text-mid);"></div>
+    <div id="card-warn" style="display:none"></div>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="goTo(1)">← Retour</button>
-      <button class="btn btn-primary" onclick="goTo(3)">Voir l'aperçu →</button>
+      <button class="btn btn-g" onclick="goTo(1)">← Retour</button>
+      <button class="btn btn-p" id="btn-next-2" onclick="goTo(3)">Voir l'aperçu →</button>
     </div>
   </div>
 
-  <!-- ───────────────────────────────────────────
-       ÉTAPE 4 — Aperçu du jeu complet
-  ─────────────────────────────────────────────── -->
-  <div class="panel" id="panel-3">
-    <h2 class="panel-title">Votre jeu de cartes</h2>
-    <p class="panel-sub">Voici les 15 cartes telles qu'elles apparaîtront sur écran pendant la séance. Cliquez pour les retourner.</p>
+  <!-- ══════════════════════════════════════
+       ÉTAPE 4 — Aperçu
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="p3">
+    <h2 class="ptitle">Aperçu du jeu</h2>
+    <p class="psub">Voici votre jeu complet. Cliquez sur une carte pour révéler sa description.</p>
 
-    <div id="summary-bar" class="summary-bar"></div>
-    <div class="deck-preview" id="deck-preview"></div>
+    <div id="preview-cats" style="margin-bottom:20px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+    <div class="preview-deck" id="preview-deck"></div>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="goTo(2)">← Modifier</button>
-      <button class="btn btn-primary" onclick="goTo(4)">Préparer la séance →</button>
+      <button class="btn btn-g" onclick="goTo(2)">← Modifier</button>
+      <button class="btn btn-p" onclick="goTo(4)">Préparer la séance →</button>
     </div>
   </div>
 
-  <!-- ───────────────────────────────────────────
-       ÉTAPE 5 — Conseils d'animation
-  ─────────────────────────────────────────────── -->
-  <div class="panel" id="panel-4">
-    <h2 class="panel-title">Prêt à animer</h2>
-    <p class="panel-sub">Votre jeu est constitué. Voici les points de vigilance pour bien utiliser ces cartes en séance.</p>
+  <!-- ══════════════════════════════════════
+       ÉTAPE 5 — Animer
+  ══════════════════════════════════════════ -->
+  <div class="panel" id="p4">
+    <h2 class="ptitle">Prêt à animer</h2>
+    <p class="psub">Votre jeu est constitué. Quelques repères pour bien utiliser les cartes en séance.</p>
 
-    <div id="session-summary" class="summary-bar" style="margin-bottom:20px"></div>
+    <div id="session-recap" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;"></div>
 
-    <div class="tips-grid" id="tips-grid"></div>
-
-    <div class="warnbox" style="margin-top:18px">
-      <strong>⚠ À ne pas faire :</strong> ne commencez pas par définir les symptômes. Laissez d'abord les patients choisir, trier, réagir. La carte est un déclencheur de parole — pas un support de cours.
+    <div class="tips-grid">
+      <div class="tip">
+        <div class="tip-ico">🃏</div>
+        <div class="tip-t">Présenter les cartes</div>
+        <div class="tip-b">Affichez toutes les cartes sans les commenter. Laissez les participants regarder, pointer, s'interroger. Le silence initial est précieux.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-ico">💬</div>
+        <div class="tip-t">Lancer la parole</div>
+        <div class="tip-b">Demandez à chacun de choisir <em>une</em> carte qui lui parle. Pas la plus grave — celle qui résonne. Ne corrigez pas les choix.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-ico">🔗</div>
+        <div class="tip-t">Construire ensemble</div>
+        <div class="tip-b">Invitez le groupe à regrouper les cartes : « Lesquelles vont ensemble selon vous ? » Les catégories émergent du groupe, pas de l'animateur.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-ico">📸</div>
+        <div class="tip-t">Tracer et clore</div>
+        <div class="tip-b">Clôturez par : « Quelle carte retenez-vous aujourd'hui ? » Capturez l'écran final — c'est la trace collective de la séance.</div>
+      </div>
     </div>
 
-    <div class="infobox" style="margin-top:14px">
-      ✓ Votre jeu est prêt. Projetez-le sur écran, distribuez la parole, reformulez sans juger.
+    <div class="wbox">
+      <strong>Ne pas faire :</strong> commencer par définir ou expliquer les symptômes. La carte est un déclencheur de parole — pas un support de cours magistral.
+    </div>
+    <div class="gbox">
+      ✓ Jeu prêt. Projetez l'écran, distribuez la parole, reformulez sans juger.
     </div>
 
     <div class="nav">
-      <button class="btn btn-ghost" onclick="goTo(3)">← Aperçu</button>
-      <button class="btn btn-primary" onclick="launchDeck()">🎴 Lancer la séance</button>
+      <button class="btn btn-g" onclick="goTo(3)">← Aperçu</button>
+      <button class="btn btn-launch" onclick="launchSession()">🎴 Lancer la séance</button>
     </div>
   </div>
 
 </div><!-- /shell -->
 
-<!-- ── SÉANCE MODE ── -->
-<div id="session-mode" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;">
-  <div style="max-width:980px;margin:0 auto;padding:36px 24px 60px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;">
+<!-- ══════════════════════════════════════
+     SESSION OVERLAY
+══════════════════════════════════════════ -->
+<div id="session-overlay">
+  <div class="session-shell">
+    <div class="session-header">
       <div>
-        <div class="badge"><div class="badge-dot"></div>Mode séance</div>
-        <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);margin-top:8px;" id="session-title">Jeu de cartes</h2>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:#8b6f47;margin-bottom:10px;font-weight:500">Mode séance · ETP</div>
+        <div class="session-title" id="s-title">Mon jeu de cartes</div>
+        <div style="font-size:13px;color:#5a4a3a;margin-top:4px" id="s-patho"></div>
       </div>
-      <button class="btn btn-ghost" onclick="closeSession()">✕ Quitter</button>
+      <button class="session-close" onclick="closeSession()">✕ Quitter</button>
     </div>
-    <p style="font-size:13px;color:var(--text-mid);margin-bottom:28px;font-style:italic;">Cliquez sur une carte pour la révéler. Cliquez à nouveau pour la retourner.</p>
-    <div class="deck-preview" id="session-cards" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px;"></div>
+    <p class="session-hint">Cliquez sur une carte pour la révéler. Recliquez pour la retourner.</p>
+    <div class="session-cats" id="s-cats"></div>
+    <div class="session-deck" id="s-deck"></div>
   </div>
 </div>
 
+<!-- EMOJI PICKER (shared, positioned dynamically) -->
+<div id="emoji-dropdown" class="emoji-dropdown" style="display:none;position:fixed;z-index:300;"></div>
+
 <script>
-// ── State ──────────────────────────────────────────────────────────────────────
-const state = {
+// ── EMOJI BANK ─────────────────────────────────────────────────────────────────
+const EMOJIS = [
+  "😴","😤","😰","🥵","🥶","😵","🤕","🤒","😣","😩","🤢","😷",
+  "💧","🌡️","❤️","💔","💓","🫀","🫁","🧠","🦷","🦴","👁","👂","👃","🖐",
+  "🦵","🦶","💪","🤲","🩺","💊","🩹","🩻","🔴","🟡","🟢","⚠️","⚡","🔥",
+  "❄️","💦","🌀","⬆️","⬇️","🔄","⏱","🛌","🍽","🚶","🏃","🧘",
+  "📊","📉","🔋","🔌","🌙","☀️","🌧","✨","💫","🫨","🫸"
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+const S = {
   step: 0,
+  patho: "",
+  titre: "",
   objectif: null,
   groupe: null,
   litteratie: null,
-  cats: ["Hyperglycémie","Hypoglycémie","Complications","Bien-être & quotidien"],
-  cards: [],
+  cats: [],      // [{id, name, icon}]
+  cards: [],     // [{id, name, icon, cat, desc}]
 };
+let catId = 0, cardId = 0;
+let activeEmojiTarget = null; // {type:'cat'|'card', id}
 
-// ── Default cards (diabète type 2) ────────────────────────────────────────────
-const DEFAULT_CARDS = [
-  // Hyperglycémie
-  {name:"Soif intense",      icon:"💧", cat:"Hyperglycémie",      desc:"Polydipsie — besoin excessif de boire"},
-  {name:"Urines fréquentes", icon:"🚽", cat:"Hyperglycémie",      desc:"Polyurie — signe classique d'hyperglycémie"},
-  {name:"Fatigue",           icon:"😴", cat:"Hyperglycémie",      desc:"Asthénie liée à l'hyperglycémie chronique"},
-  {name:"Vision floue",      icon:"👁",  cat:"Hyperglycémie",      desc:"Troubles visuels transitoires"},
-  // Hypoglycémie
-  {name:"Tremblements",      icon:"🫨", cat:"Hypoglycémie",       desc:"Signe neurovégétatif précoce"},
-  {name:"Sueurs froides",    icon:"🥶", cat:"Hypoglycémie",       desc:"Transpiration soudaine sans effort"},
-  {name:"Faim soudaine",     icon:"🍬", cat:"Hypoglycémie",       desc:"Envie impérieuse de manger sucré"},
-  {name:"Palpitations",      icon:"💓", cat:"Hypoglycémie",       desc:"Tachycardie réactionnelle"},
-  // Complications
-  {name:"Fourmillements",    icon:"⚡", cat:"Complications",      desc:"Neuropathie — pieds, mains"},
-  {name:"Plaie qui tarde",   icon:"🩹", cat:"Complications",      desc:"Cicatrisation ralentie"},
-  {name:"Gonflement",        icon:"🦵", cat:"Complications",      desc:"Œdème — retentissement rénal ou vasculaire"},
-  // Bien-être
-  {name:"Irritabilité",      icon:"😤", cat:"Bien-être & quotidien", desc:"Impact émotionnel du diabète"},
-  {name:"Maux de tête",      icon:"🤕", cat:"Bien-être & quotidien", desc:"Céphalées liées aux variations glycémiques"},
-  {name:"Manque d'énergie",  icon:"🔋", cat:"Bien-être & quotidien", desc:"Fatigue quotidienne persistante"},
-  {name:"Troubles du sommeil",icon:"🌙",cat:"Bien-être & quotidien", desc:"Insomnie ou sommeil non récupérateur"},
-];
-
-const EMOJIS = ["💧","🚽","😴","👁","🫨","🥶","🍬","💓","⚡","🩹","🦵","😤","🤕","🔋","🌙","❤️","🧠","🦷","🫁","🩺","🏃","🍽️","💊","🔴","⚠️","✨"];
-
-// ── Init ──────────────────────────────────────────────────────────────────────
+// ── BOOT ──────────────────────────────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  state.cards = DEFAULT_CARDS.map(c => ({...c}));
   bindChips();
-  buildCardEditor();
-  updateStepperUI();
+  bindStep0Inputs();
+  buildEmojiDropdown();
+  document.addEventListener("click", closeEmojiIfOutside);
 });
 
-// ── Chips ─────────────────────────────────────────────────────────────────────
+// ── CHIPS ─────────────────────────────────────────────────────────────────────
 function bindChips() {
   document.querySelectorAll(".chip[data-g]").forEach(btn => {
     btn.addEventListener("click", () => {
-      const g = btn.dataset.g;
-      const v = btn.dataset.v;
-
-      if (g === "cats") {
-        btn.classList.toggle("on");
-        const on = [...document.querySelectorAll('.chip[data-g="cats"].on')].map(b => b.dataset.v);
-        state.cats = on;
-      } else {
-        document.querySelectorAll(`.chip[data-g="${g}"]`).forEach(b => b.classList.remove("on"));
-        btn.classList.add("on");
-        if (g === "objectif") state.objectif = v;
-        if (g === "groupe")   state.groupe   = v;
-        if (g === "litteratie") state.litteratie = v;
-      }
-
-      updateContextReco();
-      updateNextBtn();
+      const g = btn.dataset.g, v = btn.dataset.v;
+      document.querySelectorAll(`.chip[data-g="${g}"]`).forEach(b => b.classList.remove("on"));
+      btn.classList.add("on");
+      S[g] = v;
+      updateCtxHint();
+      checkStep0();
     });
   });
 }
 
-function updateNextBtn() {
-  const ok = state.objectif && state.groupe && state.litteratie;
-  document.getElementById("next-0").disabled = !ok;
-}
-
-function updateContextReco() {
-  const el = document.getElementById("context-reco");
-  if (!state.groupe && !state.litteratie) { el.style.display = "none"; return; }
+function updateCtxHint() {
+  const el = document.getElementById("ctx-hint");
   const msgs = [];
-  if (state.groupe === "Grand (11–15)") msgs.push("Grand groupe : prévoyez sous-groupes pour l'activité cartes.");
-  if (state.litteratie === "Faible") msgs.push("Littératie faible : noms de symptômes courts, icône grande, lisibilité prioritaire.");
-  if (msgs.length === 0) { el.style.display = "none"; return; }
-  el.className = "infobox";
-  el.style.display = "block";
+  if (S.groupe === "11–15") msgs.push("Grand groupe : prévoyez un travail en sous-groupes.");
+  if (S.litteratie === "Faible") msgs.push("Littératie faible : noms courts, icônes grandes, consignes orales simples.");
+  if (!msgs.length) { el.style.display = "none"; return; }
+  el.className = "ibox"; el.style.display = "block";
   el.innerHTML = "💡 " + msgs.join(" · ");
 }
 
-// ── Card Editor ───────────────────────────────────────────────────────────────
-function buildCardEditor() {
-  const grid = document.getElementById("card-editor-grid");
-  grid.innerHTML = "";
-  state.cards.forEach((card, i) => {
-    const div = document.createElement("div");
-    div.className = "card-editor-item";
-    div.innerHTML = `
-      <div class="card-num">Carte ${i+1} · <span style="color:var(--accent-dim);font-size:10px">${card.cat}</span></div>
-      <input class="card-name-input" type="text" value="${card.name}" placeholder="Nom du symptôme" data-idx="${i}" oninput="updateCardName(${i},this.value)"/>
-      <div class="card-emoji-row" id="emojis-${i}">
-        ${EMOJIS.slice(0,8).map(e => `<button class="card-emoji-btn ${e===card.icon?'on':''}" onclick="setEmoji(${i},'${e}')">${e}</button>`).join("")}
+function checkStep0() {
+  const ok = S.patho.trim() && S.objectif && S.groupe && S.litteratie;
+  document.getElementById("btn-next-0").disabled = !ok;
+}
+
+function bindStep0Inputs() {
+  document.getElementById("patho").addEventListener("input", e => { S.patho = e.target.value; checkStep0(); });
+  document.getElementById("jeu-titre").addEventListener("input", e => { S.titre = e.target.value; });
+}
+
+// ── CATEGORIES ────────────────────────────────────────────────────────────────
+function renderCats() {
+  const list = document.getElementById("cat-list");
+  list.innerHTML = "";
+  S.cats.forEach(cat => {
+    const row = document.createElement("div");
+    row.className = "cat-row";
+    row.innerHTML = `
+      <button class="cat-row-icon" onclick="openEmoji('cat',${cat.id},this)" title="Changer l'icône">${cat.icon}</button>
+      <div class="cat-row-inputs">
+        <input type="text" value="${cat.name}" placeholder="Nom de la catégorie"
+          oninput="updateCat(${cat.id},'name',this.value)" style="flex:1"/>
       </div>
+      <button class="cat-del" onclick="delCat(${cat.id})" title="Supprimer">×</button>
     `;
-    grid.appendChild(div);
+    list.appendChild(row);
   });
-  updateCountBar();
+  checkStep1();
 }
 
-function updateCardName(i, val) {
-  state.cards[i].name = val;
+function addCat() {
+  const icons = ["🔴","🟡","🟢","🔵","🟣","🟠","⚪"];
+  S.cats.push({ id: catId++, name: "", icon: icons[S.cats.length % icons.length] });
+  renderCats();
+  rebuildCardCatSelects();
 }
 
-function setEmoji(i, emoji) {
-  state.cards[i].icon = emoji;
-  document.querySelectorAll(`#emojis-${i} .card-emoji-btn`).forEach(btn => {
-    btn.classList.toggle("on", btn.textContent === emoji);
+function delCat(id) {
+  S.cats = S.cats.filter(c => c.id !== id);
+  renderCats();
+  rebuildCardCatSelects();
+}
+
+function updateCat(id, field, val) {
+  const c = S.cats.find(c => c.id === id);
+  if (c) c[field] = val;
+  rebuildCardCatSelects();
+  checkStep1();
+}
+
+function checkStep1() {
+  const ok = S.cats.length > 0 && S.cats.every(c => c.name.trim());
+  document.getElementById("btn-next-1").disabled = !ok;
+}
+
+// ── CARDS ─────────────────────────────────────────────────────────────────────
+function renderCards() {
+  const bank = document.getElementById("card-bank");
+  bank.innerHTML = "";
+  S.cards.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "card-item";
+    const catOptions = S.cats.map(c =>
+      `<option value="${c.id}" ${card.catId === c.id ? "selected" : ""}>${c.icon} ${c.name}</option>`
+    ).join("");
+    div.innerHTML = `
+      <button class="card-emoji-pick" onclick="openEmoji('card',${card.id},this)" title="Changer l'icône">${card.icon}</button>
+      <div class="card-fields">
+        <input type="text" value="${card.name}" placeholder="Nom du symptôme *"
+          oninput="updateCard(${card.id},'name',this.value)"/>
+        <select class="card-cat-select" onchange="updateCard(${card.id},'catId',+this.value)">
+          <option value="" disabled ${card.catId === null ? "selected" : ""}>— Catégorie —</option>
+          ${catOptions}
+        </select>
+        <input type="text" value="${card.desc}" placeholder="Description courte (optionnel)"
+          oninput="updateCard(${card.id},'desc',this.value)" style="font-size:12px;color:var(--ink-mid)"/>
+      </div>
+      <button class="card-del" onclick="delCard(${card.id})">×</button>
+    `;
+    bank.appendChild(div);
   });
+  updateCardCount();
+  checkStep2();
 }
 
-function updateCountBar() {
-  const el = document.getElementById("count-bar");
-  el.textContent = `${state.cards.length} cartes dans le jeu.`;
+function addCard() {
+  const defCat = S.cats.length ? S.cats[0].id : null;
+  S.cards.push({ id: cardId++, name: "", icon: "❓", catId: defCat, desc: "" });
+  renderCards();
 }
 
-// ── Deck Preview ──────────────────────────────────────────────────────────────
-function buildDeckPreview() {
-  // summary bar
-  const cats = [...new Set(state.cards.map(c => c.cat))];
-  document.getElementById("summary-bar").innerHTML =
-    cats.map(c => `<span class="summary-pill">${c} (${state.cards.filter(x=>x.cat===c).length})</span>`).join("");
+function delCard(id) {
+  S.cards = S.cards.filter(c => c.id !== id);
+  renderCards();
+}
+
+function updateCard(id, field, val) {
+  const c = S.cards.find(c => c.id === id);
+  if (c) c[field] = val;
+  checkStep2();
+}
+
+function updateCardCount() {
+  const el = document.getElementById("card-count");
+  el.textContent = `${S.cards.length} carte${S.cards.length > 1 ? "s" : ""} dans le jeu.`;
+}
+
+function rebuildCardCatSelects() { renderCards(); }
+
+function checkStep2() {
+  const ok = S.cards.length >= 3 && S.cards.every(c => c.name.trim());
+  const warn = document.getElementById("card-warn");
+  if (S.cards.length > 0 && S.cards.length < 3) {
+    warn.className = "wbox"; warn.style.display = "block";
+    warn.textContent = "⚠ Minimum 3 cartes pour une séance fonctionnelle.";
+  } else { warn.style.display = "none"; }
+  document.getElementById("btn-next-2").disabled = !ok;
+}
+
+// ── EMOJI PICKER ──────────────────────────────────────────────────────────────
+function buildEmojiDropdown() {
+  const dd = document.getElementById("emoji-dropdown");
+  dd.innerHTML = EMOJIS.map(e =>
+    `<button onclick="selectEmoji('${e}')">${e}</button>`
+  ).join("");
+}
+
+function openEmoji(type, id, triggerEl) {
+  activeEmojiTarget = { type, id };
+  const dd = document.getElementById("emoji-dropdown");
+  const rect = triggerEl.getBoundingClientRect();
+  dd.style.display = "grid";
+  // position below trigger, stay in viewport
+  let top = rect.bottom + window.scrollY + 6;
+  let left = rect.left + window.scrollX;
+  if (left + 240 > window.innerWidth) left = window.innerWidth - 250;
+  dd.style.top = top + "px";
+  dd.style.left = left + "px";
+}
+
+function selectEmoji(e) {
+  if (!activeEmojiTarget) return;
+  const { type, id } = activeEmojiTarget;
+  if (type === "cat") {
+    const c = S.cats.find(c => c.id === id);
+    if (c) { c.icon = e; renderCats(); }
+  } else {
+    const c = S.cards.find(c => c.id === id);
+    if (c) { c.icon = e; renderCards(); }
+  }
+  closeEmojiPicker();
+}
+
+function closeEmojiIfOutside(e) {
+  const dd = document.getElementById("emoji-dropdown");
+  if (dd.style.display === "none") return;
+  if (!dd.contains(e.target) && !e.target.classList.contains("cat-row-icon") && !e.target.classList.contains("card-emoji-pick")) {
+    closeEmojiPicker();
+  }
+}
+
+function closeEmojiPicker() {
+  document.getElementById("emoji-dropdown").style.display = "none";
+  activeEmojiTarget = null;
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────────────────────
+function buildPreview() {
+  // cat pills
+  const pCats = document.getElementById("preview-cats");
+  pCats.innerHTML = S.cats.map(c =>
+    `<span class="cat-pill">${c.icon} ${c.name} <span style="color:var(--ink-dim);margin-left:4px">${S.cards.filter(x=>x.catId===c.id).length}</span></span>`
+  ).join("");
 
   // cards
-  const grid = document.getElementById("deck-preview");
-  grid.innerHTML = "";
-  state.cards.forEach((card, i) => {
+  const deck = document.getElementById("preview-deck");
+  deck.innerHTML = "";
+  S.cards.forEach(card => {
+    const cat = S.cats.find(c => c.id === card.catId);
     const div = document.createElement("div");
-    div.className = "deck-card";
+    div.className = "pcard";
     div.innerHTML = `
-      <div class="di">${card.icon}</div>
-      <div class="dn">${card.name}</div>
-      <div class="dc">${card.cat}</div>
-      <div class="dd" style="display:none">${card.desc}</div>
+      <div class="pi">${card.icon}</div>
+      <div class="pn">${card.name || "—"}</div>
+      <div class="pc">${cat ? cat.icon + " " + cat.name : "—"}</div>
+      <div class="pd" style="display:none">${card.desc || "Aucune description"}</div>
     `;
     div.addEventListener("click", () => {
-      const dd = div.querySelector(".dd");
-      const dn = div.querySelector(".dn");
-      const visible = dd.style.display !== "none";
-      dd.style.display = visible ? "none" : "block";
-      dn.style.display = visible ? "block" : "none";
-      div.style.borderColor = visible ? "var(--border)" : "var(--accent)";
+      const pd = div.querySelector(".pd");
+      const pn = div.querySelector(".pn");
+      const open = pd.style.display !== "none";
+      pd.style.display = open ? "none" : "block";
+      pn.style.display = open ? "block" : "none";
+      div.classList.toggle("flipped", !open);
     });
-    grid.appendChild(div);
+    deck.appendChild(div);
   });
 }
 
-// ── Session Tips ──────────────────────────────────────────────────────────────
-function buildSessionTips() {
-  // summary
-  document.getElementById("session-summary").innerHTML =
-    [state.objectif, state.groupe, state.litteratie].filter(Boolean)
-      .map(v => `<span class="summary-pill">${v}</span>`).join("");
-
-  const tips = [
-    {
-      icon: "🃏",
-      title: "Lancer l'activité",
-      body: "Posez toutes les cartes sur l'écran. Demandez à chaque participant de choisir la carte qui lui parle le plus. Ne commentez pas le choix."
-    },
-    {
-      icon: "💬",
-      title: "Animer la parole",
-      body: "Pour chaque carte choisie : « Qu'est-ce que vous reconnaissez dans ce symptôme ? » Reformulez sans corriger. La carte est un miroir, pas une leçon."
-    },
-    {
-      icon: "🔗",
-      title: "Faire les liens",
-      body: "Invitez le groupe à regrouper les cartes : « Lesquelles vont ensemble selon vous ? » Ne donnez pas les catégories — laissez émerger."
-    },
-    {
-      icon: "📋",
-      title: "Clore et tracer",
-      body: `Demandez : « Quelle carte retenez-vous aujourd'hui et pourquoi ? » Photographiez l'écran à la fin — c'est la trace collective de la séance.`
-    },
-  ];
-
-  document.getElementById("tips-grid").innerHTML = tips.map(t => `
-    <div class="tip-card">
-      <div class="tip-icon">${t.icon}</div>
-      <div class="tip-title">${t.title}</div>
-      <div class="tip-body">${t.body}</div>
-    </div>
-  `).join("");
+// ── SESSION RECAP ─────────────────────────────────────────────────────────────
+function buildSessionRecap() {
+  const recap = document.getElementById("session-recap");
+  recap.innerHTML = [
+    S.patho, S.objectif, S.groupe ? S.groupe + " pers." : null, S.litteratie ? "Littératie " + S.litteratie.toLowerCase() : null
+  ].filter(Boolean).map(v =>
+    `<span class="cat-pill">${v}</span>`
+  ).join("");
 }
 
-// ── Session Mode ──────────────────────────────────────────────────────────────
-function launchDeck() {
-  const container = document.getElementById("session-cards");
-  container.innerHTML = "";
-  const title = document.getElementById("patho-name").value || "Diabète de type 2";
-  document.getElementById("session-title").textContent = title + " — " + state.cards.length + " cartes";
+// ── SESSION OVERLAY ───────────────────────────────────────────────────────────
+function launchSession() {
+  const titre = S.titre.trim() || S.patho.trim() || "Mon jeu de cartes";
+  document.getElementById("s-title").textContent = titre;
+  document.getElementById("s-patho").textContent = S.patho ? "Pathologie : " + S.patho : "";
 
-  state.cards.forEach(card => {
+  // cat pills
+  document.getElementById("s-cats").innerHTML = S.cats.map(c =>
+    `<span class="scat-pill">${c.icon} ${c.name}</span>`
+  ).join("");
+
+  // cards
+  const deck = document.getElementById("s-deck");
+  deck.innerHTML = "";
+  S.cards.forEach(card => {
+    const cat = S.cats.find(c => c.id === card.catId);
     const div = document.createElement("div");
-    div.className = "deck-card";
-    div.style.minHeight = "160px";
+    div.className = "scard";
     div.innerHTML = `
-      <div class="di">${card.icon}</div>
-      <div class="dn">${card.name}</div>
-      <div class="dc">${card.cat}</div>
-      <div class="dd" style="display:none;margin-top:6px;">${card.desc}</div>
+      <div class="si">${card.icon}</div>
+      <div class="sn">${card.name}</div>
+      <div class="sc">${cat ? cat.icon + " " + cat.name : ""}</div>
+      <div class="sd" style="display:none">${card.desc || ""}</div>
     `;
     div.addEventListener("click", () => {
-      const dd = div.querySelector(".dd");
-      const dn = div.querySelector(".dn");
-      const visible = dd.style.display !== "none";
-      dd.style.display = visible ? "none" : "block";
-      dn.style.display = visible ? "block" : "none";
-      div.style.borderColor = visible ? "var(--border)" : "var(--accent)";
-      div.style.background = visible ? "var(--surface)" : "rgba(93,191,130,.07)";
+      const sd = div.querySelector(".sd");
+      const open = sd.style.display !== "none";
+      if (card.desc) {
+        sd.style.display = open ? "none" : "block";
+      }
+      div.classList.toggle("revealed", !open && !!card.desc);
+      div.style.borderColor = (!open && card.desc) ? "#c4a882" : "";
     });
-    container.appendChild(div);
+    deck.appendChild(div);
   });
 
-  document.getElementById("session-mode").style.display = "block";
-  window.scrollTo(0,0);
+  document.getElementById("session-overlay").style.display = "block";
+  window.scrollTo(0, 0);
 }
 
 function closeSession() {
-  document.getElementById("session-mode").style.display = "none";
+  document.getElementById("session-overlay").style.display = "none";
 }
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
 function goTo(step) {
-  // on quitte step 2 → sync cats chips
-  if (state.step === 1) {
-    const on = [...document.querySelectorAll('.chip[data-g="cats"].on')].map(b => b.dataset.v);
-    state.cats = on;
-  }
-
-  document.getElementById(`panel-${state.step}`).classList.remove("active");
-  state.step = step;
-  document.getElementById(`panel-${step}`).classList.add("active");
-
-  if (step === 2) buildCardEditor();
-  if (step === 3) buildDeckPreview();
-  if (step === 4) buildSessionTips();
-
-  updateStepperUI();
-  window.scrollTo({top:0, behavior:"smooth"});
+  document.getElementById(`p${S.step}`).classList.remove("active");
+  S.step = step;
+  document.getElementById(`p${step}`).classList.add("active");
+  if (step === 3) buildPreview();
+  if (step === 4) buildSessionRecap();
+  updateStepper();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  closeEmojiPicker();
 }
 
-function updateStepperUI() {
-  document.querySelectorAll(".step-node").forEach((node, i) => {
-    node.className = "step-node" + (i < state.step ? " done" : i === state.step ? " active" : "");
+function updateStepper() {
+  document.querySelectorAll(".snode").forEach((n, i) => {
+    n.className = "snode" + (i < S.step ? " done" : i === S.step ? " active" : "");
   });
   for (let i = 0; i < 4; i++) {
-    const line = document.getElementById(`line-${i}`);
-    if (line) line.className = "step-line" + (i < state.step ? " done" : "");
+    const l = document.getElementById(`l${i}`);
+    if (l) l.className = "sline" + (i < S.step ? " done" : "");
   }
 }
 </script>
