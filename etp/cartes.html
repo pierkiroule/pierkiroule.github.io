@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Générateur de conducteur de séance ETP</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark: #1e4d35;
+    --green-mid: #2D6A4F;
+    --green-light: #74b49b;
+    --green-pale: #eef6f1;
+    --green-border: #cde4d5;
+    --ink: #1a2e1a;
+    --ink-mid: #4a5a4a;
+    --ink-light: #7a8a7a;
+    --warn: #c0392b;
+    --warn-bg: #fff8f6;
+    --warn-border: #f0c0b0;
+    --white: #ffffff;
+    --bg: #f4f9f5;
+  }
+
+  body {
+    font-family: 'Lora', Georgia, serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  /* Layout */
+  .shell {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 20px 60px;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 36px;
+  }
+  .header-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .header-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green-mid);
+    flex-shrink: 0;
+  }
+  .header-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 10px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--green-light);
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--ink-light);
+    font-style: italic;
+  }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    padding: 34px 36px;
+    box-shadow: 0 6px 32px rgba(45,106,79,.07);
+  }
+
+  /* Progress */
+  .progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 34px;
+  }
+  .progress-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: default;
+  }
+  .progress-bar {
+    height: 3px;
+    width: 100%;
+    border-radius: 2px;
+    background: #e0ece4;
+    transition: background .4s;
+  }
+  .progress-item.done .progress-bar,
+  .progress-item.active .progress-bar { background: var(--green-mid); }
+  .progress-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 9.5px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: #b0c4b6;
+    text-align: center;
+    transition: color .4s;
+  }
+  .progress-item.active .progress-name { color: var(--green-mid); font-weight: 700; }
+  .progress-item.done .progress-name { color: var(--green-light); }
+
+  /* Step title */
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+  .step-sub {
+    font-size: 13px;
+    color: var(--ink-light);
+    font-style: italic;
+    margin-bottom: 26px;
+  }
+
+  /* Label */
+  .label {
+    font-family: 'Playfair Display', serif;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--green-light);
+    margin-bottom: 9px;
+    margin-top: 20px;
+    display: block;
+  }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .tag {
+    padding: 7px 15px;
+    border-radius: 3px;
+    border: 2px solid var(--green-border);
+    background: var(--white);
+    color: var(--ink-mid);
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .2s;
+    outline: none;
+    line-height: 1.3;
+  }
+  .tag:hover { border-color: var(--green-mid); color: var(--green-mid); }
+  .tag.active { border-color: var(--green-mid); background: var(--green-mid); color: var(--white); }
+  .tag.warn { border-color: var(--warn); color: var(--warn); }
+
+  /* Input / Textarea */
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid var(--green-border);
+    border-radius: 4px;
+    font-family: 'Lora', Georgia, serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--white);
+    outline: none;
+    transition: border-color .2s;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--green-mid); }
+  input[type="text"]::placeholder, textarea::placeholder { color: #b0c4b6; }
+
+  /* Range */
+  .range-wrap { display: flex; align-items: center; gap: 16px; }
+  input[type="range"] { flex: 1; accent-color: var(--green-mid); cursor: pointer; }
+  .range-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--green-mid);
+    min-width: 34px;
+    text-align: center;
+  }
+
+  /* Info box */
+  .infobox {
+    padding: 12px 16px;
+    border-radius: 5px;
+    font-size: 13px;
+    margin-top: 14px;
+    line-height: 1.5;
+  }
+  .infobox.green { background: #edf7f2; border: 1px solid #b7ddc9; color: #1a4a2a; }
+  .infobox.red { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+  .infobox.blue { background: #f0f4ff; border: 1px solid #c0ccf0; color: #2a3a9a; }
+
+  /* Method cards */
+  .method-card {
+    border: 2px solid var(--green-border);
+    border-radius: 7px;
+    padding: 15px 18px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: all .2s;
+    background: var(--white);
+  }
+  .method-card:hover { border-color: var(--green-mid); }
+  .method-card.active { border-color: var(--green-mid); background: var(--green-pale); }
+  .method-head { display: flex; align-items: center; gap: 11px; }
+  .method-icon { font-size: 20px; color: var(--green-mid); }
+  .method-title { font-family: 'Playfair Display', serif; font-size: 14.5px; color: var(--ink); font-weight: 600; }
+  .method-detail { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .method-col-title {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
+    margin-bottom: 5px; font-family: 'Playfair Display', serif;
+  }
+  .method-col-title.green { color: var(--green-light); }
+  .method-col-title.red { color: var(--warn); }
+  .method-col-title.grey { color: var(--ink-light); }
+  .method-item { font-size: 12px; color: var(--ink-mid); margin: 2px 0; }
+  .method-indication { grid-column: 1/-1; font-size: 12px; font-style: italic; color: var(--ink-mid); }
+
+  /* Conductor blocks */
+  .conductor-block {
+    border: 1px solid var(--green-border);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 14px;
+    background: var(--white);
+  }
+  .conductor-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .conductor-name { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--green-mid); font-weight: 600; }
+  .conductor-duration {
+    font-size: 11px; background: var(--green-pale); border: 1px solid var(--green-border);
+    border-radius: 20px; padding: 3px 11px; color: var(--green-mid); font-family: 'Lora', serif;
+  }
+  .conductor-meta { font-size: 12.5px; color: var(--ink-mid); margin-bottom: 3px; }
+  .conductor-question-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--green-light); margin: 11px 0 6px;
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Export card */
+  .export-card {
+    background: var(--green-pale);
+    border: 1px solid var(--green-border);
+    border-radius: 7px;
+    padding: 22px;
+  }
+  .export-title { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--green-dark); font-weight: 700; margin-bottom: 16px; }
+  .export-row { border-bottom: 1px solid var(--green-border); padding-bottom: 9px; margin-bottom: 9px; }
+  .export-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .export-row-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--green-light); margin-bottom: 2px; font-family: 'Playfair Display', serif; }
+  .export-row-val { font-size: 13px; color: var(--ink); }
+
+  /* Feedback rows */
+  .feedback-row {
+    padding: 10px 14px; border-radius: 4px;
+    margin-bottom: 8px; font-size: 13px; line-height: 1.5;
+  }
+  .feedback-row.ok { background: #edf7f2; border: 1px solid #b7ddc9; color: #1a4a2a; }
+  .feedback-row.warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+  .feedback-row.info { background: #f0f4ff; border: 1px solid #c0ccf0; color: #2a3a9a; }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e6f0e8;
+  }
+  .btn {
+    padding: 11px 28px;
+    border-radius: 4px;
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: all .2s;
+    outline: none;
+  }
+  .btn-primary { background: var(--green-mid); color: var(--white); border: none; }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-primary:disabled { background: #cde4d5; color: #a0b8a8; cursor: not-allowed; }
+  .btn-secondary { background: var(--white); color: var(--green-mid); border: 2px solid var(--green-mid); }
+  .btn-secondary:hover { background: var(--green-pale); }
+  .btn-ghost { background: transparent; color: var(--ink-light); border: 2px solid var(--green-border); }
+  .btn-ghost:hover { border-color: var(--green-mid); color: var(--green-mid); }
+
+  /* Print / Export btn */
+  .btn-print { background: var(--green-dark); color: var(--white); border: none; padding: 10px 22px; font-size: 13px; }
+  .btn-print:hover { background: #163a27; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 11px;
+    color: #a0b0a0;
+    font-style: italic;
+  }
+
+  /* Steps */
+  .step { display: none; }
+  .step.active { display: block; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--green-border); margin: 20px 0; }
+
+  @media (max-width: 520px) {
+    .card { padding: 22px 18px; }
+    .method-detail { grid-template-columns: 1fr; }
+    .header h1 { font-size: 24px; }
+  }
+
+  @media print {
+    body { background: white; }
+    .card { box-shadow: none; border: 1px solid #ccc; }
+    .nav, .header-badge, .progress, .step-sub, .step:not(.active) { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">
+      <div class="header-dot"></div>
+      <span class="header-label">ETP · Éducation Thérapeutique du Patient</span>
+    </div>
+    <h1>Générateur de conducteur<br>de séance</h1>
+    <p>Un entraîneur de raisonnement pédagogique — pas un modèle à remplir.</p>
+  </div>
+
+  <!-- Main card -->
+  <div class="card">
+
+    <!-- Progress -->
+    <div class="progress" id="progress">
+      <!-- filled by JS -->
+    </div>
+
+    <!-- Step 1: Intention -->
+    <div class="step" id="step-0">
+      <h2 class="step-title">Clarifier l'intention pédagogique</h2>
+      <p class="step-sub">La clarté de l'intention détermine tout le reste de la séance.</p>
+
+      <span class="label">Moment du parcours</span>
+      <div class="tags" id="tags-parcours">
+        <button class="tag" data-group="parcours" data-val="Diagnostic éducatif">Diagnostic éducatif</button>
+        <button class="tag" data-group="parcours" data-val="Acquisition">Acquisition</button>
+        <button class="tag" data-group="parcours" data-val="Renforcement">Renforcement</button>
+        <button class="tag" data-group="parcours" data-val="Évaluation">Évaluation</button>
+      </div>
+
+      <span class="label">Compétence ciblée</span>
+      <div class="tags" id="tags-competence">
+        <button class="tag" data-group="competence" data-val="Identifier">Identifier</button>
+        <button class="tag" data-group="competence" data-val="Comprendre">Comprendre</button>
+        <button class="tag" data-group="competence" data-val="Agir">Agir</button>
+        <button class="tag" data-group="competence" data-val="Anticiper">Anticiper</button>
+        <button class="tag" data-group="competence" data-val="Communiquer">Communiquer</button>
+      </div>
+
+      <div id="coherence-alert" style="display:none"></div>
+    </div>
+
+    <!-- Step 2: Public -->
+    <div class="step" id="step-1">
+      <h2 class="step-title">Définir le public</h2>
+      <p class="step-sub">Le public détermine la durée, la complexité et le nombre de cartes.</p>
+
+      <span class="label">Pathologie / Problématique</span>
+      <input type="text" id="pathologie" placeholder="ex : diabète type 2, asthme, insuffisance cardiaque…" />
+
+      <span class="label">Âge moyen du groupe</span>
+      <input type="text" id="age" placeholder="ex : 45–65 ans" />
+
+      <span class="label">Niveau de littératie</span>
+      <div class="tags">
+        <button class="tag" data-group="litteratie" data-val="Faible">Faible</button>
+        <button class="tag" data-group="litteratie" data-val="Moyen">Moyen</button>
+        <button class="tag" data-group="litteratie" data-val="Élevé">Élevé</button>
+      </div>
+
+      <span class="label">Taille du groupe</span>
+      <div class="range-wrap">
+        <input type="range" id="taille" min="2" max="20" value="8" oninput="updateTaille()" />
+        <span class="range-val" id="taille-val">8</span>
+      </div>
+
+      <div id="public-reco" class="infobox green" style="display:none"></div>
+    </div>
+
+    <!-- Step 3: Méthode -->
+    <div class="step" id="step-2">
+      <h2 class="step-title">Choisir la méthode d'animation</h2>
+      <p class="step-sub">Chaque méthode a ses forces. Choisissez en cohérence avec votre intention.</p>
+
+      <div id="methods-container">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Step 4: Conducteur -->
+    <div class="step" id="step-3">
+      <h2 class="step-title">Construire le conducteur</h2>
+      <p class="step-sub">Le squelette est généré. Complétez les questions ouvertes — c'est là que se joue votre posture éducative.</p>
+
+      <div class="conductor-block">
+        <div class="conductor-head">
+          <span class="conductor-name">🔹 Accueil</span>
+          <span class="conductor-duration">10 min</span>
+        </div>
+        <p class="conductor-meta"><em>Objectif :</em> Créer un cadre sécurisant, présenter le dispositif et les cartes</p>
+        <p class="conductor-meta"><em>Consigne :</em> Expliquer le principe des cartes symptômes et les règles du groupe</p>
+        <p class="conductor-question-label">À compléter — Quelle question ouverte allez-vous poser pour lancer la réflexion ?</p>
+        <textarea id="q-accueil" rows="2" placeholder="Votre question d'ouverture…"></textarea>
+      </div>
+
+      <div class="conductor-block">
+        <div class="conductor-head">
+          <span class="conductor-name">🔹 Activité centrale</span>
+          <span class="conductor-duration" id="activite-duration">30–40 min</span>
+        </div>
+        <p class="conductor-meta" id="activite-objectif"><em>Objectif :</em> Travailler la compétence ciblée via les cartes symptômes</p>
+        <p class="conductor-meta" id="activite-methode"><em>Méthode :</em> —</p>
+        <p class="conductor-question-label">À compléter — Quelles questions-clés poserez-vous pendant l'activité ?</p>
+        <textarea id="q-activite" rows="2" placeholder="Vos questions-clés…"></textarea>
+      </div>
+
+      <div class="conductor-block">
+        <div class="conductor-head">
+          <span class="conductor-name">🔹 Synthèse & trace écrite</span>
+          <span class="conductor-duration">15 min</span>
+        </div>
+        <p class="conductor-meta"><em>Objectif :</em> Consolider les apprentissages, produire une trace collective</p>
+        <p class="conductor-meta"><em>Consigne :</em> Reformulation par les participants, constitution d'un document partagé</p>
+        <p class="conductor-question-label">À compléter — Comment allez-vous formuler la question de synthèse finale ?</p>
+        <textarea id="q-synthese" rows="2" placeholder="Votre question de clôture…"></textarea>
+      </div>
+    </div>
+
+    <!-- Step 5: Évaluation -->
+    <div class="step" id="step-4">
+      <h2 class="step-title">Intégrer l'évaluation</h2>
+      <p class="step-sub">Sans évaluation définie à l'avance, on ne sait pas si la compétence a été atteinte.</p>
+
+      <span class="label">Indicateur observable</span>
+      <textarea id="indicateur" rows="2" placeholder="ex : Le patient cite 3 symptômes d'hypoglycémie sans aide…"></textarea>
+
+      <span class="label">Comment évaluer ?</span>
+      <textarea id="eval-methode" rows="2" placeholder="ex : Tour de table final, vote par gommette, reformulation spontanée…"></textarea>
+
+      <span class="label">Reformulation finale attendue des participants</span>
+      <textarea id="reformulation" rows="2" placeholder="ex : « Ce que je retiens de cette séance… »"></textarea>
+    </div>
+
+    <!-- Step 6: Analyse -->
+    <div class="step" id="step-5">
+      <h2 class="step-title">Analyse &amp; Conducteur final</h2>
+
+      <div style="margin-bottom:22px">
+        <span class="label" style="margin-top:0">Assistant critique</span>
+        <div id="feedbacks"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="export-card" id="export-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <p class="export-title">Conducteur de séance — Export</p>
+          <button class="btn btn-print" onclick="window.print()">🖨 Imprimer</button>
+        </div>
+        <div id="export-rows"></div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <button class="btn btn-secondary" id="btn-prev" onclick="changeStep(-1)" style="display:none">← Retour</button>
+      <div></div>
+      <button class="btn btn-primary" id="btn-next" onclick="changeStep(1)">Continuer →</button>
+    </div>
+
+  </div><!-- /card -->
+
+  <p class="footer">Intention · Compétence · Méthode · Animation · Évaluation</p>
+
+</div><!-- /shell -->
+
+<script>
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
+const STEPS = ["Intention", "Public", "Méthode", "Conducteur", "Évaluation", "Analyse"];
+
+const COHERENCE = {
+  "Diagnostic éducatif": ["Identifier", "Comprendre"],
+  "Acquisition": ["Comprendre", "Agir"],
+  "Renforcement": ["Agir", "Anticiper", "Communiquer"],
+  "Évaluation": ["Identifier", "Comprendre", "Agir", "Anticiper", "Communiquer"],
+};
+
+const METHODES = [
+  {
+    id: "A", icon: "◈",
+    label: "Tri individuel + tour de table",
+    points: ["Favorise l'expression individuelle", "Repère les représentations initiales"],
+    risques: ["Peut être chronophage", "Risque de conformisme au fil du tour"],
+    indication: "Idéal en phase de diagnostic ou de recueil de représentations.",
+  },
+  {
+    id: "B", icon: "◉",
+    label: "Cartographie collective",
+    points: ["Visualisation partagée", "Co-construction des savoirs"],
+    risques: ["Nécessite un animateur expérimenté", "Peut être dominé par certains"],
+    indication: "Parfait pour l'acquisition et la mise en lien des concepts.",
+  },
+  {
+    id: "C", icon: "◫",
+    label: "Travail en sous-groupes",
+    points: ["Implique tous les participants", "Favorise la discussion entre pairs"],
+    risques: ["Dispersion possible", "Synthèse délicate"],
+    indication: "Recommandé pour le renforcement et les groupes de plus de 8 personnes.",
+  },
+  {
+    id: "D", icon: "◬",
+    label: "Jeu narratif / Externalisation",
+    points: ["Dédramatise la maladie", "Stimule la créativité"],
+    risques: ["Peut déstabiliser certains patients", "Exige une posture souple"],
+    indication: "Indiqué pour travailler l'anticipation ou la communication.",
+  },
+];
+
+// ─── State ────────────────────────────────────────────────────────────────────
+
+let state = {
+  step: 0,
+  parcours: null,
+  competence: null,
+  pathologie: "",
+  age: "",
+  litteratie: null,
+  taille: 8,
+  methode: null,
+  qAccueil: "",
+  qActivite: "",
+  qSynthese: "",
+  indicateur: "",
+  evalMethode: "",
+  reformulation: "",
+};
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
+document.addEventListener("DOMContentLoaded", () => {
+  buildProgress();
+  buildMethods();
+  bindTags();
+  bindTextareas();
+  renderStep();
+});
+
+// ─── Progress ─────────────────────────────────────────────────────────────────
+
+function buildProgress() {
+  const el = document.getElementById("progress");
+  el.innerHTML = STEPS.map((s, i) =>
+    `<div class="progress-item" id="prog-${i}">
+      <div class="progress-bar"></div>
+      <span class="progress-name">${s}</span>
+    </div>`
+  ).join("");
+}
+
+function updateProgress() {
+  STEPS.forEach((_, i) => {
+    const el = document.getElementById(`prog-${i}`);
+    el.className = "progress-item" + (i < state.step ? " done" : i === state.step ? " active" : "");
+  });
+}
+
+// ─── Methods ──────────────────────────────────────────────────────────────────
+
+function buildMethods() {
+  const c = document.getElementById("methods-container");
+  c.innerHTML = METHODES.map(m => `
+    <div class="method-card" id="method-${m.id}" onclick="selectMethod('${m.id}')">
+      <div class="method-head">
+        <span class="method-icon">${m.icon}</span>
+        <span class="method-title">${m.id}. ${m.label}</span>
+      </div>
+      <div class="method-detail" id="method-detail-${m.id}" style="display:none">
+        <div>
+          <p class="method-col-title green">Points forts</p>
+          ${m.points.map(p => `<p class="method-item">✓ ${p}</p>`).join("")}
+        </div>
+        <div>
+          <p class="method-col-title red">Risques</p>
+          ${m.risques.map(r => `<p class="method-item">⚠ ${r}</p>`).join("")}
+        </div>
+        <div style="grid-column:1/-1">
+          <p class="method-col-title grey">Indication</p>
+          <p class="method-indication">${m.indication}</p>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function selectMethod(id) {
+  state.methode = id;
+  METHODES.forEach(m => {
+    const card = document.getElementById(`method-${m.id}`);
+    const detail = document.getElementById(`method-detail-${m.id}`);
+    if (m.id === id) {
+      card.classList.add("active");
+      detail.style.display = "grid";
+    } else {
+      card.classList.remove("active");
+      detail.style.display = "none";
+    }
+  });
+  updateNav();
+}
+
+// ─── Tags ─────────────────────────────────────────────────────────────────────
+
+function bindTags() {
+  document.querySelectorAll(".tag").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const group = btn.dataset.group;
+      const val = btn.dataset.val;
+      // deselect siblings
+      document.querySelectorAll(`.tag[data-group="${group}"]`).forEach(b => b.classList.remove("active", "warn"));
+      btn.classList.add("active");
+      state[group === "parcours" ? "parcours" : group === "competence" ? "competence" : "litteratie"] = val;
+      if (group === "parcours" || group === "competence") checkCoherence();
+      if (group === "litteratie") updatePublicReco();
+      updateNav();
+    });
+  });
+}
+
+function checkCoherence() {
+  const alert = document.getElementById("coherence-alert");
+  if (!state.parcours || !state.competence) { alert.style.display = "none"; return; }
+  const allowed = COHERENCE[state.parcours] || [];
+  const incoherent = !allowed.includes(state.competence);
+
+  // color competence tags
+  document.querySelectorAll('.tag[data-group="competence"]').forEach(b => {
+    if (b.classList.contains("active") && incoherent) b.classList.add("warn");
+    else b.classList.remove("warn");
+  });
+
+  if (incoherent) {
+    alert.style.display = "block";
+    alert.className = "infobox red";
+    alert.innerHTML = `<strong>⚠ Alerte pédagogique :</strong> La compétence <em>${state.competence}</em> est rarement ciblée en phase de <em>${state.parcours}</em>. Vérifiez votre intention ou choisissez un moment de parcours cohérent.`;
+  } else {
+    alert.style.display = "none";
+  }
+}
+
+// ─── Range ────────────────────────────────────────────────────────────────────
+
+function updateTaille() {
+  state.taille = +document.getElementById("taille").value;
+  document.getElementById("taille-val").textContent = state.taille;
+  updatePublicReco();
+}
+
+function updatePublicReco() {
+  const reco = document.getElementById("public-reco");
+  const t = state.taille;
+  const duree = t <= 6 ? "45 min" : t <= 12 ? "60–75 min" : "90 min";
+  const cartes = t <= 6 ? "12–15 cartes" : t <= 12 ? "20–25 cartes" : "30+ cartes";
+  const note = state.litteratie === "Faible" ? " · Consignes simplifiées et illustrées recommandées" : "";
+  reco.style.display = "block";
+  reco.innerHTML = `📋 Pour <strong>${t} personnes</strong> : <strong>${duree}</strong> recommandées · <strong>${cartes}</strong>${note}`;
+}
+
+// ─── Textareas ────────────────────────────────────────────────────────────────
+
+function bindTextareas() {
+  [
+    ["pathologie", "pathologie"],
+    ["age", "age"],
+    ["q-accueil", "qAccueil"],
+    ["q-activite", "qActivite"],
+    ["q-synthese", "qSynthese"],
+    ["indicateur", "indicateur"],
+    ["eval-methode", "evalMethode"],
+    ["reformulation", "reformulation"],
+  ].forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", () => { state[key] = el.value; });
+  });
+}
+
+// ─── Navigation ───────────────────────────────────────────────────────────────
+
+function canNext() {
+  if (state.step === 0) return state.parcours && state.competence;
+  if (state.step === 1) return state.litteratie;
+  if (state.step === 2) return state.methode;
+  return true;
+}
+
+function updateNav() {
+  const prev = document.getElementById("btn-prev");
+  const next = document.getElementById("btn-next");
+  prev.style.display = state.step > 0 ? "inline-block" : "none";
+  if (state.step === STEPS.length - 1) {
+    next.style.display = "none";
+  } else {
+    next.style.display = "inline-block";
+    next.textContent = state.step === STEPS.length - 2 ? "Analyser →" : "Continuer →";
+    next.disabled = !canNext();
+  }
+}
+
+function changeStep(dir) {
+  if (dir === 1 && !canNext()) return;
+  state.step = Math.max(0, Math.min(STEPS.length - 1, state.step + dir));
+  renderStep();
+}
+
+function renderStep() {
+  // show/hide steps
+  STEPS.forEach((_, i) => {
+    document.getElementById(`step-${i}`).classList.toggle("active", i === state.step);
+  });
+
+  // Step 3: update conductor details
+  if (state.step === 3) {
+    const m = METHODES.find(m => m.id === state.methode);
+    document.getElementById("activite-objectif").innerHTML =
+      `<em>Objectif :</em> Travailler la compétence « ${state.competence || "…"} » via les cartes symptômes`;
+    document.getElementById("activite-methode").innerHTML =
+      `<em>Méthode :</em> ${m ? m.id + ". " + m.label : "—"}`;
+    const t = state.taille;
+    document.getElementById("activite-duration").textContent =
+      t <= 6 ? "25–30 min" : t <= 12 ? "30–40 min" : "40–50 min";
+    // restore values
+    document.getElementById("q-accueil").value = state.qAccueil;
+    document.getElementById("q-activite").value = state.qActivite;
+    document.getElementById("q-synthese").value = state.qSynthese;
+  }
+
+  // Step 5: restore eval fields
+  if (state.step === 4) {
+    document.getElementById("indicateur").value = state.indicateur;
+    document.getElementById("eval-methode").value = state.evalMethode;
+    document.getElementById("reformulation").value = state.reformulation;
+  }
+
+  // Step 6: build analysis
+  if (state.step === 5) buildAnalysis();
+
+  updateProgress();
+  updateNav();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ─── Analysis ────────────────────────────────────────────────────────────────
+
+function buildAnalysis() {
+  const m = METHODES.find(m => m.id === state.methode);
+  const feedbacks = [];
+
+  if (!state.competence) feedbacks.push({ type: "warn", msg: "Aucune compétence ciblée — l'objectif reste flou." });
+  if (!state.indicateur) feedbacks.push({ type: "warn", msg: "Pas d'indicateur d'évaluation défini. Comment saurez-vous que la compétence est acquise ?" });
+  if (!state.qAccueil) feedbacks.push({ type: "warn", msg: "La question d'ouverture de l'accueil n'est pas rédigée." });
+  if (!state.qActivite) feedbacks.push({ type: "warn", msg: "Les questions-clés de l'activité centrale manquent." });
+  if (!state.qSynthese) feedbacks.push({ type: "warn", msg: "La question de synthèse finale n'est pas formulée." });
+  if (state.taille > 12 && state.methode === "A")
+    feedbacks.push({ type: "info", msg: `Pour un groupe de ${state.taille} personnes, le tri individuel + tour de table risque d'être très long. Envisagez la méthode C.` });
+  if (state.litteratie === "Faible" && state.methode === "D")
+    feedbacks.push({ type: "info", msg: "Le jeu narratif peut déstabiliser des patients avec un faible niveau de littératie. Veillez à la clarté des consignes." });
+  if (feedbacks.length === 0)
+    feedbacks.push({ type: "ok", msg: "✓ Conducteur complet et cohérent. Bravo !" });
+
+  const fb = document.getElementById("feedbacks");
+  fb.innerHTML = feedbacks.map(f =>
+    `<div class="feedback-row ${f.type}">${f.msg}</div>`
+  ).join("");
+
+  const rows = [
+    ["Parcours", state.parcours || "—"],
+    ["Compétence ciblée", state.competence || "—"],
+    ["Pathologie / Problématique", state.pathologie || "—"],
+    ["Âge", state.age || "—"],
+    ["Niveau de littératie", state.litteratie || "—"],
+    ["Taille du groupe", state.taille + " personnes"],
+    ["Méthode d'animation", m ? m.id + ". " + m.label : "—"],
+    ["Accueil — Question d'ouverture", state.qAccueil || "—"],
+    ["Activité — Questions-clés", state.qActivite || "—"],
+    ["Synthèse — Question finale", state.qSynthese || "—"],
+    ["Indicateur d'évaluation", state.indicateur || "—"],
+    ["Méthode d'évaluation", state.evalMethode || "—"],
+    ["Reformulation attendue", state.reformulation || "—"],
+  ];
+
+  document.getElementById("export-rows").innerHTML = rows.map(([label, val]) =>
+    `<div class="export-row">
+      <p class="export-row-label">${label}</p>
+      <p class="export-row-val">${val}</p>
+    </div>`
+  ).join("");
+}
+
+// Init taille display
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("taille-val").textContent = state.taille;
+  updatePublicReco();
+});
+</script>
+</body>
+</html>
