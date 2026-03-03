@@ -1,1 +1,504 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Support Formation ETP — Mail patient ressource (Insuffisance cardiaque)</title>
+  <style>
+    :root{
+      --bg:#0b0d12;
+      --panel:#121724;
+      --panel2:#0f1420;
+      --text:#e9eefc;
+      --muted:#b8c2df;
+      --muted2:#93a2c8;
+      --line:#2a3552;
+      --accent:#7dd3fc;
+      --accent2:#a7f3d0;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --ok:#86efac;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: radial-gradient(1200px 600px at 15% 10%, rgba(125,211,252,.14), transparent 55%),
+                  radial-gradient(900px 500px at 85% 20%, rgba(167,243,208,.10), transparent 50%),
+                  radial-gradient(900px 650px at 40% 90%, rgba(251,113,133,.08), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.55;
+    }
+    header{
+      padding:28px 18px 10px;
+      max-width:980px;
+      margin:0 auto;
+    }
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:6px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--muted);
+      background:rgba(18,23,36,.6);
+      font-size:13px;
+    }
+    h1{
+      margin:12px 0 8px;
+      font-size:28px;
+      letter-spacing:.2px;
+    }
+    p.lead{
+      margin:0 0 14px;
+      color:var(--muted);
+      max-width:68ch;
+    }
 
+    main{
+      max-width:980px;
+      margin:0 auto;
+      padding:10px 18px 44px;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+    }
+    @media (max-width: 880px){
+      main{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(18,23,36,.92), rgba(15,20,32,.92));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      background:rgba(18,23,36,.75);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:14px;
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .title strong{ font-size:14px; }
+    .title span{ font-size:12px; color:var(--muted2); }
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:var(--muted);
+      background:rgba(11,13,18,.35);
+      white-space:nowrap;
+    }
+    .body{
+      padding:16px;
+    }
+
+    /* Fake email UI */
+    .mail-top{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .avatar{
+      width:40px; height:40px;
+      border-radius:12px;
+      background: linear-gradient(135deg, rgba(125,211,252,.35), rgba(167,243,208,.22));
+      border:1px solid var(--line);
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      font-weight:700;
+    }
+    .mail-meta{
+      flex:1;
+      min-width:0;
+    }
+    .mail-meta .from{
+      font-weight:700;
+      font-size:14px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .mail-meta .details{
+      color:var(--muted2);
+      font-size:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 12px;
+      margin-top:2px;
+    }
+    .k{
+      padding:2px 8px;
+      border:1px dashed rgba(42,53,82,.9);
+      border-radius:999px;
+      background: rgba(11,13,18,.25);
+    }
+    .subject{
+      margin:10px 0 14px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(11,13,18,.28);
+    }
+    .subject strong{ display:block; font-size:13px; color:var(--muted2); }
+    .subject div{ font-size:16px; margin-top:2px; }
+    .mail-text{
+      background:rgba(11,13,18,.22);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px 14px 8px;
+    }
+    .mail-text p{
+      margin:0 0 10px;
+      color:var(--text);
+    }
+    .quote{
+      margin:10px 0 6px;
+      padding:12px 12px;
+      border-left:3px solid var(--accent);
+      background:rgba(125,211,252,.08);
+      border-radius:12px;
+      white-space:pre-wrap;
+    }
+    .sig{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .attach{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(18,23,36,.45);
+    }
+    .file{
+      width:36px; height:36px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(11,13,18,.35);
+      display:grid;
+      place-items:center;
+      font-family:var(--mono);
+      color:var(--accent2);
+      font-weight:700;
+      font-size:12px;
+    }
+    .attach .meta{
+      flex:1;
+      min-width:0;
+    }
+    .attach .meta strong{
+      display:block;
+      font-size:13px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .attach .meta span{
+      display:block;
+      font-size:12px;
+      color:var(--muted2);
+      margin-top:2px;
+    }
+
+    /* Right panel: assignment */
+    .section{
+      margin-bottom:12px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(11,13,18,.22);
+    }
+    .section h3{
+      margin:0 0 8px;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .section ul{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+    }
+    .section li{ margin:6px 0; }
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 880px){
+      .grid2{ grid-template-columns:1fr; }
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(18,23,36,.35);
+      color:var(--muted);
+      font-size:12px;
+    }
+    .dot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background:var(--accent);
+      box-shadow: 0 0 0 4px rgba(125,211,252,.12);
+    }
+    .dot.warn{ background:var(--warn); box-shadow: 0 0 0 4px rgba(251,191,36,.12); }
+    .dot.danger{ background:var(--danger); box-shadow: 0 0 0 4px rgba(251,113,133,.12); }
+    .dot.ok{ background:var(--ok); box-shadow: 0 0 0 4px rgba(134,239,172,.12); }
+
+    .deliver{
+      border:1px solid rgba(125,211,252,.35);
+      background:rgba(125,211,252,.08);
+    }
+    .deliver h3{ color:var(--text); }
+    .mono{
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+      background:rgba(11,13,18,.28);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      white-space:pre-wrap;
+    }
+    footer{
+      max-width:980px;
+      margin:0 auto;
+      padding:0 18px 26px;
+      color:var(--muted2);
+      font-size:12px;
+    }
+    a{ color:inherit; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="badge">Support formation ETP 40h • Matériau patient • Insuffisance cardiaque (50–60 ans)</span>
+    <h1>Mail d’un patient ressource (54 ans) — support de travail</h1>
+    <p class="lead">
+      Ce document simule un mail réel reçu par une équipe cardio. Le texte joint (slam) est une production patient.
+      Votre travail consiste à transformer ce matériau en <strong>AEC</strong> (action éducative ciblée) et en <strong>conducteur d’animation</strong> de séance collective.
+    </p>
+  </header>
+
+  <main>
+    <!-- Left: email -->
+    <section class="card" aria-label="Mail patient ressource">
+      <div class="hd">
+        <div class="title">
+          <strong>Boîte de réception • Cardiologie</strong>
+          <span>Message reçu d’un patient ressource (association cardio)</span>
+        </div>
+        <span class="pill">Simulation pédagogique</span>
+      </div>
+
+      <div class="body">
+        <div class="mail-top">
+          <div class="avatar" aria-hidden="true">JB</div>
+          <div class="mail-meta">
+            <div class="from">Jean-Baptiste L. (54 ans) — Association “Cœur & Cap”</div>
+            <div class="details">
+              <span class="k"><strong>À :</strong> équipe ETP Cardio</span>
+              <span class="k"><strong>Date :</strong> 03/03/2026 • 07:28</span>
+              <span class="k"><strong>Profil :</strong> IC chronique stabilisée • 50–60 ans</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="subject">
+          <strong>Objet</strong>
+          <div>Un texte que j’aurais aimé entendre plus tôt</div>
+        </div>
+
+        <div class="mail-text">
+          <p>Bonjour,</p>
+          <p>
+            Je vous écris après la journée “Rencontre ETP” de l’association. J’ai proposé un petit atelier d’écriture
+            (slam) parce que je me suis rendu compte que beaucoup d’entre nous ont les mêmes zones floues :
+            on fait “comme on peut”, on improvise, et parfois on attend trop.
+          </p>
+          <p>
+            Je me permets de vous partager un texte. Si vous pensez que ça peut servir, vous pouvez l’utiliser
+            comme point de départ pour une séance ETP. L’idée, c’est que ça parle “vrai” et que ça aide à mettre des mots
+            sur ce qui n’est pas clair.
+          </p>
+
+          <div class="quote" aria-label="Slam - texte">
+Slam – “Avant qu’on m’explique vraiment”
+
+Le matin je monte sur la balance
+mais je ne sais pas quoi faire du chiffre.
+Un kilo de plus ?
+C’est peut-être le pain d’hier.
+Ou juste de l’eau.
+Je verrai bien.
+
+Le sel, j’ai arrêté la salière.
+Ça devrait suffire, non ?
+Je ne vais pas devenir parano
+à lire les étiquettes
+comme si ma vie était écrite en petit.
+
+Mon cœur est “insuffisant”,
+c’est le mot qu’ils ont utilisé.
+Moi j’entends “défaillant”.
+Alors je me ménage trop
+ou je force trop.
+Je ne sais jamais la bonne mesure.
+
+Les médicaments…
+parfois j’en saute un.
+Juste pour voir si je tiens sans.
+Je n’aime pas dépendre
+de petites pilules blanches.
+
+Quand l’air manque,
+je me dis que ça va passer.
+Je marche quand même.
+Je ne veux pas faire fragile
+devant les autres.
+
+La nuit je rajoute un oreiller.
+C’est plus confortable,
+je ne me pose pas plus de questions.
+Les chevilles gonflées ?
+Il fait chaud, c’est normal.
+
+Ma femme me dit de faire attention.
+Moi je lui dis de ne pas dramatiser.
+On évite le sujet,
+comme si ne pas en parler
+allait protéger quelque chose.
+
+Je n’ai pas de carnet de suivi.
+Je me fie à l’impression du jour.
+Bon jour, mauvais jour.
+Ça suffit bien.
+
+On m’a parlé d’activité physique.
+Je crois que le repos protège.
+Alors je m’économise.
+Je me mets de côté
+en attendant que ça s’arrange.
+
+Je ne veux pas retourner à l’hôpital.
+Mais je ne sais pas vraiment
+ce qui ferait la différence.
+
+Je vis avec un cœur fragile
+sans mode d’emploi clair.
+
+Je navigue à vue.</div>
+
+          <p class="sig">
+            Merci de votre lecture.<br/>
+            Jean-Baptiste L., 54 ans — insuffisance cardiaque — bénévole association “Cœur & Cap”
+          </p>
+
+          <div class="attach" role="group" aria-label="Pièce jointe">
+            <div class="file">MP3</div>
+            <div class="meta">
+              <strong>Slam — “Avant qu’on m’explique vraiment”.mp3</strong>
+              <span>1 min 35 • enregistrement atelier d’écriture (association patients cardio)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: assignment -->
+    <aside class="card" aria-label="Consigne de travail">
+      <div class="hd">
+        <div class="title">
+          <strong>Consigne — Travail en sous-groupes</strong>
+          <span>Construire une AEC à partir d’une production patient</span>
+        </div>
+        <span class="pill">45–60 min</span>
+      </div>
+
+      <div class="body">
+        <div class="section">
+          <h3>1) Votre mission</h3>
+          <ul>
+            <li>Traiter le slam comme un <strong>matériau éducatif</strong> (pas comme une “illustration”).</li>
+            <li>Déduire les <strong>besoins éducatifs</strong> et les <strong>compétences à construire</strong>.</li>
+            <li>Proposer une <strong>AEC</strong> adaptée au public : hommes/femmes <strong>50–60 ans</strong>, insuffisance cardiaque stabilisée.</li>
+            <li>Utiliser le slam comme <strong>outil d’animation</strong> (déclencheur, tri, débat, cas, plan d’action).</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>2) Indices à repérer dans le slam</h3>
+          <div class="grid2" style="margin-top:8px;">
+            <div class="tag"><span class="dot warn"></span> Incertitude sur les seuils (poids, œdèmes, oreiller…)</div>
+            <div class="tag"><span class="dot danger"></span> Conduites à risque (attendre, “ça va passer”, sauter un médicament)</div>
+            <div class="tag"><span class="dot"></span> Croyances / raccourcis (“arrêter la salière suffit”, “le repos protège”)</div>
+            <div class="tag"><span class="dot ok"></span> Levier : “je ne veux pas retourner à l’hôpital”</div>
+          </div>
+        </div>
+
+        <div class="section deliver">
+          <h3>3) Livrables attendus (à rendre à l’oral)</h3>
+          <ul>
+            <li><strong>Titre</strong> de l’AEC (1 ligne).</li>
+            <li><strong>Intention éducative</strong> (1 phrase commençant par “Permettre à la personne de…”).</li>
+            <li><strong>3 objectifs</strong> formulés en compétences (observables).</li>
+            <li><strong>Outils d’animation</strong> utilisés (au moins 2), dont <strong>le slam</strong>.</li>
+            <li><strong>Conducteur</strong> détaillé d’une séance collective (60 à 90 min).</li>
+            <li><strong>Évaluation formative</strong> à chaud (comment vérifier l’acquisition).</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h3>4) Canevas rapide (à compléter)</h3>
+          <div class="mono">AEC — Titre :
+Public :
+Intention :
+Compétences visées (3) :
+Messages clés (3) :
+Outils :
+Conducteur (étapes + temps) :
+Évaluation formative :
+Rôles animateurs / posture :</div>
+        </div>
+
+        <div class="section">
+          <h3>5) Bonus (si temps)</h3>
+          <ul>
+            <li>Proposer une <strong>phrase ressource</strong> que le groupe pourrait garder (format “mémo”).</li>
+            <li>Prévoir une adaptation si niveau de littératie faible.</li>
+            <li>Prévoir une adaptation si aidants présents.</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Usage pédagogique : support “production patient → AEC”. À adapter aux protocoles locaux et aux consignes de votre structure.
+  </footer>
+</body>
+</html>
