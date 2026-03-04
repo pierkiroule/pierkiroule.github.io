@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ETP • Séance co-animée avec patient partenaire</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a33cc;
+      --card2:#0f1a33;
+      --text:#e8eeff;
+      --muted:#b8c3e6;
+      --line:#23335f;
+      --accent:#6aa7ff;
+      --ok:#2ee59d;
+      --warn:#ffd86a;
+      --hot:#ff6a8e;
+      --purple:#b58bff;
+      --cyan:#5ef2ff;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 15% 10%, rgba(106,167,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 85% 20%, rgba(255,106,142,.14), transparent 55%),
+        radial-gradient(900px 700px at 55% 92%, rgba(46,229,157,.10), transparent 60%),
+        linear-gradient(180deg, #070b14, var(--bg));
+      min-height:100vh;
+      padding:24px 16px 64px;
+    }
+
+    .wrap{ max-width:1050px; margin:0 auto; }
+
+    header{
+      display:flex; gap:16px; align-items:flex-start; justify-content:space-between;
+      margin:6px 0 18px;
+    }
+
+    .title{
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px;
+      background: rgba(15,26,51,.55);
+      backdrop-filter: blur(10px);
+      width: fit-content;
+      box-shadow: 0 10px 35px rgba(0,0,0,.22);
+      font-size:13px;
+      color: var(--muted);
+    }
+    h1{
+      margin:0;
+      font-size:26px;
+      letter-spacing:.2px;
+      line-height:1.15;
+    }
+    .subtitle{
+      margin:0;
+      color: var(--muted);
+      max-width: 70ch;
+      line-height:1.45;
+      font-size:14px;
+    }
+
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .btn{
+      appearance:none; border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,26,51,.55);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight:600;
+      box-shadow: 0 10px 35px rgba(0,0,0,.20);
+      transition: transform .08s ease, border-color .12s ease, background .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{ border-color: rgba(106,167,255,.35); background: rgba(106,167,255,.16); }
+    .btn.ok{ border-color: rgba(46,229,157,.35); background: rgba(46,229,157,.12); }
+    .btn.warn{ border-color: rgba(255,216,106,.35); background: rgba(255,216,106,.10); }
+    .btn.hot{ border-color: rgba(255,106,142,.40); background: rgba(255,106,142,.12); }
+    .btn.small{ padding:8px 10px; border-radius:10px; font-size:13px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap:16px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 920px){
+      header{ flex-direction:column; }
+      .actions{ justify-content:flex-start; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: rgba(15,26,51,.55);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .cardHeader{
+      padding:14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .cardBody{ padding:14px 16px 16px; }
+
+    .flow{
+      display:flex; flex-wrap:wrap; gap:10px;
+      padding:12px 0 0;
+    }
+    .pill{
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,26,51,.50);
+      color: var(--muted);
+      font-size:13px;
+      display:inline-flex; gap:8px; align-items:center;
+    }
+    .pill strong{ color: var(--text); font-weight:700; }
+
+    .callout{
+      padding:14px 14px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,26,51,.42);
+      box-shadow: 0 14px 40px rgba(0,0,0,.18);
+      margin: 12px 0;
+    }
+    .callout .kicker{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+      margin:0 0 6px;
+      font-size:14px;
+    }
+    .callout p{ margin:0; color: var(--muted); line-height:1.5; }
+    .callout ul{ margin:10px 0 0 18px; color: var(--muted); }
+    .callout li{ margin:6px 0; }
+
+    .callout.blue{ border-color: rgba(106,167,255,.35); background: rgba(106,167,255,.10); }
+    .callout.green{ border-color: rgba(46,229,157,.35); background: rgba(46,229,157,.08); }
+    .callout.yellow{ border-color: rgba(255,216,106,.35); background: rgba(255,216,106,.08); }
+    .callout.pink{ border-color: rgba(255,106,142,.40); background: rgba(255,106,142,.09); }
+    .callout.purple{ border-color: rgba(181,139,255,.40); background: rgba(181,139,255,.09); }
+    .callout.cyan{ border-color: rgba(94,242,255,.35); background: rgba(94,242,255,.08); }
+
+    .sectionTitle{
+      margin: 10px 0 8px;
+      font-weight:900;
+      letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+      font-size:14px;
+      color: var(--text);
+    }
+
+    .list{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,26,51,.40);
+      border-radius: 14px;
+      padding:12px 12px;
+      display:grid;
+      gap:8px;
+    }
+    .row{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .item .label{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800;
+    }
+    .item .desc{
+      color: var(--muted);
+      line-height:1.45;
+      font-size:13px;
+      margin:0;
+    }
+    .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+    .chip{
+      font-size:12px;
+      color: var(--muted);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,26,51,.40);
+      border-radius: 999px;
+      padding:6px 9px;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .chip b{ color: var(--text); }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: rgba(255,255,255,.25);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+      margin-top:3px;
+      flex:0 0 auto;
+    }
+    .dot.blue{ background: rgba(106,167,255,.9); box-shadow: 0 0 0 4px rgba(106,167,255,.18); }
+    .dot.green{ background: rgba(46,229,157,.95); box-shadow: 0 0 0 4px rgba(46,229,157,.18); }
+    .dot.yellow{ background: rgba(255,216,106,.95); box-shadow: 0 0 0 4px rgba(255,216,106,.18); }
+    .dot.pink{ background: rgba(255,106,142,.95); box-shadow: 0 0 0 4px rgba(255,106,142,.18); }
+    .dot.purple{ background: rgba(181,139,255,.95); box-shadow: 0 0 0 4px rgba(181,139,255,.18); }
+    .dot.cyan{ background: rgba(94,242,255,.95); box-shadow: 0 0 0 4px rgba(94,242,255,.18); }
+
+    .checklist{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    .check{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,26,51,.35);
+    }
+    .check input{ margin-top:3px; }
+    .check .t{ display:grid; gap:4px; }
+    .check .t b{ font-size:13px; }
+    .check .t span{ font-size:12.5px; color: var(--muted); line-height:1.35; }
+
+    .relanceBox{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+    .relance{
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,26,51,.35);
+      color: var(--text);
+      line-height:1.45;
+      font-size:13px;
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+    }
+    .relance small{ color: var(--muted); display:block; margin-top:4px; }
+    .relance .left{ display:grid; gap:4px; }
+    .relance .tag{
+      font-size:12px;
+      color: var(--muted);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,26,51,.40);
+      border-radius:999px;
+      padding:5px 8px;
+      white-space:nowrap;
+      height: fit-content;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform: translateX(-50%);
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,26,51,.72);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      display:none;
+      z-index: 50;
+      font-size:13px;
+    }
+    .sep{ height:1px; background: rgba(255,255,255,.08); margin:14px 0; }
+
+    textarea{
+      width:100%;
+      min-height:110px;
+      resize:vertical;
+      border-radius:14px;
+      padding:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,26,51,.35);
+      color: var(--text);
+      outline:none;
+      line-height:1.45;
+      font-size:13px;
+    }
+    textarea::placeholder{ color: rgba(184,195,230,.6); }
+
+    .two{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 720px){
+      .two{ grid-template-columns: 1fr; }
+    }
+
+    .mini{
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.4;
+    }
+
+    .kbd{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      padding:3px 7px;
+      border-radius:8px;
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    .footerNote{
+      margin-top:16px;
+      color: rgba(184,195,230,.72);
+      font-size:12px;
+      line-height:1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <div class="badge">🧩 ETP 40h • Outil de conception • Séance co-animée</div>
+        <h1>Concevoir une séance d’ETP co-animée<br/>avec un patient partenaire</h1>
+        <p class="subtitle">
+          Un guide opérationnel : critères simples + indicateurs concrets + relances prêtes à l’emploi.
+          Objectif : une séance utile, active, et une co-animation vraiment visible.
+        </p>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btnPrint" title="Imprimer / PDF">🖨️ Imprimer</button>
+        <button class="btn ok" id="btnCopyAll" title="Copier le guide en texte">📋 Copier</button>
+        <button class="btn warn" id="btnRandomRelance" title="Tirer une relance au hasard">🎲 Relance</button>
+        <button class="btn hot" id="btnReset" title="Réinitialiser la check-list">🧹 Reset</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="cardHeader">
+        <h2>🧭 Fil conducteur</h2>
+        <span class="mini">Astuce : imprime + coche en réunion de préparation.</span>
+      </div>
+      <div class="cardBody">
+        <div class="flow">
+          <div class="pill">🧠 <strong>Problème vécu</strong></div>
+          <div class="pill">🎯 <strong>Objectif éducatif</strong></div>
+          <div class="pill">🤝 <strong>Rôle du patient partenaire</strong></div>
+          <div class="pill">🗣️ <strong>Animation active</strong></div>
+          <div class="pill">✅ <strong>Indicateurs simples</strong></div>
+        </div>
+
+        <div class="callout blue">
+          <div class="kicker">💡 Message clé</div>
+          <p><b>Le patient partenaire apporte un savoir expérientiel</b> (vécu, obstacles, astuces, langage). Le soignant apporte le cadre, la sécurité, la structuration. La qualité, c’est la <b>complémentarité</b>.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>🧱 Critères + indicateurs simples</h2>
+          <button class="btn small" id="btnCopyCriteria">📋 Copier critères</button>
+        </div>
+        <div class="cardBody">
+
+          <div class="list" id="criteriaList"></div>
+
+          <div class="sep"></div>
+
+          <div class="callout purple">
+            <div class="kicker">🧪 Mini-test en fin de séance</div>
+            <p>Question de clôture (simple et très discriminante) :</p>
+            <p style="margin-top:8px"><b>« Quelle idée concrète pourriez-vous tester chez vous après cette séance ? »</b></p>
+            <ul>
+              <li>Si les réponses sont vagues → objectif ou méthode à revoir.</li>
+              <li>Si plusieurs patients proposent une action → séance utile.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>🧰 Check-list “partenariat au top”</h2>
+        </div>
+        <div class="cardBody">
+
+          <div class="checklist" id="checklist"></div>
+
+          <div class="sep"></div>
+
+          <div class="callout green">
+            <div class="kicker">✅ Indicateurs “partenariat au top”</div>
+            <ul>
+              <li>Le patient partenaire connaît l’objectif (<b>il peut le reformuler</b>).</li>
+              <li>Les rôles sont visibles (<b>on sait qui fait quoi</b>).</li>
+              <li>Des patients s’adressent au patient partenaire (<b>questions directes</b>).</li>
+              <li>Le patient partenaire relance et fait parler le groupe (<b>échanges entre pairs</b>).</li>
+              <li>À la fin, des patients disent : <b>« je vais essayer… »</b></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <!-- LEFT -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>🎲 Relances types du patient partenaire</h2>
+          <button class="btn small" id="btnCopyRelances">📋 Copier relances</button>
+        </div>
+        <div class="cardBody">
+
+          <div class="callout cyan">
+            <div class="kicker">🗣️ Mode d’emploi</div>
+            <p>Le patient partenaire utilise des relances courtes. Objectif : <b>faire parler les patients entre eux</b>. Le soignant garde le cap (objectif + temps).</p>
+          </div>
+
+          <div class="relanceBox" id="relances"></div>
+
+          <div class="sep"></div>
+
+          <div class="two">
+            <div>
+              <div class="sectionTitle">🧩 Exemple minute (fatigue)</div>
+              <div class="callout yellow">
+                <p><b>Patient partenaire</b> : « Au début je faisais tout le matin, puis crash l’après-midi. »</p>
+                <p style="margin-top:8px"><b>Relance</b> : « Et vous, ça se passe comment chez vous ? »</p>
+                <p style="margin-top:8px"><b>Soignant</b> : reformule + “on liste les stratégies testées”.</p>
+              </div>
+            </div>
+            <div>
+              <div class="sectionTitle">🧯 Vigilance</div>
+              <div class="callout pink">
+                <ul>
+                  <li>Éviter : conseils normatifs (“il faut…”).</li>
+                  <li>Préférer : “dans mon cas… / ce qui m’a aidé…”.</li>
+                  <li>Limiter le récit : <b>2 minutes</b>, puis relance.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>🧠 Synthèse des fonctions du patient partenaire</h2>
+          <button class="btn small" id="btnCopyRoles">📋 Copier synthèse</button>
+        </div>
+        <div class="cardBody">
+          <div class="callout blue">
+            <div class="kicker">🤝 Fonctions spécifiques (patient partenaire)</div>
+            <ul>
+              <li>📌 <b>Rendre concret</b> : raconter une situation réelle du quotidien.</li>
+              <li>🫶 <b>Normaliser</b> : “c’est fréquent”, déculpabiliser, réduire l’isolement.</li>
+              <li>🧰 <b>Outiller</b> : partager des stratégies testées (astuces praticables).</li>
+              <li>🌱 <b>Donner espoir</b> : montrer qu’une adaptation est possible.</li>
+              <li>🗣️ <b>Faire parler</b> : relancer, encourager l’échange entre pairs.</li>
+              <li>🧭 <b>Ramener au réel</b> : “dans la vraie vie, ce qui bloque c’est…”.</li>
+            </ul>
+          </div>
+
+          <div class="callout purple">
+            <div class="kicker">🧩 Complémentarité (soignant ↔ patient partenaire)</div>
+            <div class="item">
+              <div class="row">
+                <div class="label"><span class="dot blue"></span> Soignant</div>
+              </div>
+              <p class="desc">
+                Cadre, sécurité, objectifs, tempo, reformulation, validation des repères, synthèse.
+              </p>
+              <div class="chips">
+                <span class="chip">🧱 <b>Structure</b></span>
+                <span class="chip">🧭 <b>Cap</b></span>
+                <span class="chip">🛡️ <b>Sécurité</b></span>
+              </div>
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="item">
+              <div class="row">
+                <div class="label"><span class="dot green"></span> Patient partenaire</div>
+              </div>
+              <p class="desc">
+                Vécu, stratégies, langage accessible, identification, relances, réalisme.
+              </p>
+              <div class="chips">
+                <span class="chip">📌 <b>Vécu</b></span>
+                <span class="chip">🧰 <b>Astuces</b></span>
+                <span class="chip">🫶 <b>Pair</b></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout green">
+            <div class="kicker">✅ À la fin, on veut entendre</div>
+            <p><b>« Je vais essayer… »</b> (au moins chez quelques patients)</p>
+            <p class="mini" style="margin-top:6px">C’est un indicateur simple et concret d’utilité de la séance.</p>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="sectionTitle">📝 Notes de préparation (option)</div>
+          <textarea id="notes" placeholder="Objectif de la séance, rôle du patient partenaire, points à éviter, relances clés… (optionnel)"></textarea>
+
+          <p class="footerNote">
+            Astuce : en préparation, notez 1 objectif, 1 histoire (2 min), 3 relances, 1 message de clôture.
+            Raccourcis : <span class="kbd">Ctrl</span> + <span class="kbd">P</span> imprimer • <span class="kbd">Ctrl</span> + <span class="kbd">C</span> copier (boutons dédiés).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Copié ✅</div>
+
+  </div>
+
+  <script>
+    const criteria = [
+      {
+        color: "blue",
+        emoji: "🧠",
+        title: "Problème vécu",
+        desc: "La séance part d’une situation réelle de la vie quotidienne (pas un thème abstrait).",
+        indicators: [
+          "Plusieurs patients disent : « ça m’arrive aussi »",
+          "Au moins 2 patients racontent une situation personnelle"
+        ]
+      },
+      {
+        color: "yellow",
+        emoji: "🎯",
+        title: "Objectif éducatif",
+        desc: "Un objectif simple, utile, formulé du point de vue du patient.",
+        indicators: [
+          "En fin de séance, les patients peuvent dire « ce que j’ai appris / compris »",
+          "Au moins une stratégie est citée par plusieurs patients"
+        ]
+      },
+      {
+        color: "green",
+        emoji: "🤝",
+        title: "Rôle du patient partenaire",
+        desc: "Le patient partenaire apporte du vécu, des obstacles, des astuces, et une parole de pair.",
+        indicators: [
+          "Il raconte au moins 1 situation vécue",
+          "Il partage 1 stratégie concrète testée",
+          "Des patients lui posent des questions"
+        ]
+      },
+      {
+        color: "purple",
+        emoji: "🗣️",
+        title: "Animation active",
+        desc: "Les patients parlent plus que les intervenants. Les échanges circulent entre pairs.",
+        indicators: [
+          "Au moins 3 patients prennent la parole",
+          "Les patients répondent entre eux (pas seulement aux intervenants)",
+          "Le patient partenaire fait au moins 2 relances au groupe"
+        ]
+      },
+      {
+        color: "pink",
+        emoji: "🧭",
+        title: "Co-animation visible",
+        desc: "Les rôles sont complémentaires et équilibrés. La co-animation se voit.",
+        indicators: [
+          "Les deux intervenants parlent et se relaient",
+          "Le soignant recadre / synthétise, le patient partenaire illustre / relance",
+          "Les patients s’adressent aux deux"
+        ]
+      },
+      {
+        color: "cyan",
+        emoji: "✅",
+        title: "Impact concret",
+        desc: "La séance laisse une trace : une idée à tester dans la vie quotidienne.",
+        indicators: [
+          "Des patients disent : « je vais essayer… »",
+          "Le groupe liste 3 stratégies ou pistes",
+          "Question de fin répondue par plusieurs participants"
+        ]
+      }
+    ];
+
+    const checklist = [
+      { id:"prep-obj",  title:"Objectif partagé", sub:"Le patient partenaire peut reformuler l’objectif de la séance." },
+      { id:"prep-roles", title:"Rôles clairs", sub:"Qui fait quoi (intro, relances, synthèse) est décidé à l’avance." },
+      { id:"prep-story", title:"Histoire courte", sub:"1 récit utile, cadré à ~2 minutes, puis relance au groupe." },
+      { id:"prep-relances", title:"Relances prêtes", sub:"3 relances simples prévues (identification, vécu, projection)." },
+      { id:"prep-vigilance", title:"Points de vigilance", sub:"Éviter le normatif (“il faut”), privilégier “dans mon cas…”." },
+      { id:"live-questions", title:"Questions au patient partenaire", sub:"Des patients lui posent des questions pendant la séance." },
+      { id:"live-peers", title:"Échanges entre pairs", sub:"Les patients se répondent et se comparent sans jugement." },
+      { id:"end-try", title:"Idée à tester", sub:"En fin de séance, certains disent “je vais essayer…”." }
+    ];
+
+    const relances = [
+      { tag:"Identification", text:"Est-ce que certains d’entre vous vivent quelque chose de similaire ?" },
+      { tag:"Identification", text:"Est-ce que cela vous parle aussi, dans votre quotidien ?" },
+      { tag:"Vécu", text:"Dans quelles situations c’est le plus difficile pour vous ?" },
+      { tag:"Vécu", text:"Qu’avez-vous déjà essayé, même si ça n’a pas marché ?" },
+      { tag:"Partage", text:"Qu’est-ce qui vous aide un tout petit peu, même un détail ?" },
+      { tag:"Partage", text:"Si vous aviez une astuce à donner à quelqu’un, ce serait laquelle ?" },
+      { tag:"Normalisation", text:"Au début, moi aussi j’ai eu ça. Qui d’autre a connu cette phase ?" },
+      { tag:"Normalisation", text:"C’est une difficulté fréquente. Qu’est-ce qui vous rassurerait là-dessus ?" },
+      { tag:"Projection", text:"Qu’est-ce que vous pourriez essayer après cette séance, de façon réaliste ?" },
+      { tag:"Projection", text:"Quelle idée vous paraît la plus faisable chez vous cette semaine ?" },
+      { tag:"Clarification", text:"Si on résume en une phrase : qu’est-ce qui est le plus important pour vous ici ?" },
+      { tag:"Récit utile", text:"Dans mon cas, ce qui a vraiment changé, c’est… Et chez vous, qu’est-ce qui a changé ?" }
+    ];
+
+    function dotClass(color){
+      return {
+        blue:"dot blue", green:"dot green", yellow:"dot yellow",
+        pink:"dot pink", purple:"dot purple", cyan:"dot cyan"
+      }[color] || "dot";
+    }
+
+    function showToast(msg="Copié ✅"){
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.style.display = "block";
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(()=>{ t.style.display = "none"; }, 1300);
+    }
+
+    function copyText(text){
+      navigator.clipboard.writeText(text).then(()=>showToast()).catch(()=>showToast("Copie impossible"));
+    }
+
+    function renderCriteria(){
+      const host = document.getElementById("criteriaList");
+      host.innerHTML = "";
+
+      criteria.forEach(c=>{
+        const el = document.createElement("div");
+        el.className = "item";
+
+        el.innerHTML = `
+          <div class="row">
+            <div class="label">
+              <span class="${dotClass(c.color)}"></span>
+              <span>${c.emoji} ${c.title}</span>
+            </div>
+            <span class="chip">🎛️ <b>Indicateurs</b> ${c.indicators.length}</span>
+          </div>
+          <p class="desc">${c.desc}</p>
+          <div class="chips">
+            ${c.indicators.map(x=>`<span class="chip">✅ ${escapeHtml(x)}</span>`).join("")}
+          </div>
+        `;
+        host.appendChild(el);
+      });
+    }
+
+    function renderChecklist(){
+      const host = document.getElementById("checklist");
+      host.innerHTML = "";
+
+      checklist.forEach(it=>{
+        const saved = localStorage.getItem("raquetp_chk_"+it.id) === "1";
+        const el = document.createElement("label");
+        el.className = "check";
+        el.innerHTML = `
+          <input type="checkbox" ${saved ? "checked":""} data-id="${it.id}">
+          <div class="t">
+            <b>${escapeHtml(it.title)}</b>
+            <span>${escapeHtml(it.sub)}</span>
+          </div>
+        `;
+        host.appendChild(el);
+      });
+
+      host.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+        cb.addEventListener("change", ()=>{
+          localStorage.setItem("raquetp_chk_"+cb.dataset.id, cb.checked ? "1" : "0");
+        });
+      });
+    }
+
+    function renderRelances(){
+      const host = document.getElementById("relances");
+      host.innerHTML = "";
+
+      relances.forEach(r=>{
+        const el = document.createElement("div");
+        el.className = "relance";
+        el.innerHTML = `
+          <div class="left">
+            <div>${escapeHtml(r.text)}</div>
+            <small>Astuce : relance courte → laisser le silence travailler.</small>
+          </div>
+          <div class="tag">🏷️ ${escapeHtml(r.tag)}</div>
+        `;
+        el.addEventListener("click", ()=>copyText(r.text));
+        host.appendChild(el);
+      });
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function buildCriteriaText(){
+      return [
+        "Séance ETP co-animée avec patient partenaire — Critères + indicateurs simples",
+        "",
+        ...criteria.flatMap(c=>[
+          `${c.emoji} ${c.title}`,
+          `- Critère : ${c.desc}`,
+          ...c.indicators.map(i=>`- Indicateur : ${i}`),
+          ""
+        ])
+      ].join("\n");
+    }
+
+    function buildRelancesText(){
+      return [
+        "Relances types du patient partenaire (co-animation ETP)",
+        "",
+        ...relances.map(r=>`[${r.tag}] ${r.text}`)
+      ].join("\n");
+    }
+
+    function buildRolesText(){
+      return [
+        "Fonctions spécifiques du patient partenaire",
+        "- Rendre concret : situations réelles du quotidien",
+        "- Normaliser : déculpabiliser, réduire l’isolement",
+        "- Outiller : stratégies testées, astuces praticables",
+        "- Donner espoir : montrer qu’une adaptation est possible",
+        "- Faire parler : relances, échange entre pairs",
+        "- Ramener au réel : ce qui bloque / ce qui aide dans la vraie vie",
+        "",
+        "Complémentarité",
+        "Soignant : cadre, sécurité, objectifs, tempo, reformulation, synthèse",
+        "Patient partenaire : vécu, stratégies, langage accessible, identification, relances, réalisme",
+      ].join("\n");
+    }
+
+    function buildAllText(){
+      const notes = (document.getElementById("notes").value || "").trim();
+      return [
+        "ETP • Séance co-animée avec patient partenaire",
+        "",
+        buildCriteriaText(),
+        "",
+        buildRelancesText(),
+        "",
+        buildRolesText(),
+        "",
+        notes ? ("Notes de préparation\n" + notes) : ""
+      ].filter(Boolean).join("\n");
+    }
+
+    function randomRelance(){
+      const r = relances[Math.floor(Math.random() * relances.length)];
+      copyText(r.text);
+      showToast("Relance copiée 🎲");
+    }
+
+    function resetChecklist(){
+      checklist.forEach(it=>localStorage.removeItem("raquetp_chk_"+it.id));
+      renderChecklist();
+      showToast("Check-list reset 🧹");
+    }
+
+    // Events
+    document.getElementById("btnPrint").addEventListener("click", ()=>window.print());
+    document.getElementById("btnCopyAll").addEventListener("click", ()=>copyText(buildAllText()));
+    document.getElementById("btnCopyCriteria").addEventListener("click", ()=>copyText(buildCriteriaText()));
+    document.getElementById("btnCopyRelances").addEventListener("click", ()=>copyText(buildRelancesText()));
+    document.getElementById("btnCopyRoles").addEventListener("click", ()=>copyText(buildRolesText()));
+    document.getElementById("btnRandomRelance").addEventListener("click", randomRelance);
+    document.getElementById("btnReset").addEventListener("click", resetChecklist);
+
+    // Persist notes
+    const notesEl = document.getElementById("notes");
+    notesEl.value = localStorage.getItem("raquetp_notes") || "";
+    notesEl.addEventListener("input", ()=>localStorage.setItem("raquetp_notes", notesEl.value));
+
+    // Init render
+    renderCriteria();
+    renderChecklist();
+    renderRelances();
+  </script>
+</body>
+</html>
