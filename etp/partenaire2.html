@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>ETP – Patient partenaire</title>
+
+<style>
+
+body{
+font-family:Arial, sans-serif;
+background:#f4f6fb;
+margin:0;
+padding:30px;
+color:#333;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+h1{
+text-align:center;
+margin-bottom:30px;
+}
+
+.box{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+
+.blue{border-left:6px solid #4a90e2;}
+.green{border-left:6px solid #2ecc71;}
+.orange{border-left:6px solid #f39c12;}
+.purple{border-left:6px solid #9b59b6;}
+
+.title{
+font-weight:bold;
+margin-bottom:10px;
+font-size:18px;
+}
+
+ul{
+margin-top:5px;
+}
+
+button{
+background:#4a90e2;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#357bd8;
+}
+
+.relance{
+background:#eef3ff;
+padding:15px;
+border-radius:6px;
+font-size:18px;
+margin-bottom:10px;
+}
+
+.highlight{
+background:#fff3c9;
+padding:10px;
+border-radius:6px;
+margin-top:10px;
+}
+
+.footer{
+text-align:center;
+margin-top:40px;
+color:#666;
+font-size:14px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🧩 Séance ETP avec patient partenaire</h1>
+
+<div class="box blue">
+
+<div class="title">🧠 Principe</div>
+
+Une co-animation efficace repose sur deux savoirs complémentaires :
+
+<ul>
+<li><b>Soignant :</b> cadre, connaissances, structuration</li>
+<li><b>Patient partenaire :</b> vécu, stratégies concrètes, identification</li>
+</ul>
+
+</div>
+
+
+<div class="box green">
+
+<div class="title">🎯 Objectif de la séance</div>
+
+Aider les patients à repartir avec <b>une idée concrète à tester</b> dans leur vie quotidienne.
+
+<div class="highlight">
+Question finale utile :  
+<b>« Qu’est-ce que vous pourriez essayer chez vous après cette séance ? »</b>
+</div>
+
+</div>
+
+
+<div class="box orange">
+
+<div class="title">✅ Indicateurs simples que la séance fonctionne</div>
+
+<ul>
+<li>plusieurs patients prennent la parole</li>
+<li>les patients racontent leur propre expérience</li>
+<li>des questions sont posées au patient partenaire</li>
+<li>des stratégies concrètes émergent dans la discussion</li>
+<li>certains patients disent : <b>« je pourrais essayer… »</b></li>
+</ul>
+
+</div>
+
+
+<div class="box purple">
+
+<div class="title">🤝 Rôle spécifique du patient partenaire</div>
+
+<ul>
+<li>📌 partager une expérience vécue</li>
+<li>🫶 normaliser les difficultés</li>
+<li>🧰 décrire des stratégies concrètes</li>
+<li>🌱 donner de l’espoir</li>
+<li>🗣️ stimuler la parole du groupe</li>
+</ul>
+
+</div>
+
+
+<div class="box">
+
+<div class="title">💬 Relances ouvertes du patient partenaire</div>
+
+<div id="relanceBox" class="relance">
+Clique sur le bouton pour afficher une question.
+</div>
+
+<button onclick="nouvelleRelance()">🎲 Nouvelle question</button>
+
+</div>
+
+
+<div class="box">
+
+<div class="title">Exemples de questions ouvertes</div>
+
+<ul>
+<li>Qu’est-ce qui est le plus difficile pour vous dans cette situation ?</li>
+<li>Comment cela se passe pour vous au quotidien avec la maladie ?</li>
+<li>Qu’avez-vous déjà essayé pour gérer cela ?</li>
+<li>Qu’est-ce qui vous aide un peu dans votre vie quotidienne ?</li>
+<li>Dans quelles situations cela devient-il le plus compliqué pour vous ?</li>
+<li>Qu’aimeriez-vous pouvoir changer dans votre façon de gérer cela ?</li>
+<li>Qu’est-ce qui vous donnerait envie d’essayer une autre stratégie ?</li>
+
+</ul>
+
+</div>
+
+<div class="footer">
+Outil pédagogique – formation ETP
+</div>
+
+</div>
+
+
+<script>
+
+const questions=[
+"Qu’est-ce qui est le plus difficile pour vous dans cette situation ?",
+"Comment cela se passe pour vous dans votre quotidien ?",
+"Qu’avez-vous déjà essayé pour faire face à cette difficulté ?",
+"Qu’est-ce qui vous aide un peu dans votre vie de tous les jours ?",
+"Dans quelles situations cela devient-il le plus compliqué pour vous ?",
+"Qu’aimeriez-vous pouvoir changer dans votre façon de gérer cela ?",
+"Qu’est-ce qui vous donnerait envie d’essayer une autre stratégie ?",
+"Quelles petites choses ont déjà fait une différence pour vous ?"
+];
+
+function nouvelleRelance(){
+
+const q=questions[Math.floor(Math.random()*questions.length)];
+
+document.getElementById("relanceBox").innerText=q;
+
+}
+
+</script>
+
+</body>
+</html>
