@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevinETP – Le Druide des 20 Énigmes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #0d1f0f;
+    --moss: #1a3a1c;
+    --fern: #2d5a30;
+    --leaf: #4a8c4d;
+    --sage: #7ab87d;
+    --mist: #b8d4b9;
+    --parchment: #f5edd6;
+    --amber: #d4820a;
+    --gold: #f0b429;
+    --rune: #e8c97a;
+    --ember: #c0392b;
+    --correct: #27ae60;
+    --wrong: #c0392b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--forest);
+    color: var(--parchment);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* === ANIMATED FOREST BACKGROUND === */
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-layer::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(42,90,44,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 20%, rgba(26,58,28,0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 100% 40% at 50% 100%, rgba(13,31,15,0.8) 0%, transparent 70%);
+  }
+
+  .rune-float {
+    position: absolute;
+    font-size: 1.2rem;
+    opacity: 0.07;
+    animation: floatRune 15s infinite ease-in-out;
+    color: var(--gold);
+    font-family: 'Cinzel Decorative', serif;
+    user-select: none;
+  }
+
+  @keyframes floatRune {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.05; }
+    50% { transform: translateY(-30px) rotate(10deg); opacity: 0.12; }
+  }
+
+  /* === PARTICLES === */
+  .particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0;
+    animation: particle 8s infinite ease-in-out;
+  }
+  @keyframes particle {
+    0% { opacity: 0; transform: translateY(100vh) scale(0); }
+    20% { opacity: 0.6; }
+    80% { opacity: 0.3; }
+    100% { opacity: 0; transform: translateY(-10vh) scale(1.5); }
+  }
+
+  /* === LAYOUT === */
+  .container {
+    position: relative; z-index: 1;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* === HEADER === */
+  .header {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    position: relative;
+  }
+  .druid-icon {
+    font-size: 5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 20px rgba(240,180,41,0.4));
+    animation: breathe 4s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(240,180,41,0.3)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 35px rgba(240,180,41,0.7)); transform: scale(1.05); }
+  }
+  .header h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 40px rgba(240,180,41,0.4);
+    line-height: 1.2;
+  }
+  .header .subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--mist);
+    margin-top: 0.6rem;
+    opacity: 0.85;
+  }
+  .rune-divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 1.5rem 0;
+    justify-content: center;
+  }
+  .rune-divider::before, .rune-divider::after {
+    content: '';
+    flex: 1; max-width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .rune-symbol { color: var(--gold); font-size: 1.2rem; }
+
+  /* === SCORE BAR === */
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(240,180,41,0.2);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .score-item {
+    text-align: center;
+    flex: 1;
+    min-width: 80px;
+  }
+  .score-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--sage);
+    font-family: 'Space Mono', monospace;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .score-value {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.6rem;
+    color: var(--gold);
+  }
+  .progress-bar-wrap {
+    flex: 3; min-width: 140px;
+  }
+  .progress-bar-track {
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--fern), var(--gold));
+    border-radius: 20px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 0.7rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--sage);
+    margin-top: 0.3rem;
+    text-align: center;
+  }
+
+  /* === ENIGMA CARD === */
+  .card {
+    background: linear-gradient(145deg, rgba(26,58,28,0.7) 0%, rgba(13,31,15,0.8) 100%);
+    border: 1px solid rgba(240,180,41,0.25);
+    border-radius: 18px;
+    padding: 2rem 2.2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(240,180,41,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .enigma-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .enigma-number::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(240,180,41,0.3), transparent);
+  }
+
+  .enigma-text {
+    font-size: 1.25rem;
+    line-height: 1.7;
+    color: var(--parchment);
+    font-style: italic;
+    margin-bottom: 1.8rem;
+    padding-left: 1rem;
+    border-left: 3px solid rgba(240,180,41,0.4);
+  }
+
+  /* === OPTIONS === */
+  .options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+
+  .option-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 0.9rem 1.2rem;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    color: var(--parchment);
+    transition: all 0.25s ease;
+    display: flex; align-items: center; gap: 0.8rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .option-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(240,180,41,0.05));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .option-btn:hover:not(:disabled)::before { opacity: 1; }
+  .option-btn:hover:not(:disabled) {
+    border-color: rgba(240,180,41,0.5);
+    background: rgba(240,180,41,0.08);
+    transform: translateX(4px);
+  }
+  .option-letter {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--amber);
+    font-weight: 700;
+    min-width: 20px;
+  }
+  .option-btn.correct {
+    border-color: var(--correct);
+    background: rgba(39,174,96,0.15);
+    animation: correctPulse 0.5s ease;
+  }
+  .option-btn.wrong {
+    border-color: var(--wrong);
+    background: rgba(192,57,43,0.15);
+    animation: wrongShake 0.4s ease;
+  }
+  @keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  @keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .option-btn:disabled { cursor: default; }
+
+  /* === FEEDBACK === */
+  .feedback {
+    display: none;
+    margin-top: 0.5rem;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .feedback.correct {
+    display: block;
+    background: rgba(39,174,96,0.1);
+    border: 1px solid rgba(39,174,96,0.3);
+    color: #7dca8b;
+  }
+  .feedback.wrong {
+    display: block;
+    background: rgba(192,57,43,0.1);
+    border: 1px solid rgba(192,57,43,0.3);
+    color: #e07070;
+  }
+
+  /* === DRUIDE QUESTION === */
+  .druide-question {
+    display: none;
+    margin-top: 1.2rem;
+    padding: 1.2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(74,140,77,0.12), rgba(240,180,41,0.08));
+    border: 1px solid rgba(240,180,41,0.3);
+    border-radius: 12px;
+    position: relative;
+  }
+  .druide-question::before {
+    content: '🌿';
+    position: absolute;
+    top: -14px; left: 16px;
+    background: var(--forest);
+    padding: 0 6px;
+    font-size: 1.2rem;
+  }
+  .druide-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 0.5rem;
+  }
+  .druide-text {
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--rune);
+    line-height: 1.6;
+  }
+
+  /* === NEXT BUTTON === */
+  .next-btn {
+    display: none;
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--fern), var(--amber));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(212,130,10,0.3);
+  }
+  .next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(212,130,10,0.5);
+  }
+
+  /* === TRANSITION ANIMATIONS === */
+  .card.slide-out {
+    animation: slideOut 0.4s ease forwards;
+  }
+  .card.slide-in {
+    animation: slideIn 0.4s ease forwards;
+  }
+  @keyframes slideOut {
+    to { opacity: 0; transform: translateX(-40px); }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* === FINALE SCREEN === */
+  .finale {
+    display: none;
+    text-align: center;
+    padding: 3rem 2rem;
+    animation: slideIn 0.6s ease;
+  }
+  .finale-icon { font-size: 5rem; margin-bottom: 1rem; display: block;
+    animation: breathe 3s infinite; }
+  .finale h2 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+    color: var(--gold);
+    margin-bottom: 1rem;
+    text-shadow: 0 0 30px rgba(240,180,41,0.5);
+  }
+  .finale-score {
+    font-size: 4rem;
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold);
+    line-height: 1;
+    text-shadow: 0 0 40px rgba(240,180,41,0.6);
+    margin: 1rem 0;
+  }
+  .finale-msg {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--mist);
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .stars-row {
+    font-size: 2.5rem;
+    letter-spacing: 0.2rem;
+    margin: 1rem 0;
+    display: block;
+  }
+
+  /* Result summary */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+    gap: 6px;
+    max-width: 440px;
+    margin: 1.5rem auto;
+  }
+  .result-dot {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    color: white;
+  }
+  .result-dot.ok { background: var(--correct); }
+  .result-dot.ko { background: var(--wrong); }
+
+  .restart-btn {
+    padding: 1rem 2.5rem;
+    background: transparent;
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    color: var(--gold);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+    margin-top: 1.5rem;
+  }
+  .restart-btn:hover {
+    background: var(--gold);
+    color: var(--forest);
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed;
+    width: 8px; height: 14px;
+    opacity: 0;
+    animation: confettiFall 3s ease-in forwards;
+    z-index: 100;
+    pointer-events: none;
+  }
+  @keyframes confettiFall {
+    0% { opacity: 1; transform: translateY(-20px) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .card { padding: 1.5rem 1.2rem; }
+    .score-bar { gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer" id="bgLayer"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <span class="druid-icon">🧙</span>
+    <h1>DevinETP</h1>
+    <p class="subtitle">Les 20 Énigmes du Druide de l'ETP</p>
+    <div class="rune-divider"><span class="rune-symbol">᛭</span></div>
+    <p style="font-size:1rem; color:var(--mist); max-width:500px; margin:0 auto; line-height:1.6;">
+      Le Druide vous met à l'épreuve. Chaque devinette cache un concept fondamental.<br>
+      <em style="color:var(--rune)">Saurez-vous percer ses mystères ?</em>
+    </p>
+  </div>
+
+  <!-- SCORE BAR -->
+  <div class="score-bar">
+    <div class="score-item">
+      <span class="score-label">Score</span>
+      <span class="score-value" id="scoreDisplay">0</span>
+    </div>
+    <div class="score-item">
+      <span class="score-label">Série</span>
+      <span class="score-value" id="streakDisplay">🔥 0</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">Énigme 1 / 20</div>
+    </div>
+    <div class="score-item">
+      <span class="score-label">Réussies</span>
+      <span class="score-value" id="correctDisplay">0</span>
+    </div>
+  </div>
+
+  <!-- ENIGMA AREA -->
+  <div id="enigmaArea">
+    <div class="card slide-in" id="mainCard">
+      <div class="enigma-number" id="enigmaNumber">ÉNIGME 1 / 20</div>
+      <div class="enigma-text" id="enigmaText"></div>
+      <div class="options" id="optionsList"></div>
+      <div class="feedback" id="feedbackBox"></div>
+      <div class="druide-question" id="druideBox">
+        <div class="druide-label">Question du Druide</div>
+        <div class="druide-text" id="druideText"></div>
+      </div>
+      <button class="next-btn" id="nextBtn" onclick="nextEnigma()">
+        Énigme suivante →
+      </button>
+    </div>
+  </div>
+
+  <!-- FINALE -->
+  <div class="finale" id="finaleScreen">
+    <span class="finale-icon">🏆</span>
+    <h2>Épreuve accomplie !</h2>
+    <span class="stars-row" id="starsRow"></span>
+    <div class="finale-score" id="finaleScore"></div>
+    <div class="finale-msg" id="finaleMsg"></div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <button class="restart-btn" onclick="restartGame()">↺ Recommencer l'épreuve</button>
+  </div>
+
+</div>
+
+<script>
+const enigmas = [
+  {
+    text: "Avant d'enseigner, comprendre je dois.\nLa vie avec la maladie, les ressources et les obstacles du patient j'explore.",
+    options: ["Objectif éducatif", "Bilan éducatif partagé", "Action éducative ciblée"],
+    answer: 1,
+    druide: "Quelles dimensions de la vie du patient oublie-t-on le plus souvent d'explorer ?"
+  },
+  {
+    text: "Quand un patient explique sa maladie avec ses propres mots,\nje cherche à comprendre la logique derrière ses idées.",
+    options: ["Représentations du patient", "Littératie en santé", "Observance"],
+    answer: 0,
+    druide: "Pourquoi corriger immédiatement ces représentations peut-il bloquer l'échange ?"
+  },
+  {
+    text: "Je transforme un besoin éducatif en objectif concret, réaliste et négocié avec le patient.",
+    options: ["Objectif éducatif", "Compétence psychosociale", "Indicateur"],
+    answer: 0,
+    druide: "Qu'est-ce qui distingue un objectif éducatif d'un simple conseil ?"
+  },
+  {
+    text: "Je concerne les situations où le patient doit savoir agir vite pour éviter une complication.",
+    options: ["Objectif pédagogique", "Objectif de sécurité", "Compétence psychosociale"],
+    answer: 1,
+    druide: "Quels exemples d'objectifs de sécurité voyez-vous dans votre pratique ?"
+  },
+  {
+    text: "Je regroupe les capacités permettant au patient d'agir directement sur sa maladie.",
+    options: ["Compétences psychosociales", "Compétences d'auto-soin", "Littératie"],
+    answer: 1,
+    druide: "Quelle compétence d'auto-soin est la plus difficile à acquérir pour les patients ?"
+  },
+  {
+    text: "Je concerne plutôt la gestion du stress, la communication ou la prise de décision.",
+    options: ["Compétences psychosociales", "Compétences techniques", "Compétences d'auto-soin"],
+    answer: 0,
+    druide: "Pourquoi ces compétences sont-elles essentielles dans les maladies chroniques ?"
+  },
+  {
+    text: "Je suis une intervention éducative courte et ciblée sur un besoin précis.",
+    options: ["Programme ETP", "Action éducative ciblée", "Séance collective"],
+    answer: 1,
+    druide: "Dans quelles situations privilégier une AEC plutôt qu'un atelier collectif ?"
+  },
+  {
+    text: "Je privilégie l'expérience et les échanges entre patients plutôt que l'exposé magistral.",
+    options: ["Méthode pédagogique active", "Information thérapeutique", "Évaluation"],
+    answer: 0,
+    druide: "Quelle méthode active fonctionne le mieux dans vos groupes ?"
+  },
+  {
+    text: "Quand les informations médicales sont difficiles à comprendre pour un patient,\nc'est souvent moi qui suis fragile.",
+    options: ["Littératie en santé", "Empowerment", "Observance"],
+    answer: 0,
+    druide: "Comment repérer un problème de littératie chez un patient ?"
+  },
+  {
+    text: "Je représente les capacités que le patient développe pour vivre avec sa maladie.",
+    options: ["Compétences du patient", "Programme ETP", "Objectif pédagogique"],
+    answer: 0,
+    druide: "Quelle compétence patient est la plus sous-estimée selon vous ?"
+  },
+  {
+    text: "Je suis la qualité de relation qui permet un véritable travail éducatif.",
+    options: ["Alliance éducative", "Coordination", "Motivation"],
+    answer: 0,
+    druide: "Qu'est-ce qui fragilise le plus l'alliance éducative ?"
+  },
+  {
+    text: "Je vise à renforcer la capacité du patient à agir sur sa santé.",
+    options: ["Empowerment", "Observance", "Motivation"],
+    answer: 0,
+    druide: "Comment favoriser l'empowerment sans abandonner le rôle soignant ?"
+  },
+  {
+    text: "Je suis un patient dont l'expérience est reconnue comme une ressource.",
+    options: ["Patient partenaire", "Patient expert", "Patient ressource"],
+    answer: 0,
+    druide: "Quels rôles les patients partenaires peuvent-ils jouer dans un programme ?"
+  },
+  {
+    text: "Je suis une phrase exacte prononcée par un patient.",
+    options: ["Verbatim patient", "Reformulation", "Indicateur"],
+    answer: 0,
+    druide: "Comment utiliser un verbatim pour faire réfléchir un groupe ?"
+  },
+  {
+    text: "Je suis une tentation fréquente des soignants : corriger immédiatement le patient.",
+    options: ["Réflexe correcteur", "Réactance", "Reformulation"],
+    answer: 0,
+    druide: "Dans quelles situations ce réflexe apparaît-il chez vous ?"
+  },
+  {
+    text: "Quand le patient se sent contraint, je peux apparaître.",
+    options: ["Réactance psychologique", "Ambivalence", "Motivation"],
+    answer: 0,
+    druide: "Quelles attitudes soignantes déclenchent le plus la réactance ?"
+  },
+  {
+    text: "Je mets en balance les avantages et les inconvénients d'un changement.",
+    options: ["Balance décisionnelle", "Empowerment", "Prochaska"],
+    answer: 0,
+    druide: "Dans quelles situations utilisez-vous cet outil ?"
+  },
+  {
+    text: "Je décris les différentes étapes du changement comportemental.",
+    options: ["Modèle de Prochaska", "Balance décisionnelle", "Empowerment"],
+    answer: 0,
+    druide: "Pourquoi est-il utile de repérer le stade de changement d'un patient ?"
+  },
+  {
+    text: "Je suis une technique relationnelle en quatre étapes : reformuler, résumer, recontextualiser et renforcer.",
+    options: ["4R de Cungi", "Entretien motivationnel", "Posture éducative"],
+    answer: 0,
+    druide: "Quel « R » utilisez-vous le moins dans vos entretiens ?"
+  },
+  {
+    text: "Je distingue transmettre une information et développer une compétence.",
+    options: ["Information thérapeutique", "Éducation thérapeutique", "Littératie"],
+    answer: 1,
+    druide: "Dans votre pratique, comment passez-vous de l'information à l'apprentissage ?"
+  }
+];
+
+let current = 0;
+let score = 0;
+let streak = 0;
+let maxStreak = 0;
+let results = [];
+let answered = false;
+
+function initBg() {
+  const bg = document.getElementById('bgLayer');
+  const symbols = ['᛭','ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ'];
+  for (let i = 0; i < 18; i++) {
+    const r = document.createElement('div');
+    r.className = 'rune-float';
+    r.style.left = Math.random() * 100 + '%';
+    r.style.top = Math.random() * 100 + '%';
+    r.style.animationDelay = (Math.random() * 10) + 's';
+    r.style.animationDuration = (10 + Math.random() * 10) + 's';
+    r.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    bg.appendChild(r);
+  }
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = (Math.random() * 8) + 's';
+    p.style.animationDuration = (6 + Math.random() * 6) + 's';
+    p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+    p.style.background = Math.random() > 0.5 ? '#f0b429' : '#7ab87d';
+    bg.appendChild(p);
+  }
+}
+
+function renderEnigma() {
+  const e = enigmas[current];
+  document.getElementById('enigmaNumber').textContent = `ÉNIGME ${current + 1} / 20`;
+  document.getElementById('enigmaText').textContent = e.text;
+
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  const letters = ['A', 'B', 'C'];
+  e.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}.</span> ${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    list.appendChild(btn);
+  });
+
+  document.getElementById('feedbackBox').className = 'feedback';
+  document.getElementById('feedbackBox').innerHTML = '';
+  document.getElementById('druideBox').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  // Progress
+  const pct = (current / 20) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Énigme ${current + 1} / 20`;
+
+  answered = false;
+}
+
+function selectAnswer(idx, btn) {
+  if (answered) return;
+  answered = true;
+  const e = enigmas[current];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedbackBox');
+  const druide = document.getElementById('druideBox');
+
+  if (idx === e.answer) {
+    btn.classList.add('correct');
+    score += (streak >= 2 ? 2 : 1);
+    streak++;
+    maxStreak = Math.max(maxStreak, streak);
+    results.push('ok');
+    fb.className = 'feedback correct';
+    fb.innerHTML = `✅ <strong>Exact !</strong> La réponse est bien <em>${e.options[e.answer]}</em>.`;
+    document.getElementById('correctDisplay').textContent = results.filter(r => r === 'ok').length;
+    if (streak >= 3) spawnParticles();
+  } else {
+    btn.classList.add('wrong');
+    btns[e.answer].classList.add('correct');
+    streak = 0;
+    results.push('ko');
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `❌ La bonne réponse était <em>${e.options[e.answer]}</em>.`;
+  }
+
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('streakDisplay').textContent = (streak >= 2 ? '🔥 ' : '') + streak;
+
+  // Show druide
+  document.getElementById('druideText').textContent = e.druide;
+  druide.style.display = 'block';
+  druide.style.animation = 'slideIn 0.4s ease';
+
+  // Show next
+  const nb = document.getElementById('nextBtn');
+  nb.style.display = 'block';
+  nb.textContent = current < 19 ? 'Énigme suivante →' : 'Voir mes résultats ✦';
+}
+
+function nextEnigma() {
+  const card = document.getElementById('mainCard');
+  card.classList.add('slide-out');
+  setTimeout(() => {
+    current++;
+    if (current >= 20) {
+      showFinale();
+      return;
+    }
+    card.classList.remove('slide-out');
+    card.classList.add('slide-in');
+    renderEnigma();
+    setTimeout(() => card.classList.remove('slide-in'), 400);
+  }, 380);
+}
+
+function showFinale() {
+  document.getElementById('enigmaArea').style.display = 'none';
+  const fin = document.getElementById('finaleScreen');
+  fin.style.display = 'block';
+
+  const correct = results.filter(r => r === 'ok').length;
+  const pct = Math.round((correct / 20) * 100);
+
+  document.getElementById('finaleScore').textContent = `${score} pts`;
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressLabel').textContent = 'Terminé !';
+
+  let stars = '';
+  let msg = '';
+  if (pct >= 90) {
+    stars = '★★★★★';
+    msg = "Maître Druide ! Votre connaissance de l'ETP est encyclopédique. Le cercle sacré vous accueille.";
+  } else if (pct >= 70) {
+    stars = '★★★★☆';
+    msg = "Druide confirmé ! Votre maîtrise est solide. Quelques runes encore à déchiffrer…";
+  } else if (pct >= 50) {
+    stars = '★★★☆☆';
+    msg = "Apprenti prometteur ! La forêt de l'ETP vous réserve encore bien des mystères.";
+  } else if (pct >= 30) {
+    stars = '★★☆☆☆';
+    msg = "Le chemin est encore long, mais chaque énigme révèle un savoir. Persévérez !";
+  } else {
+    stars = '★☆☆☆☆';
+    msg = "Le Druide vous invite à reprendre l'épreuve. La maîtrise vient avec la pratique.";
+  }
+
+  document.getElementById('starsRow').textContent = stars;
+  document.getElementById('finaleMsg').innerHTML = `<strong>${correct}/20 bonnes réponses (${pct}%)</strong><br><br>${msg}`;
+
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = '';
+  results.forEach((r, i) => {
+    const d = document.createElement('div');
+    d.className = `result-dot ${r}`;
+    d.title = `Énigme ${i+1}`;
+    d.textContent = i + 1;
+    grid.appendChild(d);
+  });
+
+  if (pct >= 70) launchConfetti();
+}
+
+function launchConfetti() {
+  const colors = ['#f0b429','#27ae60','#2d5a30','#b8d4b9','#d4820a'];
+  for (let i = 0; i < 80; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.top = '-10px';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (2 + Math.random() * 2) + 's';
+      c.style.animationDelay = (Math.random() * 1) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      c.style.transform = `rotate(${Math.random() * 360}deg)`;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
+    }, i * 30);
+  }
+}
+
+function spawnParticles() {
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.style.cssText = `position:fixed;pointer-events:none;z-index:999;width:6px;height:6px;border-radius:50%;background:${Math.random()>0.5?'#f0b429':'#27ae60'};left:${20+Math.random()*60}vw;top:${20+Math.random()*60}vh;animation:confettiFall 1.5s ease forwards;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+function restartGame() {
+  current = 0; score = 0; streak = 0; maxStreak = 0; results = [];
+  document.getElementById('scoreDisplay').textContent = '0';
+  document.getElementById('streakDisplay').textContent = '0';
+  document.getElementById('correctDisplay').textContent = '0';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('finaleScreen').style.display = 'none';
+  document.getElementById('enigmaArea').style.display = 'block';
+  const card = document.getElementById('mainCard');
+  card.classList.remove('slide-out');
+  card.style.animation = '';
+  renderEnigma();
+  card.classList.add('slide-in');
+  setTimeout(() => card.classList.remove('slide-in'), 400);
+}
+
+// Init
+initBg();
+renderEnigma();
+</script>
+</body>
+</html>
