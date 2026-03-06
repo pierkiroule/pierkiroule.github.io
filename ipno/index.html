@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Trainer Suggestions Indirectes</title>
+
+<style>
+
+body{
+font-family:Arial, sans-serif;
+background:#f4f6fb;
+margin:0;
+padding:20px;
+color:#222;
+}
+
+.container{
+max-width:800px;
+margin:auto;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+h1,h2{
+margin-top:0;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:6px;
+background:#3b6cff;
+color:white;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#254edb;
+}
+
+.choice{
+display:block;
+width:100%;
+margin:6px 0;
+padding:10px;
+border:1px solid #ddd;
+border-radius:6px;
+background:#fafafa;
+cursor:pointer;
+}
+
+.choice:hover{
+background:#eef3ff;
+}
+
+.feedback{
+margin-top:10px;
+padding:10px;
+border-radius:6px;
+display:none;
+}
+
+.good{
+background:#e7f8ed;
+color:#1b7a38;
+}
+
+.bad{
+background:#ffeaea;
+color:#a11;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card" id="lesson">
+
+<h1>Suggestions indirectes</h1>
+
+<p><b>Principe :</b> en hypnose ericksonienne on propose une expérience sans l’imposer.</p>
+
+<h2>Techniques principales</h2>
+
+<ul>
+<li><b>Permissive</b> : « vous pouvez… »</li>
+<li><b>Présupposition</b> : « pendant que… »</li>
+<li><b>Double choix</b> : « maintenant ou dans quelques instants ? »</li>
+<li><b>Métaphore</b> : utiliser une image</li>
+<li><b>Ratification</b> : valider ce qui apparaît déjà</li>
+</ul>
+
+<h2>Observer la réaction du patient</h2>
+
+<ul>
+<li>sceptique → permissive</li>
+<li>contrôle → double choix</li>
+<li>analytique → métaphore</li>
+<li>coopératif → présupposition</li>
+<li>début de transe → ratification</li>
+</ul>
+
+<p><b>Logique :</b></p>
+
+<p><b>Observer → Adapter → Amplifier</b></p>
+
+<button onclick="startGame()">Commencer l'entraînement</button>
+
+</div>
+
+<div class="card hidden" id="game">
+
+<h2 id="title"></h2>
+
+<p id="situation"></p>
+
+<div id="choices"></div>
+
+<div id="feedback" class="feedback"></div>
+
+<button id="nextBtn" onclick="nextCase()" class="hidden">Cas suivant</button>
+
+<p id="score"></p>
+
+</div>
+
+<div class="card hidden" id="end">
+
+<h2>Résultat</h2>
+
+<p id="finalScore"></p>
+
+<button onclick="restart()">Rejouer</button>
+
+</div>
+
+</div>
+
+<script>
+
+const cases = [
+
+{
+title:"Patient sceptique",
+text:"Le patient dit : 'Je ne sais pas si l’hypnose peut marcher sur moi.'",
+answers:["Suggestion permissive","Présupposition","Ratification"],
+correct:0,
+explain:"La suggestion permissive réduit la pression et respecte le doute."
+},
+
+{
+title:"Patient contrôlant",
+text:"Le patient veut garder le contrôle et n'aime pas recevoir d'ordres.",
+answers:["Double choix","Métaphore","Ratification"],
+correct:0,
+explain:"Le double choix guide sans imposer."
+},
+
+{
+title:"Patient analytique",
+text:"Le patient analyse chaque mot et pose beaucoup de questions.",
+answers:["Métaphore","Présupposition","Ratification"],
+correct:0,
+explain:"La métaphore contourne l’analyse mentale."
+},
+
+{
+title:"Patient coopératif",
+text:"Le patient suit facilement les suggestions.",
+answers:["Présupposition","Double choix","Permissive"],
+correct:0,
+explain:"La présupposition guide l'expérience."
+},
+
+{
+title:"Début de transe",
+text:"La respiration ralentit et le patient devient immobile.",
+answers:["Ratification","Permissive","Métaphore"],
+correct:0,
+explain:"La ratification amplifie ce qui apparaît déjà."
+}
+
+]
+
+let index=0
+let score=0
+
+function startGame(){
+document.getElementById("lesson").classList.add("hidden")
+document.getElementById("game").classList.remove("hidden")
+showCase()
+}
+
+function showCase(){
+
+let c = cases[index]
+
+document.getElementById("title").innerText=c.title
+document.getElementById("situation").innerText=c.text
+
+let choicesDiv=document.getElementById("choices")
+choicesDiv.innerHTML=""
+
+c.answers.forEach((a,i)=>{
+let btn=document.createElement("button")
+btn.className="choice"
+btn.innerText=a
+btn.onclick=()=>answer(i)
+choicesDiv.appendChild(btn)
+})
+
+document.getElementById("feedback").style.display="none"
+document.getElementById("nextBtn").classList.add("hidden")
+document.getElementById("score").innerText="Score : "+score
+
+}
+
+function answer(i){
+
+let c=cases[index]
+let fb=document.getElementById("feedback")
+
+if(i===c.correct){
+score++
+fb.className="feedback good"
+fb.innerText="Bonne réponse. "+c.explain
+}else{
+fb.className="feedback bad"
+fb.innerText="Moins adapté. "+c.explain
+}
+
+fb.style.display="block"
+document.getElementById("nextBtn").classList.remove("hidden")
+
+}
+
+function nextCase(){
+
+index++
+
+if(index>=cases.length){
+endGame()
+}else{
+showCase()
+}
+
+}
+
+function endGame(){
+
+document.getElementById("game").classList.add("hidden")
+document.getElementById("end").classList.remove("hidden")
+document.getElementById("finalScore").innerText="Score final : "+score+" / "+cases.length
+
+}
+
+function restart(){
+
+index=0
+score=0
+
+document.getElementById("end").classList.add("hidden")
+document.getElementById("game").classList.remove("hidden")
+
+showCase()
+
+}
+
+</script>
+
+</body>
+</html>
