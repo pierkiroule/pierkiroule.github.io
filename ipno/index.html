@@ -1,285 +1,397 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Trainer Suggestions Indirectes</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastery : Suggestions Indirectes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #22c55e;
+            --error: #ef4444;
+            --border: #e2e8f0;
+        }
 
-<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-body{
-font-family:Arial, sans-serif;
-background:#f4f6fb;
-margin:0;
-padding:20px;
-color:#222;
-}
+        .container {
+            width: 100%;
+            max-width: 650px;
+            perspective: 1000px;
+        }
 
-.container{
-max-width:800px;
-margin:auto;
-}
+        .card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
 
-.card{
-background:white;
-padding:20px;
-margin-bottom:20px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
-}
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            text-align: center;
+        }
 
-h1,h2{
-margin-top:0;
-}
+        h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            color: var(--text-main);
+        }
 
-button{
-padding:10px 15px;
-border:none;
-border-radius:6px;
-background:#3b6cff;
-color:white;
-cursor:pointer;
-margin-top:10px;
-}
+        p { line-height: 1.6; color: var(--text-muted); }
 
-button:hover{
-background:#254edb;
-}
+        .principle-box {
+            background: #eef2ff;
+            padding: 15px;
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-.choice{
-display:block;
-width:100%;
-margin:6px 0;
-padding:10px;
-border:1px solid #ddd;
-border-radius:6px;
-background:#fafafa;
-cursor:pointer;
-}
+        .tech-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
 
-.choice:hover{
-background:#eef3ff;
-}
+        .tech-item {
+            font-size: 0.9rem;
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
 
-.feedback{
-margin-top:10px;
-padding:10px;
-border-radius:6px;
-display:none;
-}
+        button.main-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
 
-.good{
-background:#e7f8ed;
-color:#1b7a38;
-}
+        button.main-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
 
-.bad{
-background:#ffeaea;
-color:#a11;
-}
+        .choice-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin: 10px 0;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
 
-.hidden{
-display:none;
-}
+        .choice-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #f5f3ff;
+        }
 
-</style>
+        .choice-btn.correct {
+            background: #dcfce7;
+            border-color: var(--success);
+            color: #166534;
+        }
+
+        .choice-btn.wrong {
+            background: #fee2e2;
+            border-color: var(--error);
+            color: #991b1b;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hidden { display: none; }
+
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            float: right;
+        }
+
+        .example-quote {
+            font-style: italic;
+            color: var(--primary);
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85rem;
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="container">
 
-<div class="card" id="lesson">
+    <!-- ECRAN LEÇON -->
+    <div class="card" id="lesson">
+        <h1>L'Art de la Suggestion</h1>
+        <div class="principle-box">
+            <strong>Le Cœur de l'Approche :</strong> En hypnose Ericksonienne, on ne commande pas, on propose. On sème des graines que l'esprit inconscient choisit de faire germer ou non.
+        </div>
+        
+        <h2>Les 5 Techniques Clés</h2>
+        <div class="tech-list">
+            <div class="tech-item"><strong>Permissive</strong><br>"Vous pouvez..."</div>
+            <div class="tech-item"><strong>Présupposition</strong><br>"Pendant que..."</div>
+            <div class="tech-item"><strong>Double Choix</strong><br>"A ou B ?"</div>
+            <div class="tech-item) "><strong>Métaphore</strong><br>Images & Contes</div>
+            <div class="tech-item"><strong>Ratification</strong><br>Valider le réel</div>
+        </div>
 
-<h1>Suggestions indirectes</h1>
+        <p>Votre objectif : Choisir la technique la plus adaptée à l'état présent du sujet.</p>
+        <button class="main-btn" onclick="startGame()">Commencer l'entraînement</button>
+    </div>
 
-<p><b>Principe :</b> en hypnose ericksonienne on propose une expérience sans l’imposer.</p>
+    <!-- ECRAN JEU -->
+    <div class="card hidden" id="game">
+        <div class="score-badge" id="scoreDisplay">Score : 0</div>
+        <h2 id="caseTitle">Situation</h2>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <p id="situationText" style="font-size: 1.1rem; color: var(--text-main); font-weight: 500;"></p>
 
-<h2>Techniques principales</h2>
+        <div id="choicesContainer"></div>
 
-<ul>
-<li><b>Permissive</b> : « vous pouvez… »</li>
-<li><b>Présupposition</b> : « pendant que… »</li>
-<li><b>Double choix</b> : « maintenant ou dans quelques instants ? »</li>
-<li><b>Métaphore</b> : utiliser une image</li>
-<li><b>Ratification</b> : valider ce qui apparaît déjà</li>
-</ul>
+        <div id="feedbackBox" class="feedback"></div>
 
-<h2>Observer la réaction du patient</h2>
+        <button id="nextBtn" class="main-btn hidden" style="margin-top: 20px;" onclick="nextCase()">Continuer</button>
+    </div>
 
-<ul>
-<li>sceptique → permissive</li>
-<li>contrôle → double choix</li>
-<li>analytique → métaphore</li>
-<li>coopératif → présupposition</li>
-<li>début de transe → ratification</li>
-</ul>
-
-<p><b>Logique :</b></p>
-
-<p><b>Observer → Adapter → Amplifier</b></p>
-
-<button onclick="startGame()">Commencer l'entraînement</button>
-
-</div>
-
-<div class="card hidden" id="game">
-
-<h2 id="title"></h2>
-
-<p id="situation"></p>
-
-<div id="choices"></div>
-
-<div id="feedback" class="feedback"></div>
-
-<button id="nextBtn" onclick="nextCase()" class="hidden">Cas suivant</button>
-
-<p id="score"></p>
-
-</div>
-
-<div class="card hidden" id="end">
-
-<h2>Résultat</h2>
-
-<p id="finalScore"></p>
-
-<button onclick="restart()">Rejouer</button>
-
-</div>
+    <!-- ECRAN FIN -->
+    <div class="card hidden" id="end">
+        <h1 id="endEmoji">🎉</h1>
+        <h2 style="text-align:center">Entraînement Terminé</h2>
+        <p id="finalScoreText" style="text-align:center; font-size: 1.2rem;"></p>
+        <div id="performanceMessage" style="text-align:center; margin-bottom: 30px;"></div>
+        <button class="main-btn" onclick="restart()">Recommencer</button>
+    </div>
 
 </div>
 
 <script>
+    const cases = [
+        {
+            title: "Le Sceptique",
+            situation: "Un patient croise les bras et dit : 'Je suis quelqu'un de très cartésien, je doute que ça puisse marcher sur moi.'",
+            options: [
+                { text: "Suggestion Permissive", example: "« Vous pouvez tout à fait garder ce doute, car vous n'avez pas besoin d'y croire pour que votre corps commence à se détendre... »" },
+                { text: "Double Choix", example: "« Est-ce que vous préférez entrer en transe tout de suite ou après avoir douté encore un peu ? »" },
+                { text: "Présupposition", example: "« Pendant que vous entrez en transe, votre esprit cartésien va observer... »" }
+            ],
+            correct: 0,
+            explain: "Face à un sceptique, la permission enlève toute résistance. En validant son doute, vous créez un pont de confiance (Yes Set)."
+        },
+        {
+            title: "Le Besoin de Contrôle",
+            situation: "Le patient s'assoit de manière très rigide et surveille vos moindres gestes. Il a peur de 'perdre pied'.",
+            options: [
+                { text: "Métaphore", example: "« C'est comme un voyage en train... »" },
+                { text: "Double Choix", example: "« Je ne sais pas si vous préférez laisser vos yeux se fermer maintenant, ou si vous préférez attendre que votre respiration ralentisse pour cela... »" },
+                { text: "Ratification", example: "« Je vois que vous surveillez tout... »" }
+            ],
+            correct: 1,
+            explain: "Le double choix donne l'illusion du contrôle au patient. Peu importe ce qu'il choisit, il va vers l'objectif (fermer les yeux ou ralentir la respiration)."
+        },
+        {
+            title: "L'Analytique",
+            situation: "À chaque mot que vous prononcez, vous voyez le patient réfléchir intensément. Il essaie de comprendre la structure de vos phrases.",
+            options: [
+                { text: "Métaphore", example: "« Imaginez un jardinier qui sème des graines sans savoir laquelle poussera la première... »" },
+                { text: "Présupposition", example: "« Avant que vous soyez totalement relaxé... »" },
+                { text: "Suggestion Permissive", example: "« Vous pouvez analyser si vous voulez. »" }
+            ],
+            correct: 0,
+            explain: "La métaphore occupe l'esprit conscient avec une histoire imagée, permettant aux suggestions de glisser vers l'inconscient sans être interceptées par l'analyse."
+        },
+        {
+            title: "Le Sujet Coopératif",
+            situation: "Le patient est déjà très calme, il acquiesce à vos paroles et semble prêt à vivre l'expérience pleinement.",
+            options: [
+                { text: "Présupposition", example: "« Et je me demande quel changement profond vous allez remarquer en premier lorsque vous rouvrirez les yeux tout à l'heure... »" },
+                { text: "Double Choix", example: "« Main ou pied ? »" },
+                { text: "Métaphore", example: "« Il était une fois... »" }
+            ],
+            correct: 0,
+            explain: "Avec un sujet prêt, la présupposition agit comme un accélérateur. On ne demande pas SI un changement va arriver, mais LEQUEL."
+        },
+        {
+            title: "Signal de Transe",
+            situation: "Vous remarquez que les paupières du patient papillonnent et que sa déglutition ralentit.",
+            options: [
+                { text: "Métaphore", example: "« Comme un nuage... »" },
+                { text: "Suggestion Permissive", example: "« Vous pouvez continuer. »" },
+                { text: "Ratification", example: "« C'est bien... et vous pouvez noter ce battement de paupière qui indique que votre esprit conscient laisse la place... »" }
+            ],
+            correct: 2,
+            explain: "La ratification utilise un phénomène physiologique réel pour le transformer en suggestion hypnotique. Cela 'prouve' au patient qu'il se passe quelque chose."
+        }
+    ];
 
-const cases = [
+    let currentCaseIndex = 0;
+    let score = 0;
+    let canAnswer = true;
 
-{
-title:"Patient sceptique",
-text:"Le patient dit : 'Je ne sais pas si l’hypnose peut marcher sur moi.'",
-answers:["Suggestion permissive","Présupposition","Ratification"],
-correct:0,
-explain:"La suggestion permissive réduit la pression et respecte le doute."
-},
+    function startGame() {
+        document.getElementById("lesson").classList.add("hidden");
+        document.getElementById("game").classList.remove("hidden");
+        currentCaseIndex = 0;
+        score = 0;
+        showCase();
+    }
 
-{
-title:"Patient contrôlant",
-text:"Le patient veut garder le contrôle et n'aime pas recevoir d'ordres.",
-answers:["Double choix","Métaphore","Ratification"],
-correct:0,
-explain:"Le double choix guide sans imposer."
-},
+    function showCase() {
+        canAnswer = true;
+        const c = cases[currentCaseIndex];
+        
+        document.getElementById("caseTitle").innerText = `Cas n°${currentCaseIndex + 1} : ${c.title}`;
+        document.getElementById("situationText").innerText = c.situation;
+        document.getElementById("scoreDisplay").innerText = `Score : ${score}`;
+        
+        const container = document.getElementById("choicesContainer");
+        container.innerHTML = "";
+        
+        c.options.forEach((opt, i) => {
+            const btn = document.createElement("button");
+            btn.className = "choice-btn";
+            btn.innerHTML = `<strong>${opt.text}</strong><span class="example-quote">${opt.example}</span>`;
+            btn.onclick = () => checkAnswer(i, btn);
+            container.appendChild(btn);
+        });
 
-{
-title:"Patient analytique",
-text:"Le patient analyse chaque mot et pose beaucoup de questions.",
-answers:["Métaphore","Présupposition","Ratification"],
-correct:0,
-explain:"La métaphore contourne l’analyse mentale."
-},
+        document.getElementById("feedbackBox").style.display = "none";
+        document.getElementById("nextBtn").classList.add("hidden");
+        
+        updateProgress();
+    }
 
-{
-title:"Patient coopératif",
-text:"Le patient suit facilement les suggestions.",
-answers:["Présupposition","Double choix","Permissive"],
-correct:0,
-explain:"La présupposition guide l'expérience."
-},
+    function updateProgress() {
+        const progress = ((currentCaseIndex) / cases.length) * 100;
+        document.getElementById("progressBar").style.width = `${progress}%`;
+    }
 
-{
-title:"Début de transe",
-text:"La respiration ralentit et le patient devient immobile.",
-answers:["Ratification","Permissive","Métaphore"],
-correct:0,
-explain:"La ratification amplifie ce qui apparaît déjà."
-}
+    function checkAnswer(choiceIndex, btn) {
+        if (!canAnswer) return;
+        canAnswer = false;
 
-]
+        const c = cases[currentCaseIndex];
+        const feedback = document.getElementById("feedbackBox");
+        const allBtns = document.querySelectorAll(".choice-btn");
 
-let index=0
-let score=0
+        if (choiceIndex === c.correct) {
+            score++;
+            btn.classList.add("correct");
+            feedback.style.background = "#dcfce7";
+            feedback.style.color = "#166534";
+            feedback.innerHTML = `<strong>Excellent !</strong> ${c.explain}`;
+        } else {
+            btn.classList.add("wrong");
+            allBtns[c.correct].classList.add("correct");
+            feedback.style.background = "#fee2e2";
+            feedback.style.color = "#991b1b";
+            feedback.innerHTML = `<strong>Pas tout à fait.</strong> ${c.explain}`;
+        }
 
-function startGame(){
-document.getElementById("lesson").classList.add("hidden")
-document.getElementById("game").classList.remove("hidden")
-showCase()
-}
+        allBtns.forEach(b => b.disabled = true);
+        feedback.style.display = "block";
+        document.getElementById("nextBtn").classList.remove("hidden");
+        document.getElementById("scoreDisplay").innerText = `Score : ${score}`;
+    }
 
-function showCase(){
+    function nextCase() {
+        currentCaseIndex++;
+        if (currentCaseIndex < cases.length) {
+            showCase();
+        } else {
+            showEnd();
+        }
+    }
 
-let c = cases[index]
+    function showEnd() {
+        document.getElementById("game").classList.add("hidden");
+        document.getElementById("end").classList.remove("hidden");
+        document.getElementById("progressBar").style.width = `100%`;
+        
+        const finalScore = (score / cases.length) * 100;
+        document.getElementById("finalScoreText").innerText = `Vous avez obtenu ${score} / ${cases.length}`;
+        
+        let msg = "";
+        let emoji = "";
+        if (finalScore === 100) { emoji = "🏆"; msg = "Maître Ericksonien ! Vos suggestions sont d'une élégance rare."; }
+        else if (finalScore >= 70) { emoji = "🥈"; msg = "Très bien ! Vous commencez à maîtriser la souplesse de l'hypnose."; }
+        else { emoji = "💡"; msg = "Continuez à pratiquer, l'important est de s'adapter au patient."; }
+        
+        document.getElementById("endEmoji").innerText = emoji;
+        document.getElementById("performanceMessage").innerText = msg;
+    }
 
-document.getElementById("title").innerText=c.title
-document.getElementById("situation").innerText=c.text
-
-let choicesDiv=document.getElementById("choices")
-choicesDiv.innerHTML=""
-
-c.answers.forEach((a,i)=>{
-let btn=document.createElement("button")
-btn.className="choice"
-btn.innerText=a
-btn.onclick=()=>answer(i)
-choicesDiv.appendChild(btn)
-})
-
-document.getElementById("feedback").style.display="none"
-document.getElementById("nextBtn").classList.add("hidden")
-document.getElementById("score").innerText="Score : "+score
-
-}
-
-function answer(i){
-
-let c=cases[index]
-let fb=document.getElementById("feedback")
-
-if(i===c.correct){
-score++
-fb.className="feedback good"
-fb.innerText="Bonne réponse. "+c.explain
-}else{
-fb.className="feedback bad"
-fb.innerText="Moins adapté. "+c.explain
-}
-
-fb.style.display="block"
-document.getElementById("nextBtn").classList.remove("hidden")
-
-}
-
-function nextCase(){
-
-index++
-
-if(index>=cases.length){
-endGame()
-}else{
-showCase()
-}
-
-}
-
-function endGame(){
-
-document.getElementById("game").classList.add("hidden")
-document.getElementById("end").classList.remove("hidden")
-document.getElementById("finalScore").innerText="Score final : "+score+" / "+cases.length
-
-}
-
-function restart(){
-
-index=0
-score=0
-
-document.getElementById("end").classList.add("hidden")
-document.getElementById("game").classList.remove("hidden")
-
-showCase()
-
-}
-
+    function restart() {
+        document.getElementById("end").classList.add("hidden");
+        startGame();
+    }
 </script>
 
 </body>
