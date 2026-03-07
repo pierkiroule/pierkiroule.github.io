@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ABS – Parcours clinique</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#d8e1ee;
+      --primary:#315efb;
+      --primary-2:#5b7cff;
+      --soft:#eef3ff;
+      --good:#dff7ea;
+      --good-text:#166534;
+      --warn:#fff3dc;
+      --warn-text:#9a6700;
+      --shadow:0 10px 30px rgba(27,39,94,.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, #eef3ff 0, transparent 35%),
+        radial-gradient(circle at bottom right, #eafbf3 0, transparent 30%),
+        var(--bg);
+      color:var(--text);
+    }
+
+    .app{
+      max-width:980px;
+      margin:0 auto;
+      padding:24px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg, #2447d8 0%, #315efb 55%, #6f8cff 100%);
+      color:#fff;
+      border-radius:24px;
+      padding:28px;
+      box-shadow:var(--shadow);
+      margin-bottom:20px;
+    }
+
+    .hero h1{
+      margin:0 0 8px;
+      font-size:2rem;
+      line-height:1.1;
+    }
+
+    .hero p{
+      margin:0;
+      max-width:760px;
+      opacity:.95;
+      line-height:1.5;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:22px;
+      margin-bottom:18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
+    }
+
+    h2,h3{
+      margin:0 0 12px;
+      line-height:1.2;
+    }
+
+    p{
+      line-height:1.6;
+      margin:8px 0;
+    }
+
+    .lead{
+      font-size:1.03rem;
+    }
+
+    .mini{
+      color:var(--muted);
+      font-size:.95rem;
+    }
+
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:14px 0 0;
+    }
+
+    .pill{
+      background:var(--soft);
+      color:#2243c7;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:.92rem;
+      font-weight:600;
+    }
+
+    .flow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:16px 0;
+      align-items:center;
+    }
+
+    .flow-step{
+      background:#f8faff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      min-width:160px;
+      flex:1;
+    }
+
+    .flow-step strong{
+      display:block;
+      margin-bottom:6px;
+      color:#1638b5;
+    }
+
+    .arrow{
+      font-weight:700;
+      color:#6b7bb5;
+    }
+
+    .quote{
+      background:#f8fbff;
+      border-left:4px solid #8aa3ff;
+      padding:14px 16px;
+      border-radius:12px;
+      margin-top:12px;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
+    button{
+      border:none;
+      border-radius:14px;
+      padding:12px 16px;
+      font-size:1rem;
+      cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+    }
+
+    .primary{
+      background:var(--primary);
+      color:#fff;
+    }
+
+    .secondary{
+      background:#fff;
+      color:var(--primary);
+      border:1px solid #c8d6ff;
+    }
+
+    .ghost{
+      background:#edf2ff;
+      color:#2547d5;
+    }
+
+    .stage{
+      display:none;
+    }
+
+    .stage.active{
+      display:block;
+    }
+
+    .case-badge{
+      display:inline-block;
+      background:#edf2ff;
+      color:#1f43cf;
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .case-title{
+      font-size:1.5rem;
+      margin-bottom:8px;
+    }
+
+    .case-box{
+      background:#fafcff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:16px;
+      margin:14px 0;
+    }
+
+    .prompt-box{
+      background:#fffaf2;
+      border:1px solid #f2dfb3;
+      color:#7a5800;
+      border-radius:14px;
+      padding:14px 16px;
+      margin-top:14px;
+    }
+
+    .abs-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .abs-box{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      background:#fbfdff;
+    }
+
+    .abs-box h3{
+      font-size:1rem;
+      margin-bottom:8px;
+      color:#1638b5;
+    }
+
+    .abs-box ul{
+      margin:8px 0 0 18px;
+      padding:0;
+    }
+
+    .reveal{
+      display:none;
+      margin-top:16px;
+    }
+
+    .reveal.show{
+      display:block;
+    }
+
+    .good-box{
+      background:var(--good);
+      color:var(--good-text);
+      border-radius:14px;
+      padding:14px 16px;
+      border:1px solid #b8ebc9;
+      margin-bottom:12px;
+    }
+
+    .hint-box{
+      background:var(--warn);
+      color:var(--warn-text);
+      border-radius:14px;
+      padding:14px 16px;
+      border:1px solid #f3db9a;
+    }
+
+    .example{
+      background:#f8fbff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px 16px;
+      margin-top:12px;
+    }
+
+    .footer-nav{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:20px;
+      flex-wrap:wrap;
+    }
+
+    .summary-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .summary-item{
+      background:#fafcff;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width: 860px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+      .abs-grid{
+        grid-template-columns:1fr;
+      }
+      .hero h1{
+        font-size:1.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <h1>ABS – Parcours clinique</h1>
+      <p>
+        Mini-app pour animer un débat en sous-groupe autour de 5 cas cliniques.
+        Le groupe réfléchit à partir du modèle ABS : <strong>Attract → Bypass → Stimulate</strong>.
+      </p>
+    </section>
+
+    <section id="introStage" class="stage active">
+      <div class="grid">
+        <div class="card">
+          <h2>Le modèle ABS</h2>
+          <p class="lead">
+            Le modèle <strong>ABS</strong> est utilisé dans l’enseignement de l’hypnose conversationnelle,
+            notamment par <strong>Igor Ledochowski</strong>, formateur en hypnose. Il s’inscrit dans la lignée
+            de l’hypnose moderne inspirée par <strong>Milton H. Erickson</strong>, où la communication devient
+            un levier thérapeutique à part entière.
+          </p>
+          <p>
+            L’idée générale : une suggestion efficace ne consiste pas seulement à “dire quelque chose”.
+            Elle suit souvent une dynamique en trois temps.
+          </p>
+
+          <div class="flow">
+            <div class="flow-step">
+              <strong>A — Attract</strong>
+              Attirer l’attention du patient.
+            </div>
+            <div class="arrow">→</div>
+            <div class="flow-step">
+              <strong>B — Bypass</strong>
+              Contourner l’analyse ou la résistance.
+            </div>
+            <div class="arrow">→</div>
+            <div class="flow-step">
+              <strong>S — Stimulate</strong>
+              Stimuler une expérience utile.
+            </div>
+          </div>
+
+          <div class="quote">
+            <strong>Métaphore pédagogique :</strong><br>
+            Si la porte est fermée, on peut passer par la fenêtre.<br><br>
+            La <strong>porte</strong> = l’approche directe.<br>
+            La <strong>fenêtre</strong> = le détour hypnotique.
+          </div>
+
+          <div class="pill-row">
+            <div class="pill">A = capter l’attention</div>
+            <div class="pill">B = contourner la résistance</div>
+            <div class="pill">S = activer une expérience</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Comment utiliser ce parcours</h2>
+          <p>
+            Pour chaque cas, le sous-groupe débat autour de trois questions :
+          </p>
+
+          <div class="case-box">
+            <p><strong>1.</strong> Qu’est-ce qui pourrait <strong>attirer l’attention</strong> du patient ?</p>
+            <p><strong>2.</strong> Comment <strong>contourner</strong> le doute, le contrôle ou l’analyse ?</p>
+            <p><strong>3.</strong> Quelle expérience pourrait être <strong>stimulée</strong> ?</p>
+          </div>
+
+          <p class="mini">
+            L’app ne sert pas à prendre des notes. Elle sert à lancer la discussion, structurer le raisonnement et nourrir le débrief.
+          </p>
+
+          <div class="example">
+            <strong>Exemple simple</strong><br><br>
+            « Vous pouvez remarquer votre respiration…<br>
+            et pendant que votre esprit continue à réfléchir…<br>
+            votre corps peut commencer à se détendre. »
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="startBtn">Commencer le parcours</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="caseStage" class="stage">
+      <div class="card">
+        <div class="case-badge" id="caseBadge">Cas 1 / 5</div>
+        <div class="case-title" id="caseTitle">Titre</div>
+        <p class="mini" id="caseTheme">Thème</p>
+
+        <div class="case-box">
+          <p id="caseStory"></p>
+        </div>
+
+        <div class="prompt-box">
+          <strong>Question au sous-groupe</strong><br>
+          À partir de ce cas, comment raisonneriez-vous en termes de <strong>Attract</strong>, <strong>Bypass</strong> et <strong>Stimulate</strong> ?
+        </div>
+
+        <div class="abs-grid">
+          <div class="abs-box">
+            <h3>A — Attract</h3>
+            <p id="qA"></p>
+          </div>
+          <div class="abs-box">
+            <h3>B — Bypass</h3>
+            <p id="qB"></p>
+          </div>
+          <div class="abs-box">
+            <h3>S — Stimulate</h3>
+            <p id="qS"></p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="secondary" id="revealBtn">Afficher des pistes</button>
+        </div>
+
+        <div class="reveal" id="revealBox">
+          <div class="good-box">
+            <strong>Pistes de réflexion</strong>
+            <ul id="hintsList"></ul>
+          </div>
+
+          <div class="hint-box">
+            <strong>Point pédagogique</strong><br>
+            <span id="teachingPoint"></span>
+          </div>
+
+          <div class="example">
+            <strong>Exemple de formulation possible</strong><br><br>
+            <span id="suggestionExample"></span>
+          </div>
+        </div>
+
+        <div class="footer-nav">
+          <button class="ghost" id="prevBtn">Cas précédent</button>
+          <button class="primary" id="nextBtn">Cas suivant</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="endStage" class="stage">
+      <div class="card">
+        <h2>Fin du parcours</h2>
+        <p class="lead">
+          Vous avez parcouru 5 situations cliniques. L’objectif n’était pas de trouver une seule “bonne” suggestion,
+          mais d’apprendre à raisonner avec le modèle ABS.
+        </p>
+
+        <div class="summary-list">
+          <div class="summary-item">
+            <strong>Attract</strong><br>
+            Chercher ce qui peut capter l’attention du patient : respiration, sensation, image, souvenir, perception.
+          </div>
+          <div class="summary-item">
+            <strong>Bypass</strong><br>
+            Ne pas lutter contre la résistance. La contourner avec du permissif, une métaphore, une dissociation, une acceptation.
+          </div>
+          <div class="summary-item">
+            <strong>Stimulate</strong><br>
+            Stimuler une expérience utile : détente, concentration, sécurité, ressource, mouvement intérieur.
+          </div>
+          <div class="summary-item">
+            <strong>Idée clé</strong><br>
+            Observer le langage du patient. Utiliser ses mots, ses ressources, son rythme.
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="restartBtn">Recommencer</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const cases = [
+      {
+        title: "Julie, 21 ans",
+        theme: "Insomnie – mental actif",
+        story: "Julie explique : « Le soir je suis fatiguée, mais dès que je me mets au lit mon cerveau se met à réfléchir à tout. Je me dis qu’il faut dormir… et plus j’essaie, moins j’y arrive. Quand j’écoute la pluie dehors, ça ralentit un peu. »",
+        qA: "Sur quoi pourrait-on attirer son attention ?",
+        qB: "Comment contourner le mental qui cherche à dormir ?",
+        qS: "Quelle expérience intérieure pourrait-on stimuler ?",
+        hints: [
+          "Utiliser la pluie comme ressource déjà présente dans son discours.",
+          "Ne pas lutter contre les pensées. Les inclure ou les laisser exister.",
+          "Orienter vers un ralentissement plutôt que vers l’injonction de dormir."
+        ],
+        teaching: "Le bypass est souvent utile quand le patient est pris dans le “plus j’essaie, moins ça marche”.",
+        example: "« Vous pouvez peut-être écouter ce qui, dans votre respiration, ressemble déjà à un léger ralentissement… et pendant que votre esprit peut encore penser à certaines choses… votre corps peut retrouver peu à peu ce rythme plus tranquille, comme lorsqu’on écoute la pluie. »"
+      },
+      {
+        title: "Lucas, 18 ans",
+        theme: "Anxiété d’examen",
+        story: "Lucas dit : « Juste avant un examen, mon cœur bat trop vite. J’ai peur de perdre mes moyens. Pourtant, quand je commence à écrire, ça va souvent déjà un peu mieux. »",
+        qA: "Quel élément concret pourrait attirer l’attention ici ?",
+        qB: "Comment contourner la peur d’échouer sans la contredire ?",
+        qS: "Quelle expérience utile pourrait être activée ?",
+        hints: [
+          "S’appuyer sur le moment où il commence à écrire.",
+          "Utiliser une formulation permissive plutôt qu’un ordre de se calmer.",
+          "Stimuler une sensation de rythme, de continuité ou de concentration."
+        ],
+        teaching: "Une bonne suggestion part souvent d’une micro-ressource déjà repérée par le patient.",
+        example: "« Pendant que tu imagines les premiers mots qui s’écrivent sur la feuille… ton attention peut déjà retrouver ce mouvement que tu connais… et ton corps peut laisser le rythme se poser un peu plus calmement. »"
+      },
+      {
+        title: "Sophie, 45 ans",
+        theme: "Tensions corporelles",
+        story: "Sophie dit : « Je serre les épaules toute la journée. Même quand je m’en aperçois, j’ai du mal à les relâcher. Par contre, quand je marche au bord de la rivière le week-end, je sens que mon corps se relâche naturellement. »",
+        qA: "Quelle sensation ou image peut servir d’accroche attentionnelle ?",
+        qB: "Comment contourner l’idée “je n’arrive pas à relâcher” ?",
+        qS: "Quelle expérience corporelle ou ressource peut être stimulée ?",
+        hints: [
+          "Utiliser la marche ou la rivière comme expérience ressource.",
+          "Ne pas exiger le relâchement immédiat.",
+          "Stimuler une sensation naturelle de descente, de fluidité ou d’aisance."
+        ],
+        teaching: "Quand le patient échoue à “faire”, il peut être plus utile de stimuler un laisser-faire.",
+        example: "« Vous pouvez repenser à cette façon particulière qu’a votre corps de marcher au bord de la rivière… et pendant que votre esprit remarque encore les épaules… d’autres parties du corps peuvent déjà retrouver cette manière plus fluide de se relâcher naturellement. »"
+      },
+      {
+        title: "Marc, 39 ans",
+        theme: "Patient sceptique",
+        story: "Marc dit d’emblée : « Je ne sais pas si l’hypnose peut marcher sur moi. Je préfère être honnête, j’ai du mal à croire à ce genre de choses. »",
+        qA: "Que pourrait-on utiliser pour capter son attention sans le brusquer ?",
+        qB: "Comment contourner son doute sans entrer en débat ?",
+        qS: "Quelle expérience minimale pourrait-on simplement amorcer ?",
+        hints: [
+          "Prendre appui sur son observation présente : respiration, posture, contact du corps.",
+          "Ne pas argumenter contre son scepticisme.",
+          "Stimuler une petite expérience concrète et non spectaculaire."
+        ],
+        teaching: "Le bypass n’est pas de convaincre. C’est de laisser le mental douter pendant qu’autre chose devient possible.",
+        example: "« Vous pouvez tout à fait garder votre façon de réfléchir à cela… et pendant que vous observez simplement la manière dont vous êtes assis ici… il est possible que certaines sensations deviennent un peu plus nettes ou un peu plus calmes, sans que vous ayez besoin d’y croire d’avance. »"
+      },
+      {
+        title: "Nadia, 32 ans",
+        theme: "Besoin de contrôle",
+        story: "Nadia dit : « J’ai toujours besoin de garder le contrôle. Dès que je sens que je ne maîtrise plus, je me crispe. »",
+        qA: "Quel point d’appui attentionnel peut être proposé ici ?",
+        qB: "Comment contourner le besoin de contrôle sans le confronter ?",
+        qS: "Quelle expérience peut être activée tout en respectant ce besoin ?",
+        hints: [
+          "Utiliser des formulations qui laissent du choix.",
+          "Permettre à une partie d’elle de garder le contrôle pendant qu’autre chose se passe.",
+          "Stimuler une détente partielle, progressive ou localisée."
+        ],
+        teaching: "Le bypass peut consister à ne pas demander de lâcher le contrôle, mais à autoriser une autre voie parallèle.",
+        example: "« Une partie de vous peut continuer à rester attentive à tout ce qui se passe… et pendant que cette partie fait très bien son travail… une autre peut simplement remarquer si certains muscles savent déjà comment se relâcher un peu, à leur façon. »"
+      }
+    ];
+
+    const introStage = document.getElementById("introStage");
+    const caseStage = document.getElementById("caseStage");
+    const endStage = document.getElementById("endStage");
+
+    const caseBadge = document.getElementById("caseBadge");
+    const caseTitle = document.getElementById("caseTitle");
+    const caseTheme = document.getElementById("caseTheme");
+    const caseStory = document.getElementById("caseStory");
+    const qA = document.getElementById("qA");
+    const qB = document.getElementById("qB");
+    const qS = document.getElementById("qS");
+    const hintsList = document.getElementById("hintsList");
+    const teachingPoint = document.getElementById("teachingPoint");
+    const suggestionExample = document.getElementById("suggestionExample");
+    const revealBox = document.getElementById("revealBox");
+
+    const startBtn = document.getElementById("startBtn");
+    const revealBtn = document.getElementById("revealBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    let current = 0;
+
+    function showStage(name){
+      introStage.classList.remove("active");
+      caseStage.classList.remove("active");
+      endStage.classList.remove("active");
+
+      if(name === "intro") introStage.classList.add("active");
+      if(name === "case") caseStage.classList.add("active");
+      if(name === "end") endStage.classList.add("active");
+    }
+
+    function renderCase(index){
+      const c = cases[index];
+      caseBadge.textContent = `Cas ${index + 1} / ${cases.length}`;
+      caseTitle.textContent = c.title;
+      caseTheme.textContent = c.theme;
+      caseStory.textContent = c.story;
+      qA.textContent = c.qA;
+      qB.textContent = c.qB;
+      qS.textContent = c.qS;
+
+      hintsList.innerHTML = "";
+      c.hints.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        hintsList.appendChild(li);
+      });
+
+      teachingPoint.textContent = c.teaching;
+      suggestionExample.textContent = c.example;
+
+      revealBox.classList.remove("show");
+      revealBtn.textContent = "Afficher des pistes";
+
+      prevBtn.classList.toggle("hidden", index === 0);
+      nextBtn.textContent = index === cases.length - 1 ? "Voir la synthèse" : "Cas suivant";
+    }
+
+    startBtn.addEventListener("click", () => {
+      current = 0;
+      renderCase(current);
+      showStage("case");
+    });
+
+    revealBtn.addEventListener("click", () => {
+      revealBox.classList.toggle("show");
+      revealBtn.textContent = revealBox.classList.contains("show")
+        ? "Masquer les pistes"
+        : "Afficher des pistes";
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if(current > 0){
+        current--;
+        renderCase(current);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if(current < cases.length - 1){
+        current++;
+        renderCase(current);
+      } else {
+        showStage("end");
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      showStage("intro");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
