@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
 <title>Fil d'@riane Scanner</title>
 
 <style>
@@ -77,7 +76,6 @@ width:210px;
 height:210px;
 border:2px dashed #7c3aed;
 clip-path:polygon(50% 0%, 0% 100%, 100% 100%);
-border-radius:6px;
 transition:.2s;
 }
 
@@ -144,7 +142,7 @@ opacity:1;
 <div class="app">
 
 <h1>Fil d'@riane</h1>
-<div class="subtitle">Aligne ton triangle avec @</div>
+<div class="subtitle">Aligne ton tatouage triangle @</div>
 
 <div class="cam">
 
@@ -154,26 +152,12 @@ opacity:1;
 <div class="scan" id="scan"></div>
 
 <div class="filigrane">
-
 <svg viewBox="0 0 200 200">
-
-<polygon
-points="100,10 10,180 190,180"
-stroke="white"
-stroke-width="4"
-fill="none"
-/>
-
-<text
-x="100"
-y="120"
-font-size="60"
-text-anchor="middle"
-fill="white"
->@</text>
-
+<polygon points="100,10 10,180 190,180"
+stroke="white" stroke-width="4" fill="none"/>
+<text x="100" y="120" font-size="60"
+text-anchor="middle" fill="white">@</text>
 </svg>
-
 </div>
 
 <div class="success" id="success">✓</div>
@@ -220,11 +204,9 @@ video.srcObject=stream
 await video.play()
 
 startBtn.style.display="none"
-
-status.textContent="cherche triangle"
+status.textContent="cherche triangle @"
 
 running=true
-
 setInterval(scan,350)
 
 }catch(e){
@@ -251,14 +233,26 @@ ctx.drawImage(video,0,0)
 let src=cv.imread(canvas)
 
 let gray=new cv.Mat()
-
 cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY)
 
 cv.GaussianBlur(gray,gray,new cv.Size(5,5),0)
 
-let edges=new cv.Mat()
+cv.equalizeHist(gray,gray)
 
-cv.Canny(gray,edges,50,130)
+let thresh=new cv.Mat()
+
+cv.adaptiveThreshold(
+gray,
+thresh,
+255,
+cv.ADAPTIVE_THRESH_GAUSSIAN_C,
+cv.THRESH_BINARY_INV,
+11,
+2
+)
+
+let edges=new cv.Mat()
+cv.Canny(thresh,edges,40,120)
 
 let contours=new cv.MatVector()
 let hierarchy=new cv.Mat()
@@ -271,22 +265,23 @@ for(let i=0;i<contours.size();i++){
 
 let cnt=contours.get(i)
 
+let area=cv.contourArea(cnt)
+
+if(area<4000) continue
+
 let peri=cv.arcLength(cnt,true)
 
 let approx=new cv.Mat()
-
 cv.approxPolyDP(cnt,approx,0.04*peri,true)
 
 if(approx.rows==3){
-
-let area=cv.contourArea(cnt)
-
-if(area>3000){
 
 let M=cv.moments(cnt)
 
 let cx=M.m10/M.m00
 let cy=M.m01/M.m00
+
+if(cx>W*0.3 && cx<W*0.7){
 
 let pixel=gray.ucharPtr(Math.floor(cy),Math.floor(cx))[0]
 
@@ -308,22 +303,19 @@ if(found){
 scanBox.classList.add("detect")
 
 detect++
-
 bar.style.width=(detect/NEEDED*100)+"%"
 
-status.textContent="triangle détecté"
-
-if(navigator.vibrate)navigator.vibrate(20)
+status.textContent="tatouage détecté"
 
 if(detect>=NEEDED){
 
 running=false
 
 success.classList.add("show")
-
 status.textContent="symbole reconnu"
 
-if(navigator.vibrate)navigator.vibrate([120,60,120])
+if(navigator.vibrate)
+navigator.vibrate([120,60,120])
 
 setTimeout(()=>{
 window.location.href="https://urlr.me/34872E"
@@ -334,17 +326,16 @@ window.location.href="https://urlr.me/34872E"
 }else{
 
 scanBox.classList.remove("detect")
-
 detect=Math.max(detect-1,0)
 
 bar.style.width=(detect/NEEDED*100)+"%"
-
-status.textContent="aligne le triangle"
+status.textContent="aligne le tatouage"
 
 }
 
 src.delete()
 gray.delete()
+thresh.delete()
 edges.delete()
 contours.delete()
 hierarchy.delete()
