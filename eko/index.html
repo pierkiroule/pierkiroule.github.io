@@ -17,21 +17,7 @@ justify-content:center;
 height:100vh;
 }
 
-.app{
-width:420px;
-text-align:center;
-}
-
-h1{
-font-size:28px;
-margin-bottom:4px;
-}
-
-.subtitle{
-font-size:12px;
-color:#94a3b8;
-margin-bottom:14px;
-}
+.app{width:420px;text-align:center;}
 
 .cam{
 position:relative;
@@ -42,22 +28,17 @@ overflow:hidden;
 border:1px solid #2a2a35;
 }
 
-video{
-width:100%;
-height:100%;
-object-fit:cover;
-}
+video{width:100%;height:100%;object-fit:cover;}
 
 .scan{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-width:190px;
-height:190px;
+width:200px;
+height:200px;
 border:2px solid #7c3aed;
 border-radius:50%;
-transition:.2s;
 }
 
 .scan.detect{
@@ -65,35 +46,7 @@ border-color:#10b981;
 box-shadow:0 0 18px #10b981;
 }
 
-.guide{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:64px;
-opacity:.18;
-}
-
-.status{
-margin-top:10px;
-font-size:13px;
-color:#94a3b8;
-}
-
-.progress{
-height:4px;
-background:#222;
-border-radius:99px;
-margin-top:6px;
-overflow:hidden;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#7c3aed,#06b6d4);
-transition:.25s;
-}
+.status{margin-top:10px;color:#94a3b8;}
 
 button{
 margin-top:14px;
@@ -108,23 +61,6 @@ cursor:pointer;
 }
 
 canvas{display:none}
-
-.success{
-position:absolute;
-inset:0;
-background:#7c3aed;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:60px;
-opacity:0;
-pointer-events:none;
-transition:.4s;
-}
-
-.success.show{
-opacity:1;
-}
 </style>
 </head>
 
@@ -132,51 +68,37 @@ opacity:1;
 
 <div class="app">
 
-<h1>Trace ton @ solaire</h1>
-<div class="subtitle">@ au centre + rayons libres, comme un soleil arobase </div>
+<h2>Trace ton @ solaire</h2>
 
 <div class="cam">
-
 <video id="video" autoplay playsinline muted></video>
 <canvas id="canvas"></canvas>
-
-<div class="scan" id="scan">
-<div class="guide">@</div>
-</div>
-
-<div class="success" id="success">☀</div>
-
+<div class="scan" id="scan"></div>
 </div>
 
 <div class="status" id="status">caméra inactive</div>
-
-<div class="progress">
-<div class="bar" id="bar"></div>
-</div>
 
 <button id="start">Activer caméra</button>
 
 </div>
 
+<script src="https://docs.opencv.org/4.x/opencv.js"></script>
+
 <script>
 
-const video=document.getElementById("video")
-const canvas=document.getElementById("canvas")
-const ctx=canvas.getContext("2d")
+let video=document.getElementById("video")
+let canvas=document.getElementById("canvas")
+let ctx=canvas.getContext("2d")
 
-const status=document.getElementById("status")
-const bar=document.getElementById("bar")
-const scanBox=document.getElementById("scan")
-const success=document.getElementById("success")
-const startBtn=document.getElementById("start")
+let scanBox=document.getElementById("scan")
+let status=document.getElementById("status")
+let startBtn=document.getElementById("start")
 
-let detect=0
-const NEEDED=6
+let detectCount=0
+const NEEDED=5
 let running=false
 
 startBtn.onclick=async()=>{
-
-try{
 
 const stream=await navigator.mediaDevices.getUserMedia({
 video:{facingMode:"environment"}
@@ -186,16 +108,10 @@ video.srcObject=stream
 await video.play()
 
 startBtn.style.display="none"
-status.textContent="montre ton soleil"
+status.innerText="cherche symbole"
 
 running=true
-setInterval(scan,450)
-
-}catch(e){
-
-status.textContent="accès caméra refusé"
-
-}
+setInterval(scan,400)
 
 }
 
@@ -204,90 +120,118 @@ function scan(){
 if(!running)return
 if(video.readyState<4)return
 
-const W=video.videoWidth
-const H=video.videoHeight
-
-canvas.width=W
-canvas.height=H
+canvas.width=video.videoWidth
+canvas.height=video.videoHeight
 
 ctx.drawImage(video,0,0)
 
-const cx=W/2
-const cy=H/2
-const R=Math.min(W,H)*0.22
+let src=cv.imread(canvas)
 
-const img=ctx.getImageData(cx-R,cy-R,R*2,R*2).data
+let gray=new cv.Mat()
+cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY)
 
-let darkCenter=0
-let totalCenter=0
-let darkRing=0
+cv.GaussianBlur(gray,gray,new cv.Size(5,5),0)
 
-const step=5
+let circles=new cv.Mat()
 
-for(let y=0;y<R*2;y+=step){
+cv.HoughCircles(
+gray,
+circles,
+cv.HOUGH_GRADIENT,
+1,
+100,
+120,
+40,
+40,
+200
+)
 
-for(let x=0;x<R*2;x+=step){
+let found=false
 
-const i=(y*(R*2)+x)*4
+if(circles.cols>0){
 
-const lum=img[i]*0.3+img[i+1]*0.6+img[i+2]*0.1
+for(let i=0;i<circles.cols;i++){
 
-const dx=x-R
-const dy=y-R
-const dist=Math.sqrt(dx*dx+dy*dy)
+let x=circles.data32F[i*3]
+let y=circles.data32F[i*3+1]
+let r=circles.data32F[i*3+2]
 
-if(dist<R*0.35){
-totalCenter++
-if(lum<110)darkCenter++
+if(checkSun(gray,x,y,r)){
+found=true
+break
 }
 
-if(dist>R*0.5 && dist<R*0.9){
-if(lum<110)darkRing++
 }
 
 }
 
-}
-
-const centerRatio=darkCenter/totalCenter
-const raysOk=darkRing>50
-
-const match=centerRatio>0.15 && raysOk
-
-if(match){
+if(found){
 
 scanBox.classList.add("detect")
-detect++
-bar.style.width=(detect/NEEDED*100)+"%"
-status.textContent="soleil détecté"
+detectCount++
 
-if(navigator.vibrate)navigator.vibrate(25)
-
-if(detect>=NEEDED){
+if(detectCount>=NEEDED){
 
 running=false
-success.classList.add("show")
-status.textContent="symbole reconnu"
-
-if(navigator.vibrate)navigator.vibrate([100,50,100])
+status.innerText="symbole reconnu"
 
 setTimeout(()=>{
 window.location.href="https://urlr.me/34872E"
-},1300)
+},1200)
 
 }
 
 }else{
 
 scanBox.classList.remove("detect")
-detect=Math.max(detect-1,0)
-bar.style.width=(detect/NEEDED*100)+"%"
-status.textContent="aligne ton soleil"
+detectCount=0
+status.innerText="aligne ton soleil"
 
 }
+
+src.delete()
+gray.delete()
+circles.delete()
+
+}
+
+function checkSun(gray,cx,cy,r){
+
+let rays=0
+
+for(let a=0;a<360;a+=15){
+
+let rad=a*Math.PI/180
+
+let x1=Math.floor(cx+Math.cos(rad)*r*0.5)
+let y1=Math.floor(cy+Math.sin(rad)*r*0.5)
+
+let x2=Math.floor(cx+Math.cos(rad)*r*0.9)
+let y2=Math.floor(cy+Math.sin(rad)*r*0.9)
+
+if(
+x1>0 && y1>0 &&
+x2>0 && y2>0 &&
+x1<gray.cols && y1<gray.rows &&
+x2<gray.cols && y2<gray.rows
+){
+
+let p1=gray.ucharPtr(y1,x1)[0]
+let p2=gray.ucharPtr(y2,x2)[0]
+
+if(p2<p1-20){
+rays++
+}
+
+}
+
+}
+
+return rays>6
 
 }
 
 </script>
+
 </body>
 </html>
