@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Le Défi d’Eko — Fil d'@riane</title>
+<title>Le Fil d'@riane</title>
 
 <style>
 
@@ -13,72 +13,46 @@
 --panel:#171a21;
 --line:#2a3140;
 --text:#f3f5f7;
---muted:#b8c0cc;
+--muted:#9ca3af;
 --accent:#8b5cf6;
 --blue:#3b82f6;
 --red:#ef4444;
 --radius:18px;
 }
 
-*{box-sizing:border-box}
-
 body{
 margin:0;
 background:var(--bg);
 color:var(--text);
 font-family:system-ui;
+overflow:hidden;
 }
 
-.hidden{display:none}
+/* SCROLL HORIZONTAL */
 
-.btn{
-background:linear-gradient(135deg,var(--blue),var(--accent));
-border:none;
-padding:14px;
-border-radius:12px;
-font-weight:bold;
-color:white;
-cursor:pointer;
-font-size:1rem;
+.wrapper{
+display:flex;
+width:600vw;
+height:100vh;
+transition:transform .6s ease;
 }
 
-.challenge-wrap{
-min-height:100vh;
+.screen{
+width:100vw;
+height:100vh;
+padding:40px;
 display:flex;
 align-items:center;
 justify-content:center;
-padding:30px;
 }
 
-.challenge-card{
+.card{
 max-width:650px;
 background:var(--panel);
 border:1px solid var(--line);
 border-radius:20px;
 padding:35px;
 line-height:1.6;
-}
-
-.challenge-card h1{
-text-align:center;
-}
-
-.challenge-card p{
-color:var(--muted);
-}
-
-.app{
-width:min(900px,calc(100% - 30px));
-margin:auto;
-padding:40px 0;
-}
-
-.card{
-background:var(--panel);
-border:1px solid var(--line);
-border-radius:var(--radius);
-padding:25px;
-margin-bottom:20px;
 }
 
 textarea{
@@ -90,18 +64,37 @@ border-radius:12px;
 padding:14px;
 color:white;
 font:inherit;
-margin-bottom:15px;
+margin-top:10px;
 }
 
-.result-card{
-display:none;
+.btn{
+margin-top:20px;
+background:linear-gradient(135deg,var(--blue),var(--accent));
+border:none;
+padding:14px 22px;
+border-radius:12px;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.btn.secondary{
+background:#1f2937;
+}
+
+.center{text-align:center}
+
+.tip{
+color:var(--muted);
+font-size:.9rem;
+margin-top:6px;
+}
+
+/* RESULT */
+
+.result{
 background:white;
 color:#1e293b;
-padding:40px;
-}
-
-.res-block{
-margin-bottom:20px;
 }
 
 .help{
@@ -114,7 +107,7 @@ margin-top:25px;
 
 .help-grid{
 display:grid;
-grid-template-columns:repeat(3,1fr);
+grid-template-columns:repeat(2,1fr);
 gap:10px;
 }
 
@@ -129,159 +122,179 @@ color:inherit;
 font-weight:bold;
 }
 
-.sigs{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:40px;
-margin-top:40px;
-}
-
-.sig-line{
-border-bottom:1px solid #1e293b;
-height:45px;
-}
-
-@media(max-width:600px){
-.help-grid,.sigs{grid-template-columns:1fr}
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- Écran défi -->
+<div class="wrapper" id="wrapper">
 
-<section id="challengeScreen" class="challenge-wrap">
+<!-- INTRO -->
 
-<div class="challenge-card">
+<section class="screen">
 
-<h1>EkoDéfi </h1>
+<div class="card">
+
+<h1>Hello, c’est Eko.</h1>
 
 <p>
-Salut, c’est <strong>Eko</strong>.
+Je vous écris parce que beaucoup de jeunes et de parents
+traversent aujourd’hui un drôle de labyrinthe :
+<strong>le monde numérique</strong>.
 </p>
 
 <p>
-Internet ressemble parfois à un grand labyrinthe.
-On peut y trouver des trésors, des idées, des amis…
-mais aussi quelques <strong>minotaures</strong> : pièges, manipulations, contenus toxiques, harcèlement.
+On y trouve des trésors :
+apprendre, créer, jouer, rencontrer.
 </p>
 
 <p>
-Dans le mythe grec, Thésée entre dans le labyrinthe pour affronter le Minotaure.
-Mais Ariane lui donne un fil.
-Grâce à ce fil, il peut toujours retrouver le chemin de sortie.
+Mais parfois aussi…
+des <strong>minotaures invisibles</strong> :
+manipulation, harcèlement, dépendance.
 </p>
 
 <p>
-Aujourd’hui, chacun de nous traverse aussi un labyrinthe : le monde numérique.
-Alors la question est simple :
-<strong>quel est ton fil d’Ariane ?</strong>
+Dans le mythe grec,
+Ariane donne un fil à Thésée
+pour qu’il retrouve son chemin.
 </p>
 
-<p>
-Ce petit outil va t’aider, avec tes parents, à créer ton propre
-<strong>Fil d'@riane numérique</strong>.
+<p class="center">
+
+<strong>Et si vous tissiez votre Fil d’@riane numérique ?</strong>
+
 </p>
 
-<p>
-Un pacte simple pour garder des repères quand le labyrinthe devient compliqué.
-</p>
-
-<br>
-
-<div style="text-align:center">
-
-<button class="btn" onclick="enterApp()">
-Créer notre Fil d'@riane
-</button>
-
+<div class="center">
+<button class="btn" onclick="next()">Entrer dans le labyrinthe</button>
 </div>
 
 </div>
 
 </section>
 
-<!-- Application -->
+<!-- LUMIERES -->
 
-<div id="mainApp" class="app hidden">
+<section class="screen">
 
-<section class="card">
+<div class="card">
 
-<h2>Notre Fil d'@riane</h2>
+<h2>Les lumières du numérique</h2>
 
 <p>
-Complétez ensemble ces quatre repères.
-Il ne s’agit pas de règles imposées, mais d’un accord pour naviguer dans le numérique.
+Qu’est-ce que vous aimez dans internet ?
 </p>
 
-<label>Les lumières du numérique (ce que nous aimons)</label>
 <textarea id="in1"></textarea>
 
-<label>Les minotaures du labyrinthe (les risques)</label>
-<textarea id="in2"></textarea>
+<div class="tip">
+Ex : apprendre, créer, jouer, discuter
+</div>
 
-<label>Nos repères pour rester libres</label>
-<textarea id="in3"></textarea>
+<button class="btn" onclick="next()">Suivant</button>
 
-<label>Notre pacte numérique</label>
-<textarea id="in4"></textarea>
-
-<button class="btn" onclick="generate()">Générer notre fil</button>
+</div>
 
 </section>
 
-<div id="resultCard" class="card result-card">
+<!-- MINOTAURES -->
+
+<section class="screen">
+
+<div class="card">
+
+<h2>Les minotaures</h2>
+
+<p>
+Quels dangers peut-on rencontrer ?
+</p>
+
+<textarea id="in2"></textarea>
+
+<div class="tip">
+Ex : harcèlement, fake news, manipulation
+</div>
+
+<button class="btn" onclick="next()">Suivant</button>
+
+</div>
+
+</section>
+
+<!-- REPERES -->
+
+<section class="screen">
+
+<div class="card">
+
+<h2>Nos repères</h2>
+
+<p>
+Quels repères pour rester libres ?
+</p>
+
+<textarea id="in3"></textarea>
+
+<div class="tip">
+Ex : parler avec un adulte, vérifier une info
+</div>
+
+<button class="btn" onclick="next()">Suivant</button>
+
+</div>
+
+</section>
+
+<!-- PACTE -->
+
+<section class="screen">
+
+<div class="card">
+
+<h2>Notre pacte numérique</h2>
+
+<p>
+Quel accord voulons-nous poser ensemble ?
+</p>
+
+<textarea id="in4"></textarea>
+
+<button class="btn" onclick="generate()">Créer notre fil</button>
+
+</div>
+
+</section>
+
+<!-- RESULT -->
+
+<section class="screen">
+
+<div class="card result">
 
 <h2>NOTRE FIL D'@RIANE</h2>
 
-<div class="res-block">
 <h3>Lumières</h3>
 <p id="out1"></p>
-</div>
 
-<div class="res-block">
 <h3>Minotaures</h3>
 <p id="out2"></p>
-</div>
 
-<div class="res-block">
 <h3>Repères</h3>
 <p id="out3"></p>
-</div>
 
-<div class="res-block">
-<h3>Engagement</h3>
+<h3>Pacte</h3>
 <p id="out4"></p>
-</div>
 
 <div class="help">
 
-<div style="text-align:center;font-weight:bold;color:red">
-Besoin d’aide
-</div>
+<strong>Besoin d’aide</strong>
 
 <div class="help-grid">
 
 <a href="tel:3018" class="help-box">3018</a>
 <a href="https://www.e-enfance.org" target="_blank" class="help-box">e-Enfance</a>
-<a href="https://www.netecoute.fr" target="_blank" class="help-box">NetÉcoute</a>
 
-</div>
-
-</div>
-
-<div class="sigs">
-
-<div>
-<div class="sig-line"></div>
-Parent
-</div>
-
-<div>
-<div class="sig-line"></div>
-Ado
 </div>
 
 </div>
@@ -292,21 +305,26 @@ Ado
 
 </div>
 
+</section>
+
 </div>
 
 <script>
 
-function enterApp(){
+let step=0
+const wrapper=document.getElementById("wrapper")
 
-document.getElementById("challengeScreen").classList.add("hidden")
-document.getElementById("mainApp").classList.remove("hidden")
+function next(){
+
+step++
+
+wrapper.style.transform="translateX(-"+(step*100)+"vw)"
 
 }
 
 function val(id){
 
 let v=document.getElementById(id).value
-
 return v || "À définir ensemble"
 
 }
@@ -318,11 +336,7 @@ document.getElementById("out2").innerText=val("in2")
 document.getElementById("out3").innerText=val("in3")
 document.getElementById("out4").innerText=val("in4")
 
-let r=document.getElementById("resultCard")
-
-r.style.display="block"
-
-r.scrollIntoView({behavior:"smooth"})
+next()
 
 }
 
