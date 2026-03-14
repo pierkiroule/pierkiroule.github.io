@@ -51,11 +51,15 @@ padding:30px;
 }
 
 .challenge-card{
-max-width:600px;
+max-width:650px;
 background:var(--panel);
 border:1px solid var(--line);
 border-radius:20px;
-padding:30px;
+padding:35px;
+line-height:1.6;
+}
+
+.challenge-card h1{
 text-align:center;
 }
 
@@ -64,7 +68,7 @@ color:var(--muted);
 }
 
 .app{
-width:min(850px,calc(100% - 30px));
+width:min(900px,calc(100% - 30px));
 margin:auto;
 padding:40px 0;
 }
@@ -146,7 +150,7 @@ height:45px;
 
 <body>
 
-<!-- écran défi -->
+<!-- Écran défi -->
 
 <section id="challengeScreen" class="challenge-wrap">
 
@@ -155,23 +159,51 @@ height:45px;
 <h1>Le Défi d’Eko</h1>
 
 <p>
-Bienvenue dans le labyrinthe numérique.  
-Pour avancer, il faut un fil.  
-Eko te propose d’en créer un :  
-<strong>ton Fil d'@riane.</strong>
+Salut. Moi c’est <strong>Eko</strong>.
+</p>
+
+<p>
+Internet ressemble parfois à un grand labyrinthe.
+On peut y trouver des trésors, des idées, des amis…
+mais aussi quelques <strong>minotaures</strong> : pièges, manipulations, contenus toxiques, harcèlement.
+</p>
+
+<p>
+Dans le mythe grec, Thésée entre dans le labyrinthe pour affronter le Minotaure.
+Mais Ariane lui donne un fil.
+Grâce à ce fil, il peut toujours retrouver le chemin de sortie.
+</p>
+
+<p>
+Aujourd’hui, chacun de nous traverse aussi un labyrinthe : le monde numérique.
+Alors la question est simple :
+<strong>quel est ton fil d’Ariane ?</strong>
+</p>
+
+<p>
+Ce petit outil va t’aider, avec tes parents, à créer ton propre
+<strong>Fil d'@riane numérique</strong>.
+</p>
+
+<p>
+Un pacte simple pour garder des repères quand le labyrinthe devient compliqué.
 </p>
 
 <br>
 
+<div style="text-align:center">
+
 <button class="btn" onclick="enterApp()">
-Entrer dans le défi
+Créer notre Fil d'@riane
 </button>
+
+</div>
 
 </div>
 
 </section>
 
-<!-- application -->
+<!-- Application -->
 
 <div id="mainApp" class="app hidden">
 
@@ -179,21 +211,24 @@ Entrer dans le défi
 
 <h2>Notre Fil d'@riane</h2>
 
-<p>Créer ensemble un pacte numérique.</p>
+<p>
+Complétez ensemble ces quatre repères.
+Il ne s’agit pas de règles imposées, mais d’un accord pour naviguer dans le numérique.
+</p>
 
-<label>Ce que nous aimons dans le numérique</label>
+<label>Les lumières du numérique (ce que nous aimons)</label>
 <textarea id="in1"></textarea>
 
-<label>Les pièges du labyrinthe</label>
+<label>Les minotaures du labyrinthe (les risques)</label>
 <textarea id="in2"></textarea>
 
-<label>Nos repères</label>
+<label>Nos repères pour rester libres</label>
 <textarea id="in3"></textarea>
 
-<label>Notre pacte</label>
+<label>Notre pacte numérique</label>
 <textarea id="in4"></textarea>
 
-<button class="btn" onclick="generate()">Générer</button>
+<button class="btn" onclick="generate()">Générer notre fil</button>
 
 </section>
 
@@ -224,7 +259,7 @@ Entrer dans le défi
 <div class="help">
 
 <div style="text-align:center;font-weight:bold;color:red">
-AIDE
+Besoin d’aide
 </div>
 
 <div class="help-grid">
