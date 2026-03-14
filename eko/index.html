@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Scanner Sol@riane</title>
+
+<title>Fil d'@riane Scanner</title>
 
 <style>
+
 body{
 margin:0;
 background:#0b0b12;
@@ -17,7 +19,21 @@ justify-content:center;
 height:100vh;
 }
 
-.app{width:420px;text-align:center;}
+.app{
+width:420px;
+text-align:center;
+}
+
+h1{
+font-size:26px;
+margin-bottom:6px;
+}
+
+.subtitle{
+font-size:13px;
+color:#94a3b8;
+margin-bottom:12px;
+}
 
 .cam{
 position:relative;
@@ -28,17 +44,41 @@ overflow:hidden;
 border:1px solid #2a2a35;
 }
 
-video{width:100%;height:100%;object-fit:cover;}
+video{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+canvas{
+display:none;
+}
+
+.filigrane{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+opacity:.18;
+pointer-events:none;
+}
+
+.filigrane svg{
+width:200px;
+height:200px;
+}
 
 .scan{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-width:200px;
-height:200px;
-border:2px solid #7c3aed;
-border-radius:50%;
+width:210px;
+height:210px;
+border:2px dashed #7c3aed;
+clip-path:polygon(50% 0%, 0% 100%, 100% 100%);
+border-radius:6px;
+transition:.2s;
 }
 
 .scan.detect{
@@ -46,7 +86,26 @@ border-color:#10b981;
 box-shadow:0 0 18px #10b981;
 }
 
-.status{margin-top:10px;color:#94a3b8;}
+.status{
+margin-top:10px;
+font-size:13px;
+color:#94a3b8;
+}
+
+.progress{
+height:4px;
+background:#222;
+border-radius:99px;
+margin-top:6px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#7c3aed,#06b6d4);
+transition:.25s;
+}
 
 button{
 margin-top:14px;
@@ -60,7 +119,23 @@ font-weight:bold;
 cursor:pointer;
 }
 
-canvas{display:none}
+.success{
+position:absolute;
+inset:0;
+background:#10b981;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:60px;
+opacity:0;
+pointer-events:none;
+transition:.4s;
+}
+
+.success.show{
+opacity:1;
+}
+
 </style>
 </head>
 
@@ -68,15 +143,48 @@ canvas{display:none}
 
 <div class="app">
 
-<h2>Trace ton @ solaire</h2>
+<h1>Fil d'@riane</h1>
+<div class="subtitle">Aligne ton triangle avec @</div>
 
 <div class="cam">
+
 <video id="video" autoplay playsinline muted></video>
 <canvas id="canvas"></canvas>
+
 <div class="scan" id="scan"></div>
+
+<div class="filigrane">
+
+<svg viewBox="0 0 200 200">
+
+<polygon
+points="100,10 10,180 190,180"
+stroke="white"
+stroke-width="4"
+fill="none"
+/>
+
+<text
+x="100"
+y="120"
+font-size="60"
+text-anchor="middle"
+fill="white"
+>@</text>
+
+</svg>
+
+</div>
+
+<div class="success" id="success">✓</div>
+
 </div>
 
 <div class="status" id="status">caméra inactive</div>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
 
 <button id="start">Activer caméra</button>
 
@@ -86,19 +194,23 @@ canvas{display:none}
 
 <script>
 
-let video=document.getElementById("video")
-let canvas=document.getElementById("canvas")
-let ctx=canvas.getContext("2d")
+const video=document.getElementById("video")
+const canvas=document.getElementById("canvas")
+const ctx=canvas.getContext("2d")
 
-let scanBox=document.getElementById("scan")
-let status=document.getElementById("status")
-let startBtn=document.getElementById("start")
+const status=document.getElementById("status")
+const bar=document.getElementById("bar")
+const scanBox=document.getElementById("scan")
+const success=document.getElementById("success")
+const startBtn=document.getElementById("start")
 
-let detectCount=0
-const NEEDED=5
+let detect=0
+const NEEDED=6
 let running=false
 
 startBtn.onclick=async()=>{
+
+try{
 
 const stream=await navigator.mediaDevices.getUserMedia({
 video:{facingMode:"environment"}
@@ -108,10 +220,18 @@ video.srcObject=stream
 await video.play()
 
 startBtn.style.display="none"
-status.innerText="cherche symbole"
+
+status.textContent="cherche triangle"
 
 running=true
-setInterval(scan,400)
+
+setInterval(scan,350)
+
+}catch(e){
+
+status.textContent="accès caméra refusé"
+
+}
 
 }
 
@@ -120,60 +240,90 @@ function scan(){
 if(!running)return
 if(video.readyState<4)return
 
-canvas.width=video.videoWidth
-canvas.height=video.videoHeight
+const W=video.videoWidth
+const H=video.videoHeight
+
+canvas.width=W
+canvas.height=H
 
 ctx.drawImage(video,0,0)
 
 let src=cv.imread(canvas)
 
 let gray=new cv.Mat()
+
 cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY)
 
 cv.GaussianBlur(gray,gray,new cv.Size(5,5),0)
 
-let circles=new cv.Mat()
+let edges=new cv.Mat()
 
-cv.HoughCircles(
-gray,
-circles,
-cv.HOUGH_GRADIENT,
-1,
-100,
-120,
-40,
-40,
-200
-)
+cv.Canny(gray,edges,50,130)
+
+let contours=new cv.MatVector()
+let hierarchy=new cv.Mat()
+
+cv.findContours(edges,contours,hierarchy,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
 
 let found=false
 
-if(circles.cols>0){
+for(let i=0;i<contours.size();i++){
 
-for(let i=0;i<circles.cols;i++){
+let cnt=contours.get(i)
 
-let x=circles.data32F[i*3]
-let y=circles.data32F[i*3+1]
-let r=circles.data32F[i*3+2]
+let peri=cv.arcLength(cnt,true)
 
-if(checkSun(gray,x,y,r)){
+let approx=new cv.Mat()
+
+cv.approxPolyDP(cnt,approx,0.04*peri,true)
+
+if(approx.rows==3){
+
+let area=cv.contourArea(cnt)
+
+if(area>3000){
+
+let M=cv.moments(cnt)
+
+let cx=M.m10/M.m00
+let cy=M.m01/M.m00
+
+let pixel=gray.ucharPtr(Math.floor(cy),Math.floor(cx))[0]
+
+if(pixel<120){
 found=true
-break
 }
 
 }
+
+}
+
+approx.delete()
+cnt.delete()
 
 }
 
 if(found){
 
 scanBox.classList.add("detect")
-detectCount++
 
-if(detectCount>=NEEDED){
+detect++
+
+bar.style.width=(detect/NEEDED*100)+"%"
+
+status.textContent="triangle détecté"
+
+if(navigator.vibrate)navigator.vibrate(20)
+
+if(detect>=NEEDED){
 
 running=false
-status.innerText="symbole reconnu"
+
+success.classList.add("show")
+
+status.textContent="symbole reconnu"
+
+if(navigator.vibrate)navigator.vibrate([120,60,120])
 
 setTimeout(()=>{
 window.location.href="https://urlr.me/34872E"
@@ -184,50 +334,20 @@ window.location.href="https://urlr.me/34872E"
 }else{
 
 scanBox.classList.remove("detect")
-detectCount=0
-status.innerText="aligne ton soleil"
+
+detect=Math.max(detect-1,0)
+
+bar.style.width=(detect/NEEDED*100)+"%"
+
+status.textContent="aligne le triangle"
 
 }
 
 src.delete()
 gray.delete()
-circles.delete()
-
-}
-
-function checkSun(gray,cx,cy,r){
-
-let rays=0
-
-for(let a=0;a<360;a+=15){
-
-let rad=a*Math.PI/180
-
-let x1=Math.floor(cx+Math.cos(rad)*r*0.5)
-let y1=Math.floor(cy+Math.sin(rad)*r*0.5)
-
-let x2=Math.floor(cx+Math.cos(rad)*r*0.9)
-let y2=Math.floor(cy+Math.sin(rad)*r*0.9)
-
-if(
-x1>0 && y1>0 &&
-x2>0 && y2>0 &&
-x1<gray.cols && y1<gray.rows &&
-x2<gray.cols && y2<gray.rows
-){
-
-let p1=gray.ucharPtr(y1,x1)[0]
-let p2=gray.ucharPtr(y2,x2)[0]
-
-if(p2<p1-20){
-rays++
-}
-
-}
-
-}
-
-return rays>6
+edges.delete()
+contours.delete()
+hierarchy.delete()
 
 }
 
