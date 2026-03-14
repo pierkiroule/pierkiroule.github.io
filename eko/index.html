@@ -3,14 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Fil d'@riane Scanner</title>
+<title>Fil d'@riane — Résonance</title>
 
 <style>
 
+:root{
+--primary:#a78bfa;
+--bg:#05050a;
+--success:#10b981;
+}
+
 body{
 margin:0;
-background:#0b0b12;
-color:#e2e8f0;
+background:var(--bg);
+color:white;
 font-family:system-ui;
 display:flex;
 align-items:center;
@@ -18,120 +24,77 @@ justify-content:center;
 height:100vh;
 }
 
-.app{
-width:420px;
+.container{
 text-align:center;
+width:90%;
+max-width:420px;
 }
 
-h1{
-font-size:26px;
-margin-bottom:6px;
-}
-
-.subtitle{
-font-size:13px;
-color:#94a3b8;
-margin-bottom:12px;
-}
-
-.cam{
+.resonance-box{
 position:relative;
-aspect-ratio:4/3;
-background:black;
-border-radius:14px;
-overflow:hidden;
-border:1px solid #2a2a35;
+width:220px;
+height:220px;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-video{
-width:100%;
-height:100%;
-object-fit:cover;
-}
-
-canvas{
-display:none;
-}
-
-.filigrane{
+.wave{
 position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-opacity:.18;
-pointer-events:none;
+border:2px solid var(--primary);
+border-radius:50%;
+width:80px;
+height:80px;
+opacity:.8;
 }
 
-.filigrane svg{
-width:200px;
-height:200px;
-}
-
-.scan{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:210px;
-height:210px;
-border:2px dashed #7c3aed;
-clip-path:polygon(50% 0%, 0% 100%, 100% 100%);
-transition:.2s;
-}
-
-.scan.detect{
-border-color:#10b981;
-box-shadow:0 0 18px #10b981;
+.core-at{
+font-size:90px;
+font-weight:900;
+text-shadow:0 0 25px rgba(167,139,250,.4);
+transition:.15s;
 }
 
 .status{
-margin-top:10px;
+margin-top:15px;
 font-size:13px;
-color:#94a3b8;
+color:var(--primary);
+letter-spacing:2px;
+text-transform:uppercase;
 }
 
-.progress{
-height:4px;
-background:#222;
-border-radius:99px;
+.preview{
+font-size:12px;
+color:#475569;
 margin-top:6px;
-overflow:hidden;
-}
-
-.bar{
-height:100%;
-width:0%;
-background:linear-gradient(90deg,#7c3aed,#06b6d4);
-transition:.25s;
 }
 
 button{
-margin-top:14px;
-padding:14px;
-width:100%;
+margin-top:25px;
+padding:16px 40px;
+border-radius:50px;
 border:none;
-border-radius:10px;
-background:#7c3aed;
-color:white;
-font-weight:bold;
+background:var(--primary);
+color:black;
+font-weight:900;
+font-size:16px;
 cursor:pointer;
 }
 
 .success{
-position:absolute;
+position:fixed;
 inset:0;
-background:#10b981;
+background:var(--success);
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:60px;
-opacity:0;
-pointer-events:none;
-transition:.4s;
+transform:translateY(100%);
+transition:.5s;
 }
 
 .success.show{
-opacity:1;
+transform:translateY(0);
 }
 
 </style>
@@ -139,208 +102,154 @@ opacity:1;
 
 <body>
 
-<div class="app">
-
-<h1>Fil d'@riane</h1>
-<div class="subtitle">Aligne ton tatouage triangle @</div>
-
-<div class="cam">
-
-<video id="video" autoplay playsinline muted></video>
-<canvas id="canvas"></canvas>
-
-<div class="scan" id="scan"></div>
-
-<div class="filigrane">
-<svg viewBox="0 0 200 200">
-<polygon points="100,10 10,180 190,180"
-stroke="white" stroke-width="4" fill="none"/>
-<text x="100" y="120" font-size="60"
-text-anchor="middle" fill="white">@</text>
+<div class="success" id="success">
+<svg width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+<polyline points="20 6 9 17 4 12"></polyline>
 </svg>
 </div>
 
-<div class="success" id="success">✓</div>
+<div class="container">
 
+<div class="resonance-box" id="box">
+<div class="core-at" id="at">@</div>
 </div>
 
-<div class="status" id="status">caméra inactive</div>
+<h2>Fil d'@riane</h2>
 
-<div class="progress">
-<div class="bar" id="bar"></div>
+<div class="status" id="status">système inactif</div>
+<div class="preview" id="preview"></div>
+
+<button id="startBtn">ACTIVER MICRO</button>
+
 </div>
-
-<button id="start">Activer caméra</button>
-
-</div>
-
-<script src="https://docs.opencv.org/4.x/opencv.js"></script>
 
 <script>
 
-const video=document.getElementById("video")
-const canvas=document.getElementById("canvas")
-const ctx=canvas.getContext("2d")
-
+const startBtn=document.getElementById("startBtn")
 const status=document.getElementById("status")
-const bar=document.getElementById("bar")
-const scanBox=document.getElementById("scan")
+const preview=document.getElementById("preview")
+const box=document.getElementById("box")
+const at=document.getElementById("at")
 const success=document.getElementById("success")
-const startBtn=document.getElementById("start")
 
-let detect=0
-const NEEDED=6
-let running=false
+let recognition
+let listening=false
+let unlocked=false
+let waveTimer
 
-startBtn.onclick=async()=>{
+const KEYWORDS=["EKO","ÉCHO","ECHO"]
 
-try{
+function createWave(){
 
-const stream=await navigator.mediaDevices.getUserMedia({
-video:{facingMode:"environment"}
+if(!listening || unlocked) return
+
+const w=document.createElement("div")
+w.className="wave"
+box.appendChild(w)
+
+w.animate([
+{transform:"scale(1)",opacity:.8},
+{transform:"scale(3)",opacity:0}
+],{
+duration:2000,
+easing:"ease-out"
 })
 
-video.srcObject=stream
-await video.play()
+setTimeout(()=>w.remove(),2000)
 
+at.style.transform="scale(1.15)"
+setTimeout(()=>at.style.transform="scale(1)",120)
+
+}
+
+function startListening(){
+
+const SpeechRecognition=
+window.SpeechRecognition ||
+window.webkitSpeechRecognition
+
+if(!SpeechRecognition){
+
+status.innerText="navigateur non compatible"
+return
+
+}
+
+recognition=new SpeechRecognition()
+
+recognition.lang="fr-FR"
+recognition.continuous=true
+recognition.interimResults=false
+
+recognition.onstart=()=>{
+
+listening=true
+status.innerText="écoute..."
 startBtn.style.display="none"
-status.textContent="cherche triangle @"
+waveTimer=setInterval(createWave,700)
 
-running=true
-setInterval(scan,350)
+}
 
-}catch(e){
+recognition.onresult=(event)=>{
 
-status.textContent="accès caméra refusé"
+const text=event.results[event.results.length-1][0].transcript.toUpperCase()
+
+preview.innerText=text
+
+if(KEYWORDS.some(w=>text.includes(w))){
+
+unlock()
 
 }
 
 }
 
-function scan(){
+recognition.onend=()=>{
 
-if(!running)return
-if(video.readyState<4)return
+if(listening && !unlocked){
 
-const W=video.videoWidth
-const H=video.videoHeight
-
-canvas.width=W
-canvas.height=H
-
-ctx.drawImage(video,0,0)
-
-let src=cv.imread(canvas)
-
-let gray=new cv.Mat()
-cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY)
-
-cv.GaussianBlur(gray,gray,new cv.Size(5,5),0)
-
-cv.equalizeHist(gray,gray)
-
-let thresh=new cv.Mat()
-
-cv.adaptiveThreshold(
-gray,
-thresh,
-255,
-cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-cv.THRESH_BINARY_INV,
-11,
-2
-)
-
-let edges=new cv.Mat()
-cv.Canny(thresh,edges,40,120)
-
-let contours=new cv.MatVector()
-let hierarchy=new cv.Mat()
-
-cv.findContours(edges,contours,hierarchy,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
-
-let found=false
-
-for(let i=0;i<contours.size();i++){
-
-let cnt=contours.get(i)
-
-let area=cv.contourArea(cnt)
-
-if(area<4000) continue
-
-let peri=cv.arcLength(cnt,true)
-
-let approx=new cv.Mat()
-cv.approxPolyDP(cnt,approx,0.04*peri,true)
-
-if(approx.rows==3){
-
-let M=cv.moments(cnt)
-
-let cx=M.m10/M.m00
-let cy=M.m01/M.m00
-
-if(cx>W*0.3 && cx<W*0.7){
-
-let pixel=gray.ucharPtr(Math.floor(cy),Math.floor(cx))[0]
-
-if(pixel<120){
-found=true
-}
+recognition.start()
 
 }
 
 }
 
-approx.delete()
-cnt.delete()
+recognition.onerror=(e)=>{
+
+status.innerText="erreur micro"
 
 }
 
-if(found){
+recognition.start()
 
-scanBox.classList.add("detect")
+}
 
-detect++
-bar.style.width=(detect/NEEDED*100)+"%"
+function unlock(){
 
-status.textContent="tatouage détecté"
+if(unlocked) return
 
-if(detect>=NEEDED){
+unlocked=true
+listening=false
 
-running=false
+clearInterval(waveTimer)
+
+recognition.stop()
+
+status.innerText="résonance détectée"
+
+navigator.vibrate?.([100,50,100])
 
 success.classList.add("show")
-status.textContent="symbole reconnu"
-
-if(navigator.vibrate)
-navigator.vibrate([120,60,120])
 
 setTimeout(()=>{
-window.location.href="https://urlr.me/34872E"
+
+window.location.assign("https://urlr.me/34872E")
+
 },1200)
 
 }
 
-}else{
-
-scanBox.classList.remove("detect")
-detect=Math.max(detect-1,0)
-
-bar.style.width=(detect/NEEDED*100)+"%"
-status.textContent="aligne le tatouage"
-
-}
-
-src.delete()
-gray.delete()
-thresh.delete()
-edges.delete()
-contours.delete()
-hierarchy.delete()
-
-}
+startBtn.onclick=startListening
 
 </script>
 
