@@ -1,775 +1,434 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Le Défi d’Eko — Notre Fil d’@riane</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Le Défi d’Eko — Fil d'@riane</title>
 
 <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 
 <style>
+
 :root{
-  --bg:#0c0e13;
-  --panel:#171a21;
-  --panel2:#1f2430;
-  --text:#f3f5f7;
-  --muted:#b8c0cc;
-  --line:#2a3140;
-  --accent:#8b5cf6;
-  --blue:#3b82f6;
-  --red:#ef4444;
-  --ok:#22c55e;
-  --radius:18px;
-  --shadow:0 12px 36px rgba(0,0,0,.35);
+--bg:#0c0e13;
+--panel:#171a21;
+--panel2:#1f2430;
+--text:#f3f5f7;
+--muted:#b8c0cc;
+--line:#2a3140;
+--accent:#8b5cf6;
+--blue:#3b82f6;
+--red:#ef4444;
+--radius:18px;
 }
 
 *{box-sizing:border-box}
 
-html,body{
-  margin:0;
-  padding:0;
-  background:
-    radial-gradient(circle at top, rgba(139,92,246,.16), transparent 30%),
-    #0c0e13;
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  line-height:1.6;
+body{
+margin:0;
+background:#0c0e13;
+color:var(--text);
+font-family:system-ui;
 }
 
-h1,h2,h3,p{margin-top:0}
-
-a{color:inherit}
-
-.hidden{display:none !important}
+.hidden{display:none}
 
 .btn{
-  background:linear-gradient(135deg,var(--blue),var(--accent));
-  border:none;
-  padding:14px 16px;
-  border-radius:12px;
-  font-weight:700;
-  color:#fff;
-  cursor:pointer;
-  font-size:1rem;
-  box-shadow:var(--shadow);
-}
-
-.btn.secondary{
-  background:#232733;
-  border:1px solid var(--line);
-  box-shadow:none;
-}
-
-.btn:disabled{
-  opacity:.55;
-  cursor:not-allowed;
+background:linear-gradient(135deg,var(--blue),var(--accent));
+border:none;
+padding:14px;
+border-radius:12px;
+font-weight:bold;
+color:white;
+cursor:pointer;
+font-size:1rem;
 }
 
 .challenge-wrap{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:30px;
 }
 
 .challenge-card{
-  width:min(720px,100%);
-  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
-  border:1px solid var(--line);
-  border-radius:28px;
-  padding:28px;
-  box-shadow:var(--shadow);
-  text-align:center;
-}
-
-.eyebrow{
-  font-size:12px;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:var(--accent);
-  font-weight:800;
-  margin-bottom:10px;
-}
-
-.challenge-title{
-  font-size:clamp(28px,6vw,44px);
-  margin-bottom:12px;
-  background:linear-gradient(to right,#fff,var(--blue));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-
-.challenge-text{
-  color:var(--muted);
-  max-width:560px;
-  margin:0 auto 16px;
-}
-
-.challenge-note{
-  color:#d1d5db;
-  font-size:.95rem;
-  margin:12px auto 18px;
-  max-width:560px;
-}
-
-.camera-wrap{
-  margin:20px auto 10px;
-  width:min(420px,100%);
+max-width:600px;
+background:var(--panel);
+border:1px solid var(--line);
+border-radius:20px;
+padding:30px;
+text-align:center;
 }
 
 video{
-  width:100%;
-  border-radius:18px;
-  background:#090b0f;
-  box-shadow:var(--shadow);
-  display:block;
+width:100%;
+border-radius:15px;
+margin-top:15px;
 }
 
-canvas{
-  display:none;
+.scan-frame{
+position:absolute;
+width:200px;
+height:200px;
+border:3px dashed var(--accent);
+border-radius:20px;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+pointer-events:none;
 }
 
 .status{
-  margin-top:12px;
-  font-size:.92rem;
-  color:var(--muted);
-  min-height:24px;
-}
-
-.status.ok{color:#86efac}
-.status.warn{color:#fca5a5}
-
-.challenge-actions{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-top:16px;
+margin-top:10px;
+color:var(--muted);
 }
 
 .app{
-  width:min(850px,calc(100% - 30px));
-  margin:auto;
-  padding:40px 0;
-}
-
-.hero{
-  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
-  border:1px solid var(--line);
-  border-radius:28px;
-  padding:30px;
-  text-align:center;
-  margin-bottom:25px;
-  box-shadow:var(--shadow);
-}
-
-.hero h1{
-  font-size:clamp(28px,6vw,42px);
-  margin:10px 0;
-  background:linear-gradient(to right,#fff,var(--blue));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+width:min(850px,calc(100% - 30px));
+margin:auto;
+padding:40px 0;
 }
 
 .card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:25px;
-  margin-bottom:20px;
-  box-shadow:var(--shadow);
-}
-
-.section-title{
-  display:flex;
-  align-items:center;
-  gap:15px;
-  margin-bottom:20px;
-}
-
-.section-title h2{
-  margin:0;
-  color:var(--blue);
-  font-size:1.4rem;
-}
-
-.section-title .line{
-  flex:1;
-  height:1px;
-  background:linear-gradient(90deg,var(--accent),transparent);
-}
-
-.tip-list{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-}
-
-.tip{
-  background:var(--panel2);
-  border:1px solid var(--line);
-  border-radius:15px;
-  padding:15px;
-}
-
-.tip-num{
-  display:inline-flex;
-  width:28px;
-  height:28px;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  background:var(--accent);
-  font-weight:800;
-  font-size:.8rem;
-  margin-bottom:8px;
-}
-
-.tip h3{
-  margin:0 0 4px;
-  font-size:1rem;
-}
-
-.tip p{
-  margin:0;
-  font-size:.88rem;
-  color:var(--muted);
-}
-
-label{
-  display:block;
-  margin:16px 0 6px;
-  font-weight:700;
-  color:var(--blue);
+background:var(--panel);
+border:1px solid var(--line);
+border-radius:var(--radius);
+padding:25px;
+margin-bottom:20px;
 }
 
 textarea{
-  width:100%;
-  min-height:98px;
-  background:#0a0c10;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:14px;
-  color:white;
-  font:inherit;
-  resize:vertical;
-}
-
-textarea:focus{
-  border-color:var(--accent);
-  outline:none;
+width:100%;
+min-height:90px;
+background:#0a0c10;
+border:1px solid var(--line);
+border-radius:12px;
+padding:14px;
+color:white;
+font:inherit;
 }
 
 .result-card{
-  display:none;
-  background:#fff;
-  color:#1e293b;
-  padding:40px;
-}
-
-.result-card h2{
-  border-bottom:2px solid var(--blue);
-  padding-bottom:10px;
+display:none;
+background:white;
+color:#1e293b;
+padding:40px;
 }
 
 .res-block{
-  margin-bottom:20px;
-}
-
-.res-block h3{
-  font-size:.85rem;
-  color:var(--blue);
-  text-transform:uppercase;
-  margin-bottom:6px;
-}
-
-.res-block p{
-  background:#f8fafc;
-  padding:14px;
-  border-radius:8px;
-  border-left:4px solid var(--blue);
-  margin:0;
-  white-space:pre-wrap;
+margin-bottom:20px;
 }
 
 .help{
-  background:#fff1f2;
-  border:2px solid var(--red);
-  border-radius:15px;
-  padding:18px;
-  margin-top:25px;
+background:#fff1f2;
+border:2px solid var(--red);
+border-radius:15px;
+padding:18px;
+margin-top:25px;
 }
 
 .help-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:12px;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
 }
 
 .help-box{
-  background:#fff;
-  border:1px solid #fecaca;
-  border-radius:10px;
-  padding:10px;
-  text-align:center;
-  text-decoration:none;
-  color:inherit;
-  transition:transform .15s ease,border-color .15s ease;
-}
-
-.help-box:hover{
-  transform:translateY(-2px);
-  border-color:var(--red);
-}
-
-.help-val{
-  display:block;
-  font-weight:900;
-  color:var(--red);
-  font-size:1.1rem;
-}
-
-.help-lbl{
-  font-size:10px;
-  font-weight:700;
-  color:#64748b;
-}
-
-.mini-recap{
-  margin-top:22px;
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  border-radius:12px;
-  padding:14px;
-}
-
-.mini-recap ul{
-  margin:8px 0 0 18px;
-  padding:0;
+background:white;
+border:1px solid #fecaca;
+border-radius:10px;
+padding:10px;
+text-align:center;
+text-decoration:none;
+color:inherit;
 }
 
 .sigs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:40px;
-  margin-top:40px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+margin-top:40px;
 }
 
 .sig-line{
-  border-bottom:1px solid #1e293b;
-  height:45px;
+border-bottom:1px solid #1e293b;
+height:45px;
 }
 
-.footer-quote{
-  text-align:center;
-  margin-top:30px;
-  font-size:.82rem;
-  color:#94a3b8;
-  font-style:italic;
+@media(max-width:600px){
+.help-grid,.sigs{grid-template-columns:1fr}
 }
 
-@media (max-width:600px){
-  .tip-list,.help-grid,.sigs{grid-template-columns:1fr}
-  .challenge-actions{flex-direction:column}
-}
-@media print{
-  .no-print{display:none !important}
-  .result-card{display:block !important; box-shadow:none; border:none}
-  body{background:#fff}
-}
 </style>
 </head>
 
 <body>
 
-<!-- ÉCRAN 1 : DÉFI -->
+<!-- Écran Défi -->
+
 <section id="challengeScreen" class="challenge-wrap">
-  <div class="challenge-card">
-    <div class="eyebrow">Eko • Le Défi</div>
-    <h1 class="challenge-title">Trouver l’entrée du labyrinthe</h1>
 
-    <p class="challenge-text">
-      Dessine un symbole <strong>@</strong> sur ta peau.
-      Ce signe ouvre le passage vers le <strong>Fil d’@riane</strong>.
-    </p>
+<div class="challenge-card">
 
-    <p class="challenge-note">
-      Montre ensuite ce symbole à la caméra. Si la détection ne marche pas du premier coup,
-      rapproche la main, améliore la lumière, puis réessaie.
-    </p>
+<h1>Le Défi d’Eko</h1>
 
-    <div class="camera-wrap">
-      <video id="video" autoplay playsinline muted></video>
-      <canvas id="canvas"></canvas>
-    </div>
+<p>Dessine un <strong>@</strong> sur ta main.</p>
 
-    <div id="status" class="status">
-      Caméra non activée.
-    </div>
+<p>Montre le symbole à la caméra pour ouvrir le passage.</p>
 
-    <div class="challenge-actions">
-      <button id="startBtn" class="btn" onclick="startCamera()">Activer la caméra</button>
-      <button id="manualBtn" class="btn secondary" onclick="unlockApp()">
-        Continuer sans détection
-      </button>
-    </div>
-  </div>
+<div style="position:relative">
+
+<video id="video" autoplay playsinline muted></video>
+
+<div class="scan-frame"></div>
+
+</div>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<div id="status" class="status">Caméra inactive</div>
+
+<button class="btn" onclick="startCamera()">Activer la caméra</button>
+
+</div>
+
 </section>
 
-<!-- ÉCRAN 2 : APP COMPLÈTE -->
+<!-- App -->
+
 <div id="mainApp" class="app hidden">
 
-  <header class="hero no-print">
-    <div class="eyebrow">Eko • Traverser l’Ékran</div>
-    <h1>Notre Fil d’@riane</h1>
-    <p style="color:var(--muted)">Un pacte simple pour garder le cap dans le labyrinthe numérique.</p>
-  </header>
+<section class="card">
 
-  <section class="card no-print">
-    <h2 style="color:var(--accent)">Le message d’Eko</h2>
+<h2>Notre Fil d'@riane</h2>
 
-    <p><strong>Salut explorateurs du labyrinthe,</strong></p>
+<p>Créer ensemble un pacte numérique.</p>
 
-    <p>Dans le mythe grec, Thésée entre dans le labyrinthe. Un endroit fascinant, mais où l’on peut vite se perdre.</p>
+<label>Ce que nous aimons dans le numérique</label>
+<textarea id="in1"></textarea>
 
-    <p>Le Minotaure n’est pas seulement un monstre. Aujourd’hui il ressemble parfois à :</p>
+<label>Les pièges du labyrinthe</label>
+<textarea id="in2"></textarea>
 
-    <ul>
-      <li>la fatigue des écrans</li>
-      <li>les images qui blessent</li>
-      <li>les messages qui mettent la pression</li>
-      <li>le cyberharcèlement</li>
-    </ul>
+<label>Nos repères</label>
+<textarea id="in3"></textarea>
 
-    <p>Thésée ne gagne pas parce qu’il est le plus fort.</p>
-    <p>Il s’en sort parce qu’Ariane lui donne <strong>un fil</strong>.</p>
-    <p>Un fil pour explorer… sans se perdre.</p>
+<label>Notre pacte</label>
+<textarea id="in4"></textarea>
 
-    <p><strong>Je vous propose un défi :</strong><br>
-    prenez 10 minutes ensemble pour créer votre propre Fil d’@riane.</p>
+<button class="btn" onclick="generate()">Générer</button>
 
-    <p><strong>— Eko</strong></p>
-  </section>
+</section>
 
-  <section class="card no-print">
-    <div class="section-title">
-      <h2>Les ÉkoTips</h2>
-      <div class="line"></div>
-    </div>
+<div id="resultCard" class="card result-card">
 
-    <div class="tip-list">
-      <div class="tip">
-        <div class="tip-num">1</div>
-        <h3>Lumières</h3>
-        <p>Identifiez ce que le numérique vous apporte de positif : apprendre, créer, rire, rester en lien.</p>
-      </div>
+<h2>NOTRE FIL D'@RIANE</h2>
 
-      <div class="tip">
-        <div class="tip-num">2</div>
-        <h3>Minotaures</h3>
-        <p>Repérez ce qui peut faire perdre le fil : fatigue, comparaison, harcèlement, contenus choquants.</p>
-      </div>
+<div class="res-block">
+<h3>Lumières</h3>
+<p id="out1"></p>
+</div>
 
-      <div class="tip">
-        <div class="tip-num">3</div>
-        <h3>Repères</h3>
-        <p>Choisissez 3 règles simples pour protéger le sommeil, l’attention et la confiance.</p>
-      </div>
+<div class="res-block">
+<h3>Minotaures</h3>
+<p id="out2"></p>
+</div>
 
-      <div class="tip">
-        <div class="tip-num">4</div>
-        <h3>Alliance</h3>
-        <p>Décidez ensemble à qui parler si quelque chose devient difficile en ligne.</p>
-      </div>
-    </div>
-  </section>
+<div class="res-block">
+<h3>Repères</h3>
+<p id="out3"></p>
+</div>
 
-  <section class="card no-print">
-    <div class="section-title">
-      <h2>Tisser notre fil</h2>
-      <div class="line"></div>
-    </div>
+<div class="res-block">
+<h3>Engagement</h3>
+<p id="out4"></p>
+</div>
 
-    <label for="in1">✨ Ce que nous aimons dans le numérique</label>
-    <textarea id="in1" placeholder="Jeux, apprendre, créer, parler avec des amis..."></textarea>
+<div class="help">
 
-    <label for="in2">⚠️ Les pièges du labyrinthe (Minotaures)</label>
-    <textarea id="in2" placeholder="Fatigue, comparaison, cyberharcèlement, contenus choquants..."></textarea>
+<div style="text-align:center;font-weight:bold;color:red">
+AIDE
+</div>
 
-    <label for="in3">📌 Nos 3 repères pour garder le fil</label>
-    <textarea id="in3" placeholder="1. Pas de téléphone dans la chambre la nuit
-2. On parle si quelque chose nous met mal à l'aise
-3. ..."></textarea>
+<div class="help-grid">
 
-    <label for="in4">🤝 Notre pacte de confiance</label>
-    <textarea id="in4" placeholder="Si quelque chose devient difficile en ligne, on s'engage à en parler sans jugement."></textarea>
+<a href="tel:3018" class="help-box">3018</a>
+<a href="https://www.e-enfance.org" target="_blank" class="help-box">e-Enfance</a>
+<a href="https://www.netecoute.fr" target="_blank" class="help-box">NetÉcoute</a>
 
-    <button class="btn" onclick="generate()">Générer notre pacte</button>
-  </section>
+</div>
 
-  <div id="resultCard" class="card result-card">
-    <div style="text-align:center">
-      <h1 style="color:#0f172a;margin:0">NOTRE FIL D'@RIANE</h1>
-      <p style="color:#64748b;font-weight:bold;font-size:.8rem;letter-spacing:2px">
-        PACTE DE CONFIANCE NUMÉRIQUE
-      </p>
-    </div>
+</div>
 
-    <div style="margin-top:30px">
-      <div class="res-block">
-        <h3>✨ Nos Lumières</h3>
-        <p id="out1"></p>
-      </div>
+<div class="sigs">
 
-      <div class="res-block">
-        <h3>⚔️ Vigilance Minotaure</h3>
-        <p id="out2"></p>
-      </div>
+<div>
+<div class="sig-line"></div>
+Parent
+</div>
 
-      <div class="res-block">
-        <h3>📌 Nos Repères</h3>
-        <p id="out3"></p>
-      </div>
+<div>
+<div class="sig-line"></div>
+Ado
+</div>
 
-      <div class="res-block">
-        <h3>🤝 Notre Engagement</h3>
-        <p id="out4"></p>
-      </div>
-    </div>
+</div>
 
-    <div class="help">
-      <div style="text-align:center;font-weight:900;color:var(--red)">
-        AIDE & SOUTIEN
-      </div>
+<button class="btn" onclick="window.print()">Imprimer</button>
 
-      <div class="help-grid">
-        <a href="tel:3018" class="help-box">
-          <span class="help-val">3018</span>
-          <span class="help-lbl">Cyberharcèlement</span>
-        </a>
+</div>
 
-        <a href="https://www.e-enfance.org" target="_blank" rel="noreferrer" class="help-box">
-          <span class="help-val">e-Enfance</span>
-          <span class="help-lbl">Association</span>
-        </a>
-
-        <a href="https://www.filsantejeunes.com" target="_blank" rel="noreferrer" class="help-box">
-          <span class="help-val">FSJ</span>
-          <span class="help-lbl">Fil Santé Jeunes</span>
-        </a>
-
-        <a href="https://www.netecoute.fr" target="_blank" rel="noreferrer" class="help-box">
-          <span class="help-val">NetÉcoute</span>
-          <span class="help-lbl">Conseils</span>
-        </a>
-
-        <a href="https://www.cnil.fr/fr/maitriser-mes-donnees" target="_blank" rel="noreferrer" class="help-box">
-          <span class="help-val">CNIL</span>
-          <span class="help-lbl">Données</span>
-        </a>
-
-        <a href="https://www.jeprotegemonenfant.gouv.fr" target="_blank" rel="noreferrer" class="help-box">
-          <span class="help-val">Guide</span>
-          <span class="help-lbl">Parents</span>
-        </a>
-      </div>
-
-      <p style="font-size:10px;text-align:center;margin-top:10px;color:#64748b">
-        Le 3018 est le numéro national pour les victimes de cyberharcèlement.
-      </p>
-    </div>
-
-    <div class="mini-recap">
-      <strong>3 repères pour ne pas se perdre :</strong>
-      <ul>
-        <li>Le cerveau peut saturer avec trop de flux.</li>
-        <li>Les réseaux ne montrent pas toute la réalité.</li>
-        <li>On peut toujours demander de l’aide.</li>
-      </ul>
-    </div>
-
-    <div class="sigs">
-      <div>
-        <div class="sig-line"></div>
-        <div style="font-size:11px;color:#64748b">Signature Parent</div>
-      </div>
-
-      <div>
-        <div class="sig-line"></div>
-        <div style="font-size:11px;color:#64748b">Signature Ado</div>
-      </div>
-    </div>
-
-    <p class="footer-quote">
-      « On explore mieux quand on sait comment revenir. » — Eko
-    </p>
-
-    <div class="no-print" style="margin-top:30px">
-      <button class="btn" onclick="window.print()">Imprimer / PDF</button>
-    </div>
-  </div>
 </div>
 
 <script>
-let cvReady = false;
-let videoStream = null;
-let detectInterval = null;
-let unlocked = false;
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const statusEl = document.getElementById("status");
-const startBtn = document.getElementById("startBtn");
+let video=document.getElementById("video")
+let canvas=document.getElementById("canvas")
+let ctx=canvas.getContext("2d")
+let status=document.getElementById("status")
 
-function setStatus(text, kind = "") {
-  statusEl.textContent = text;
-  statusEl.className = "status" + (kind ? " " + kind : "");
+let detectCounter=0
+let unlocked=false
+
+async function startCamera(){
+
+let stream=await navigator.mediaDevices.getUserMedia({video:true})
+
+video.srcObject=stream
+
+status.innerText="Montre le symbole @"
+
+setInterval(processFrame,600)
+
 }
 
-function safeValue(id) {
-  const value = document.getElementById(id).value.trim();
-  return value || "À définir ensemble";
+function detectAtSymbol(contours){
+
+let spiralScore=0
+let holeDetected=false
+
+for(let i=0;i<contours.size();i++){
+
+let cnt=contours.get(i)
+
+let area=cv.contourArea(cnt)
+
+if(area>2000){
+
+let peri=cv.arcLength(cnt,true)
+
+let approx=new cv.Mat()
+
+cv.approxPolyDP(cnt,approx,0.01*peri,true)
+
+if(approx.rows>10){
+spiralScore++
 }
 
-function unlockApp() {
-  if (unlocked) return;
-  unlocked = true;
+let rect=cv.boundingRect(cnt)
 
-  if (detectInterval) {
-    clearInterval(detectInterval);
-    detectInterval = null;
-  }
-
-  if (videoStream) {
-    videoStream.getTracks().forEach(track => track.stop());
-    videoStream = null;
-  }
-
-  document.getElementById("challengeScreen").classList.add("hidden");
-  document.getElementById("mainApp").classList.remove("hidden");
-  window.scrollTo({ top: 0, behavior: "smooth" });
+if(rect.width/rect.height>0.7 && rect.width/rect.height<1.3){
+holeDetected=true
 }
 
-function generate() {
-  document.getElementById("out1").innerText = safeValue("in1");
-  document.getElementById("out2").innerText = safeValue("in2");
-  document.getElementById("out3").innerText = safeValue("in3");
-  document.getElementById("out4").innerText = safeValue("in4");
+approx.delete()
 
-  const result = document.getElementById("resultCard");
-  result.style.display = "block";
-  result.scrollIntoView({ behavior: "smooth" });
 }
 
-window.addEventListener("load", () => {
-  const waitForCv = setInterval(() => {
-    if (window.cv && cv.Mat) {
-      cvReady = true;
-      clearInterval(waitForCv);
-      setStatus("OpenCV prêt. Vous pouvez activer la caméra.");
-    }
-  }, 200);
-});
+cnt.delete()
 
-async function startCamera() {
-  try {
-    setStatus("Activation de la caméra…");
-    startBtn.disabled = true;
-
-    videoStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: false
-    });
-
-    video.srcObject = videoStream;
-    await video.play();
-
-    setStatus("Caméra active. Montrez le symbole @ à l’écran.");
-    startBtn.disabled = false;
-
-    if (!cvReady) {
-      setStatus("Chargement du moteur de détection… vous pouvez aussi continuer sans détection.", "warn");
-    }
-
-    if (detectInterval) clearInterval(detectInterval);
-    detectInterval = setInterval(processFrame, 700);
-
-  } catch (err) {
-    console.error(err);
-    setStatus("Impossible d’accéder à la caméra. Utilisez le bouton de secours.", "warn");
-    startBtn.disabled = false;
-  }
 }
 
-function processFrame() {
-  if (!cvReady || unlocked) return;
-  if (!video.videoWidth || !video.videoHeight) return;
-
-  try {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    let src = cv.imread(canvas);
-    let gray = new cv.Mat();
-    let blur = new cv.Mat();
-    let edges = new cv.Mat();
-    let contours = new cv.MatVector();
-    let hierarchy = new cv.Mat();
-
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-    cv.GaussianBlur(gray, blur, new cv.Size(5, 5), 0);
-    cv.Canny(blur, edges, 60, 140);
-
-    cv.findContours(edges, contours, hierarchy, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE);
-
-    let foundComplexRoundedShape = false;
-    let largeContours = 0;
-
-    for (let i = 0; i < contours.size(); i++) {
-      const cnt = contours.get(i);
-      const area = cv.contourArea(cnt);
-
-      if (area > 1200) {
-        largeContours++;
-        const peri = cv.arcLength(cnt, true);
-        const approx = new cv.Mat();
-        cv.approxPolyDP(cnt, approx, 0.02 * peri, true);
-
-        // Un @ manuscrit donne souvent une forme courbe / complexe
-        if (approx.rows >= 8) {
-          foundComplexRoundedShape = true;
-        }
-
-        approx.delete();
-      }
-
-      cnt.delete();
-    }
-
-    src.delete();
-    gray.delete();
-    blur.delete();
-    edges.delete();
-    contours.delete();
-    hierarchy.delete();
-
-    if (largeContours > 1 && foundComplexRoundedShape) {
-      setStatus("Symbole détecté. Le passage s’ouvre…", "ok");
-      setTimeout(unlockApp, 800);
-    }
-
-  } catch (err) {
-    console.error(err);
-  }
+if(spiralScore>=2 && holeDetected){
+return true
 }
+
+return false
+
+}
+
+function processFrame(){
+
+if(unlocked) return
+
+canvas.width=video.videoWidth
+canvas.height=video.videoHeight
+
+ctx.drawImage(video,0,0)
+
+let src=cv.imread(canvas)
+let gray=new cv.Mat()
+
+cv.cvtColor(src,gray,cv.COLOR_RGBA2GRAY)
+
+let edges=new cv.Mat()
+
+cv.Canny(gray,edges,60,140)
+
+let contours=new cv.MatVector()
+let hierarchy=new cv.Mat()
+
+cv.findContours(edges,contours,hierarchy,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
+
+if(detectAtSymbol(contours)){
+
+detectCounter++
+
+if(detectCounter>=3){
+
+unlockApp()
+
+}
+
+}else{
+
+detectCounter=0
+
+}
+
+src.delete()
+gray.delete()
+edges.delete()
+contours.delete()
+hierarchy.delete()
+
+}
+
+function unlockApp(){
+
+unlocked=true
+
+document.getElementById("challengeScreen").classList.add("hidden")
+
+document.getElementById("mainApp").classList.remove("hidden")
+
+}
+
+function val(id){
+
+let v=document.getElementById(id).value
+
+return v || "À définir ensemble"
+
+}
+
+function generate(){
+
+document.getElementById("out1").innerText=val("in1")
+document.getElementById("out2").innerText=val("in2")
+document.getElementById("out3").innerText=val("in3")
+document.getElementById("out4").innerText=val("in4")
+
+let r=document.getElementById("resultCard")
+
+r.style.display="block"
+
+r.scrollIntoView({behavior:"smooth"})
+
+}
+
 </script>
 
 </body>
