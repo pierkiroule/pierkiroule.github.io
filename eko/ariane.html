@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Notre Fil d'@riane - Défi d’Eko</title>
+
+<style>
+
+:root{
+--bg:#0c0e13;
+--panel:#171a21;
+--panel2:#1f2430;
+--text:#f3f5f7;
+--muted:#b8c0cc;
+--line:#2a3140;
+--accent:#8b5cf6;
+--blue:#3b82f6;
+--red:#ef4444;
+--radius:18px;
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:radial-gradient(circle at top,rgba(139,92,246,.15),transparent 30%),#0c0e13;
+color:var(--text);
+font-family:system-ui,-apple-system,Segoe UI,Roboto;
+line-height:1.6;
+}
+
+.app{
+width:min(850px,calc(100% - 30px));
+margin:auto;
+padding:40px 0;
+}
+
+.hero{
+background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+border:1px solid var(--line);
+border-radius:28px;
+padding:30px;
+text-align:center;
+margin-bottom:25px;
+}
+
+.eyebrow{
+font-size:12px;
+letter-spacing:2px;
+text-transform:uppercase;
+color:var(--accent);
+font-weight:bold;
+}
+
+h1{
+font-size:clamp(28px,6vw,42px);
+margin:10px 0;
+background:linear-gradient(to right,#fff,var(--blue));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.card{
+background:var(--panel);
+border:1px solid var(--line);
+border-radius:var(--radius);
+padding:25px;
+margin-bottom:20px;
+}
+
+.section-title{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:20px;
+}
+
+.section-title h2{
+margin:0;
+color:var(--blue);
+font-size:1.4rem;
+}
+
+.section-title .line{
+flex:1;
+height:1px;
+background:linear-gradient(90deg,var(--accent),transparent);
+}
+
+.tip-list{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+}
+
+.tip{
+background:var(--panel2);
+border:1px solid var(--line);
+border-radius:15px;
+padding:15px;
+}
+
+.tip-num{
+display:inline-flex;
+width:28px;
+height:28px;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+background:var(--accent);
+font-weight:bold;
+font-size:.8rem;
+margin-bottom:8px;
+}
+
+.tip h3{
+margin:0 0 4px;
+font-size:1rem;
+}
+
+.tip p{
+margin:0;
+font-size:.85rem;
+color:var(--muted);
+}
+
+label{
+display:block;
+margin:16px 0 6px;
+font-weight:bold;
+color:var(--blue);
+}
+
+textarea{
+width:100%;
+min-height:95px;
+background:#0a0c10;
+border:1px solid var(--line);
+border-radius:12px;
+padding:14px;
+color:white;
+font:inherit;
+}
+
+textarea:focus{
+border-color:var(--accent);
+outline:none;
+}
+
+.btn{
+background:linear-gradient(135deg,var(--blue),var(--accent));
+border:none;
+padding:14px;
+border-radius:12px;
+font-weight:bold;
+width:100%;
+color:white;
+cursor:pointer;
+margin-top:15px;
+font-size:1rem;
+}
+
+.result-card{
+display:none;
+background:white;
+color:#1e293b;
+padding:40px;
+}
+
+.result-card h2{
+border-bottom:2px solid var(--blue);
+padding-bottom:10px;
+}
+
+.res-block{
+margin-bottom:20px;
+}
+
+.res-block h3{
+font-size:.85rem;
+color:var(--blue);
+text-transform:uppercase;
+margin-bottom:6px;
+}
+
+.res-block p{
+background:#f8fafc;
+padding:14px;
+border-radius:8px;
+border-left:4px solid var(--blue);
+margin:0;
+}
+
+.help{
+background:#fff1f2;
+border:2px solid var(--red);
+border-radius:15px;
+padding:18px;
+margin-top:25px;
+}
+
+.help-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+margin-top:12px;
+}
+
+.help-box{
+background:white;
+border:1px solid #fecaca;
+border-radius:10px;
+padding:10px;
+text-align:center;
+text-decoration:none;
+color:inherit;
+}
+
+.help-val{
+display:block;
+font-weight:900;
+color:var(--red);
+font-size:1.1rem;
+}
+
+.help-lbl{
+font-size:10px;
+font-weight:bold;
+color:#64748b;
+}
+
+.sigs{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+margin-top:40px;
+}
+
+.sig-line{
+border-bottom:1px solid #1e293b;
+height:45px;
+}
+
+.footer-quote{
+text-align:center;
+margin-top:30px;
+font-size:.8rem;
+color:#94a3b8;
+font-style:italic;
+}
+
+.no-print{}
+
+@media(max-width:600px){
+.tip-list,.help-grid,.sigs{grid-template-columns:1fr}
+}
+
+@media print{
+.no-print{display:none}
+.result-card{display:block;box-shadow:none;border:none}
+body{background:white}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="hero no-print">
+<div class="eyebrow">Eko • Traverser l’Ékran</div>
+<h1>Notre Fil d’@riane</h1>
+<p style="color:var(--muted)">Un pacte simple pour garder le cap dans le labyrinthe numérique.</p>
+</header>
+
+
+<section class="card no-print">
+
+<h2 style="color:var(--accent)">Le message d’Eko</h2>
+
+<p><strong>Salut explorateurs du labyrinthe,</strong></p>
+
+<p>Dans le mythe grec, Thésée entre dans le labyrinthe. Un endroit fascinant, mais où l’on peut vite se perdre.</p>
+
+<p>Le Minotaure n’est pas seulement un monstre. Aujourd’hui il ressemble parfois à :</p>
+
+<ul>
+<li>la fatigue des écrans</li>
+<li>les images qui blessent</li>
+<li>les messages qui mettent la pression</li>
+<li>le cyberharcèlement</li>
+</ul>
+
+<p>Thésée ne gagne pas parce qu’il est le plus fort.</p>
+
+<p>Il s’en sort parce qu’Ariane lui donne <strong>un fil</strong>.</p>
+
+<p>Un fil pour explorer… sans se perdre.</p>
+
+<p><strong>Je vous propose un défi :</strong><br>
+Prenez 10 minutes ensemble pour créer votre propre Fil d’@riane.</p>
+
+<p><strong>— Eko</strong></p>
+
+</section>
+
+
+
+<section class="card no-print">
+
+<div class="section-title">
+<h2>Les ÉkoTips</h2>
+<div class="line"></div>
+</div>
+
+<div class="tip-list">
+
+<div class="tip">
+<div class="tip-num">1</div>
+<h3>Lumières</h3>
+<p>Identifiez ce que le numérique vous apporte de positif : apprendre, créer, rire, rester en lien.</p>
+</div>
+
+<div class="tip">
+<div class="tip-num">2</div>
+<h3>Minotaures</h3>
+<p>Repérez ce qui peut faire perdre le fil : fatigue, comparaison, harcèlement, contenus choquants.</p>
+</div>
+
+<div class="tip">
+<div class="tip-num">3</div>
+<h3>Repères</h3>
+<p>Choisissez 3 règles simples pour protéger le sommeil, l’attention et la confiance.</p>
+</div>
+
+<div class="tip">
+<div class="tip-num">4</div>
+<h3>Alliance</h3>
+<p>Décidez ensemble à qui parler si quelque chose devient difficile en ligne.</p>
+</div>
+
+</div>
+
+</section>
+
+
+
+<section class="card no-print">
+
+<div class="section-title">
+<h2>Tisser notre fil</h2>
+<div class="line"></div>
+</div>
+
+<label>✨ Ce que nous aimons dans le numérique</label>
+<textarea id="in1" placeholder="Jeux, apprendre, créer, parler avec des amis..."></textarea>
+
+<label>⚠️ Les pièges du labyrinthe (Minotaures)</label>
+<textarea id="in2" placeholder="Fatigue, comparaison, cyberharcèlement, contenus choquants..."></textarea>
+
+<label>📌 Nos 3 repères pour garder le fil</label>
+<textarea id="in3" placeholder="1. Pas de téléphone dans la chambre la nuit
+2. On parle si quelque chose nous met mal à l'aise
+3. ..."></textarea>
+
+<label>🤝 Notre pacte de confiance</label>
+<textarea id="in4" placeholder="Si quelque chose devient difficile en ligne, on s'engage à en parler sans jugement."></textarea>
+
+<button class="btn" onclick="generate()">Générer notre pacte</button>
+
+</section>
+
+
+
+<div id="resultCard" class="card result-card">
+
+<div style="text-align:center">
+
+<h1 style="color:#0f172a;margin:0">NOTRE FIL D'@RIANE</h1>
+<p style="color:#64748b;font-weight:bold;font-size:.8rem;letter-spacing:2px">
+PACTE DE CONFIANCE NUMÉRIQUE
+</p>
+
+</div>
+
+
+<div style="margin-top:30px">
+
+<div class="res-block">
+<h3>✨ Nos Lumières</h3>
+<p id="out1"></p>
+</div>
+
+<div class="res-block">
+<h3>⚔️ Vigilance Minotaure</h3>
+<p id="out2"></p>
+</div>
+
+<div class="res-block">
+<h3>📌 Nos Repères</h3>
+<p id="out3"></p>
+</div>
+
+<div class="res-block">
+<h3>🤝 Notre Engagement</h3>
+<p id="out4"></p>
+</div>
+
+</div>
+
+
+<div class="help">
+
+<div style="text-align:center;font-weight:900;color:var(--red)">
+AIDE & SOUTIEN
+</div>
+
+<div class="help-grid">
+
+<a href="tel:3018" class="help-box">
+<span class="help-val">3018</span>
+<span class="help-lbl">Cyberharcèlement</span>
+</a>
+
+<a href="https://www.e-enfance.org" target="_blank" class="help-box">
+<span class="help-val">e-Enfance</span>
+<span class="help-lbl">Association</span>
+</a>
+
+<a href="https://www.filsantejeunes.com" target="_blank" class="help-box">
+<span class="help-val">FSJ</span>
+<span class="help-lbl">Fil Santé Jeunes</span>
+</a>
+
+<a href="https://www.netecoute.fr" target="_blank" class="help-box">
+<span class="help-val">NetÉcoute</span>
+<span class="help-lbl">Conseils</span>
+</a>
+
+<a href="https://www.cnil.fr/fr/maitriser-mes-donnees" target="_blank" class="help-box">
+<span class="help-val">CNIL</span>
+<span class="help-lbl">Données</span>
+</a>
+
+<a href="https://www.jeprotege.mon-enfant.gouv.fr" target="_blank" class="help-box">
+<span class="help-val">Guide</span>
+<span class="help-lbl">Parents</span>
+</a>
+
+</div>
+
+<p style="font-size:10px;text-align:center;margin-top:10px;color:#64748b">
+Le 3018 est le numéro national pour les victimes de cyberharcèlement.
+</p>
+
+</div>
+
+
+<div class="sigs">
+
+<div>
+<div class="sig-line"></div>
+<div style="font-size:11px;color:#64748b">Signature Parent</div>
+</div>
+
+<div>
+<div class="sig-line"></div>
+<div style="font-size:11px;color:#64748b">Signature Ado</div>
+</div>
+
+</div>
+
+
+<p class="footer-quote">
+« On explore mieux quand on sait comment revenir. » — Eko
+</p>
+
+<div class="no-print" style="margin-top:30px">
+<button class="btn" onclick="window.print()">Imprimer / PDF</button>
+</div>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+function generate(){
+
+const val=id=>document.getElementById(id).value || "À définir ensemble"
+
+document.getElementById("out1").innerText=val("in1")
+document.getElementById("out2").innerText=val("in2")
+document.getElementById("out3").innerText=val("in3")
+document.getElementById("out4").innerText=val("in4")
+
+const res=document.getElementById("resultCard")
+
+res.style.display="block"
+
+res.scrollIntoView({behavior:"smooth"})
+
+}
+
+</script>
+
+</body>
+</html>
