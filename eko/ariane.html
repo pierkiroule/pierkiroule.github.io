@@ -126,6 +126,9 @@ font-weight:bold;
 </head>
 
 <body>
+  <audio id="music" loop>
+  <source src="musique.mp3" type="audio/mpeg">
+  </audio>
 
 <div class="wrapper" id="wrapper">
 
@@ -168,8 +171,8 @@ pour qu’il retrouve son chemin.
 
 <div class="center">
 <button class="btn" onclick="next()">Entrer dans le labyrinthe</button>
-</div>
-
+<br>
+<button class="btn secondary" onclick="toggleMusic()">🔊 Son on/off</button>
 </div>
 
 </section>
@@ -313,8 +316,45 @@ Quel accord voulons-nous poser ensemble ?
 
 let step=0
 const wrapper=document.getElementById("wrapper")
+const music=document.getElementById("music")
+let musicStarted=false
+
+  function startMusic(){
+
+if(!musicStarted){
+
+music.volume=0
+music.play()
+
+let vol=0
+
+let fade=setInterval(()=>{
+
+vol+=0.02
+music.volume=vol
+
+if(vol>=0.35){
+music.volume=0.35
+clearInterval(fade)
+}
+
+},200)
+
+musicStarted=true
+
+}
+
+  }
+
+  function toggleMusic(){
+
+music.muted=!music.muted
+
+  }
 
 function next(){
+
+startMusic()
 
 step++
 
