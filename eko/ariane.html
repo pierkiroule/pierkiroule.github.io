@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Le Fil d'@riane numérique</title>
 
@@ -24,69 +25,70 @@ margin:0;
 font-family:system-ui;
 background:var(--bg);
 color:var(--text);
-overflow:hidden;
 }
 
 /* HEADER */
 
 header{
-position:fixed;
-top:0;
-left:0;
-right:0;
-background:#0f1218;
-border-bottom:1px solid var(--line);
-padding:20px;
+
+padding:18px;
 text-align:center;
-z-index:10;
+border-bottom:1px solid var(--line);
+
 }
 
-/* BANNIERE */
+/* BANNIERE RESPONSIVE */
 
 .banner{
 
-width:600px;
-height:400px;
+width:100%;
+max-width:700px;
+aspect-ratio:3/1;
 
 margin:auto;
-margin-bottom:15px;
-
-background:#1b2030;
 border-radius:14px;
+overflow:hidden;
 border:1px solid var(--line);
 
-display:flex;
-align-items:center;
-justify-content:center;
+}
 
-font-size:1.2rem;
-color:#9ca3af;
+.banner img{
+
+width:100%;
+height:100%;
+object-fit:cover;
 
 }
 
-/* AUDIO */
+header h1{
+
+margin:12px 0 4px 0;
+font-size:1.4rem;
+
+}
+
+header p{
+
+margin:0;
+color:var(--muted);
+font-size:.9rem;
+
+}
 
 audio{
-margin-top:5px;
-width:240px;
+
+margin-top:10px;
+width:200px;
+
 }
 
-/* CAROUSEL */
+/* MAIN */
 
-.carousel{
+main{
 
-position:absolute;
-
-top:330px;
-bottom:0;
-left:0;
-right:0;
-
-display:flex;
-overflow-x:auto;
-
-scroll-snap-type:x mandatory;
-scroll-behavior:smooth;
+max-width:720px;
+margin:auto;
+padding:20px;
 
 }
 
@@ -94,15 +96,13 @@ scroll-behavior:smooth;
 
 .page{
 
-min-width:100vw;
+display:none;
 
-display:flex;
-align-items:center;
-justify-content:center;
+}
 
-padding:30px;
+.page.active{
 
-scroll-snap-align:center;
+display:block;
 
 }
 
@@ -110,40 +110,33 @@ scroll-snap-align:center;
 
 .card{
 
-max-width:650px;
-
 background:var(--panel);
-
 border:1px solid var(--line);
-
-border-radius:20px;
-
-padding:30px;
-
-line-height:1.6;
+border-radius:18px;
+padding:22px;
 
 }
 
-/* TEXTAREA */
+/* TEXT */
+
+h2{
+
+margin-top:0;
+
+}
 
 textarea{
 
 width:100%;
-
-min-height:120px;
+min-height:110px;
 
 background:#0a0c10;
-
 border:1px solid var(--line);
+border-radius:10px;
 
-border-radius:12px;
-
-padding:14px;
-
+padding:12px;
 color:white;
-
 font:inherit;
-
 margin-top:10px;
 
 }
@@ -153,25 +146,19 @@ margin-top:10px;
 .nav{
 
 display:flex;
-
 justify-content:space-between;
-
-margin-top:25px;
+margin-top:22px;
 
 }
 
 button{
 
-background:linear-gradient(135deg,var(--blue),var(--accent));
-
 border:none;
-
-padding:12px 20px;
-
+padding:12px 18px;
 border-radius:10px;
 
+background:linear-gradient(135deg,var(--blue),var(--accent));
 color:white;
-
 font-weight:bold;
 
 cursor:pointer;
@@ -184,71 +171,51 @@ background:#1f2937;
 
 }
 
-/* RESULT */
+/* TIP */
 
-.result{
+.tip{
 
-background:white;
-
-color:#1e293b;
+font-size:.85rem;
+color:var(--muted);
+margin-top:6px;
 
 }
+
+/* HELP */
 
 .help{
 
 background:#fff1f2;
-
 border:2px solid var(--red);
-
-border-radius:15px;
-
-padding:18px;
-
-margin-top:25px;
+border-radius:12px;
+padding:16px;
+margin-top:18px;
+color:#1e293b;
 
 }
 
 .help-grid{
 
 display:grid;
-
-grid-template-columns:repeat(2,1fr);
-
-gap:10px;
+grid-template-columns:1fr 1fr;
+gap:8px;
 
 }
 
 .help-box{
 
 background:white;
-
-border:1px solid #fecaca;
-
-border-radius:10px;
-
+border-radius:8px;
 padding:10px;
-
 text-align:center;
-
 text-decoration:none;
-
-color:inherit;
-
+color:#1e293b;
 font-weight:bold;
 
 }
 
-.tip{
-
-font-size:.85rem;
-
-color:var(--muted);
-
-margin-top:6px;
-
-}
-
 </style>
+
 </head>
 
 <body>
@@ -256,184 +223,203 @@ margin-top:6px;
 <header>
 
 <div class="banner">
-<img src="banniere.gif" class="banner">
+
+<img src="banniere.gif">
 
 </div>
 
-<h1>Le Fil d'@riane numérique</h1>
+<h1>🧵 Le Fil d'@riane numérique</h1>
 
-<p style="color:#9ca3af">
-Construire ensemble un pacte numérique parent-ado
-</p>
+<p>Construire ensemble un pacte numérique parent-ado</p>
 
-<audio id="music" controls loop>
+<audio controls loop>
 <source src="Minotaure.mp3" type="audio/mpeg">
 </audio>
 
 </header>
 
-<div class="carousel" id="carousel">
+<main>
 
 <!-- INTRO -->
 
-<section class="page">
+<div class="page active">
 
 <div class="card">
 
 <h2>🧭 Bienvenue dans le labyrinthe numérique</h2>
 
-<p>
-Internet est un immense territoire.
-</p>
+<p>Internet est un immense territoire.</p>
 
 <p>
-✨ apprendre  
-🎮 jouer  
-🎨 créer  
+✨ apprendre<br>
+🎮 jouer<br>
+🎨 créer<br>
 💬 discuter
 </p>
 
-<p>
-Mais on peut aussi y rencontrer des **minotaures numériques** :
-</p>
+<p>Mais parfois aussi :</p>
 
 <p>
-⚠️ cyberharcèlement  
-⚠️ manipulation  
-⚠️ dépendance  
+⚠️ cyberharcèlement<br>
+⚠️ manipulation<br>
+⚠️ dépendance<br>
 ⚠️ fake news
 </p>
 
 <p>
-Dans la mythologie grecque, Ariane donne un fil à Thésée pour retrouver son chemin.
+Dans le mythe grec, Ariane donne un fil à Thésée pour retrouver son chemin.
 </p>
 
-<p>
-<strong>Et si vous tissiez votre Fil d’@riane numérique ?</strong>
-</p>
+<p><strong>Tissons ensemble votre Fil d’@riane numérique.</strong></p>
 
 <div class="nav">
+
+<span></span>
+
 <button onclick="next()">Commencer</button>
-</div>
 
 </div>
 
-</section>
+</div>
+
+</div>
 
 <!-- LUMIERES -->
 
-<section class="page">
+<div class="page">
 
 <div class="card">
 
-<h2>✨ Les lumières du numérique</h2>
+<h2>✨ Les lumières</h2>
 
 <p>Qu’est-ce que vous aimez dans internet ?</p>
 
 <textarea id="in1"></textarea>
 
 <div class="tip">
-ex : apprendre une passion, regarder des vidéos, discuter avec des amis
+
+ex : apprendre une passion, discuter avec des amis
+
 </div>
 
 <div class="nav">
+
 <button class="secondary" onclick="prev()">Retour</button>
+
 <button onclick="next()">Suivant</button>
-</div>
 
 </div>
 
-</section>
+</div>
+
+</div>
 
 <!-- MINOTAURES -->
 
-<section class="page">
+<div class="page">
 
 <div class="card">
 
 <h2>🐂 Les minotaures</h2>
 
-<p>Quels dangers peut-on rencontrer en ligne ?</p>
+<p>Quels dangers peut-on rencontrer ?</p>
 
 <textarea id="in2"></textarea>
 
 <div class="tip">
-ex : cyberharcèlement, fake news, pression sociale
+
+ex : cyberharcèlement, fake news
+
 </div>
 
 <div class="nav">
+
 <button class="secondary" onclick="prev()">Retour</button>
+
 <button onclick="next()">Suivant</button>
-</div>
 
 </div>
 
-</section>
+</div>
+
+</div>
 
 <!-- REPERES -->
 
-<section class="page">
+<div class="page">
 
 <div class="card">
 
 <h2>🧭 Nos repères</h2>
 
-<p>Quels repères peuvent nous aider à rester libres ?</p>
+<p>Quels repères peuvent aider ?</p>
 
 <textarea id="in3"></textarea>
 
 <div class="tip">
-ex : parler avec un adulte, vérifier une info, faire des pauses
+
+ex : parler avec un adulte, vérifier une info
+
 </div>
 
 <div class="nav">
+
 <button class="secondary" onclick="prev()">Retour</button>
+
 <button onclick="next()">Suivant</button>
-</div>
 
 </div>
 
-</section>
+</div>
+
+</div>
 
 <!-- PACTE -->
 
-<section class="page">
+<div class="page">
 
 <div class="card">
 
 <h2>🤝 Notre pacte numérique</h2>
 
-<p>Quel accord voulons-nous poser ensemble ?</p>
+<p>Quel accord voulez-vous poser ?</p>
 
 <textarea id="in4"></textarea>
 
 <div class="nav">
+
 <button class="secondary" onclick="prev()">Retour</button>
-<button onclick="generate()">Créer notre fil</button>
-</div>
+
+<button onclick="generate()">Créer le pacte</button>
 
 </div>
 
-</section>
+</div>
+
+</div>
 
 <!-- RESULT -->
 
-<section class="page">
+<div class="page">
 
-<div class="card result">
+<div class="card">
 
 <h2>🧵 Notre Fil d’@riane</h2>
 
 <h3>✨ Lumières</h3>
+
 <p id="out1"></p>
 
 <h3>🐂 Minotaures</h3>
+
 <p id="out2"></p>
 
 <h3>🧭 Repères</h3>
+
 <p id="out3"></p>
 
 <h3>🤝 Pacte</h3>
+
 <p id="out4"></p>
 
 <div class="help">
@@ -443,53 +429,48 @@ ex : parler avec un adulte, vérifier une info, faire des pauses
 <div class="help-grid">
 
 <a href="tel:3018" class="help-box">📞 3018</a>
+
 <a href="https://www.e-enfance.org" target="_blank" class="help-box">🌐 e-Enfance</a>
 
 </div>
 
 </div>
 
-<br>
-
-<button onclick="window.print()">Imprimer le pacte</button>
+</div>
 
 </div>
 
-</section>
-
-</div>
+</main>
 
 <script>
 
+let pages=document.querySelectorAll(".page")
 let index=0
-const carousel=document.getElementById("carousel")
+
+function show(){
+
+pages.forEach(p=>p.classList.remove("active"))
+pages[index].classList.add("active")
+
+}
 
 function next(){
 
 index++
-
-carousel.scrollTo({
-left:index*window.innerWidth,
-behavior:"smooth"
-})
+show()
 
 }
 
 function prev(){
 
 index--
-
-carousel.scrollTo({
-left:index*window.innerWidth,
-behavior:"smooth"
-})
+show()
 
 }
 
 function val(id){
 
 let v=document.getElementById(id).value
-
 return v || "À définir ensemble"
 
 }
