@@ -208,6 +208,40 @@ font-weight:bold;
 
 }
 
+  .clipModal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.85);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:999;
+}
+
+.clipContent{
+width:90%;
+max-width:900px;
+aspect-ratio:16/9;
+position:relative;
+}
+
+.clipContent iframe{
+width:100%;
+height:100%;
+border-radius:14px;
+}
+
+.closeClip{
+position:absolute;
+top:-40px;
+right:0;
+background:none;
+border:none;
+color:white;
+font-size:28px;
+cursor:pointer;
+}
+
 </style>
 
 </head>
@@ -229,6 +263,9 @@ font-weight:bold;
 <audio controls loop>
 <source src="Mino.mp3" type="audio/mpeg">
 </audio>
+  <button class="btn clipBtn" onclick="openClip()">
+🎬 Voir le clip
+  </button>
 
 </header>
 
@@ -480,7 +517,47 @@ next()
 
 }
 
+  function openClip(){
+
+const modal=document.getElementById("clipModal")
+const frame=document.getElementById("clipFrame")
+
+frame.src="https://www.youtube.com/embed/xJmbsrkC5_A?autoplay=1"
+
+modal.style.display="flex"
+
+}
+
+function closeClip(){
+
+const modal=document.getElementById("clipModal")
+const frame=document.getElementById("clipFrame")
+
+modal.style.display="none"
+frame.src=""
+
+}
+
 </script>
+
+  <div id="clipModal" class="clipModal">
+
+<div class="clipContent">
+
+<button class="closeClip" onclick="closeClip()">✕</button>
+
+<iframe
+id="clipFrame"
+src=""
+title="Clip"
+frameborder="0"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen>
+</iframe>
+
+</div>
+
+  </div>
 
 </body>
 </html>
