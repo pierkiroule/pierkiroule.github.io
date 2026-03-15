@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>Le Fil d'@riane</title>
+<title>Le Fil d'@riane numérique</title>
 
 <style>
 
@@ -17,185 +17,331 @@
 --accent:#8b5cf6;
 --blue:#3b82f6;
 --red:#ef4444;
---radius:18px;
 }
 
 body{
 margin:0;
+font-family:system-ui;
 background:var(--bg);
 color:var(--text);
-font-family:system-ui;
 overflow:hidden;
 }
 
-/* SCROLL HORIZONTAL */
+/* HEADER */
 
-.wrapper{
-display:flex;
-width:600vw;
-height:100vh;
-transition:transform .6s ease;
+header{
+position:fixed;
+top:0;
+left:0;
+right:0;
+background:#0f1218;
+border-bottom:1px solid var(--line);
+padding:20px;
+text-align:center;
+z-index:10;
 }
 
-.screen{
-width:100vw;
-height:100vh;
-padding:40px;
+/* BANNIERE */
+
+.banner{
+
+width:600px;
+height:200px;
+
+margin:auto;
+margin-bottom:15px;
+
+background:#1b2030;
+border-radius:14px;
+border:1px solid var(--line);
+
 display:flex;
 align-items:center;
 justify-content:center;
+
+font-size:1.2rem;
+color:#9ca3af;
+
 }
+
+/* AUDIO */
+
+audio{
+margin-top:5px;
+width:240px;
+}
+
+/* CAROUSEL */
+
+.carousel{
+
+position:absolute;
+
+top:330px;
+bottom:0;
+left:0;
+right:0;
+
+display:flex;
+overflow-x:auto;
+
+scroll-snap-type:x mandatory;
+scroll-behavior:smooth;
+
+}
+
+/* PAGE */
+
+.page{
+
+min-width:100vw;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+padding:30px;
+
+scroll-snap-align:center;
+
+}
+
+/* CARD */
 
 .card{
+
 max-width:650px;
+
 background:var(--panel);
+
 border:1px solid var(--line);
+
 border-radius:20px;
-padding:35px;
+
+padding:30px;
+
 line-height:1.6;
+
 }
+
+/* TEXTAREA */
 
 textarea{
+
 width:100%;
-min-height:90px;
+
+min-height:120px;
+
 background:#0a0c10;
+
 border:1px solid var(--line);
+
 border-radius:12px;
+
 padding:14px;
+
 color:white;
+
 font:inherit;
+
 margin-top:10px;
+
 }
 
-.btn{
-margin-top:20px;
+/* NAV */
+
+.nav{
+
+display:flex;
+
+justify-content:space-between;
+
+margin-top:25px;
+
+}
+
+button{
+
 background:linear-gradient(135deg,var(--blue),var(--accent));
+
 border:none;
-padding:14px 22px;
-border-radius:12px;
+
+padding:12px 20px;
+
+border-radius:10px;
+
 color:white;
+
 font-weight:bold;
+
 cursor:pointer;
+
 }
 
-.btn.secondary{
+button.secondary{
+
 background:#1f2937;
-}
 
-.center{text-align:center}
-
-.tip{
-color:var(--muted);
-font-size:.9rem;
-margin-top:6px;
 }
 
 /* RESULT */
 
 .result{
+
 background:white;
+
 color:#1e293b;
+
 }
 
 .help{
+
 background:#fff1f2;
+
 border:2px solid var(--red);
+
 border-radius:15px;
+
 padding:18px;
+
 margin-top:25px;
+
 }
 
 .help-grid{
+
 display:grid;
+
 grid-template-columns:repeat(2,1fr);
+
 gap:10px;
+
 }
 
 .help-box{
+
 background:white;
+
 border:1px solid #fecaca;
+
 border-radius:10px;
+
 padding:10px;
+
 text-align:center;
+
 text-decoration:none;
+
 color:inherit;
+
 font-weight:bold;
+
+}
+
+.tip{
+
+font-size:.85rem;
+
+color:var(--muted);
+
+margin-top:6px;
+
 }
 
 </style>
 </head>
 
 <body>
-  <audio id="music" loop>
-  <source src="Minotaure.mp3" type="audio/mpeg">
-  </audio>
 
-<div class="wrapper" id="wrapper">
+<header>
+
+<div class="banner">
+
+🧵 BANNIÈRE VISUELLE 600×200  
+(placer ici une image)
+
+</div>
+
+<h1>Le Fil d'@riane numérique</h1>
+
+<p style="color:#9ca3af">
+Construire ensemble un pacte numérique parent-ado
+</p>
+
+<audio id="music" controls loop>
+<source src="Minotaure.mp3" type="audio/mpeg">
+</audio>
+
+</header>
+
+<div class="carousel" id="carousel">
 
 <!-- INTRO -->
 
-<section class="screen">
+<section class="page">
 
 <div class="card">
 
-<h1>Hello, c’est Eko.</h1>
+<h2>🧭 Bienvenue dans le labyrinthe numérique</h2>
 
 <p>
-Je vous écris parce que beaucoup de jeunes et de parents
-traversent aujourd’hui un drôle de labyrinthe :
-<strong>le monde numérique</strong>.
+Internet est un immense territoire.
 </p>
 
 <p>
-On y trouve des trésors :
-apprendre, créer, jouer, rencontrer.
+✨ apprendre  
+🎮 jouer  
+🎨 créer  
+💬 discuter
 </p>
 
 <p>
-Mais parfois aussi…
-des <strong>minotaures invisibles</strong> :
-manipulation, harcèlement, dépendance.
+Mais on peut aussi y rencontrer des **minotaures numériques** :
 </p>
 
 <p>
-Dans le mythe grec,
-Ariane donne un fil à Thésée
-pour qu’il retrouve son chemin.
+⚠️ cyberharcèlement  
+⚠️ manipulation  
+⚠️ dépendance  
+⚠️ fake news
 </p>
 
-<p class="center">
+<p>
+Dans la mythologie grecque, Ariane donne un fil à Thésée pour retrouver son chemin.
+</p>
 
+<p>
 <strong>Et si vous tissiez votre Fil d’@riane numérique ?</strong>
-
 </p>
 
-<div class="center">
-<button class="btn" onclick="next()">Entrer dans le labyrinthe</button>
-<br>
-<button class="btn secondary" onclick="toggleMusic()">🔊 Son on/off</button>
+<div class="nav">
+<button onclick="next()">Commencer</button>
+</div>
+
 </div>
 
 </section>
 
 <!-- LUMIERES -->
 
-<section class="screen">
+<section class="page">
 
 <div class="card">
 
-<h2>Les lumières du numérique</h2>
+<h2>✨ Les lumières du numérique</h2>
 
-<p>
-Qu’est-ce que vous aimez dans internet ?
-</p>
+<p>Qu’est-ce que vous aimez dans internet ?</p>
 
 <textarea id="in1"></textarea>
 
 <div class="tip">
-Ex : apprendre, créer, jouer, discuter
+ex : apprendre une passion, regarder des vidéos, discuter avec des amis
 </div>
 
-<button class="btn" onclick="next()">Suivant</button>
+<div class="nav">
+<button class="secondary" onclick="prev()">Retour</button>
+<button onclick="next()">Suivant</button>
+</div>
 
 </div>
 
@@ -203,23 +349,24 @@ Ex : apprendre, créer, jouer, discuter
 
 <!-- MINOTAURES -->
 
-<section class="screen">
+<section class="page">
 
 <div class="card">
 
-<h2>Les minotaures</h2>
+<h2>🐂 Les minotaures</h2>
 
-<p>
-Quels dangers peut-on rencontrer ?
-</p>
+<p>Quels dangers peut-on rencontrer en ligne ?</p>
 
 <textarea id="in2"></textarea>
 
 <div class="tip">
-Ex : harcèlement, fake news, manipulation
+ex : cyberharcèlement, fake news, pression sociale
 </div>
 
-<button class="btn" onclick="next()">Suivant</button>
+<div class="nav">
+<button class="secondary" onclick="prev()">Retour</button>
+<button onclick="next()">Suivant</button>
+</div>
 
 </div>
 
@@ -227,23 +374,24 @@ Ex : harcèlement, fake news, manipulation
 
 <!-- REPERES -->
 
-<section class="screen">
+<section class="page">
 
 <div class="card">
 
-<h2>Nos repères</h2>
+<h2>🧭 Nos repères</h2>
 
-<p>
-Quels repères pour rester libres ?
-</p>
+<p>Quels repères peuvent nous aider à rester libres ?</p>
 
 <textarea id="in3"></textarea>
 
 <div class="tip">
-Ex : parler avec un adulte, vérifier une info
+ex : parler avec un adulte, vérifier une info, faire des pauses
 </div>
 
-<button class="btn" onclick="next()">Suivant</button>
+<div class="nav">
+<button class="secondary" onclick="prev()">Retour</button>
+<button onclick="next()">Suivant</button>
+</div>
 
 </div>
 
@@ -251,19 +399,20 @@ Ex : parler avec un adulte, vérifier une info
 
 <!-- PACTE -->
 
-<section class="screen">
+<section class="page">
 
 <div class="card">
 
-<h2>Notre pacte numérique</h2>
+<h2>🤝 Notre pacte numérique</h2>
 
-<p>
-Quel accord voulons-nous poser ensemble ?
-</p>
+<p>Quel accord voulons-nous poser ensemble ?</p>
 
 <textarea id="in4"></textarea>
 
-<button class="btn" onclick="generate()">Créer notre fil</button>
+<div class="nav">
+<button class="secondary" onclick="prev()">Retour</button>
+<button onclick="generate()">Créer notre fil</button>
+</div>
 
 </div>
 
@@ -271,32 +420,32 @@ Quel accord voulons-nous poser ensemble ?
 
 <!-- RESULT -->
 
-<section class="screen">
+<section class="page">
 
 <div class="card result">
 
-<h2>NOTRE FIL D'@RIANE</h2>
+<h2>🧵 Notre Fil d’@riane</h2>
 
-<h3>Lumières</h3>
+<h3>✨ Lumières</h3>
 <p id="out1"></p>
 
-<h3>Minotaures</h3>
+<h3>🐂 Minotaures</h3>
 <p id="out2"></p>
 
-<h3>Repères</h3>
+<h3>🧭 Repères</h3>
 <p id="out3"></p>
 
-<h3>Pacte</h3>
+<h3>🤝 Pacte</h3>
 <p id="out4"></p>
 
 <div class="help">
 
-<strong>Besoin d’aide</strong>
+<strong>🆘 Besoin d’aide</strong>
 
 <div class="help-grid">
 
-<a href="tel:3018" class="help-box">3018</a>
-<a href="https://www.e-enfance.org" target="_blank" class="help-box">e-Enfance</a>
+<a href="tel:3018" class="help-box">📞 3018</a>
+<a href="https://www.e-enfance.org" target="_blank" class="help-box">🌐 e-Enfance</a>
 
 </div>
 
@@ -304,7 +453,7 @@ Quel accord voulons-nous poser ensemble ?
 
 <br>
 
-<button class="btn" onclick="window.print()">Imprimer</button>
+<button onclick="window.print()">Imprimer le pacte</button>
 
 </div>
 
@@ -314,57 +463,35 @@ Quel accord voulons-nous poser ensemble ?
 
 <script>
 
-let step=0
-const wrapper=document.getElementById("wrapper")
-const music=document.getElementById("music")
-let musicStarted=false
-
-  function startMusic(){
-
-if(!musicStarted){
-
-music.volume=0
-music.play()
-
-let vol=0
-
-let fade=setInterval(()=>{
-
-vol+=0.02
-music.volume=vol
-
-if(vol>=0.35){
-music.volume=0.35
-clearInterval(fade)
-}
-
-},200)
-
-musicStarted=true
-
-}
-
-  }
-
-  function toggleMusic(){
-
-music.muted=!music.muted
-
-  }
+let index=0
+const carousel=document.getElementById("carousel")
 
 function next(){
 
-startMusic()
+index++
 
-step++
+carousel.scrollTo({
+left:index*window.innerWidth,
+behavior:"smooth"
+})
 
-wrapper.style.transform="translateX(-"+(step*100)+"vw)"
+}
+
+function prev(){
+
+index--
+
+carousel.scrollTo({
+left:index*window.innerWidth,
+behavior:"smooth"
+})
 
 }
 
 function val(id){
 
 let v=document.getElementById(id).value
+
 return v || "À définir ensemble"
 
 }
