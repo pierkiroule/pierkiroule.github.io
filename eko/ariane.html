@@ -164,6 +164,16 @@ button.secondary{
 background:#1f2937;
 
 }
+  .btn{
+border:none;
+padding:12px 18px;
+border-radius:10px;
+background:linear-gradient(135deg,var(--blue),var(--accent));
+color:white;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+  }
 
 /* TIP */
 
@@ -208,7 +218,7 @@ font-weight:bold;
 
 }
 
-  .clipModal{
+.clipModal{
 position:fixed;
 inset:0;
 background:rgba(0,0,0,0.85);
@@ -301,7 +311,7 @@ cursor:pointer;
 Dans le mythe grec, Ariane donne un fil à Thésée pour retrouver son chemin.
 </p>
 
-<p><strong>Tissons ensemble votre Fil d’@riane numérique.</strong></p>
+<p><strong>Tissons ensemble votre Fil d’@riane transnumérique.</strong></p>
 
 <div class="nav">
 
@@ -486,17 +496,17 @@ pages[index].classList.add("active")
 }
 
 function next(){
-
+if(index < pages.length-1){
 index++
 show()
-
+}
 }
 
 function prev(){
-
+if(index > 0){
 index--
 show()
-
+}
 }
 
 function val(id){
@@ -540,10 +550,9 @@ frame.src=""
 
 </script>
 
-  <div id="clipModal" class="clipModal">
+  <div id="clipModal" class="clipModal" onclick="closeClip()">
 
-<div class="clipContent">
-
+<div class="clipContent" onclick="event.stopPropagation()">
 <button class="closeClip" onclick="closeClip()">✕</button>
 
 <iframe
