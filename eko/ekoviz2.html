@@ -190,11 +190,21 @@ function loop() {
     requestAnimationFrame(loop);  
     t += 0.005;  
   
-    if (analyser) {  
-        analyser.getByteFrequencyData(data);  
-        volume = data.reduce((a, b) => a + b) / data.length / 255;  
-    }  
-    smoothVol += (volume - smoothVol) * 0.1;  
+    if (analyser) {
+    analyser.getByteTimeDomainData(data);
+
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+        const v = (data[i] - 128) / 128;
+        sum += v * v;
+    }
+
+    const rms = Math.sqrt(sum / data.length);
+
+    volume = Math.min(rms * 2.2, 1);
+}
+
+smoothVol += (volume - smoothVol) * 0.18;  
   
     // Mise à jour du symbole central (effets audio)  
     mainSymbol.style.filter = `blur(${2 + smoothVol * 20}px) drop-shadow(0 0 ${10 + smoothVol * 50}px var(--accent))`;  
