@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Résonance Onirique</title>
+
+<style>
+
+:root{
+--accent:#d4ffd6;
+--bg:#010402;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:var(--bg);
+overflow:hidden;
+cursor:none;
+font-family:system-ui;
+}
+
+canvas{
+position:fixed;
+inset:0;
+}
+
+#center-symbol{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:12rem;
+color:var(--accent);
+font-weight:100;
+pointer-events:none;
+z-index:5;
+opacity:0;
+transition:opacity 5s ease;
+filter:blur(2px) drop-shadow(0 0 15px rgba(212,255,214,0.3));
+}
+
+#ui{
+position:fixed;
+inset:0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+background:black;
+z-index:100;
+transition:opacity 2s ease;
+}
+
+.instruction{
+color:var(--accent);
+font-weight:100;
+letter-spacing:0.8em;
+text-transform:uppercase;
+font-size:0.7rem;
+opacity:0.5;
+margin-top:30px;
+text-align:center;
+}
+
+.vignette{
+position:fixed;
+inset:0;
+pointer-events:none;
+background:radial-gradient(circle,transparent 35%,rgba(0,0,0,0.9) 100%);
+z-index:10;
+}
+
+@keyframes pulse{
+0%{transform:scale(1);opacity:0.5}
+50%{transform:scale(1.2);opacity:1}
+100%{transform:scale(1);opacity:0.5}
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="center-symbol">@</div>
+<canvas id="c"></canvas>
+<div class="vignette"></div>
+
+<div id="ui" onclick="startAudio()">
+<div style="width:40px;height:40px;border:1px solid white;border-radius:50%;animation:pulse 2s infinite"></div>
+<p class="instruction">Tisser la connexion<br>(Cliquer pour commencer)</p>
+</div>
+
+<script>
+
+const canvas=document.getElementById("c")
+const ctx=canvas.getContext("2d")
+const symbol=document.getElementById("center-symbol")
+
+let W,H
+let t=0
+
+let analyser,data
+let volume=0
+let smooth=0
+
+/* images */
+
+const SRCS=[
+"https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1600&q=60",
+"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=60",
+"https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=1600&q=60"
+]
+
+const imgs=SRCS.map(src=>{
+const i=new Image()
+i.crossOrigin="anonymous"
+i.src=src
+return i
+})
+
+let iA=0
+let iB=1
+let fade=0
+
+function resize(){
+W=canvas.width=window.innerWidth
+H=canvas.height=window.innerHeight
+}
+
+window.addEventListener("resize",resize)
+resize()
+
+/* AUDIO */
+
+async function startAudio(){
+
+document.getElementById("ui").style.opacity=0
+setTimeout(()=>document.getElementById("ui").remove(),2000)
+
+symbol.style.opacity=0.25
+
+try{
+
+const stream=await navigator.mediaDevices.getUserMedia({
+audio:{
+echoCancellation:true,
+noiseSuppression:true,
+autoGainControl:true
+}
+})
+
+const ac=new AudioContext()
+
+const source=ac.createMediaStreamSource(stream)
+
+const gain=ac.createGain()
+gain.gain.value=1.8
+
+analyser=ac.createAnalyser()
+analyser.fftSize=1024
+analyser.smoothingTimeConstant=0.75
+
+source.connect(gain)
+gain.connect(analyser)
+
+data=new Uint8Array(analyser.fftSize)
+
+}catch(e){console.log(e)}
+
+}
+
+/* SPORES */
+
+let spores=Array.from({length:50},()=>({
+x:Math.random()*window.innerWidth,
+y:Math.random()*window.innerHeight,
+vx:(Math.random()-0.5)*0.25,
+vy:(Math.random()-0.5)*0.25
+}))
+
+/* MYCELIUM */
+
+let nodes=Array.from({length:34},()=>({
+
+x:Math.random()*window.innerWidth,
+y:Math.random()*window.innerHeight,
+
+vx:(Math.random()-0.5)*0.25,
+vy:(Math.random()-0.5)*0.25,
+
+phase:Math.random()*Math.PI*2
+
+}))
+
+function audioLevel(){
+
+if(!analyser)return
+
+analyser.getByteTimeDomainData(data)
+
+let sum=0
+
+for(let i=0;i<data.length;i++){
+const v=(data[i]-128)/128
+sum+=v*v
+}
+
+const rms=Math.sqrt(sum/data.length)
+
+volume=Math.min(Math.pow(rms*2.8,0.9),1)
+
+}
+
+/* BACKGROUND */
+
+function drawBackground(){
+
+const silence=1-smooth
+
+fade+=0.0015
+
+if(fade>=1){
+fade=0
+iA=iB
+iB=(iB+1)%imgs.length
+}
+
+const blur=(Math.sin(fade*Math.PI)*8)+(smooth*40)
+
+ctx.globalCompositeOperation="source-over"
+ctx.fillStyle=`rgba(1,4,2,${0.12+smooth*0.08})`
+ctx.fillRect(0,0,W,H)
+
+ctx.save()
+
+ctx.filter=`blur(${blur}px) saturate(${1+silence*0.6})`
+
+;[iA,iB].forEach((img,idx)=>{
+
+const im=imgs[img]
+
+if(im.complete){
+
+ctx.globalAlpha=(idx===0?1-fade:fade)*(0.35+silence*0.45)
+
+ctx.drawImage(im,-20,-20,W+40,H+40)
+
+}
+
+})
+
+ctx.restore()
+
+}
+
+/* MYCELIUM ORGANIC */
+
+function drawMycelium(){
+
+ctx.globalCompositeOperation="screen"
+
+const silence=1-smooth
+
+const cx=W/2
+const cy=H/2
+
+nodes.forEach((n,i)=>{
+
+/* attraction vers centre en silence */
+
+const dx=cx-n.x
+const dy=cy-n.y
+
+const dist=Math.sqrt(dx*dx+dy*dy)
+
+const force=silence*0.002
+
+n.vx+=dx*force
+n.vy+=dy*force
+
+/* agitation quand il y a du son */
+
+n.vx+=Math.cos(t+n.phase)*(smooth*0.4)
+n.vy+=Math.sin(t+n.phase)*(smooth*0.4)
+
+n.x+=n.vx
+n.y+=n.vy
+
+n.vx*=0.98
+n.vy*=0.98
+
+nodes.slice(i+1).forEach(n2=>{
+
+const dx=n.x-n2.x
+const dy=n.y-n2.y
+const d=Math.sqrt(dx*dx+dy*dy)
+
+const range=150+smooth*160
+
+if(d<range){
+
+const angle=Math.abs(Math.atan2(dy,dx))
+
+if(angle<0.2||angle>2.9)return
+
+const alpha=(1-d/range)*(0.15+silence*0.35)
+
+const mx=(n.x+n2.x)/2+Math.sin(t+n.phase)*30
+const my=(n.y+n2.y)/2+Math.cos(t+n.phase)*30
+
+ctx.beginPath()
+
+ctx.moveTo(n.x,n.y)
+ctx.quadraticCurveTo(mx,my,n2.x,n2.y)
+
+ctx.strokeStyle=`rgba(212,255,214,${alpha})`
+ctx.lineWidth=0.6+silence*0.7
+
+ctx.stroke()
+
+}
+
+})
+
+})
+
+}
+
+/* SPORES */
+
+function drawSpores(){
+
+ctx.globalCompositeOperation="screen"
+
+spores.forEach(s=>{
+
+s.vx+=Math.cos(t+s.x*0.01)*0.01
+s.vy+=Math.sin(t+s.y*0.01)*0.01
+
+s.x+=s.vx*(1+smooth*2)
+s.y+=s.vy*(1+smooth*2)
+
+if(s.x<0)s.x=W
+if(s.x>W)s.x=0
+if(s.y<0)s.y=H
+if(s.y>H)s.y=0
+
+ctx.beginPath()
+ctx.arc(s.x,s.y,1.5+smooth*2,0,Math.PI*2)
+
+ctx.fillStyle=`rgba(255,255,255,${0.2+smooth*0.6})`
+
+ctx.fill()
+
+})
+
+}
+
+/* SYMBOL */
+
+function drawSymbol(){
+
+const silence=1-smooth
+
+symbol.style.opacity=0.15+silence*0.25
+
+symbol.style.filter=
+`blur(${2+smooth*25}px) drop-shadow(0 0 ${10+smooth*60}px rgba(212,255,214,0.5))`
+
+symbol.style.transform=
+`translate(-50%,-50%) scale(${1+smooth*0.5+Math.sin(t*2)*0.02})`
+
+}
+
+/* LOOP */
+
+function loop(){
+
+requestAnimationFrame(loop)
+
+t+=0.004
+
+audioLevel()
+
+smooth+=(volume-smooth)*0.2
+
+drawBackground()
+
+drawMycelium()
+
+drawSpores()
+
+drawSymbol()
+
+}
+
+loop()
+
+</script>
+
+</body>
+</html>
