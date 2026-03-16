@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Echoviz</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -94,7 +105,7 @@ z-index:10;
 
 <div id="ui" onclick="startAudio()">
 <div style="width:40px;height:40px;border:1px solid white;border-radius:50%;animation:pulse 2s infinite"></div>
-<p class="instruction">Tisser la connexion<br>(Cliquer pour commencer)</p>
+<p class="instruction">EkoMorphoz<br>(Cliquer pour commencer)</p>
 </div>
 
 <script>
@@ -129,6 +140,8 @@ let iA=0
 let iB=1
 let fade=0
 
+/* resize */
+
 function resize(){
 W=canvas.width=window.innerWidth
 H=canvas.height=window.innerHeight
@@ -137,7 +150,7 @@ H=canvas.height=window.innerHeight
 window.addEventListener("resize",resize)
 resize()
 
-/* AUDIO */
+/* audio */
 
 async function startAudio(){
 
@@ -148,24 +161,18 @@ symbol.style.opacity=0.25
 
 try{
 
-const stream=await navigator.mediaDevices.getUserMedia({
-audio:{
-echoCancellation:true,
-noiseSuppression:true,
-autoGainControl:true
-}
-})
+const stream=await navigator.mediaDevices.getUserMedia({audio:true})
 
 const ac=new AudioContext()
 
 const source=ac.createMediaStreamSource(stream)
 
 const gain=ac.createGain()
-gain.gain.value=1.8
+gain.gain.value=1.7
 
 analyser=ac.createAnalyser()
 analyser.fftSize=1024
-analyser.smoothingTimeConstant=0.75
+analyser.smoothingTimeConstant=0.7
 
 source.connect(gain)
 gain.connect(analyser)
@@ -176,27 +183,24 @@ data=new Uint8Array(analyser.fftSize)
 
 }
 
-/* SPORES */
+/* particules */
 
-let spores=Array.from({length:50},()=>({
+let spores=Array.from({length:40},()=>({
 x:Math.random()*window.innerWidth,
 y:Math.random()*window.innerHeight,
-vx:(Math.random()-0.5)*0.25,
-vy:(Math.random()-0.5)*0.25
+vx:(Math.random()-0.5)*0.5,
+vy:(Math.random()-0.5)*0.5,
+life:Math.random()*100
 }))
 
-/* MYCELIUM */
+/* noeuds mycelium */
 
-let nodes=Array.from({length:34},()=>({
-
+let nodes=Array.from({length:30},()=>({
 x:Math.random()*window.innerWidth,
 y:Math.random()*window.innerHeight,
-
-vx:(Math.random()-0.5)*0.25,
-vy:(Math.random()-0.5)*0.25,
-
+vx:(Math.random()-0.5)*0.2,
+vy:(Math.random()-0.5)*0.2,
 phase:Math.random()*Math.PI*2
-
 }))
 
 function audioLevel(){
@@ -218,11 +222,9 @@ volume=Math.min(Math.pow(rms*2.8,0.9),1)
 
 }
 
-/* BACKGROUND */
+/* fond */
 
 function drawBackground(){
-
-const silence=1-smooth
 
 fade+=0.0015
 
@@ -232,15 +234,14 @@ iA=iB
 iB=(iB+1)%imgs.length
 }
 
-const blur=(Math.sin(fade*Math.PI)*8)+(smooth*40)
+const blur=(Math.sin(fade*Math.PI)*6)+(smooth*5)
 
 ctx.globalCompositeOperation="source-over"
 ctx.fillStyle=`rgba(1,4,2,${0.12+smooth*0.08})`
 ctx.fillRect(0,0,W,H)
 
 ctx.save()
-
-ctx.filter=`blur(${blur}px) saturate(${1+silence*0.6})`
+ctx.filter=`blur(${blur}px) saturate(${1+smooth})`
 
 ;[iA,iB].forEach((img,idx)=>{
 
@@ -248,8 +249,7 @@ const im=imgs[img]
 
 if(im.complete){
 
-ctx.globalAlpha=(idx===0?1-fade:fade)*(0.35+silence*0.45)
-
+ctx.globalAlpha=(idx===0?1-fade:fade)*0.5
 ctx.drawImage(im,-20,-20,W+40,H+40)
 
 }
@@ -260,41 +260,19 @@ ctx.restore()
 
 }
 
-/* MYCELIUM ORGANIC */
+/* mycelium */
 
 function drawMycelium(){
 
 ctx.globalCompositeOperation="screen"
 
-const silence=1-smooth
-
-const cx=W/2
-const cy=H/2
-
 nodes.forEach((n,i)=>{
 
-/* attraction vers centre en silence */
+n.x+=n.vx+Math.cos(t+n.phase)*0.3
+n.y+=n.vy+Math.sin(t+n.phase)*0.3
 
-const dx=cx-n.x
-const dy=cy-n.y
-
-const dist=Math.sqrt(dx*dx+dy*dy)
-
-const force=silence*0.002
-
-n.vx+=dx*force
-n.vy+=dy*force
-
-/* agitation quand il y a du son */
-
-n.vx+=Math.cos(t+n.phase)*(smooth*0.4)
-n.vy+=Math.sin(t+n.phase)*(smooth*0.4)
-
-n.x+=n.vx
-n.y+=n.vy
-
-n.vx*=0.98
-n.vy*=0.98
+if(n.x<0||n.x>W)n.vx*=-1
+if(n.y<0||n.y>H)n.vy*=-1
 
 nodes.slice(i+1).forEach(n2=>{
 
@@ -302,7 +280,7 @@ const dx=n.x-n2.x
 const dy=n.y-n2.y
 const d=Math.sqrt(dx*dx+dy*dy)
 
-const range=150+smooth*160
+const range=140+smooth*120
 
 if(d<range){
 
@@ -310,19 +288,17 @@ const angle=Math.abs(Math.atan2(dy,dx))
 
 if(angle<0.2||angle>2.9)return
 
-const alpha=(1-d/range)*(0.15+silence*0.35)
+const alpha=(1-d/range)*(0.12+smooth*0.3)
 
 const mx=(n.x+n2.x)/2+Math.sin(t+n.phase)*30
 const my=(n.y+n2.y)/2+Math.cos(t+n.phase)*30
 
 ctx.beginPath()
-
 ctx.moveTo(n.x,n.y)
 ctx.quadraticCurveTo(mx,my,n2.x,n2.y)
 
 ctx.strokeStyle=`rgba(212,255,214,${alpha})`
-ctx.lineWidth=0.6+silence*0.7
-
+ctx.lineWidth=0.9+smooth*0.2
 ctx.stroke()
 
 }
@@ -333,7 +309,7 @@ ctx.stroke()
 
 }
 
-/* SPORES */
+/* spores */
 
 function drawSpores(){
 
@@ -354,32 +330,26 @@ if(s.y>H)s.y=0
 
 ctx.beginPath()
 ctx.arc(s.x,s.y,1.5+smooth*2,0,Math.PI*2)
-
 ctx.fillStyle=`rgba(255,255,255,${0.2+smooth*0.6})`
-
 ctx.fill()
 
 })
 
 }
 
-/* SYMBOL */
+/* symbole */
 
 function drawSymbol(){
-
-const silence=1-smooth
-
-symbol.style.opacity=0.15+silence*0.25
 
 symbol.style.filter=
 `blur(${2+smooth*25}px) drop-shadow(0 0 ${10+smooth*60}px rgba(212,255,214,0.5))`
 
 symbol.style.transform=
-`translate(-50%,-50%) scale(${1+smooth*0.5+Math.sin(t*2)*0.02})`
+`translate(-50%,-50%) scale(${1+smooth*0.6})`
 
 }
 
-/* LOOP */
+/* loop */
 
 function loop(){
 
@@ -389,7 +359,7 @@ t+=0.004
 
 audioLevel()
 
-smooth+=(volume-smooth)*0.2
+smooth+= (volume-smooth)*0.2
 
 drawBackground()
 
@@ -406,4 +376,8 @@ loop()
 </script>
 
 </body>
+</html>
+    
+  </body>
+  
 </html>
