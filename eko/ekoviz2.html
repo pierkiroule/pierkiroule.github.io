@@ -204,7 +204,7 @@ function loop() {
     volume = Math.min(rms * 2.2, 1);
 }
 
-smoothVol += (volume - smoothVol) * 0.18;  
+smoothVol += (volume - smoothVol) * 0.22;  
   
     // Mise à jour du symbole central (effets audio)  
     mainSymbol.style.filter = `blur(${2 + smoothVol * 20}px) drop-shadow(0 0 ${10 + smoothVol * 50}px var(--accent))`;  
