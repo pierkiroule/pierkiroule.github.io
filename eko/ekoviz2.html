@@ -233,19 +233,6 @@ smoothVol += (volume - smoothVol) * 0.22;
         const px = cx + p.ox + driftX;  
         const py = cy + p.oy + driftY;  
   
-        if (idx % 3 === 0) {  
-            const nextP = symbolPoints[(idx + 4) % symbolPoints.length];  
-            const npx = cx + nextP.ox + Math.cos(t + nextP.phase) * 5;  
-            const npy = cy + nextP.oy + Math.sin(t + nextP.phase) * 5;  
-  
-            ctx.beginPath();  
-            ctx.moveTo(px, py);  
-            ctx.lineTo(npx, npy);  
-            ctx.strokeStyle = `rgba(212, 255, 214, ${symbolOpacity * (0.1 + smoothVol * 0.4)})`;  
-            ctx.lineWidth = 0.5 + smoothVol;  
-            ctx.stroke();  
-        }  
-  
         if (Math.random() > 0.98) {  
             ctx.fillStyle = `rgba(255, 255, 255, ${symbolOpacity * smoothVol})`;  
             ctx.beginPath();  
