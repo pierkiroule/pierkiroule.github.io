@@ -149,7 +149,7 @@ async function startAudio() {
     setTimeout(() => document.getElementById("ui").remove(), 2000);  
       
     // Rendre le symbole HTML visible  
-    mainSymbol.style.opacity = "0.15";  
+    mainSymbol.style.opacity = "0.25";  
   
     try {  
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });  
@@ -217,7 +217,7 @@ smoothVol += (volume - smoothVol) * 0.22;
         fade = 0; iA = iB; iB = (iB + 1) % imgs.length;  
     }  
   
-    const totalBlur = (Math.sin(fade * Math.PI) * 15) + (smoothVol * 25);  
+    const totalBlur = (Math.sin(fade * Math.PI) * 15) + (smoothVol * 35);  
       
     ctx.globalCompositeOperation = "source-over";  
     ctx.fillStyle = `rgba(1, 4, 2, ${0.12 + (smoothVol * 0.08)})`;  
