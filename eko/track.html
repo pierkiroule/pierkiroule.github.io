@@ -3,26 +3,27 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Echoviz Morphogenèse</title>
+<title>Main Résonante Mycélium</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
 <style>
 
-:root{
---accent:#d4ffd6;
---bg:#010402;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
 body{
-margin:0;
-background:var(--bg);
+background:#000;
 overflow:hidden;
-cursor:none;
-font-family:system-ui;
+font-family:'Orbitron',sans-serif;
 }
 
 canvas{
@@ -30,396 +31,312 @@ position:fixed;
 inset:0;
 }
 
-#center-symbol{
+video{
 position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-font-size:12rem;
-color:var(--accent);
-opacity:.2;
-pointer-events:none;
+inset:0;
+width:100vw;
+height:100vh;
+object-fit:cover;
+opacity:.45;
 }
 
-video{
-display:none;
+#ui{
+position:fixed;
+top:24px;
+left:24px;
+font-size:10px;
+letter-spacing:3px;
+color:#a5b4fc;
+z-index:10;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<video id="video"></video>
+<div id="ui">Tracking — <span id="status">Init...</span></div>
 
-<div id="center-symbol">@</div>
-
+<video id="video" playsinline></video>
 <canvas id="c"></canvas>
 
 <script>
 
 const canvas=document.getElementById("c")
 const ctx=canvas.getContext("2d")
+const video=document.getElementById("video")
+const statusEl=document.getElementById("status")
 
 let W,H
-let t=0
-
-function resize(){
-
-W=canvas.width=window.innerWidth
-H=canvas.height=window.innerHeight
-
-}
-
-window.addEventListener("resize",resize)
-resize()
-
-/* AUDIO */
-
-let analyser,data
-let volume=0
-let smooth=0
-
-async function startAudio(){
-
-const stream=await navigator.mediaDevices.getUserMedia({audio:true})
-
-const ac=new AudioContext()
-
-const source=ac.createMediaStreamSource(stream)
-
-analyser=ac.createAnalyser()
-
-source.connect(analyser)
-
-data=new Uint8Array(analyser.fftSize)
-
-}
-
-function audioLevel(){
-
-if(!analyser)return
-
-analyser.getByteTimeDomainData(data)
-
-let sum=0
-
-for(let i=0;i<data.length;i++){
-
-const v=(data[i]-128)/128
-sum+=v*v
-
-}
-
-volume=Math.sqrt(sum/data.length)
-
-}
-
-/* HAND TRACKING */
-
-const video=document.getElementById("video")
-
-let handX=W/2
-let handY=H/2
+let particles=[]
+let present=false
 let handOpen=0
 
-let landmarks=null
+function resize(){
+W=canvas.width=innerWidth
+H=canvas.height=innerHeight
+}
+resize()
+addEventListener("resize",resize)
 
-const hands=new Hands({
+const smoothed=Array.from({length:21},()=>({x:.5,y:.5,z:0}))
+const LERP=.25
 
-locateFile:(file)=>{
-return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+class Particle{
+
+constructor(x,y){
+this.x=x
+this.y=y
+this.vx=(Math.random()-.5)*2
+this.vy=(Math.random()-.5)*2
+this.life=1
+this.size=Math.random()*2+1
 }
 
+update(){
+this.x+=this.vx
+this.y+=this.vy
+this.life-=.01
+}
+
+draw(){
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2)
+ctx.fillStyle=`rgba(200,220,255,${this.life})`
+ctx.fill()
+}
+
+}
+
+const hands=new Hands({
+locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
 })
 
 hands.setOptions({
-
 maxNumHands:1,
 modelComplexity:1,
-minDetectionConfidence:0.7,
-minTrackingConfidence:0.7
+minDetectionConfidence:.8,
+minTrackingConfidence:.8
+})
+
+hands.onResults((results)=>{
+
+if(results.multiHandLandmarks.length){
+
+present=true
+statusEl.innerText="Main détectée"
+
+const detected=results.multiHandLandmarks[0]
+
+detected.forEach((pt,i)=>{
+
+smoothed[i].x+=(pt.x-smoothed[i].x)*LERP
+smoothed[i].y+=(pt.y-smoothed[i].y)*LERP
+smoothed[i].z+=(pt.z-smoothed[i].z)*LERP
 
 })
 
-hands.onResults(results=>{
+const dx=smoothed[12].x-smoothed[0].x
+const dy=smoothed[12].y-smoothed[0].y
+const dist=Math.sqrt(dx*dx+dy*dy)
 
-if(results.multiHandLandmarks.length>0){
+let target=Math.min(Math.max((dist-.15)/.4,0),1)
+handOpen+=(target-handOpen)*.1
 
-landmarks=results.multiHandLandmarks[0]
+if(handOpen>.2){
 
-const index=landmarks[8]
-const thumb=landmarks[4]
+;[4,8,12,16,20].forEach(i=>{
 
-handX=(1-index.x)*W
-handY=index.y*H
+if(Math.random()<.4){
 
-const dx=index.x-thumb.x
-const dy=index.y-thumb.y
+const p=smoothed[i]
 
-handOpen=Math.sqrt(dx*dx+dy*dy)
+particles.push(
+new Particle(p.x*W,p.y*H)
+)
+
+}
+
+})
+
+}
 
 }else{
 
-landmarks=null
+present=false
+statusEl.innerText="Recherche..."
+handOpen*=.95
 
 }
 
 })
 
 const camera=new Camera(video,{
-onFrame:async()=>{
-await hands.send({image:video})
-},
-width:640,
-height:480
+onFrame:async()=>{await hands.send({image:video})},
+width:1280,
+height:720
 })
 
 camera.start()
 
-/* IMAGES */
-
-const SRCS=[
-
-"https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1600&q=60",
-"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/pap.png",
-"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/foug.jpg",
-"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/bird.jpg",
-"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/imm.jpg"
-
+const fingers=[
+[0,1,2,3,4],
+[0,5,6,7,8],
+[0,9,10,11,12],
+[0,13,14,15,16],
+[0,17,18,19,20]
 ]
 
-const imgs=SRCS.map(src=>{
-const i=new Image()
-i.crossOrigin="anonymous"
-i.src=src
-return i
-})
-
-let iA=0
-let iB=1
-let fade=0
-
-function drawImageCover(img){
-
-const r=Math.max(W/img.width,H/img.height)
-
-const nw=img.width*r
-const nh=img.height*r
-
-const x=(W-nw)/2
-const y=(H-nh)/2
-
-ctx.drawImage(img,x,y,nw,nh)
-
-}
-
-/* BACKGROUND */
-
-function drawBackground(){
-
-fade+=0.001
-
-if(fade>=1){
-
-fade=0
-iA=iB
-iB=(iB+1)%imgs.length
-
-}
-
-ctx.fillStyle=`rgba(1,4,2,${0.12+smooth*0.1})`
-ctx.fillRect(0,0,W,H)
-
-ctx.save()
-
-ctx.filter=`blur(${smooth*6}px)`
-
-;[iA,iB].forEach((img,idx)=>{
-
-const im=imgs[img]
-
-if(im.complete){
-
-ctx.globalAlpha=(idx===0?1-fade:fade)*0.5
-drawImageCover(im)
-
-}
-
-})
-
-ctx.restore()
-
-}
-
-/* SPORES */
-
-let spores=Array.from({length:120},()=>({
-
-x:Math.random()*W,
-y:Math.random()*H,
-vx:(Math.random()-0.5)*0.5,
-vy:(Math.random()-0.5)*0.5
-
-}))
-
-function updateSpores(){
-
-spores.forEach(s=>{
-
-const dx=handX-s.x
-const dy=handY-s.y
-
-const d=Math.sqrt(dx*dx+dy*dy)
-
-if(d<220){
-
-s.vx+=dx/d*0.05
-s.vy+=dy/d*0.05
-
-}
-
-s.x+=s.vx*(1+smooth*3)
-s.y+=s.vy*(1+smooth*3)
-
-s.vx*=0.98
-s.vy*=0.98
-
-})
-
-}
-
-function drawSpores(){
-
-spores.forEach(s=>{
+function drawFinger(points){
 
 ctx.beginPath()
-ctx.arc(s.x,s.y,2,0,Math.PI*2)
-ctx.fillStyle="white"
-ctx.fill()
 
-})
+points.forEach((i,k)=>{
 
-}
-
-/* MYCELIUM */
-
-let nodes=Array.from({length:40},()=>({
-
-x:Math.random()*W,
-y:Math.random()*H,
-vx:(Math.random()-0.5)*0.3,
-vy:(Math.random()-0.5)*0.3
-
-}))
-
-function drawMycelium(){
-
-const openFactor=handOpen*800
-
-nodes.forEach((n,i)=>{
-
-const dx=handX-n.x
-const dy=handY-n.y
-
-const d=Math.sqrt(dx*dx+dy*dy)
-
-if(d<250){
-
-n.vx+=dx/d*0.02
-n.vy+=dy/d*0.02
-
-}
-
-/* ouverture réseau */
-
-n.vx+=dx/d*(openFactor*0.00002)
-n.vy+=dy/d*(openFactor*0.00002)
-
-n.x+=n.vx
-n.y+=n.vy
-
-nodes.slice(i+1).forEach(n2=>{
-
-const dx=n.x-n2.x
-const dy=n.y-n2.y
-const d=Math.sqrt(dx*dx+dy*dy)
-
-const range=140+openFactor
-
-if(d<range){
-
-ctx.beginPath()
-ctx.moveTo(n.x,n.y)
-ctx.lineTo(n2.x,n2.y)
-
-ctx.strokeStyle=`rgba(212,255,214,${0.2+smooth})`
-
-ctx.stroke()
-
-}
-
-})
-
-})
-
-}
-
-/* HAND VISUAL */
-
-function drawHand(){
-
-if(!landmarks)return
-
-ctx.strokeStyle="rgba(0,255,150,0.9)"
-ctx.lineWidth=2
-
-landmarks.forEach(p=>{
+const p=smoothed[i]
 
 const x=(1-p.x)*W
 const y=p.y*H
 
-ctx.beginPath()
-ctx.arc(x,y,4,0,Math.PI*2)
-ctx.stroke()
+if(k===0){
+ctx.moveTo(x,y)
+}else{
+
+const prev=smoothed[points[k-1]]
+
+const px=(1-prev.x)*W
+const py=prev.y*H
+
+const cx=(px+x)/2
+const cy=(py+y)/2
+
+ctx.quadraticCurveTo(px,py,cx,cy)
+
+}
 
 })
 
-ctx.beginPath()
-ctx.arc(handX,handY,80+handOpen*400,0,Math.PI*2)
-ctx.strokeStyle="rgba(0,255,180,0.5)"
 ctx.stroke()
 
 }
 
-/* LOOP */
+function drawMycelium(){
 
-function loop(){
+ctx.lineCap="round"
+ctx.lineWidth=1.5
 
-requestAnimationFrame(loop)
+const t=Date.now()*0.002
 
-t+=0.004
+for(let i=0;i<21;i++){
 
-audioLevel()
+const p=smoothed[i]
 
-smooth+=(volume-smooth)*0.2
+const x1=p.x*W
+const y1=p.y*H
 
-drawBackground()
+const x2=(1-p.x)*W
+const y2=p.y*H
 
-updateSpores()
+const midx=(x1+x2)/2
+const midy=(y1+y2)/2
 
-drawSpores()
+const offset=Math.sin(t+i)*30
 
-drawMycelium()
+ctx.beginPath()
 
-drawHand()
+ctx.moveTo(x1,y1)
+
+ctx.quadraticCurveTo(
+midx,
+midy+offset,
+x2,
+y2
+)
+
+const alpha=.12+.18*Math.sin(t+i)
+
+ctx.strokeStyle=`rgba(170,210,255,${alpha})`
+
+ctx.stroke()
 
 }
 
-loop()
+}
 
-startAudio()
+function draw(){
+
+ctx.clearRect(0,0,W,H)
+
+particles=particles.filter(p=>p.life>0)
+
+particles.forEach(p=>{
+p.update()
+p.draw()
+})
+
+if(present){
+
+ctx.shadowBlur=20
+ctx.shadowColor="rgba(120,170,255,.5)"
+
+drawMycelium()
+
+ctx.shadowBlur=0
+
+ctx.lineCap="round"
+ctx.lineJoin="round"
+
+const glow=15+Math.sin(Date.now()*0.004)*5
+
+ctx.shadowBlur=glow
+ctx.shadowColor="rgba(140,170,255,.8)"
+
+ctx.lineWidth=8
+ctx.strokeStyle="rgba(140,170,255,.25)"
+
+fingers.forEach(drawFinger)
+
+ctx.shadowBlur=0
+
+ctx.lineWidth=3
+ctx.strokeStyle="rgba(230,240,255,.9)"
+
+fingers.forEach(drawFinger)
+
+smoothed.forEach((pt,i)=>{
+
+const x=(1-pt.x)*W
+const y=pt.y*H
+
+const tip=[4,8,12,16,20].includes(i)
+
+ctx.beginPath()
+ctx.arc(x,y,tip?6:4,0,Math.PI*2)
+
+if(tip){
+
+ctx.shadowBlur=20
+ctx.shadowColor="white"
+ctx.fillStyle="white"
+
+}else{
+
+ctx.fillStyle="rgba(160,170,255,.8)"
+
+}
+
+ctx.fill()
+ctx.shadowBlur=0
+
+})
+
+}
+
+requestAnimationFrame(draw)
+
+}
+
+draw()
 
 </script>
 
