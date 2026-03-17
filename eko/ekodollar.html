@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+
+<style>
+
+body{
+
+margin:0;
+
+background:black;
+
+overflow:hidden;
+
+}
+
+video{
+
+position:fixed;
+
+inset:0;
+
+width:100vw;
+
+height:100vh;
+
+object-fit:cover;
+
+opacity:.95;
+
+transform:scaleX(-1);
+
+}
+
+canvas{
+
+position:fixed;
+
+inset:0;
+
+}
+
+#start{
+
+position:fixed;
+
+inset:0;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+justify-content:center;
+
+background:black;
+
+color:white;
+
+font-family:monospace;
+
+font-size:10px;
+
+cursor:pointer;
+
+z-index:10;
+
+gap:10px;
+
+}
+
+#start span{
+
+opacity:.25;
+
+font-size:4px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="start">
+
+DÉMARRER
+
+<span>autorisation caméra</span>
+
+</div>
+
+<video id="video" autoplay playsinline muted></video>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const video=document.getElementById("video")
+
+const canvas=document.getElementById("canvas")
+
+const ctx=canvas.getContext("2d")
+
+let model
+
+let segmentation=null
+
+const particles=[]
+
+const COUNT=120
+
+const symbols=[
+
+"💰","$","🤑"
+
+]
+
+function resize(){
+
+canvas.width=innerWidth
+
+canvas.height=innerHeight
+
+}
+
+resize()
+
+addEventListener("resize",resize)
+
+document.getElementById("start").onclick=start
+
+async function start(){
+
+document.getElementById("start").remove()
+
+const stream=await navigator.mediaDevices.getUserMedia({
+
+video:{width:{ideal:640},height:{ideal:480},facingMode:"user"}
+
+})
+
+video.srcObject=stream
+
+await video.play()
+
+await tf.setBackend("webgl")
+
+await tf.ready()
+
+model=await bodyPix.load({
+
+architecture:"MobileNetV1",
+
+outputStride:16,
+
+multiplier:0.75,
+
+quantBytes:2
+
+})
+
+initParticles()
+
+detectLoop()
+
+draw()
+
+}
+
+function initParticles(){
+
+for(let i=0;i<COUNT;i++){
+
+particles.push({
+
+x:Math.random()*canvas.width,
+
+y:Math.random()*canvas.height,
+
+vx:(Math.random()-.5)*0.18,
+
+vy:(Math.random()-.5)*0.18,
+
+size:16+Math.random()*18,
+
+alpha:.35+Math.random()*.8,
+
+phase:Math.random()*Math.PI*2,
+
+symbol:symbols[Math.floor(Math.random()*symbols.length)]
+
+})
+
+}
+
+}
+
+async function detectLoop(){
+
+while(true){
+
+try{
+
+segmentation=await model.segmentPerson(video,{
+
+flipHorizontal:true,
+
+internalResolution:"low",
+
+segmentationThreshold:.7
+
+})
+
+}catch(e){}
+
+await new Promise(r=>setTimeout(r,120))
+
+}
+
+}
+
+function insideBody(x,y){
+
+if(!segmentation) return false
+
+const w=segmentation.width
+
+const h=segmentation.height
+
+const sx=Math.floor((canvas.width-x)/canvas.width*w)
+
+const sy=Math.floor(y/canvas.height*h)
+
+if(sx<0||sy<0||sx>=w||sy>=h) return false
+
+return segmentation.data[sy*w+sx]===1
+
+}
+
+function respawn(p){
+
+p.x=canvas.width*.4+Math.random()*canvas.width*.2
+
+p.y=canvas.height*.2+Math.random()*canvas.height*.6
+
+p.symbol=symbols[Math.floor(Math.random()*symbols.length)]
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+const t=performance.now()*.002
+
+ctx.textAlign="center"
+
+ctx.textBaseline="middle"
+
+ctx.shadowBlur=16
+
+ctx.shadowColor="rgba(0,255,150,.6)"
+
+for(const p of particles){
+
+p.x+=p.vx
+
+p.y+=p.vy
+
+if(
+
+p.x<-20||
+
+p.x>canvas.width+20||
+
+p.y<-20||
+
+p.y>canvas.height+20
+
+){
+
+respawn(p)
+
+}
+
+if(!insideBody(p.x,p.y)){
+
+continue
+
+}
+
+const a=p.alpha*(.6+.4*Math.sin(t+p.phase))
+
+ctx.globalAlpha=a
+
+ctx.font=`${p.size}px sans-serif`
+
+ctx.fillText(p.symbol,p.x,p.y)
+
+}
+
+ctx.globalAlpha=1
+
+ctx.shadowBlur=0
+
+requestAnimationFrame(draw)
+
+}
+
+</script>
+
+</body>
+
+</html>
