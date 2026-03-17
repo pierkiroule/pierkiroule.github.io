@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Echoviz Morphogenèse</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<style>
+
+:root{
+--accent:#d4ffd6;
+--bg:#010402;
+}
+
+body{
+margin:0;
+background:var(--bg);
+overflow:hidden;
+cursor:none;
+font-family:system-ui;
+}
+
+canvas{
+position:fixed;
+inset:0;
+}
+
+#center-symbol{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:12rem;
+color:var(--accent);
+opacity:.2;
+pointer-events:none;
+}
+
+video{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<video id="video"></video>
+
+<div id="center-symbol">@</div>
+
+<canvas id="c"></canvas>
+
+<script>
+
+const canvas=document.getElementById("c")
+const ctx=canvas.getContext("2d")
+
+let W,H
+let t=0
+
+function resize(){
+
+W=canvas.width=window.innerWidth
+H=canvas.height=window.innerHeight
+
+}
+
+window.addEventListener("resize",resize)
+resize()
+
+/* AUDIO */
+
+let analyser,data
+let volume=0
+let smooth=0
+
+async function startAudio(){
+
+const stream=await navigator.mediaDevices.getUserMedia({audio:true})
+
+const ac=new AudioContext()
+
+const source=ac.createMediaStreamSource(stream)
+
+analyser=ac.createAnalyser()
+
+source.connect(analyser)
+
+data=new Uint8Array(analyser.fftSize)
+
+}
+
+function audioLevel(){
+
+if(!analyser)return
+
+analyser.getByteTimeDomainData(data)
+
+let sum=0
+
+for(let i=0;i<data.length;i++){
+
+const v=(data[i]-128)/128
+sum+=v*v
+
+}
+
+volume=Math.sqrt(sum/data.length)
+
+}
+
+/* HAND TRACKING */
+
+const video=document.getElementById("video")
+
+let handX=W/2
+let handY=H/2
+let handOpen=0
+
+let landmarks=null
+
+const hands=new Hands({
+
+locateFile:(file)=>{
+return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+}
+
+})
+
+hands.setOptions({
+
+maxNumHands:1,
+modelComplexity:1,
+minDetectionConfidence:0.7,
+minTrackingConfidence:0.7
+
+})
+
+hands.onResults(results=>{
+
+if(results.multiHandLandmarks.length>0){
+
+landmarks=results.multiHandLandmarks[0]
+
+const index=landmarks[8]
+const thumb=landmarks[4]
+
+handX=(1-index.x)*W
+handY=index.y*H
+
+const dx=index.x-thumb.x
+const dy=index.y-thumb.y
+
+handOpen=Math.sqrt(dx*dx+dy*dy)
+
+}else{
+
+landmarks=null
+
+}
+
+})
+
+const camera=new Camera(video,{
+onFrame:async()=>{
+await hands.send({image:video})
+},
+width:640,
+height:480
+})
+
+camera.start()
+
+/* IMAGES */
+
+const SRCS=[
+
+"https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1600&q=60",
+"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/pap.png",
+"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/foug.jpg",
+"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/bird.jpg",
+"https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/eko/imm.jpg"
+
+]
+
+const imgs=SRCS.map(src=>{
+const i=new Image()
+i.crossOrigin="anonymous"
+i.src=src
+return i
+})
+
+let iA=0
+let iB=1
+let fade=0
+
+function drawImageCover(img){
+
+const r=Math.max(W/img.width,H/img.height)
+
+const nw=img.width*r
+const nh=img.height*r
+
+const x=(W-nw)/2
+const y=(H-nh)/2
+
+ctx.drawImage(img,x,y,nw,nh)
+
+}
+
+/* BACKGROUND */
+
+function drawBackground(){
+
+fade+=0.001
+
+if(fade>=1){
+
+fade=0
+iA=iB
+iB=(iB+1)%imgs.length
+
+}
+
+ctx.fillStyle=`rgba(1,4,2,${0.12+smooth*0.1})`
+ctx.fillRect(0,0,W,H)
+
+ctx.save()
+
+ctx.filter=`blur(${smooth*6}px)`
+
+;[iA,iB].forEach((img,idx)=>{
+
+const im=imgs[img]
+
+if(im.complete){
+
+ctx.globalAlpha=(idx===0?1-fade:fade)*0.5
+drawImageCover(im)
+
+}
+
+})
+
+ctx.restore()
+
+}
+
+/* SPORES */
+
+let spores=Array.from({length:120},()=>({
+
+x:Math.random()*W,
+y:Math.random()*H,
+vx:(Math.random()-0.5)*0.5,
+vy:(Math.random()-0.5)*0.5
+
+}))
+
+function updateSpores(){
+
+spores.forEach(s=>{
+
+const dx=handX-s.x
+const dy=handY-s.y
+
+const d=Math.sqrt(dx*dx+dy*dy)
+
+if(d<220){
+
+s.vx+=dx/d*0.05
+s.vy+=dy/d*0.05
+
+}
+
+s.x+=s.vx*(1+smooth*3)
+s.y+=s.vy*(1+smooth*3)
+
+s.vx*=0.98
+s.vy*=0.98
+
+})
+
+}
+
+function drawSpores(){
+
+spores.forEach(s=>{
+
+ctx.beginPath()
+ctx.arc(s.x,s.y,2,0,Math.PI*2)
+ctx.fillStyle="white"
+ctx.fill()
+
+})
+
+}
+
+/* MYCELIUM */
+
+let nodes=Array.from({length:40},()=>({
+
+x:Math.random()*W,
+y:Math.random()*H,
+vx:(Math.random()-0.5)*0.3,
+vy:(Math.random()-0.5)*0.3
+
+}))
+
+function drawMycelium(){
+
+const openFactor=handOpen*800
+
+nodes.forEach((n,i)=>{
+
+const dx=handX-n.x
+const dy=handY-n.y
+
+const d=Math.sqrt(dx*dx+dy*dy)
+
+if(d<250){
+
+n.vx+=dx/d*0.02
+n.vy+=dy/d*0.02
+
+}
+
+/* ouverture réseau */
+
+n.vx+=dx/d*(openFactor*0.00002)
+n.vy+=dy/d*(openFactor*0.00002)
+
+n.x+=n.vx
+n.y+=n.vy
+
+nodes.slice(i+1).forEach(n2=>{
+
+const dx=n.x-n2.x
+const dy=n.y-n2.y
+const d=Math.sqrt(dx*dx+dy*dy)
+
+const range=140+openFactor
+
+if(d<range){
+
+ctx.beginPath()
+ctx.moveTo(n.x,n.y)
+ctx.lineTo(n2.x,n2.y)
+
+ctx.strokeStyle=`rgba(212,255,214,${0.2+smooth})`
+
+ctx.stroke()
+
+}
+
+})
+
+})
+
+}
+
+/* HAND VISUAL */
+
+function drawHand(){
+
+if(!landmarks)return
+
+ctx.strokeStyle="rgba(0,255,150,0.9)"
+ctx.lineWidth=2
+
+landmarks.forEach(p=>{
+
+const x=(1-p.x)*W
+const y=p.y*H
+
+ctx.beginPath()
+ctx.arc(x,y,4,0,Math.PI*2)
+ctx.stroke()
+
+})
+
+ctx.beginPath()
+ctx.arc(handX,handY,80+handOpen*400,0,Math.PI*2)
+ctx.strokeStyle="rgba(0,255,180,0.5)"
+ctx.stroke()
+
+}
+
+/* LOOP */
+
+function loop(){
+
+requestAnimationFrame(loop)
+
+t+=0.004
+
+audioLevel()
+
+smooth+=(volume-smooth)*0.2
+
+drawBackground()
+
+updateSpores()
+
+drawSpores()
+
+drawMycelium()
+
+drawHand()
+
+}
+
+loop()
+
+startAudio()
+
+</script>
+
+</body>
+</html>
