@@ -55,7 +55,7 @@ z-index:10;
 
 <body>
 
-<div id="ui">Tracking — <span id="status">Init...</span></div>
+<div id="ui">Eko — <span id="status">Init...</span></div>
 
 <video id="video" playsinline></video>
 <canvas id="c"></canvas>
@@ -124,7 +124,7 @@ hands.onResults((results)=>{
 if(results.multiHandLandmarks.length){
 
 present=true
-statusEl.innerText="Main détectée"
+statusEl.innerText="•°○"
 
 const detected=results.multiHandLandmarks[0]
 
@@ -164,7 +164,7 @@ new Particle(p.x*W,p.y*H)
 }else{
 
 present=false
-statusEl.innerText="Recherche..."
+statusEl.innerText="•°○"
 handOpen*=.95
 
 }
@@ -223,7 +223,7 @@ ctx.stroke()
 function drawMycelium(){
 
 ctx.lineCap="round"
-ctx.lineWidth=1.5
+ctx.lineWidth=2
 
 const t=Date.now()*0.002
 
@@ -315,8 +315,8 @@ ctx.arc(x,y,tip?6:4,0,Math.PI*2)
 
 if(tip){
 
-ctx.shadowBlur=20
-ctx.shadowColor="white"
+ctx.shadowBlur=40
+ctx.shadowColor="blue"
 ctx.fillStyle="white"
 
 }else{
