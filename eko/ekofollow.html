@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:black;
+  overflow:hidden;
+}
+
+body{
+  position:relative;
+}
+
+video{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  object-fit:cover;
+  opacity:.95;
+  transform:scaleX(-1);
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+}
+
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:black;
+  color:white;
+  font-family:monospace;
+  font-size:30px;
+  cursor:pointer;
+  z-index:10;
+  gap:10px;
+  text-align:center;
+  padding:24px;
+}
+
+#start span{
+  opacity:.45;
+  font-size:12px;
+}
+
+#error{
+  color:#ff8f8f;
+  font-size:12px;
+  max-width:320px;
+  line-height:1.4;
+  white-space:pre-wrap;
+}
+</style>
+</head>
+
+<body>
+
+<div id="start">
+  <div>DÉMARRER</div>
+  <span>autorisation caméra</span>
+  <div id="error"></div>
+</div>
+
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+
+<script>
+const video = document.getElementById("video")
+const canvas = document.getElementById("canvas")
+const ctx = canvas.getContext("2d", { alpha:true })
+const startBtn = document.getElementById("start")
+const errorBox = document.getElementById("error")
+
+let model = null
+let segmentation = null
+let started = false
+let animId = null
+
+const particles = []
+const COUNT = 90
+const symbols = ["👍","$","🔥","🤩","❤️","💯","💋"]
+
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+  canvas.width = Math.floor(innerWidth * dpr)
+  canvas.height = Math.floor(innerHeight * dpr)
+  canvas.style.width = innerWidth + "px"
+  canvas.style.height = innerHeight + "px"
+  ctx.setTransform(dpr,0,0,dpr,0,0)
+}
+
+resize()
+addEventListener("resize", resize)
+
+startBtn.onclick = start
+
+async function start(){
+  if(started) return
+  started = true
+  errorBox.textContent = ""
+
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio:false,
+      video:{
+        facingMode:"user",
+        width:{ ideal:640 },
+        height:{ ideal:480 }
+      }
+    })
+
+    video.srcObject = stream
+    await video.play()
+
+    await tf.setBackend("webgl")
+    await tf.ready()
+
+    model = await bodyPix.load({
+      architecture:"MobileNetV1",
+      outputStride:16,
+      multiplier:0.75,
+      quantBytes:2
+    })
+
+    initParticles()
+    startBtn.style.display = "none"
+
+    detectLoop()
+    draw()
+
+  }catch(err){
+    started = false
+    errorBox.textContent = "Erreur caméra ou chargement IA.\n" + (err?.message || err)
+  }
+}
+
+function initParticles(){
+  particles.length = 0
+
+  for(let i=0;i<COUNT;i++){
+    particles.push(makeParticle())
+  }
+}
+
+function makeParticle(){
+  return {
+    x:Math.random()*innerWidth,
+    y:Math.random()*innerHeight,
+    vx:(Math.random()-.5)*0.18,
+    vy:(Math.random()-.5)*0.18,
+    size:10 + Math.random()*16,
+    alpha:.35 + Math.random()*.6,
+    phase:Math.random()*Math.PI*2,
+    symbol:symbols[Math.floor(Math.random()*symbols.length)],
+    off:0
+  }
+}
+
+async function detectLoop(){
+  while(started){
+    try{
+      if(video.readyState >= 2 && model){
+        segmentation = await model.segmentPerson(video,{
+          flipHorizontal:true,
+          internalResolution:"low",
+          segmentationThreshold:.7
+        })
+
+        seedParticlesIntoBody(6)
+      }
+    }catch(err){
+    }
+
+    await new Promise(r=>setTimeout(r,90))
+  }
+}
+
+function seedParticlesIntoBody(count = 4){
+  if(!segmentation) return
+
+  for(let n=0;n<count;n++){
+    const p = particles[(Math.random()*particles.length)|0]
+    if(p && !insideBody(p.x,p.y)){
+      placeParticleInBody(p)
+    }
+  }
+}
+
+function placeParticleInBody(p){
+  if(!segmentation){
+    p.x = innerWidth * (.35 + Math.random()*.3)
+    p.y = innerHeight * (.15 + Math.random()*.7)
+    return
+  }
+
+  for(let tries=0; tries<80; tries++){
+    const x = Math.random()*innerWidth
+    const y = Math.random()*innerHeight
+    if(insideBody(x,y)){
+      p.x = x
+      p.y = y
+      p.off = 0
+      return
+    }
+  }
+
+  p.x = innerWidth * (.35 + Math.random()*.3)
+  p.y = innerHeight * (.15 + Math.random()*.7)
+  p.off = 0
+}
+
+function insideBody(x,y){
+  if(!segmentation) return false
+
+  const w = segmentation.width
+  const h = segmentation.height
+
+  // segmentation déjà flipHorizontal:true
+  // donc on ne remiroire pas une 2e fois
+  const sx = Math.floor((x / innerWidth) * w)
+  const sy = Math.floor((y / innerHeight) * h)
+
+  if(sx < 0 || sy < 0 || sx >= w || sy >= h) return false
+
+  return segmentation.data[sy * w + sx] === 1
+}
+
+function respawn(p){
+  p.symbol = symbols[Math.floor(Math.random()*symbols.length)]
+  p.vx = (Math.random()-.5)*0.18
+  p.vy = (Math.random()-.5)*0.18
+  placeParticleInBody(p)
+}
+
+function updateParticles(){
+  for(const p of particles){
+    p.x += p.vx
+    p.y += p.vy
+
+    const inside = insideBody(p.x,p.y)
+
+    if(
+      p.x < -30 ||
+      p.x > innerWidth + 30 ||
+      p.y < -30 ||
+      p.y > innerHeight + 30
+    ){
+      respawn(p)
+      continue
+    }
+
+    if(inside){
+      p.off = 0
+    }else{
+      p.off++
+      if(p.off > 20){
+        respawn(p)
+      }
+    }
+  }
+}
+
+function getVisibleParticles(){
+  const visible = []
+  for(const p of particles){
+    if(insideBody(p.x,p.y)) visible.push(p)
+  }
+  return visible
+}
+
+function drawConnections(visible){
+  const maxDist = 90
+
+  ctx.save()
+  ctx.lineWidth = 1
+  ctx.shadowBlur = 10
+  ctx.shadowColor = "rgba(255,255,255,.7)"
+  ctx.strokeStyle = "rgba(255,255,255,.55)"
+
+  for(let i=0;i<visible.length;i++){
+    const a = visible[i]
+    let links = 0
+
+    for(let j=i+1;j<visible.length;j++){
+      const b = visible[j]
+
+      const dx = a.x - b.x
+      const dy = a.y - b.y
+      const d2 = dx*dx + dy*dy
+
+      if(d2 < maxDist*maxDist){
+        const d = Math.sqrt(d2)
+        ctx.globalAlpha = Math.max(0, 1 - d/maxDist) * 0.75
+        ctx.beginPath()
+        ctx.moveTo(a.x, a.y)
+        ctx.lineTo(b.x, b.y)
+        ctx.stroke()
+
+        links++
+        if(links >= 3) break
+      }
+    }
+  }
+
+  ctx.restore()
+  ctx.globalAlpha = 1
+}
+
+function drawParticles(visible, t){
+  ctx.save()
+  ctx.textAlign = "center"
+  ctx.textBaseline = "middle"
+  ctx.shadowBlur = 10
+  ctx.shadowColor = "rgba(255,255,255,.35)"
+
+  for(const p of visible){
+    const a = p.alpha * (.6 + .4*Math.sin(t + p.phase))
+    ctx.globalAlpha = a
+    ctx.font = `${p.size}px sans-serif`
+    ctx.fillStyle = "white"
+    ctx.fillText(p.symbol, p.x, p.y)
+  }
+
+  ctx.restore()
+  ctx.globalAlpha = 1
+}
+
+function draw(){
+  ctx.clearRect(0,0,innerWidth,innerHeight)
+
+  updateParticles()
+
+  const visible = getVisibleParticles()
+  const t = performance.now() * 0.002
+
+  if(visible.length){
+    drawConnections(visible)
+    drawParticles(visible, t)
+  }
+
+  animId = requestAnimationFrame(draw)
+}
+</script>
+
+</body>
+</html>
