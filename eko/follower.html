@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
+
+<style>
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:black;
+  overflow:hidden;
+}
+
+video{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  object-fit:cover;
+  opacity:.95;
+  transform:scaleX(-1);
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+}
+
+/* start */
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:black;
+  color:white;
+  font-family:monospace;
+  font-size:28px;
+  cursor:pointer;
+  z-index:10;
+  gap:10px;
+}
+
+/* bouton fullscreen */
+#fs{
+  position:fixed;
+  bottom:12px;
+  right:14px;
+  font-size:20px;
+  color:#fff;
+  opacity:.6;
+  z-index:20;
+  cursor:pointer;
+}
+
+/* select cam */
+#camSelect{
+  position:fixed;
+  top:12px;
+  right:12px;
+  z-index:20;
+  background:#000;
+  color:#fff;
+  border:1px solid #444;
+  padding:4px;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="start">DÉMARRER</div>
+
+<div id="fs">•°○</div>
+<select id="camSelect"></select>
+
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+
+<script>
+const video = document.getElementById("video")
+const canvas = document.getElementById("canvas")
+const ctx = canvas.getContext("2d", { alpha:true })
+const startBtn = document.getElementById("start")
+const fsBtn = document.getElementById("fs")
+const camSelect = document.getElementById("camSelect")
+
+let model = null
+let segmentation = null
+let currentStream = null
+let started = false
+
+/* ---------- FULLSCREEN ---------- */
+fsBtn.onclick = () => {
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen()
+  }else{
+    document.exitFullscreen()
+  }
+}
+
+/* ---------- RESIZE ---------- */
+function resize(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+  canvas.width = innerWidth * dpr
+  canvas.height = innerHeight * dpr
+  canvas.style.width = innerWidth + "px"
+  canvas.style.height = innerHeight + "px"
+  ctx.setTransform(dpr,0,0,dpr,0,0)
+}
+resize()
+addEventListener("resize", resize)
+
+/* ---------- CAMERA LIST ---------- */
+async function listCameras(){
+  const devices = await navigator.mediaDevices.enumerateDevices()
+  const cams = devices.filter(d => d.kind === "videoinput")
+
+  camSelect.innerHTML = ""
+  cams.forEach((cam,i)=>{
+    const opt = document.createElement("option")
+    opt.value = cam.deviceId
+    opt.text = cam.label || "cam " + (i+1)
+    camSelect.appendChild(opt)
+  })
+}
+
+/* ---------- START CAMERA ---------- */
+async function startCamera(deviceId=null){
+
+  if(currentStream){
+    currentStream.getTracks().forEach(t=>t.stop())
+  }
+
+  const constraints = {
+    video: deviceId
+      ? { deviceId:{ exact:deviceId } }
+      : { facingMode:"user" }
+  }
+
+  const stream = await navigator.mediaDevices.getUserMedia(constraints)
+  currentStream = stream
+  video.srcObject = stream
+  await video.play()
+}
+
+/* switch caméra */
+camSelect.onchange = ()=>{
+  startCamera(camSelect.value)
+}
+
+/* ---------- START ---------- */
+startBtn.onclick = async ()=>{
+  if(started) return
+  started = true
+
+  await listCameras()
+  await startCamera()
+
+  await tf.setBackend("webgl")
+  await tf.ready()
+
+  model = await bodyPix.load({
+    architecture:"MobileNetV1",
+    outputStride:16,
+    multiplier:0.75,
+    quantBytes:2
+  })
+
+  startBtn.style.display="none"
+
+  detectLoop()
+  draw()
+}
+
+/* ---------- IA ---------- */
+async function detectLoop(){
+  while(started){
+    if(video.readyState >= 2 && model){
+      segmentation = await model.segmentPerson(video,{
+        flipHorizontal:true,
+        internalResolution:"low",
+        segmentationThreshold:.7
+      })
+    }
+    await new Promise(r=>setTimeout(r,90))
+  }
+}
+
+/* ---------- PARTICULES ---------- */
+const particles=[]
+const COUNT=80
+const symbols=["👍","$","🔥","❤️","💯"]
+
+function initParticles(){
+  for(let i=0;i<COUNT;i++){
+    particles.push({
+      x:Math.random()*innerWidth,
+      y:Math.random()*innerHeight,
+      vx:(Math.random()-.5)*0.2,
+      vy:(Math.random()-.5)*0.2,
+      size:12+Math.random()*14,
+      symbol:symbols[Math.floor(Math.random()*symbols.length)]
+    })
+  }
+}
+initParticles()
+
+function insideBody(x,y){
+  if(!segmentation) return false
+  const w=segmentation.width
+  const h=segmentation.height
+
+  const sx = (x/innerWidth)*w |0
+  const sy = (y/innerHeight)*h |0
+
+  return segmentation.data[sy*w+sx]===1
+}
+
+function draw(){
+  ctx.clearRect(0,0,innerWidth,innerHeight)
+
+  for(const p of particles){
+    p.x+=p.vx
+    p.y+=p.vy
+
+    if(!insideBody(p.x,p.y)){
+      p.x=Math.random()*innerWidth
+      p.y=Math.random()*innerHeight
+    }
+
+    ctx.font=p.size+"px sans-serif"
+    ctx.fillStyle="white"
+    ctx.fillText(p.symbol,p.x,p.y)
+  }
+
+  requestAnimationFrame(draw)
+}
+</script>
+
+</body>
+</html>
