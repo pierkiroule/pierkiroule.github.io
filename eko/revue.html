@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ados & Numérique — État de la littérature 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:   #F5F0E8;
+    --paper:   #EDE5D5;
+    --ink:     #1C1510;
+    --ink-m:   #4A3728;
+    --ink-l:   #8A7060;
+    --terre:   #C17A4A;
+    --sauge:   #7A9E7E;
+    --rouille: #A85C3A;
+    --ocre:    #C9A84C;
+    --rose:    #C4816A;
+    --alert:   #8B2020;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* ── HEADER ─────────────────────────── */
+  header {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 3rem 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: var(--terre);
+    opacity: .12;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 30%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--sauge);
+    opacity: .10;
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .18em;
+    color: var(--terre);
+    text-transform: uppercase;
+    margin-bottom: .7rem;
+  }
+  h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: .5rem;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--terre);
+  }
+  .header-sub {
+    color: rgba(245,240,232,.6);
+    font-size: 12.5px;
+    margin-top: .8rem;
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .header-sub span {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+  }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--terre); display: inline-block; }
+
+  /* ── LAYOUT ─────────────────────────── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  /* ── SECTION TITLES ─────────────────── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--ink-l);
+    margin-bottom: .5rem;
+  }
+
+  /* ── CARDS ───────────────────────────── */
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    border: 1px solid rgba(0,0,0,.07);
+    box-shadow: 0 2px 12px rgba(28,21,16,.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent, var(--terre));
+  }
+  .card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: .7rem;
+    line-height: 1.3;
+  }
+  .card h2 .num {
+    font-family: 'DM Mono', monospace;
+    font-size: .7rem;
+    color: var(--ink-l);
+    margin-right: .4rem;
+    vertical-align: middle;
+  }
+
+  /* ── FULL-WIDTH INTRO CARD ───────────── */
+  .card-intro {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    padding: 1.6rem 1.8rem;
+  }
+  .card-intro::before { background: var(--terre); }
+  .card-intro p { color: rgba(245,240,232,.8); font-size: 13.5px; }
+  .card-intro strong { color: var(--cream); }
+
+  /* ── 2-COL GRID ─────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── STAT BLOCK ─────────────────────── */
+  .stats-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: .8rem 0;
+  }
+  .stat {
+    flex: 1;
+    min-width: 90px;
+    text-align: center;
+    padding: .7rem .5rem;
+    background: var(--cream);
+    border-radius: 8px;
+  }
+  .stat-n {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent, var(--terre));
+    display: block;
+  }
+  .stat-l {
+    font-size: 10.5px;
+    color: var(--ink-m);
+    line-height: 1.3;
+    margin-top: .25rem;
+  }
+  .stat-src {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    color: var(--ink-l);
+    margin-top: .2rem;
+  }
+
+  /* ── LIST ────────────────────────────── */
+  ul.clean {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    margin-top: .6rem;
+  }
+  ul.clean li {
+    padding-left: 1rem;
+    position: relative;
+    font-size: 13px;
+    color: var(--ink-m);
+    line-height: 1.45;
+  }
+  ul.clean li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent, var(--terre));
+    font-weight: 500;
+  }
+
+  /* ── ALERT / NUANCE BOX ─────────────── */
+  .nuance {
+    background: rgba(139,32,32,.06);
+    border: 1px solid rgba(139,32,32,.18);
+    border-radius: 7px;
+    padding: .65rem .85rem;
+    font-size: 12px;
+    color: var(--alert);
+    margin-top: .8rem;
+    line-height: 1.4;
+  }
+  .nuance strong { font-weight: 500; }
+
+  /* ── MEDIATOR TABLE ──────────────────── */
+  .med-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .6rem;
+    margin-top: .8rem;
+  }
+  .med-item {
+    background: var(--cream);
+    border-radius: 7px;
+    padding: .65rem .85rem;
+    border-left: 3px solid var(--accent-m, var(--sauge));
+  }
+  .med-title {
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--ink);
+    margin-bottom: .2rem;
+  }
+  .med-desc {
+    font-size: 11.5px;
+    color: var(--ink-l);
+    line-height: 1.4;
+  }
+
+  /* ── CONCLUSION ──────────────────────── */
+  .conclusion {
+    background: linear-gradient(135deg, var(--ink) 0%, #2C1F14 100%);
+    color: var(--cream);
+    border-radius: 10px;
+    padding: 1.8rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .conclusion::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; right: -50px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--sauge);
+    opacity: .08;
+  }
+  .conclusion h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+    color: var(--cream);
+  }
+  .conclusion .thesis {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: rgba(245,240,232,.85);
+    border-left: 3px solid var(--terre);
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+  }
+  .pillars {
+    display: flex;
+    gap: .7rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  .pillar {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 20px;
+    padding: .35rem .85rem;
+    font-size: 11.5px;
+    color: rgba(245,240,232,.75);
+  }
+
+  /* ── SOURCES ─────────────────────────── */
+  .sources {
+    background: var(--paper);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    border: 1px solid rgba(0,0,0,.07);
+  }
+  .sources h3 {
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--ink-l);
+    margin-bottom: .8rem;
+  }
+  .source-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: .4rem;
+  }
+  .source-item {
+    font-size: 11px;
+    color: var(--ink-m);
+    line-height: 1.4;
+    padding: .35rem .5rem;
+    border-radius: 5px;
+    background: rgba(255,255,255,.5);
+    border-left: 2px solid var(--ocre);
+  }
+  .source-item strong {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ── BADGE ───────────────────────────── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .2rem .55rem;
+    border-radius: 3px;
+    margin-bottom: .6rem;
+  }
+  .badge-new { background: rgba(168,92,58,.12); color: var(--rouille); border: 1px solid rgba(168,92,58,.25); }
+  .badge-alert { background: rgba(139,32,32,.1); color: var(--alert); border: 1px solid rgba(139,32,32,.2); }
+  .badge-ok { background: rgba(122,158,126,.12); color: var(--sauge); border: 1px solid rgba(122,158,126,.25); }
+
+  /* ── ARROW INSIGHT ───────────────────── */
+  .insight {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    padding: .7rem .9rem;
+    background: rgba(201,168,76,.08);
+    border: 1px solid rgba(201,168,76,.25);
+    border-radius: 7px;
+    margin-top: .8rem;
+  }
+  .insight-arrow {
+    font-size: 1rem;
+    color: var(--ocre);
+    flex-shrink: 0;
+    margin-top: .05rem;
+  }
+  .insight p {
+    font-size: 12.5px;
+    color: var(--ink-m);
+    line-height: 1.45;
+  }
+  .insight strong { color: var(--ink); }
+
+  /* ── DIVIDER ─────────────────────────── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,.1), transparent);
+  }
+
+  /* ── AMPLIFIER VIZ ───────────────────── */
+  .amplifier {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin-top: .8rem;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 12px;
+  }
+  .amp-col {
+    flex: 1;
+    padding: .7rem .8rem;
+  }
+  .amp-col.left  { background: rgba(122,158,126,.12); border: 1px solid rgba(122,158,126,.25); border-right: none; }
+  .amp-col.center {
+    flex: 0 0 32px;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cream);
+    font-size: 1rem;
+  }
+  .amp-col.right { background: rgba(168,92,58,.10); border: 1px solid rgba(168,92,58,.25); border-left: none; }
+  .amp-col-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: .35rem;
+  }
+  .amp-col.left  .amp-col-label { color: var(--sauge); }
+  .amp-col.right .amp-col-label { color: var(--rouille); }
+  .amp-col ul { list-style: none; }
+  .amp-col ul li { font-size: 11.5px; color: var(--ink-m); line-height: 1.5; }
+  .amp-col ul li::before { content: '· '; color: var(--ink-l); }
+
+  /* Animations */
+  .card, .conclusion, .sources {
+    animation: fadeUp .5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card:nth-child(1) { animation-delay: .05s; }
+  .card:nth-child(2) { animation-delay: .1s; }
+  .card:nth-child(3) { animation-delay: .15s; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-tag">État de la littérature scientifique. synthèse par P-H Garnier</div>
+    <h1>Ados &amp; <em>numérique</em><br>Santé globale</h1>
+    <div class="header-sub">
+      <span><span class="dot"></span> Synthèse 2025–2026</span>
+      <span><span class="dot"></span> Anses · OMS · AP-HP · Common Sense Media</span>
+      <span><span class="dot"></span> &gt; 1 000 études analysées</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- INTRO -->
+  <div class="card card-intro" style="--accent: var(--terre);">
+    <p><strong>Constat central :</strong> Le numérique n'est plus un outil mais un <strong>milieu de développement</strong>. Ses effets sur la santé des adolescents sont <strong>réels, complexes et non linéaires</strong> — ni cause unique, ni facteur neutre. Ils dépendent du type d'usage, du contexte, et de la vulnérabilité individuelle.</p>
+  </div>
+
+  <!-- EXPOSITION -->
+  <div class="card" style="--accent: var(--sauge);">
+    <div class="section-label">1 — Exposition</div>
+    <h2>Un contexte normatif inédit</h2>
+    <div class="stats-row">
+      <div class="stat" style="--accent: var(--sauge);">
+        <span class="stat-n">≈90%</span>
+        <div class="stat-l">des 12–17 ans<br>usage smartphone quotidien</div>
+        <div class="stat-src">Anses, 2025</div>
+      </div>
+      <div class="stat" style="--accent: var(--terre);">
+        <span class="stat-n">11 ans</span>
+        <div class="stat-l">âge moyen du<br>1er smartphone</div>
+        <div class="stat-src">OPEN, oct. 2024</div>
+      </div>
+      <div class="stat" style="--accent: var(--ocre);">
+        <span class="stat-n">34%</span>
+        <div class="stat-l">jouent aux jeux vidéo<br>chaque jour</div>
+        <div class="stat-src">OMS/HBSC 2022, n=280k</div>
+      </div>
+      <div class="stat" style="--accent: var(--rouille);">
+        <span class="stat-n">22%</span>
+        <div class="stat-l">≥ 4h de jeu<br>les jours de jeu</div>
+        <div class="stat-src">OMS/HBSC 2022</div>
+      </div>
+    </div>
+    <div class="nuance">
+      <strong>⚠ Nuance sur l'usage problématique des jeux :</strong> de 1,6 % (critères diagnostiques stricts, étude européenne 7 pays, n=12 938) à 12 % (estimation large OMS Europe) selon les critères retenus. L'usage problématique des réseaux sociaux progresse : 7 % (2018) → 11 % (2022) — OMS Europe.
+    </div>
+  </div>
+
+  <!-- SANTÉ MENTALE + SOMMEIL grid -->
+  <div class="grid-2">
+
+    <div class="card" style="--accent: var(--rouille);">
+      <div class="section-label">2 — Santé mentale</div>
+      <h2>Association forte,<br>causalité complexe</h2>
+      <ul class="clean">
+        <li>Dépression chez ados : <strong>2 % (2014) → 9 % (2021)</strong>, particulièrement chez les filles <span style="font-size:10px;color:var(--ink-l)">(AP-HP/Inserm, PLOS Medicine 2025)</span></li>
+        <li>Usage excessif RS associé à 590 000 cas supplémentaires de dépression et 799 décès par suicide sur une génération de 18,6M d'ados français <span style="font-size:10px;color:var(--ink-l)">(micro-simulation, Hoertel et al., 2025 — pas de causalité directe)</span></li>
+        <li>Anxiété, automutilation, idées suicidaires : facteurs contributifs confirmés <span style="font-size:10px;color:var(--ink-l)">(Anses, dec. 2025)</span></li>
+      </ul>
+      <div class="insight" style="margin-top:.7rem;">
+        <div class="insight-arrow">↔</div>
+        <p><strong>Relation bidirectionnelle :</strong> mal-être → usage intensif → aggravation. Les filles sont davantage exposées via les plateformes visuelles (Instagram, TikTok, Snap).</p>
+      </div>
+    </div>
+
+    <div class="card" style="--accent: var(--ocre);">
+      <div class="section-label">3 — Sommeil</div>
+      <h2>Le médiateur central</h2>
+      <ul class="clean">
+        <li>Écrans avant le coucher → <strong>endormissement retardé + durée réduite</strong> <span style="font-size:10px;color:var(--ink-l)">(JAMA 2024)</span></li>
+        <li>Arrêter les écrans après 21h pendant 15 jours → augmentation significative du sommeil + amélioration de l'attention <span style="font-size:10px;color:var(--ink-l)">(Perrault et al., UNIGE/HUG, Sleep)</span></li>
+        <li><strong>Plus d'1 ado sur 2</strong> présente au moins un trouble du sommeil <span style="font-size:10px;color:var(--ink-l)">(Réseau Morphée / ORS IdF)</span></li>
+      </ul>
+      <div class="insight">
+        <div class="insight-arrow">→</div>
+        <p>Le sommeil est le <strong>médiateur pivot</strong> entre usage numérique et santé mentale. Intervenir sur le sommeil est plus efficient que sur le "temps d'écran" global.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- IMAGE DE SOI + COGNITION -->
+  <div class="grid-2">
+
+    <div class="card" style="--accent: var(--rose);">
+      <div class="section-label">4 — Image &amp; identité</div>
+      <h2>Corps et comparaison sociale</h2>
+      <ul class="clean">
+        <li>Comparaison sociale ascendante permanente → <strong>insatisfaction corporelle</strong></li>
+        <li>Corrélation avec les <strong>TCA</strong> confirmée, en particulier chez les adolescentes</li>
+        <li>Selfies et contenus idéalisés : mécanismes d'internalisation des idéaux irréalistes</li>
+        <li>Effet plus marqué sur les plateformes <strong>hautement visuelles</strong></li>
+      </ul>
+      <div style="margin-top:.6rem; font-size:11px; color:var(--ink-l);">Anses, 2025 (expertise collective)</div>
+    </div>
+
+    <div class="card" style="--accent: var(--terre);">
+      <div class="section-label">5 — Cognition &amp; attention</div>
+      <h2>Ce n'est pas juste<br>"le temps d'écran"</h2>
+      <ul class="clean">
+        <li>Jeux vidéo : <strong>effet positif</strong> sur développement cognitif (8–10 ans) <span style="font-size:10px;color:var(--ink-l)">(cohorte ABCD, IRM fonctionnelle)</span></li>
+        <li>Réseaux sociaux passifs : <strong>fragmentation attentionnelle</strong></li>
+        <li>L'effet dépend du <strong>type d'usage</strong> (actif/créatif vs passif/consumériste)</li>
+      </ul>
+      <div class="nuance" style="margin-top:.6rem;">
+        <strong>→</strong> "Temps d'écran" est une mesure trop grossière. Le type d'interaction, le contenu et le contexte sont déterminants.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AMPLIFICATEUR -->
+  <div class="card" style="--accent: var(--sauge);">
+    <div class="section-label">6 — Effets positifs</div>
+    <h2>Le numérique comme amplificateur — dans les deux sens</h2>
+    <div class="amplifier">
+      <div class="amp-col left">
+        <div class="amp-col-label">Ressources amplifiées</div>
+        <ul>
+          <li>Soutien social &amp; communautés d'entraide</li>
+          <li>Expression identitaire et créativité</li>
+          <li>Accès à l'information en santé mentale</li>
+          <li>Apprentissage et curiosité intellectuelle</li>
+        </ul>
+      </div>
+      <div class="amp-col center">⇄</div>
+      <div class="amp-col right">
+        <div class="amp-col-label">Vulnérabilités amplifiées</div>
+        <ul>
+          <li>Fragilité psychique préexistante</li>
+          <li>Isolement et cyberharcèlement</li>
+          <li>Exposition aux conduites à risque</li>
+          <li>Désorganisation des routines de vie</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:.6rem; font-size:11.5px; color:var(--ink-l);">→ Le numérique n'est pas bon ou mauvais en soi : il <em>réfléchit et intensifie</em> ce qui existe déjà.</div>
+  </div>
+
+  <!-- IA RELATIONNELLE -->
+  <div class="card" style="--accent: var(--alert);">
+    <span class="badge badge-new">◈ Rupture 2025</span>
+    <div class="section-label">7 — IA relationnelle</div>
+    <h2>La mutation en cours</h2>
+    <p style="font-size:13px; color:var(--ink-m); margin-bottom:.7rem;">On passe des <em>réseaux sociaux</em> (interactions humaines médiées) aux <em>relations artificielles personnalisées</em> (entités simulant l'empathie, disponibles 24/7, conçues pour maximiser l'engagement).</p>
+    <div class="grid-2" style="gap:.6rem;">
+      <div style="background:var(--cream); border-radius:7px; padding:.7rem .8rem;">
+        <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--ink-l); margin-bottom:.3rem;">DONNÉES</div>
+        <div style="font-size:12.5px; color:var(--ink-m); line-height:1.5;"><strong style="color:var(--ink);">72 %</strong> des ados américains ont déjà interagi avec un compagnon IA. ~<strong style="color:var(--ink);">1/3</strong> préfèrent un chatbot à un humain pour les sujets sensibles.</div>
+        <div style="font-size:10px; color:var(--ink-l); margin-top:.3rem;">Common Sense Media, 2025</div>
+      </div>
+      <div style="background:var(--cream); border-radius:7px; padding:.7rem .8rem;">
+        <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--ink-l); margin-bottom:.3rem;">RISQUES DOCUMENTÉS</div>
+        <ul class="clean" style="--accent: var(--alert);">
+          <li>Attachement émotionnel artificiel &amp; dépendance</li>
+          <li>Confusion réel / simulé</li>
+          <li>Conseils dangereux (suicide, TCA, sexualité)</li>
+          <li>Isolement renforcé</li>
+        </ul>
+      </div>
+    </div>
+    <div class="nuance" style="margin-top:.7rem; background:rgba(139,32,32,.05); border-color:rgba(139,32,32,.15);">
+      <strong>Cas extrêmes documentés :</strong> décès par suicide liés à Character.AI — recevabilité judiciaire établie (mai 2025). Common Sense Media / Stanford Brainstorm recommandent l'<strong>interdiction des compagnons IA aux mineurs</strong>.
+    </div>
+  </div>
+
+  <!-- MODÈLE MÉDIATEURS -->
+  <div class="card" style="--accent: var(--ocre);">
+    <div class="section-label">8 — Modèle explicatif dominant</div>
+    <h2>Effets indirects via médiateurs</h2>
+    <p style="font-size:12.5px; color:var(--ink-m); margin-bottom:.7rem;">Les effets du numérique sur la santé ne sont pas directs. Ils transitent par des <strong>médiateurs intermédiaires</strong> :</p>
+    <div class="med-grid">
+      <div class="med-item" style="--accent-m: var(--ocre);">
+        <div class="med-title">💤 Sommeil</div>
+        <div class="med-desc">Retard → déficit → troubles cognitifs et émotionnels en cascade</div>
+      </div>
+      <div class="med-item" style="--accent-m: var(--sauge);">
+        <div class="med-title">🏃 Activité physique</div>
+        <div class="med-desc">Sédentarité induite → effets métaboliques et sur la régulation de l'humeur</div>
+      </div>
+      <div class="med-item" style="--accent-m: var(--rouille);">
+        <div class="med-title">👥 Climat social</div>
+        <div class="med-desc">Cyberharcèlement, pression des pairs, comparaison permanente</div>
+      </div>
+      <div class="med-item" style="--accent-m: var(--rose);">
+        <div class="med-title">🧠 Vulnérabilité psychique</div>
+        <div class="med-desc">Préexistante → usage intensif → spirale d'aggravation bidirectionnelle</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion">
+    <h2>Conclusion scientifique</h2>
+    <div class="thesis">
+      Le numérique est un <strong>facteur de modulation des trajectoires de développement</strong>, pas un déterminant unique. Il amplifie les ressources et vulnérabilités préexistantes, reconfigure l'attention, l'identité et le rapport au corps — et introduit depuis 2024–2025 une rupture qualitative avec l'IA relationnelle.
+    </div>
+    <p style="font-size:12.5px; color:rgba(245,240,232,.7); margin-bottom:.8rem;">L'enjeu n'est pas de supprimer mais d'<strong style="color:var(--cream);">apprendre à habiter le numérique</strong> — par la régulation, l'éducation critique, et l'accompagnement adulte.</p>
+    <div class="pillars">
+      <span class="pillar">Sommeil — médiateur central</span>
+      <span class="pillar">Type d'usage, pas temps total</span>
+      <span class="pillar">Bidirectionnalité des effets</span>
+      <span class="pillar">IA relationnelle — rupture 2025</span>
+      <span class="pillar">Accompagnement adulte protecteur</span>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="sources">
+    <h3>Sources principales</h3>
+    <div class="source-list">
+      <div class="source-item"><strong>Anses, déc. 2025</strong>Usages des réseaux sociaux et santé des adolescents. Expertise collective, &gt;1 000 études.</div>
+      <div class="source-item"><strong>Hoertel et al., PLOS Medicine, oct. 2025</strong>Micro-simulation sur 18,6M d'ados français. AP-HP / Inserm / Univ. Paris Cité.</div>
+      <div class="source-item"><strong>OMS Europe — HBSC 2022</strong>Enquête santé ados, 280 000 participants, 44 pays. Rapport sept. 2024.</div>
+      <div class="source-item"><strong>Common Sense Media / Stanford Brainstorm, avr. 2025</strong>Rapport sur les compagnons IA et les mineurs.</div>
+      <div class="source-item"><strong>Crédoc / ARCEP, 2024–2025</strong>Baromètre du numérique. Équipement et usages des jeunes.</div>
+      <div class="source-item"><strong>Perrault et al. — UNIGE / HUG</strong>Restriction écrans après 21h : sommeil et attention. Journal Sleep.</div>
+      <div class="source-item"><strong>Cohorte ABCD (NIH)</strong>IRM fonctionnelle, jeux vidéo et développement cognitif 8–10 ans.</div>
+      <div class="source-item"><strong>OPEN (ONPE), oct. 2024</strong>Âge premier smartphone : 11 ans 4 mois. Observatoire parentalité numérique.</div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
