@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<title>Main Résonante Mycélium</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#000;
+overflow:hidden;
+font-family:'Orbitron',sans-serif;
+touch-action:none;
+}
+
+canvas{
+position:fixed;
+inset:0;
+}
+
+video{
+position:fixed;
+inset:0;
+width:100vw;
+height:100vh;
+object-fit:cover;
+opacity:.45;
+}
+
+/* status discret */
+#ui{
+position:fixed;
+top:16px;
+left:16px;
+font-size:10px;
+letter-spacing:3px;
+color:#a5b4fc;
+z-index:10;
+}
+
+/* bouton fullscreen minimal */
+#fs{
+position:fixed;
+top:16px;
+right:16px;
+font-size:12px;
+color:rgba(180,200,255,.5);
+cursor:pointer;
+z-index:20;
+user-select:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="ui">Eko — <span id="status">Init...</span></div>
+<div id="fs">•°○</div>
+
+<video id="video" playsinline></video>
+<canvas id="c"></canvas>
+
+<script>
+
+const canvas=document.getElementById("c")
+const ctx=canvas.getContext("2d")
+const video=document.getElementById("video")
+const statusEl=document.getElementById("status")
+const fsBtn=document.getElementById("fs")
+
+/* fullscreen toggle */
+fsBtn.onclick=()=>{
+
+const el=document.documentElement
+
+if(!document.fullscreenElement){
+if(el.requestFullscreen) el.requestFullscreen()
+}else{
+if(document.exitFullscreen) document.exitFullscreen()
+}
+
+}
+
+let W,H
+let particles=[]
+let present=false
+let handOpen=0
+
+function resize(){
+W=canvas.width=innerWidth
+H=canvas.height=innerHeight
+}
+resize()
+addEventListener("resize",resize)
+
+const smoothed=Array.from({length:21},()=>({x:.5,y:.5,z:0}))
+const LERP=.25
+
+class Particle{
+
+constructor(x,y){
+this.x=x
+this.y=y
+this.vx=(Math.random()-.5)*2
+this.vy=(Math.random()-.5)*2
+this.life=1
+this.size=Math.random()*2+1
+}
+
+update(){
+this.x+=this.vx
+this.y+=this.vy
+this.life-=.01
+}
+
+draw(){
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2)
+ctx.fillStyle=`rgba(200,220,255,${this.life})`
+ctx.fill()
+}
+
+}
+
+const hands=new Hands({
+locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+})
+
+hands.setOptions({
+maxNumHands:1,
+modelComplexity:1,
+minDetectionConfidence:.8,
+minTrackingConfidence:.8
+})
+
+hands.onResults((results)=>{
+
+if(results.multiHandLandmarks && results.multiHandLandmarks.length){
+
+present=true
+statusEl.innerText="•°○"
+
+const detected=results.multiHandLandmarks[0]
+
+detected.forEach((pt,i)=>{
+
+smoothed[i].x+=(pt.x-smoothed[i].x)*LERP
+smoothed[i].y+=(pt.y-smoothed[i].y)*LERP
+smoothed[i].z+=(pt.z-smoothed[i].z)*LERP
+
+})
+
+const dx=smoothed[12].x-smoothed[0].x
+const dy=smoothed[12].y-smoothed[0].y
+const dist=Math.sqrt(dx*dx+dy*dy)
+
+let target=Math.min(Math.max((dist-.15)/.4,0),1)
+handOpen+=(target-handOpen)*.1
+
+if(handOpen>.2){
+
+;[4,8,12,16,20].forEach(i=>{
+
+if(Math.random()<.4){
+const p=smoothed[i]
+particles.push(new Particle(p.x*W,p.y*H))
+}
+
+})
+
+}
+
+}else{
+
+present=false
+statusEl.innerText="•°○"
+handOpen*=.95
+
+}
+
+})
+
+const camera=new Camera(video,{
+onFrame:async()=>{await hands.send({image:video})},
+width:1280,
+height:720
+})
+
+camera.start()
+
+const fingers=[
+[0,1,2,3,4],
+[0,5,6,7,8],
+[0,9,10,11,12],
+[0,13,14,15,16],
+[0,17,18,19,20]
+]
+
+function drawFinger(points){
+
+ctx.beginPath()
+
+points.forEach((i,k)=>{
+
+const p=smoothed[i]
+
+const x=(1-p.x)*W
+const y=p.y*H
+
+if(k===0){
+ctx.moveTo(x,y)
+}else{
+
+const prev=smoothed[points[k-1]]
+
+const px=(1-prev.x)*W
+const py=prev.y*H
+
+const cx=(px+x)/2
+const cy=(py+y)/2
+
+ctx.quadraticCurveTo(px,py,cx,cy)
+
+}
+
+})
+
+ctx.stroke()
+
+}
+
+function drawMycelium(){
+
+ctx.lineCap="round"
+ctx.lineWidth=2
+
+const t=Date.now()*0.002
+
+for(let i=0;i<21;i++){
+
+const p=smoothed[i]
+
+const x1=p.x*W
+const y1=p.y*H
+
+const x2=(1-p.x)*W
+const y2=p.y*H
+
+const midx=(x1+x2)/2
+const midy=(y1+y2)/2
+
+const offset=Math.sin(t+i)*30
+
+ctx.beginPath()
+
+ctx.moveTo(x1,y1)
+
+ctx.quadraticCurveTo(midx,midy+offset,x2,y2)
+
+const alpha=.12+.18*Math.sin(t+i)
+
+ctx.strokeStyle=`rgba(170,210,255,${alpha})`
+
+ctx.stroke()
+
+}
+
+}
+
+function draw(){
+
+ctx.clearRect(0,0,W,H)
+
+particles=particles.filter(p=>p.life>0)
+
+particles.forEach(p=>{
+p.update()
+p.draw()
+})
+
+if(present){
+
+ctx.shadowBlur=20
+ctx.shadowColor="rgba(120,170,255,.5)"
+
+drawMycelium()
+
+ctx.shadowBlur=0
+
+ctx.lineCap="round"
+ctx.lineJoin="round"
+
+const glow=15+Math.sin(Date.now()*0.004)*5
+
+ctx.shadowBlur=glow
+ctx.shadowColor="rgba(140,170,255,.8)"
+
+ctx.lineWidth=8
+ctx.strokeStyle="rgba(140,170,255,.25)"
+
+fingers.forEach(drawFinger)
+
+ctx.shadowBlur=0
+
+ctx.lineWidth=3
+ctx.strokeStyle="rgba(230,240,255,.9)"
+
+fingers.forEach(drawFinger)
+
+smoothed.forEach((pt,i)=>{
+
+const x=(1-pt.x)*W
+const y=pt.y*H
+
+const tip=[4,8,12,16,20].includes(i)
+
+ctx.beginPath()
+ctx.arc(x,y,tip?6:4,0,Math.PI*2)
+
+if(tip){
+ctx.shadowBlur=40
+ctx.shadowColor="blue"
+ctx.fillStyle="white"
+}else{
+ctx.fillStyle="rgba(160,170,255,.8)"
+}
+
+ctx.fill()
+ctx.shadowBlur=0
+
+})
+
+}
+
+requestAnimationFrame(draw)
+
+}
+
+draw()
+
+</script>
+
+</body>
+</html>
