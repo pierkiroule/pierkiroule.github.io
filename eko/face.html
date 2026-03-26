@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+<style>
+html,body{
+  margin:0;
+  background:#000;
+  overflow:hidden;
+}
+
+canvas{
+  position:fixed;
+  inset:0;
+}
+</style>
+</head>
+
+<body>
+
+<input id="url" placeholder="URL VDO" style="position:fixed;z-index:10">
+<button onclick="start()" style="position:fixed;top:40px;z-index:10">GO</button>
+
+<video id="video" autoplay playsinline style="display:none"></video>
+<canvas id="canvas"></canvas>
+
+<script>
+const video = document.getElementById("video")
+const canvas = document.getElementById("canvas")
+const ctx = canvas.getContext("2d")
+
+let modelLoaded = false
+
+async function loadModels(){
+  await faceapi.nets.tinyFaceDetector.loadFromUri(
+    "https://cdn.jsdelivr.net/npm/face-api.js/weights"
+  )
+  modelLoaded = true
+}
+
+async function start(){
+  let url = document.getElementById("url").value
+  video.src = url + "&autostart&cleanoutput"
+
+  await loadModels()
+
+  video.onplay = loop
+}
+
+async function loop(){
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+
+  ctx.drawImage(video,0,0,canvas.width,canvas.height)
+
+  if(modelLoaded){
+
+    const detections = await faceapi.detectAllFaces(
+      video,
+      new faceapi.TinyFaceDetectorOptions()
+    )
+
+    detections.forEach(det=>{
+      const box = det.box
+
+      const x = box.x * (canvas.width / video.videoWidth)
+      const y = box.y * (canvas.height / video.videoHeight)
+      const w = box.width * (canvas.width / video.videoWidth)
+      const h = box.height * (canvas.height / video.videoHeight)
+
+      // 🔮 glow violet
+      ctx.save()
+      ctx.globalCompositeOperation = "lighter"
+      ctx.shadowBlur = 40
+      ctx.shadowColor = "rgba(140,0,255,0.9)"
+
+      ctx.strokeStyle = "rgba(160,80,255,0.8)"
+      ctx.lineWidth = 4
+
+      ctx.beginPath()
+      ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2)
+      ctx.stroke()
+
+      ctx.restore()
+    })
+  }
+
+  requestAnimationFrame(loop)
+}
+</script>
+
+</body>
+</html>
