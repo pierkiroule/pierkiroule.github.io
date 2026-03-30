@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETP en France — Mutations anthropologiques · P.H. Garnier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ── TOKENS ─────────────────────────────────────── */
+  :root {
+    --terra:   #7C3228;
+    --rust:    #A8432F;
+    --amber:   #B8842A;
+    --sage:    #516B5A;
+    --sage-lt: #6B8C7A;
+    --ink:     #1A1410;
+    --ink-mid: #3D342C;
+    --ink-lt:  #6B5E54;
+    --sand:    #EDE8DF;
+    --cream:   #F8F4ED;
+    --paper:   #FDFAF5;
+    --rule:    #C8BFB2;
+    --col-w:   780px;
+    --serif:   'Source Serif 4', Georgia, serif;
+    --display: 'Playfair Display', Georgia, serif;
+    --mono:    'JetBrains Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── GRAIN TEXTURE ──────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 9999; opacity: 0.6;
+  }
+
+  /* ── PROGRESS BAR ───────────────────────────────── */
+  #progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--terra); width: 0%; z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  header {
+    background: var(--ink);
+    padding: 0;
+    position: sticky; top: 0; z-index: 100;
+    border-bottom: 2px solid var(--terra);
+  }
+  .header-inner {
+    max-width: var(--col-w);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex; align-items: baseline; gap: 20px;
+  }
+  .header-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--amber);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .header-author {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #888;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── HERO ───────────────────────────────────────── */
+  .hero {
+    background: var(--ink);
+    padding: 80px 24px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: 'ETP';
+    position: absolute; right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--display);
+    font-size: 220px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.03);
+    letter-spacing: -10px;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .hero-inner {
+    max-width: var(--col-w);
+    margin: 0 auto;
+    position: relative;
+  }
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--amber);
+  }
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(34px, 5vw, 52px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: #9A8F86;
+    font-style: italic;
+    line-height: 1.6;
+    max-width: 560px;
+    border-left: 2px solid var(--terra);
+    padding-left: 16px;
+    margin-top: 24px;
+  }
+  .hero-meta {
+    margin-top: 36px;
+    display: flex; gap: 32px; align-items: center;
+    flex-wrap: wrap;
+  }
+  .hero-author {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+  }
+  .hero-tags {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    padding: 3px 10px;
+    border: 1px solid #3A3028;
+    color: #6B5E54;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN ───────────────────────────────────────── */
+  main {
+    max-width: var(--col-w);
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── INTRO BLOC ─────────────────────────────────── */
+  .intro {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .intro p {
+    font-size: 18px;
+    line-height: 1.85;
+    color: var(--ink-mid);
+    max-width: 660px;
+  }
+  .intro p + p { margin-top: 16px; }
+
+  /* ── FORMULE CLE ────────────────────────────────── */
+  .formule {
+    background: var(--ink);
+    padding: 32px 36px;
+    margin: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .formule::before {
+    content: '"';
+    position: absolute; left: 20px; top: -10px;
+    font-family: var(--display);
+    font-size: 120px;
+    color: var(--terra);
+    opacity: 0.3;
+    line-height: 1;
+  }
+  .formule blockquote {
+    font-family: var(--display);
+    font-size: 20px;
+    font-style: italic;
+    color: #fff;
+    line-height: 1.55;
+    position: relative;
+    border-left: 3px solid var(--amber);
+    padding-left: 20px;
+  }
+  .formule cite {
+    display: block;
+    margin-top: 12px;
+    font-style: normal;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.12em;
+  }
+
+  /* ── SECTION TITLE ──────────────────────────────── */
+  .section-title {
+    padding: 52px 0 8px;
+  }
+  .section-title .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title .label::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(to right, var(--rule), transparent);
+  }
+  .section-title h2 {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  /* ── TIMELINE ───────────────────────────────────── */
+  .timeline {
+    padding: 32px 0 16px;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 0 28px;
+    margin-bottom: 0;
+    position: relative;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .timeline-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ligne verticale */
+  .timeline-item::after {
+    content: '';
+    position: absolute;
+    left: 89px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+  .timeline-item:last-child::after { display: none; }
+
+  .tl-year {
+    text-align: right;
+    padding: 28px 0 0;
+  }
+  .year-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--terra);
+    background: var(--sand);
+    padding: 4px 10px;
+    border-left: 3px solid var(--terra);
+    line-height: 1.4;
+  }
+
+  .tl-content {
+    padding: 28px 0 36px 0;
+  }
+
+  .tl-law {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+
+  .tl-desc {
+    font-size: 15px;
+    color: var(--ink-lt);
+    line-height: 1.7;
+    margin-bottom: 16px;
+    max-width: 560px;
+  }
+
+  .mutation-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  .mutation-pill {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    flex-direction: column;
+  }
+
+  .pill-label {
+    font-family: var(--mono);
+    font-size: 8.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    font-weight: 600;
+  }
+  .pill-label.mutation { background: var(--terra); color: #fff; }
+  .pill-label.anthropo { background: var(--sage); color: #fff; }
+
+  .pill-content {
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 8px 12px 10px;
+    max-width: 300px;
+    border: 1px solid;
+  }
+  .pill-content.mutation {
+    border-color: var(--terra);
+    color: var(--terra);
+    background: #FDF8F6;
+    font-style: italic;
+    font-family: var(--display);
+    font-size: 14px;
+  }
+  .pill-content.anthropo {
+    border-color: var(--sage);
+    color: var(--sage2, #3D5C4A);
+    background: #F4F8F5;
+    font-size: 13px;
+  }
+
+  /* ── LES 3 BASCULES ─────────────────────────────── */
+  .bascules {
+    background: var(--sand);
+    padding: 40px 36px;
+    margin: 48px 0;
+  }
+  .bascules h3 {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .bascule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .bascule-col {
+    background: var(--paper);
+  }
+  .bascule-head {
+    background: var(--ink);
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+  .bascule-body {
+    padding: 16px;
+  }
+  .bascule-step {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--ink-mid);
+  }
+  .bascule-step::before {
+    content: '→';
+    color: var(--terra);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .bascule-arrow {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--terra);
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--rule);
+    padding-top: 10px;
+  }
+
+  /* ── TABLEAU SYNTHESE ───────────────────────────── */
+  .synthese-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 40px;
+    font-size: 14px;
+  }
+  .synthese-table th {
+    background: var(--ink);
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .synthese-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .synthese-table tr:nth-child(even) td { background: var(--sand); }
+  .synthese-table .td-year {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--terra);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .synthese-table .td-status {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .synthese-table .td-mutation {
+    color: var(--ink-lt);
+    font-size: 13px;
+  }
+
+  /* ── TENSIONS ───────────────────────────────────── */
+  .tensions {
+    padding: 40px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .tensions h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .tension-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .tension-item {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    align-items: center;
+    gap: 0;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+  }
+  .t-left, .t-right {
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .t-left {
+    color: var(--terra);
+    font-weight: 600;
+    font-family: var(--serif);
+    border-right: 1px solid var(--rule);
+  }
+  .t-right {
+    color: var(--sage2, #3D5C4A);
+    font-weight: 600;
+    border-left: 1px solid var(--rule);
+  }
+  .t-vs {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--ink-lt);
+    letter-spacing: 0.1em;
+  }
+  .tension-caption {
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--ink-lt);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ── FOOTER ─────────────────────────────────────── */
+  footer {
+    background: var(--ink);
+    padding: 36px 24px;
+    border-top: 2px solid var(--terra);
+  }
+  .footer-inner {
+    max-width: var(--col-w);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-sig {
+    font-family: var(--display);
+    font-style: italic;
+    color: #fff;
+    font-size: 17px;
+  }
+  .footer-sig span {
+    display: block;
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.12em;
+    margin-top: 4px;
+  }
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 0.08em;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* ── SCROLL INDICATOR ───────────────────────────── */
+  .toc {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 50;
+  }
+  .toc-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--rule);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    padding: 0;
+  }
+  .toc-dot.active {
+    background: var(--terra);
+    transform: scale(1.5);
+  }
+  @media (max-width: 860px) { .toc { display: none; } }
+
+  /* ── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 640px) {
+    .timeline-item { grid-template-columns: 70px 1fr; gap: 0 16px; }
+    .timeline-item::after { left: 69px; }
+    .mutation-row { flex-direction: column; gap: 8px; }
+    .bascule-grid { grid-template-columns: 1fr; }
+    .tension-item { grid-template-columns: 1fr; }
+    .t-vs { display: none; }
+    .t-left { border-right: none; border-bottom: 1px solid var(--rule); }
+    .t-right { border-left: none; }
+    footer .footer-inner { flex-direction: column; align-items: flex-start; }
+    .footer-note { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- TOC dots -->
+<nav class="toc" aria-label="Navigation rapide">
+  <button class="toc-dot active" data-target="hero" title="Titre"></button>
+  <button class="toc-dot" data-target="intro" title="Introduction"></button>
+  <button class="toc-dot" data-target="timeline" title="Chronologie"></button>
+  <button class="toc-dot" data-target="bascules" title="Bascules"></button>
+  <button class="toc-dot" data-target="synthese" title="Synthèse"></button>
+  <button class="toc-dot" data-target="tensions" title="Tensions"></button>
+</nav>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-title">ETP · France · Mutations anthropologiques</div>
+    <div class="header-author">P.H. Garnier, Psychologue</div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Synthèse historique &amp; anthropologique</div>
+    <h1>Histoire &amp; enjeux<br><em>anthropologiques</em><br>de l'ETP en France</h1>
+    <p class="hero-sub">
+      Une lecture des mutations de la figure du patient à travers les grandes lois
+      de la santé publique française — de la loi Kouchner (2002) à la pair-aidance (2020+).
+    </p>
+    <div class="hero-meta">
+      <div class="hero-author">P.H. Garnier · Psychologue</div>
+      <div class="hero-tags">
+        <span class="tag">Anthropologie</span>
+        <span class="tag">ETP</span>
+        <span class="tag">Santé publique</span>
+        <span class="tag">Clinique</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main>
+
+  <!-- INTRO -->
+  <section class="intro" id="intro">
+    <p>
+      L'Éducation Thérapeutique du Patient n'est pas un simple dispositif technique.
+      Elle est l'expression d'une <strong>transformation profonde de la figure du sujet soigné</strong>
+      dans la culture médicale française. En vingt ans, une série de mutations législatives, cliniques
+      et épistémologiques a reconfiguré les rapports entre savoir, pouvoir et soin.
+    </p>
+    <p>
+      Lire l'histoire de l'ETP, c'est lire une histoire de l'individuation :
+      comment le patient est passé d'<em>objet de prescription</em> à <em>sujet apprenant</em>,
+      puis à <em>acteur de parcours</em>, et enfin à <em>partenaire porteur d'un savoir expérientiel</em>
+      irréductible au savoir biomédical.
+    </p>
+  </section>
+
+  <div class="formule">
+    <blockquote>
+      L'histoire de l'ETP en France est une histoire de transformation du sujet :
+      du patient soigné au sujet qui se construit avec sa maladie.
+      <cite>— P.H. Garnier, Psychologue</cite>
+    </blockquote>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section-title" id="timeline">
+    <div class="label">Chronologie</div>
+    <h2>Dates clés comme mutations anthropologiques</h2>
+  </div>
+
+  <div class="timeline">
+
+    <!-- 2002 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2002</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Loi Kouchner — Droits des malades et qualité du système de santé</div>
+        <div class="tl-desc">
+          Reconnaissance du patient comme sujet de droit. Accès à l'information médicale,
+          consentement éclairé obligatoire, secret partagé. Premier encadrement légal
+          de la relation soignant–soigné.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">Du patient objet → au patient sujet</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Émergence d'un individu autonome juridiquement.
+              Début d'un rééquilibrage du pouvoir médical — le corps cesse d'être
+              la propriété exclusive du clinicien.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2004 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2004</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Loi de santé publique — Introduction de la prévention structurée</div>
+        <div class="tl-desc">
+          Première logique populationnelle de santé en France. Le risque devient
+          objet de politique publique ; la prévention s'inscrit dans une gouvernance sanitaire collective.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">Du soin individuel → à la santé collective</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Le patient devient aussi citoyen sanitaire. Il s'inscrit dans des normes
+              de santé publique qui le définissent autant comme ressource collective
+              que comme individu soigné.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2009 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2009</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Loi HPST — Hôpital, Patients, Santé, Territoires</div>
+        <div class="tl-desc">
+          Reconnaissance officielle de l'ETP dans le Code de la santé publique (art. L.1161-1).
+          Création des Agences régionales de santé, structuration en programmes autorisés.
+          Formation obligatoire des soignants.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation majeure</div>
+            <div class="pill-content mutation">Du soin → à l'apprentissage du soin</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Apparition de la figure du <em>patient apprenant</em>.
+              La maladie devient un espace de formation : le soignant
+              se fait éducateur, le patient devient sujet d'un apprentissage
+              permanent et structuré.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2010 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2010</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Décrets ETP — Formalisation et cahier des charges</div>
+        <div class="tl-desc">
+          Exigences réglementaires précises : pluridisciplinarité, compétences des soignants formés,
+          diagnostic éducatif, dossier thérapeutique, évaluation individuelle et quadriennale.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">De l'intention → au dispositif normé</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Standardisation des pratiques éducatives. Émergence implicite
+              du modèle du <em>« bon patient compétent »</em> — une figure normative
+              qui entre en tension avec la singularité des vécus.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2013-2015 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2013–15</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Recommandations HAS — Structuration pédagogique</div>
+        <div class="tl-desc">
+          La Haute Autorité de Santé formalise : diagnostic éducatif partagé, compétences visées,
+          évaluation des objectifs. L'ETP devient une ingénierie pédagogique à part entière.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">Du relationnel → à l'ingénierie pédagogique</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Le soin devient un espace didactique avec objectifs, méthodes et évaluation.
+              Formalisation du parcours d'apprentissage du patient — le sujet est aussi
+              un apprenant évalué.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2016 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2016</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Loi de modernisation du système de santé — Parcours et coordination</div>
+        <div class="tl-desc">
+          Logique de parcours de santé : coordination ville–hôpital, décloisonnement
+          des acteurs, inscription de l'ETP dans la continuité des soins
+          et non plus dans l'épisode hospitalier seul.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">Du moment de soin → au continuum de vie</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              La maladie chronique s'inscrit dans une trajectoire existentielle totale.
+              Le patient devient <em>acteur de parcours</em> : il se mobilise
+              entre les consultations, dans l'espace ordinaire de sa vie quotidienne.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2018-2022 -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2018–22</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Virage ambulatoire et numérique — ETP hors les murs</div>
+        <div class="tl-desc">
+          Développement de l'ETP hors de l'hôpital. Télésanté, outils digitaux,
+          applications de suivi, séances en visioconférence. La pandémie accélère
+          ce déplacement vers le domicile et les dispositifs connectés.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">Du lieu de soin → à l'environnement de vie</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Hybridation soin/quotidien, réel/numérique.
+              Émergence d'un <em>patient connecté</em> dont le corps devient
+              surface de données, et dont l'expérience de la maladie
+              se médiatise par des interfaces techniques.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2020+ -->
+    <div class="timeline-item">
+      <div class="tl-year"><span class="year-badge">2020+</span></div>
+      <div class="tl-content">
+        <div class="tl-law">Patient partenaire &amp; pair-aidance — Les savoirs expérientiels</div>
+        <div class="tl-desc">
+          Reconnaissance institutionnelle des savoirs expérientiels. Patients formateurs,
+          pairs-aidants intégrés aux équipes soignantes. Le vécu de la maladie
+          devient un savoir légitime et transmissible.
+        </div>
+        <div class="mutation-row">
+          <div class="mutation-pill">
+            <div class="pill-label mutation">Mutation</div>
+            <div class="pill-content mutation">Du savoir médical → à la pluralité des savoirs</div>
+          </div>
+          <div class="mutation-pill">
+            <div class="pill-label anthropo">Anthropologie</div>
+            <div class="pill-content anthropo">
+              Légitimation du vécu. Naissance de la figure du <em>patient-expert</em> :
+              sujet porteur d'une épistémè propre, irréductible au savoir clinique,
+              fondée sur l'expérience intime du soin au long cours.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+  <!-- BASCULES -->
+  <div class="bascules" id="bascules">
+    <h3>Les trois grandes bascules</h3>
+    <div class="bascule-grid">
+      <div class="bascule-col">
+        <div class="bascule-head">1 · Le statut du patient</div>
+        <div class="bascule-body">
+          <div class="bascule-step">Objet de soin</div>
+          <div class="bascule-step">Sujet de droit</div>
+          <div class="bascule-step">Acteur de santé</div>
+          <div class="bascule-step">Partenaire expert</div>
+          <div class="bascule-arrow">objet → sujet → acteur → partenaire</div>
+        </div>
+      </div>
+      <div class="bascule-col">
+        <div class="bascule-head">2 · La nature du savoir</div>
+        <div class="bascule-body">
+          <div class="bascule-step">Savoir médical unilatéral</div>
+          <div class="bascule-step">Savoir partagé</div>
+          <div class="bascule-step">Savoir expérientiel légitimé</div>
+          <div class="bascule-arrow">médical → partagé → expérientiel</div>
+        </div>
+      </div>
+      <div class="bascule-col">
+        <div class="bascule-head">3 · Le lieu du soin</div>
+        <div class="bascule-body">
+          <div class="bascule-step">Hôpital prescriptif</div>
+          <div class="bascule-step">Parcours coordonné</div>
+          <div class="bascule-step">Environnement de vie quotidienne</div>
+          <div class="bascule-arrow">hôpital → parcours → vie quotidienne</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYNTHESE TABLE -->
+  <div class="section-title" id="synthese">
+    <div class="label">Tableau de synthèse</div>
+    <h2>Périodes et mutations anthropologiques</h2>
+  </div>
+
+  <table class="synthese-table">
+    <thead>
+      <tr>
+        <th>Période</th>
+        <th>Figure du patient</th>
+        <th>Mutation centrale</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-year">2002</td>
+        <td class="td-status">Sujet de droit</td>
+        <td class="td-mutation">Accès à l'information, consentement, autonomie juridique</td>
+      </tr>
+      <tr>
+        <td class="td-year">2004</td>
+        <td class="td-status">Citoyen sanitaire</td>
+        <td class="td-mutation">Inscription dans les normes de santé publique collective</td>
+      </tr>
+      <tr>
+        <td class="td-year">2009</td>
+        <td class="td-status">Patient apprenant</td>
+        <td class="td-mutation">La maladie devient espace de formation permanente</td>
+      </tr>
+      <tr>
+        <td class="td-year">2010</td>
+        <td class="td-status">Patient normé</td>
+        <td class="td-mutation">Standardisation des compétences et des pratiques éducatives</td>
+      </tr>
+      <tr>
+        <td class="td-year">2013–15</td>
+        <td class="td-status">Sujet pédagogique</td>
+        <td class="td-mutation">Ingénierie didactique, objectifs évaluables, parcours formalisé</td>
+      </tr>
+      <tr>
+        <td class="td-year">2016</td>
+        <td class="td-status">Acteur de parcours</td>
+        <td class="td-mutation">La maladie s'inscrit dans la trajectoire existentielle totale</td>
+      </tr>
+      <tr>
+        <td class="td-year">2018–22</td>
+        <td class="td-status">Patient connecté</td>
+        <td class="td-mutation">Hybridation soin / quotidien, corps devenu données</td>
+      </tr>
+      <tr>
+        <td class="td-year">2020+</td>
+        <td class="td-status">Sujet expérientiel</td>
+        <td class="td-mutation">Légitimation du vécu, patient-expert et pair-aidance</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TENSIONS -->
+  <section class="tensions" id="tensions">
+    <h3>Point critique — Les tensions constitutives</h3>
+    <p style="font-size:15px; color:var(--ink-lt); margin-bottom:20px; line-height:1.7;">
+      Chaque avancée de l'ETP porte en elle une tension irrésolue entre deux impératifs
+      anthropologiques contradictoires. Ces polarités ne sont pas des défauts du système :
+      elles en sont la <em>condition de vitalité</em>.
+    </p>
+    <div class="tension-list">
+      <div class="tension-item">
+        <div class="t-left">Autonomie</div>
+        <div class="t-vs">↔</div>
+        <div class="t-right">Normalisation</div>
+      </div>
+      <div class="tension-item">
+        <div class="t-left">Empowerment</div>
+        <div class="t-vs">↔</div>
+        <div class="t-right">Responsabilisation implicite</div>
+      </div>
+      <div class="tension-item">
+        <div class="t-left">Expérience singulière</div>
+        <div class="t-vs">↔</div>
+        <div class="t-right">Protocolisation</div>
+      </div>
+      <div class="tension-item">
+        <div class="t-left">Savoir vécu</div>
+        <div class="t-vs">↔</div>
+        <div class="t-right">Validation biomédicale</div>
+      </div>
+      <div class="tension-item">
+        <div class="t-left">Subjectivité du patient</div>
+        <div class="t-vs">↔</div>
+        <div class="t-right">Objectivation par les données</div>
+      </div>
+    </div>
+    <p class="tension-caption">
+      Ces tensions traversent chaque consultation, chaque programme ETP, chaque alliance thérapeutique.
+      Les reconnaître, c'est déjà pratiquer l'ETP avec lucidité anthropologique.
+    </p>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-sig">
+      P.H. Garnier
+      <span>Psychologue · Synthèse anthropologique ETP</span>
+    </div>
+    <div class="footer-note">
+      Éducation Thérapeutique du Patient<br>
+      France · 2002 — 2020+<br>
+      Document de travail — Usage pédagogique
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Progress bar ──────────────────────────────────
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const pct = (window.scrollY / (h.scrollHeight - h.clientHeight)) * 100;
+    bar.style.width = pct + '%';
+  });
+
+  // ── Intersection observer (timeline reveal) ───────
+  const items = document.querySelectorAll('.timeline-item');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  items.forEach(el => obs.observe(el));
+
+  // ── TOC dots ──────────────────────────────────────
+  const sections = ['hero','intro','timeline','bascules','synthese','tensions'];
+  const dots = document.querySelectorAll('.toc-dot');
+  const sectEls = sections.map(id => document.getElementById(id));
+
+  const tocObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = sections.indexOf(e.target.id);
+        if (idx >= 0) {
+          dots.forEach(d => d.classList.remove('active'));
+          dots[idx].classList.add('active');
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+  sectEls.forEach(el => { if (el) tocObs.observe(el); });
+
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      const el = sectEls[i];
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
