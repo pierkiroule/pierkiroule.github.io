@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CookieR code : Décode les mots des ados !</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #fdf6e3;
+            color: #4e342e;
+            touch-action: manipulation;
+            overflow: hidden;
+        }
+
+        .wheel-outer {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin: 20px auto;
+            perspective: 1000px;
+        }
+
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 12px solid #5d4037;
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+            background: conic-gradient(
+                #ffb74d 0deg 18deg, #fff3e0 18deg 36deg,
+                #ffb74d 36deg 54deg, #fff3e0 54deg 72deg,
+                #ffb74d 72deg 90deg, #fff3e0 90deg 108deg,
+                #ffb74d 108deg 126deg, #fff3e0 126deg 144deg,
+                #ffb74d 144deg 162deg, #fff3e0 162deg 180deg,
+                #ffb74d 180deg 198deg, #fff3e0 198deg 216deg,
+                #ffb74d 216deg 234deg, #fff3e0 234deg 252deg,
+                #ffb74d 252deg 270deg, #fff3e0 270deg 288deg,
+                #ffb74d 288deg 306deg, #fff3e0 306deg 324deg,
+                #ffb74d 324deg 342deg, #fff3e0 342deg 360deg
+            );
+            box-shadow: 0 20px 40px rgba(93, 64, 55, 0.25);
+        }
+
+        /* Cookie Button Style */
+        #cookieBtn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            background: #fdf6e3;
+            border: 6px solid #5d4037;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        #cookieBtn:hover:not(.disabled) {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        #cookieBtn:active:not(.disabled) {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        #cookieBtn.disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 35px solid #d84315;
+            z-index: 30;
+        }
+
+        .timer-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        #timerProgress {
+            height: 100%;
+            background: #d84315;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        .option-btn {
+            transition: all 0.2s;
+            border: 2px solid #f3f4f6;
+        }
+        .option-btn:not(:disabled):hover { border-color: #5d4037; background: #fffcf9; }
+
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .instruction-tag {
+            background: #5d4037;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 24px;
+            font-weight: 900;
+            margin-top: 30px;
+            animation: bounce 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-12px);}
+            60% {transform: translateY(-6px);}
+        }
+
+        @keyframes rotate-emoji {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinning-emoji {
+            display: inline-block;
+            animation: rotate-emoji 0.5s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <header class="text-center mt-8">
+        <h1 class="text-3xl font-black text-[#5d4037] tracking-tight leading-tight px-4 italic">CookieR code :<br>Décode les mots des ados !</h1>
+        <p class="text-sm font-bold text-orange-600 uppercase tracking-[0.3em] mt-2">Le Défi Cookies de PHG</p>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center w-full max-w-md">
+        <div class="wheel-outer">
+            <div class="pointer"></div>
+            <div id="wheel"></div>
+            <div id="cookieBtn" onclick="spin()">
+                <span id="cookieEmoji">🍪</span>
+            </div>
+        </div>
+
+        <div id="instruction" class="instruction-tag text-xs">
+            Appuie sur le Cookie !
+        </div>
+    </main>
+
+    <!-- Quiz Overlay -->
+    <div id="quizModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-md">
+        <div id="modalContent" class="bg-white rounded-[3rem] w-full max-w-sm p-8 shadow-2xl animate-pop">
+            <div id="quizBody">
+                <div class="text-center mb-2">
+                    <span id="qCategory" class="text-[10px] font-black uppercase text-orange-500 tracking-[0.2em]">Chargement...</span>
+                    <h2 id="qTitle" class="text-2xl font-black mt-2 leading-tight">Question ?</h2>
+                </div>
+                
+                <div class="timer-bar">
+                    <div id="timerProgress"></div>
+                </div>
+                
+                <div id="optionsGrid" class="space-y-3 mt-6"></div>
+            </div>
+
+            <!-- Final Result View -->
+            <div id="feedback" class="mt-4 hidden text-center p-2 flex flex-col items-center">
+                <span id="statusEmoji" class="text-6xl mb-4"></span>
+                <p id="statusText" class="text-2xl font-black mb-2"></p>
+                <div id="phgMessage" class="hidden text-sm bg-orange-50 p-4 rounded-2xl border border-orange-100 text-orange-900 leading-relaxed italic mb-4">
+                    Bravo ! Tu as mérité ton cookie cuisiné avec joie par PHG le jeune quinquagénaire 😊
+                </div>
+                <p id="correctAnswerText" class="text-sm font-medium opacity-60"></p>
+            </div>
+
+            <button id="restartBtn" class="hidden w-full mt-6 bg-[#5d4037] text-white py-5 rounded-[1.5rem] font-black shadow-lg uppercase tracking-wider">
+                Rejouer 🔄
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            { id: 1, term: "Masterclass", def: "Un contenu ou une action d'une qualité excellente.", cat: "Incontournables" },
+            { id: 2, term: "Dinguerie", def: "Quelque chose d'incroyable ou de fou.", cat: "Incontournables" },
+            { id: 3, term: "Banger", def: "Un contenu (musique, vidéo) très réussi.", cat: "Incontournables" },
+            { id: 4, term: "Flop", def: "Un échec total, un manque de succès.", cat: "Incontournables" },
+            { id: 5, term: "Cringe", def: "Quelque chose de gênant ou de malaisant.", cat: "Incontournables" },
+            { id: 6, term: "Red flag", def: "Un signal d'alerte ou un comportement toxique.", cat: "Incontournables" },
+            { id: 7, term: "POV", def: "Mise en scène d'un point de vue (Point Of View).", cat: "Incontournables" },
+            { id: 8, term: "GOAT", def: "Le meilleur de tous les temps (Greatest Of All Time).", cat: "Incontournables" },
+            { id: 9, term: "Validé", def: "Action d'approuver ou confirmer un choix.", cat: "Incontournables" },
+            { id: 10, term: "TikTok", def: "La plateforme moteur principal des tendances.", cat: "Incontournables" },
+            { id: 11, term: "Ça me fume", def: "Expression pour dire que c'est très drôle.", cat: "Émotions" },
+            { id: 12, term: "Jsuis mort", def: "Rire extrême devant une situation.", cat: "Émotions" },
+            { id: 13, term: "Abusé", def: "Quelque chose de totalement exagéré.", cat: "Émotions" },
+            { id: 14, term: "Lunaire", def: "Une situation ou un propos totalement absurde.", cat: "Émotions" },
+            { id: 15, term: "Hype", def: "Une forte attente ou excitation médiatique.", cat: "Émotions" },
+            { id: 16, term: "Seum", def: "Sentiment de frustration intense.", cat: "Émotions" },
+            { id: 17, term: "Avoir le flow", def: "Avoir énormément de style ou de classe.", cat: "Émotions" },
+            { id: 18, term: "Être matrixé", def: "Être obsédé ou formaté par un sujet.", cat: "Émotions" },
+            { id: 19, term: "Sah", def: "Expression pour dire 'sérieusement' ou 'vrai'.", cat: "Émotions" },
+            { id: 20, term: "Gazo", def: "Artiste majeur de la drill en France.", cat: "Culture" },
+            { id: 21, term: "Frérot", def: "Terme désignant un ami très proche.", cat: "Social" },
+            { id: 22, term: "Le sang", def: "Personne que l'on considère comme sa famille.", cat: "Social" },
+            { id: 23, term: "Ghoster", def: "Couper brusquement tout contact sans explication.", cat: "Social" },
+            { id: 24, term: "Gatekeep", def: "Garder une info secrète pour ne pas la partager.", cat: "Social" },
+            { id: 25, term: "Crush", def: "Personne pour qui on a une attirance secrète.", cat: "Social" },
+            { id: 26, term: "Friendzone", def: "Relation amicale sans espoir d'amour.", cat: "Social" },
+            { id: 27, term: "Drama", def: "Embrouilles, conflits ou potins publics.", cat: "Social" },
+            { id: 28, term: "Flex", def: "Action de se vanter ou d'étaler sa réussite.", cat: "Social" },
+            { id: 29, term: "Main character", def: "Se sentir ou agir comme le héros de l'histoire.", cat: "Social" },
+            { id: 30, term: "Snapchat", def: "Réseau social d'échanges photos rapides.", cat: "Plateformes" },
+            { id: 31, term: "Carry", def: "Porter son équipe vers la victoire seul.", cat: "Gaming" },
+            { id: 32, term: "Tryhard", def: "S'investir excessivement pour gagner.", cat: "Gaming" },
+            { id: 33, term: "Noob", def: "Terme pour désigner un débutant maladroit.", cat: "Gaming" },
+            { id: 34, term: "AFK", def: "Away From Keyboard : être absent.", cat: "Gaming" },
+            { id: 35, term: "Ragequit", def: "Quitter une partie car on est trop énervé.", cat: "Gaming" },
+            { id: 36, term: "Skill", def: "Le niveau de compétence technique d'un joueur.", cat: "Gaming" },
+            { id: 37, term: "Cheat", def: "Utiliser des moyens déloyaux pour gagner.", cat: "Gaming" },
+            { id: 38, term: "Cheat code", def: "Une astuce qui facilite énormément la vie.", cat: "Gaming" },
+            { id: 39, term: "Fortnite", def: "Jeu vidéo pilier de la culture ado actuelle.", cat: "Gaming" },
+            { id: 40, term: "Twitch", def: "Plateforme leader du streaming en direct.", cat: "Plateformes" },
+            { id: 41, term: "Payer son loyer", def: "Occuper les pensées de quelqu'un durablement.", cat: "Lifestyle" },
+            { id: 42, term: "Soft", def: "Quelque chose de léger ou peu agressif.", cat: "Lifestyle" },
+            { id: 43, term: "Clean", def: "Style simple, net et très efficace.", cat: "Lifestyle" },
+            { id: 44, term: "Outfit", def: "L'ensemble du look vestimentaire du jour.", cat: "Lifestyle" },
+            { id: 45, term: "Drop", def: "Sortie d'un nouveau produit en édition limitée.", cat: "Lifestyle" },
+            { id: 46, term: "Flemme", def: "Manque total d'énergie ou d'envie.", cat: "Lifestyle" },
+            { id: 47, term: "Grave", def: "Utilisé comme adverbe pour dire 'énormément'.", cat: "Lifestyle" },
+            { id: 48, term: "Bestie", def: "Terme désignant sa meilleure amie.", cat: "Social" },
+            { id: 49, term: "Pépouze", def: "Être tranquille, détendu, sans souci.", cat: "Lifestyle" },
+            { id: 50, term: "Instagram", def: "Plateforme axée sur l'image et l'esthétique.", cat: "Plateformes" }
+        ];
+
+        const wheel = document.getElementById('wheel');
+        const cookieBtn = document.getElementById('cookieBtn');
+        const cookieEmoji = document.getElementById('cookieEmoji');
+        const instruction = document.getElementById('instruction');
+        const quizModal = document.getElementById('quizModal');
+        const quizBody = document.getElementById('quizBody');
+        const optionsGrid = document.getElementById('optionsGrid');
+        const feedback = document.getElementById('feedback');
+        const restartBtn = document.getElementById('restartBtn');
+        const timerProgress = document.getElementById('timerProgress');
+        const phgMessage = document.getElementById('phgMessage');
+
+        let currentRotation = 0;
+        let isSpinning = false;
+        let timerInterval;
+        let currentItem = null;
+
+        function startTimer() {
+            let timeLeft = 10;
+            timerProgress.style.width = "100%";
+            timerProgress.style.background = "#d84315";
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.05;
+                const percent = (timeLeft / 10) * 100;
+                timerProgress.style.width = percent + "%";
+                if (timeLeft <= 3) timerProgress.style.background = "#ff1744";
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleAnswer(null, false, true);
+                }
+            }, 50);
+        }
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            // UI States
+            cookieBtn.classList.add('disabled');
+            cookieEmoji.classList.add('spinning-emoji');
+            instruction.classList.add('invisible');
+            
+            // Random spin logic
+            const extraSpins = 6 + Math.random() * 4;
+            const targetIndex = Math.floor(Math.random() * data.length);
+            currentItem = data[targetIndex];
+            
+            const anglePerItem = 360 / data.length;
+            currentRotation += (extraSpins * 360) + (targetIndex * anglePerItem); 
+            
+            // Animate only the wheel background
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                showQuestion();
+                isSpinning = false;
+                cookieBtn.classList.remove('disabled');
+                cookieEmoji.classList.remove('spinning-emoji');
+            }, 4000);
+        }
+
+        function showQuestion() {
+            document.getElementById('qCategory').innerText = currentItem.cat;
+            document.getElementById('qTitle').innerText = `Que veut dire "${currentItem.term}" ?`;
+            
+            const answers = [
+                { text: currentItem.def, correct: true },
+                ...data.filter(i => i.id !== currentItem.id).sort(() => 0.5 - Math.random()).slice(0, 2).map(i => ({ text: i.def, correct: false }))
+            ].sort(() => 0.5 - Math.random());
+
+            quizBody.classList.remove('hidden');
+            feedback.classList.add('hidden');
+            restartBtn.classList.add('hidden');
+            phgMessage.classList.add('hidden');
+
+            optionsGrid.innerHTML = '';
+            answers.forEach(ans => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-4 rounded-2xl font-bold bg-gray-50 text-sm shadow-sm";
+                btn.innerText = ans.text;
+                btn.onclick = () => handleAnswer(btn, ans.correct, false);
+                optionsGrid.appendChild(btn);
+            });
+
+            quizModal.classList.remove('hidden');
+            startTimer();
+        }
+
+        function handleAnswer(btn, isCorrect, isTimeout) {
+            clearInterval(timerInterval);
+            quizBody.classList.add('hidden');
+            feedback.classList.remove('hidden');
+            restartBtn.classList.remove('hidden');
+
+            const statusEmoji = document.getElementById('statusEmoji');
+            const statusText = document.getElementById('statusText');
+            const correctAnswerText = document.getElementById('correctAnswerText');
+
+            if (isTimeout) {
+                statusEmoji.innerText = "⏰";
+                statusText.innerText = "TEMPS ÉCOULÉ !";
+                statusText.style.color = "#d84315";
+                correctAnswerText.innerText = `La réponse était : ${currentItem.def}`;
+            } else if (isCorrect) {
+                statusEmoji.innerText = "🍪";
+                statusText.innerText = "MASTERCLASS !";
+                statusText.style.color = "#2e7d32";
+                phgMessage.classList.remove('hidden');
+                correctAnswerText.innerText = "Tu as mérité ton cookie de champion.";
+            } else {
+                statusEmoji.innerText = "💀";
+                statusText.innerText = "FLOP... DOMMAGE";
+                statusText.style.color = "#c62828";
+                correctAnswerText.innerText = `La réponse correcte : ${currentItem.def}`;
+            }
+        }
+
+        restartBtn.onclick = () => {
+            quizModal.classList.add('hidden');
+            instruction.classList.remove('invisible');
+        };
+    </script>
+</body>
+</html>
