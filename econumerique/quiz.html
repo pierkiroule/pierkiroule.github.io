@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Éconumérique</title>
+
+<style>
+body {
+  margin:0;
+  font-family:sans-serif;
+  background: radial-gradient(circle at center, #0f172a, #020617);
+  color:#e2e8f0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  overflow:hidden;
+}
+
+.bubble-bg {
+  position:absolute;
+  width:100%;
+  height:100%;
+}
+.bubble-bg span {
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  animation: float linear infinite;
+}
+@keyframes float {
+  from { transform: translateY(100vh); }
+  to { transform: translateY(-10vh); }
+}
+
+.card {
+  position:relative;
+  z-index:2;
+  background:#1e293b;
+  padding:20px;
+  border-radius:16px;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+}
+
+.btn {
+  border:none;
+  margin:8px 0;
+  padding:14px;
+  border-radius:30px;
+  background:#334155;
+  color:white;
+  width:100%;
+}
+
+.btn:hover { background:#475569; }
+
+.btn:disabled {
+  opacity:0.7;
+}
+
+.next {
+  margin-top:12px;
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  background:#22c55e;
+  color:black;
+  width:100%;
+  display:none;
+}
+
+.feedback {
+  margin-top:12px;
+  font-size:14px;
+  opacity:0.9;
+}
+
+.result {
+  margin-top:20px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bubble-bg" id="bg"></div>
+
+<div class="card">
+  <h2>🫧 Quiz éconumérique</h2>
+  <p id="q"></p>
+  <div id="a"></div>
+  <div class="feedback" id="f"></div>
+  <button class="next" id="next">Suivant →</button>
+  <div class="result" id="r"></div>
+</div>
+
+<script>
+// bulles décoratives
+for(let i=0;i<20;i++){
+  const b=document.createElement("span");
+  b.style.width=b.style.height=(Math.random()*80+20)+"px";
+  b.style.left=Math.random()*100+"%";
+  b.style.animationDuration=(10+Math.random()*20)+"s";
+  document.getElementById("bg").appendChild(b);
+}
+
+// données quiz
+const quiz=[
+{q:"Une IA qui tourne sur ton téléphone ?",a:["Cloud","Edge AI","Streaming"],c:1,exp:"Edge AI = local → moins de données envoyées"},
+{q:"Un site qui garde en mémoire ?",a:["Cache","API","Streaming"],c:0,exp:"Cache = évite de recharger"},
+{q:"Image chargée au scroll ?",a:["Lazy loading","Bug","Full load"],c:0,exp:"Lazy = charger seulement si visible"},
+{q:"Collecter seulement le nécessaire ?",a:["Big data","Tracking","Data minimization"],c:2,exp:"Moins de données = moins d’impact"},
+{q:"App qui marche sans internet ?",a:["Offline-first","Cloud","Live"],c:0,exp:"Fonctionne en local"},
+{q:"Réduire poids des images ?",a:["Compression","Zoom","HD"],c:0,exp:"Moins de data transférée"},
+{q:"Limiter requêtes ?",a:["Boost","Throttling","Cache"],c:1,exp:"Régule le flux"},
+{q:"Site préparé à l’avance ?",a:["Static","Dynamic","Live"],c:0,exp:"Pas de calcul serveur"},
+{q:"Contenu adapté réseau ?",a:["Adaptive delivery","Full HD","Streaming"],c:0,exp:"S’ajuste pour consommer moins"},
+{q:"Contenu chargé seulement si clic ?",a:["Shadow","Dark mode","Cache"],c:0,exp:"Rien d’inutile chargé"}
+];
+
+let i=0, score=0, answered=false;
+
+const qEl=document.getElementById("q");
+const aEl=document.getElementById("a");
+const fEl=document.getElementById("f");
+const rEl=document.getElementById("r");
+const nextBtn=document.getElementById("next");
+
+function show(){
+  answered=false;
+  nextBtn.style.display="none";
+
+  if(i>=quiz.length){
+    let msg="";
+    if(score<=4) msg="⚡ Tu charges trop → allège";
+    else if(score<=7) msg="🔧 Tu optimises déjà";
+    else msg="🌿 Tu es éconumérique avancé";
+
+    rEl.innerHTML="Score "+score+"/10<br>"+msg+
+    "<br><br>💡 Moins de flux = plus de respiration";
+    qEl.style.display="none";
+    aEl.innerHTML="";
+    fEl.innerHTML="";
+    return;
+  }
+
+  const q=quiz[i];
+  qEl.textContent=q.q;
+  aEl.innerHTML="";
+  fEl.innerHTML="";
+
+  q.a.forEach((txt,idx)=>{
+    const btn=document.createElement("button");
+    btn.className="btn";
+    btn.textContent=txt;
+
+    btn.onclick=()=>{
+      if(answered) return;
+      answered=true;
+
+      const allBtns=document.querySelectorAll(".btn");
+      allBtns.forEach(b=>b.disabled=true);
+
+      allBtns.forEach((b,i2)=>{
+        if(i2===q.c){
+          b.style.background="#16a34a"; // vert
+        } else if(i2===idx){
+          b.style.background="#dc2626"; // rouge
+        }
+      });
+
+      if(idx===q.c){
+        score++;
+        fEl.innerHTML="✅ "+q.exp;
+      } else {
+        fEl.innerHTML="❌ "+q.exp;
+      }
+
+      nextBtn.style.display="block";
+    };
+
+    aEl.appendChild(btn);
+  });
+}
+
+nextBtn.onclick=()=>{
+  i++;
+  show();
+};
+
+show();
+
+/* cache simple */
+if('caches' in window){
+  caches.open('ecoquiz').then(c=>c.add(location.href));
+}
+</script>
+
+</body>
+</html>
