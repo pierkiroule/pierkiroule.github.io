@@ -1,618 +1,223 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Play, 
-  BookOpen, 
-  ChevronRight, 
-  Trophy, 
-  Volume2, 
-  VolumeX, 
-  RefreshCcw,
-  Info,
-  Lightbulb,
-  Target,
-  CheckCircle2,
-  AlertCircle
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sous la Phrase - Formation ETP</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .custom-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+    </style>
+</head>
+<body class="bg-slate-100">
+    <div id="root"></div>
 
-// --- DATA: 14 Situations ETP ---
-const GAME_DATA = [
-  {
-    id: 1,
-    patient: "Je sais ce qu’il faut faire mais je n’y arrive pas.",
-    soignant: "Il faut surtout vous remotiver.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller",
-      intention: "Vouloir aider vite et donner une direction.",
-      risque: "Mettre la pression et banaliser la difficulté réelle du patient.",
-      reflexe: "Oui, réflexe correcteur typique.",
-      astuce: "Avant de pousser à l'action, explorez les freins."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Il faut vous organiser davantage." },
-      { id: 'B', texte: "Qu’est-ce qui vous freine le plus aujourd’hui ?" },
-      { id: 'C', texte: "Vous connaissez pourtant les règles." }
-    ],
-    bonneReponse: 'B',
-    explication: "En posant une question ouverte, vous invitez le patient à identifier ses propres obstacles (autonomie)."
-  },
-  {
-    id: 2,
-    patient: "C'est trop dur, je ne pourrai jamais arrêter de fumer.",
-    soignant: "Fumer augmente pourtant vos risques cardio-vasculaires.",
-    bonnePosture: "Informer",
-    analyse: {
-      posture: "Informer",
-      intention: "Rappeler les faits scientifiques pour provoquer un déclic.",
-      risque: "Créer une résistance ou de la culpabilité (effet boomerang).",
-      reflexe: "Réflexe d'expert : la connaissance suffit au changement.",
-      astuce: "L'information n'est utile que si le patient est prêt à la recevoir."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Si vous continuez, les conséquences seront graves." },
-      { id: 'B', texte: "Qu'est-ce qui rend cet arrêt si difficile pour vous ?" },
-      { id: 'C', texte: "Il existe des patchs très efficaces." }
-    ],
-    bonneReponse: 'B',
-    explication: "Explorer le sentiment d'auto-efficacité est la base de la posture éducative."
-  },
-  {
-    id: 3,
-    patient: "J'ai arrêté mon traitement car je me sentais mieux.",
-    soignant: "On ne doit jamais arrêter un traitement sans avis médical.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller (Parent Normatif)",
-      intention: "Protéger le patient par le rappel de la règle.",
-      risque: "Casser l'alliance thérapeutique ; le patient cachera ses futurs arrêts.",
-      reflexe: "Posture de sachant qui impose une norme.",
-      astuce: "Accueillez l'expérience du patient avant de recadrer."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Qu'est-ce que vous avez observé quand vous avez arrêté ?" },
-      { id: 'B', texte: "C'est très dangereux, il faut le reprendre immédiatement." },
-      { id: 'C', texte: "C'est dommage de gâcher vos efforts." }
-    ],
-    bonneReponse: 'A',
-    explication: "Comprendre le raisonnement du patient permet de ré-ajuster le traitement avec lui."
-  },
-  {
-    id: 4,
-    patient: "Je ne comprends rien à ces mesures de glycémie.",
-    soignant: "C'est simple : en dessous de 0.70 vous êtes en hypo.",
-    bonnePosture: "Informer",
-    analyse: {
-      posture: "Informer",
-      intention: "Clarifier une donnée technique.",
-      risque: "Rester sur un plan théorique sans lien avec le vécu du patient.",
-      reflexe: "Réponse immédiate au contenu, sans vérifier le besoin.",
-      astuce: "Demandez d'abord ce que le patient en comprend déjà."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Voulez-vous que je vous réexplique le tableau ?" },
-      { id: 'B', texte: "Qu'est-ce qui vous semble le plus confus dans ces chiffres ?" },
-      { id: 'C', texte: "Pourtant, nous l'avons vu la semaine dernière." }
-    ],
-    bonneReponse: 'B',
-    explication: "L'ETP part des besoins du patient. Cibler la confusion évite la surcharge cognitive."
-  },
-  {
-    id: 5,
-    patient: "Ma femme s'inquiète, mais moi je me trouve très bien comme ça.",
-    soignant: "Vous devriez l'écouter, elle veut votre bien.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller / Sauveur",
-      intention: "Prendre parti pour l'entourage pour aider le patient.",
-      risque: "S'allier à un tiers contre le patient, renforçant son déni.",
-      reflexe: "Jugement de valeur sur ce qui est 'bien'.",
-      astuce: "Restez neutre et explorez la divergence de perception."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Elle a raison, votre santé est en jeu." },
-      { id: 'B', texte: "Qu'est-ce qui fait que vous, vous ne vous inquiétez pas ?" },
-      { id: 'C', texte: "Pourquoi votre femme s'inquiète-t-elle selon vous ?" }
-    ],
-    bonneReponse: 'B',
-    explication: "Travailler sur l'ambivalence du patient est plus efficace que de lui donner raison."
-  },
-  {
-    id: 6,
-    patient: "Avec le travail, je n'ai pas le temps de faire du sport.",
-    soignant: "C'est une question de priorités et d'organisation.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller (Moralisateur)",
-      intention: "Essayer de motiver par la logique.",
-      risque: "Provoquer un sentiment d'incapacité ou de culpabilité.",
-      reflexe: "Le 'Ya ka' (Il n'y a qu'à).",
-      astuce: "Validez la difficulté avant de chercher des solutions."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "À quoi ressemble une de vos journées types ?" },
-      { id: 'B', texte: "On peut toujours trouver 15 minutes par jour." },
-      { id: 'C', texte: "Le sport est pourtant indispensable à votre coeur." }
-    ],
-    bonneReponse: 'A',
-    explication: "L'analyse du quotidien permet au patient de trouver lui-même ses fenêtres d'opportunité."
-  },
-  {
-    id: 7,
-    patient: "Je n'arrive pas à suivre ce régime, c'est trop frustrant.",
-    soignant: "Vous savez, on s'habitue au bout d'un moment.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller / Rassureur",
-      intention: "Minimiser la douleur pour encourager.",
-      risque: "Le patient ne se sent pas entendu dans sa souffrance.",
-      reflexe: "La banalisation empathique.",
-      astuce: "Nommer l'émotion pour permettre au patient de la dépasser."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "C'est vrai que c'est difficile. Qu'est-ce qui vous manque le plus ?" },
-      { id: 'B', texte: "Soyez patient, les résultats arriveront." },
-      { id: 'C', texte: "Pensez aux bénéfices pour votre santé." }
-    ],
-    bonneReponse: 'A',
-    explication: "L'empathie (nommer la frustration) renforce l'alliance thérapeutique."
-  },
-  {
-    id: 8,
-    patient: "À quoi ça sert de faire tous ces efforts si je ne guéris pas ?",
-    soignant: "Le but n'est pas de guérir mais d'éviter les complications.",
-    bonnePosture: "Informer",
-    analyse: {
-      posture: "Informer",
-      intention: "Recadrer les objectifs médicaux réels.",
-      risque: "Éteindre l'espoir ou le sens de l'action du patient.",
-      reflexe: "Le rappel de la vérité médicale brute.",
-      astuce: "Explorez ce qui donnerait du sens à ces efforts pour lui."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Sans ces efforts, vous risquez l'amputation." },
-      { id: 'B', texte: "Pour vous, qu'est-ce qui vaudrait la peine de faire des efforts ?" },
-      { id: 'C', texte: "C'est le principe des maladies chroniques." }
-    ],
-    bonneReponse: 'B',
-    explication: "L'ETP vise la qualité de vie définie par le patient lui-même."
-  },
-  {
-    id: 9,
-    patient: "J'ai lu sur internet que ce médicament était toxique.",
-    soignant: "Il ne faut pas croire tout ce qu'on lit sur le web.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller / Défensif",
-      intention: "Protéger la vérité scientifique et le traitement.",
-      risque: "Discréditer la démarche de recherche du patient.",
-      reflexe: "Le rejet de la source d'information tierce.",
-      astuce: "Partez de ce qu'il a lu pour discuter de ses craintes."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Internet raconte n'importe quoi sur la santé." },
-      { id: 'B', texte: "Qu'est-ce qui vous a le plus inquiété dans ce que vous avez lu ?" },
-      { id: 'C', texte: "Fiez-vous plutôt à mon expertise." }
-    ],
-    bonneReponse: 'B',
-    explication: "Valider l'inquiétude (plutôt que la source) permet de rééduquer sur les faits."
-  },
-  {
-    id: 10,
-    patient: "Je me sens seul face à la maladie.",
-    soignant: "Vous devriez rejoindre une association de patients.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller",
-      intention: "Apporter une solution concrète immédiate.",
-      risque: "Sauter l'étape de l'écoute du vécu émotionnel.",
-      reflexe: "Réponse technique à un besoin relationnel.",
-      astuce: "Laissez le patient exprimer sa solitude avant de suggérer."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Il y en a une juste à côté de l'hôpital." },
-      { id: 'B', texte: "Qu'est-ce qui est le plus lourd dans cette solitude ?" },
-      { id: 'C', texte: "C'est normal au début de se sentir ainsi." }
-    ],
-    bonneReponse: 'B',
-    explication: "L'écoute active est le préalable à toute proposition éducative."
-  },
-  {
-    id: 11,
-    patient: "Mon fils dit que je ne fais pas attention à mon régime.",
-    soignant: "Et qu'en pensez-vous, vous ?",
-    bonnePosture: "Éduquer",
-    analyse: {
-      posture: "Éduquer",
-      intention: "Renvoyer le patient à sa propre auto-observation.",
-      risque: "Peu de risques, c'est une posture d'ouverture.",
-      reflexe: "Absence de réflexe correcteur, c'est une question miroir.",
-      astuce: "C'est la posture idéale pour initier un changement autonome."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Il a peut-être raison de s'inquiéter." },
-      { id: 'B', texte: "Avez-vous des exemples où vous avez réussi à faire attention ?" },
-      { id: 'C', texte: "Il ne devrait pas vous mettre la pression." }
-    ],
-    bonneReponse: 'B',
-    explication: "Chercher les 'exceptions positives' renforce le sentiment de compétence."
-  },
-  {
-    id: 12,
-    patient: "C'est ma maladie, je fais ce que je veux.",
-    soignant: "Bien sûr, mais vous en subirez les conséquences.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller (Parent Normand / Menace)",
-      intention: "Responsabiliser par la crainte.",
-      risque: "Renforcer la rébellion du patient.",
-      reflexe: "Le bras de fer relationnel.",
-      astuce: "Reconnaissez son autonomie sans y ajouter de menace."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Vous êtes en effet le seul décideur pour votre santé." },
-      { id: 'B', texte: "C'est irresponsable comme réaction." },
-      { id: 'C', texte: "On en reparlera quand vous aurez une crise." }
-    ],
-    bonneReponse: 'A',
-    explication: "L'accord paradoxal (valider l'autonomie) désamorce souvent la colère."
-  },
-  {
-    id: 13,
-    patient: "Je n'ai pas pu noter mes résultats cette semaine.",
-    soignant: "Pourtant c'est indispensable pour adapter votre dose.",
-    bonnePosture: "Informer",
-    analyse: {
-      posture: "Informer / Rappeler l'ordre",
-      intention: "Expliquer l'utilité technique de l'autosurveillance.",
-      risque: "Être perçu comme un professeur qui réprimande l'élève.",
-      reflexe: "Rappel de la consigne non tenue.",
-      astuce: "Cherchez l'obstacle matériel ou motivationnel au carnet."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Comment pourrait-on rendre cette notation plus facile pour vous ?" },
-      { id: 'B', texte: "Sans notes, je ne peux pas faire mon travail correctement." },
-      { id: 'C', texte: "Essayez de faire un effort pour la semaine prochaine." }
-    ],
-    bonneReponse: 'A',
-    explication: "Travailler sur l'outil et son ergonomie facilite l'observance."
-  },
-  {
-    id: 14,
-    patient: "J'ai peur de faire une crise si je sors seul.",
-    soignant: "Ne vous inquiétez pas, vous avez vos médicaments sur vous.",
-    bonnePosture: "Conseiller",
-    analyse: {
-      posture: "Conseiller / Rassureur",
-      intention: "Calmer l'anxiété par une solution logique.",
-      risque: "Ignorer la dimension émotionnelle de la peur.",
-      reflexe: "Réassurance prématurée.",
-      astuce: "Explorez le scénario de la peur avant de rassurer."
-    },
-    choixEducatifs: [
-      { id: 'A', texte: "Vous ne risquez rien avec ce traitement." },
-      { id: 'B', texte: "Qu'est-ce qui vous fait le plus peur s'il vous arrivait quelque chose dehors ?" },
-      { id: 'C', texte: "Il faut affronter vos peurs pour avancer." }
-    ],
-    bonneReponse: 'B',
-    explication: "L'exploration permet au patient de verbaliser ses besoins de sécurité."
-  }
-];
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
-// --- APP COMPONENT ---
+        // --- DONNÉES DU JEU ---
+        const GAME_DATA = [
+            { id: 1, patient: "Je sais ce qu’il faut faire mais je n’y arrive pas.", soignant: "Il faut surtout vous remotiver.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller", intention: "Vouloir aider vite et donner une direction.", risque: "Mettre la pression et banaliser la difficulté.", reflexe: "Oui, réflexe correcteur typique.", astuce: "Explorez les freins avant de pousser." }, choixEducatifs: [{id:'A', texte:"Il faut vous organiser davantage."}, {id:'B', texte:"Qu’est-ce qui vous freine le plus aujourd’hui ?"}, {id:'C', texte:"Vous connaissez les règles."}], bonneReponse: 'B', explication: "La question ouverte invite à l'auto-analyse des obstacles." },
+            { id: 2, patient: "C'est trop dur, je ne pourrai jamais arrêter de fumer.", soignant: "Fumer augmente pourtant vos risques cardio-vasculaires.", bonnePosture: "Informer", analyse: { posture: "Informer", intention: "Rappeler les faits pour provoquer un déclic.", risque: "Créer une résistance ou de la culpabilité.", reflexe: "Réflexe d'expert.", astuce: "Vérifiez si le patient est prêt à recevoir l'info." }, choixEducatifs: [{id:'A', texte:"Les conséquences seront graves."}, {id:'B', texte:"Qu'est-ce qui rend cet arrêt si difficile ?"}, {id:'C', texte:"Il existe des patchs efficaces."}], bonneReponse: 'B', explication: "L'ETP explore le sentiment d'auto-efficacité." },
+            { id: 3, patient: "J'ai arrêté mon traitement car je me sentais mieux.", soignant: "On ne doit jamais arrêter sans avis médical.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller (Normatif)", intention: "Protéger par le rappel de la règle.", risque: "Casser l'alliance, le patient cachera ses arrêts.", reflexe: "Posture de sachant.", astuce: "Accueillez l'expérience avant de recadrer." }, choixEducatifs: [{id:'A', texte:"Qu'avez-vous observé lors de l'arrêt ?"}, {id:'B', texte:"C'est dangereux, reprenez-le vite."}, {id:'C', texte:"C'est dommage de gâcher vos efforts."}], bonneReponse: 'A', explication: "Comprendre le raisonnement du patient permet un ré-ajustement partagé." },
+            { id: 4, patient: "Je ne comprends rien à ces mesures de glycémie.", soignant: "C'est simple : en dessous de 0.70 vous êtes en hypo.", bonnePosture: "Informer", analyse: { posture: "Informer", intention: "Clarifier une donnée technique.", risque: "Rester théorique sans lien au vécu.", reflexe: "Réponse immédiate au contenu.", astuce: "Demandez ce qu'il en comprend déjà." }, choixEducatifs: [{id:'A', texte:"Voulez-vous que je réexplique ?"}, {id:'B', texte:"Qu'est-ce qui est le plus confus pour vous ?"}, {id:'C', texte:"On l'a vu la semaine dernière."}], bonneReponse: 'B', explication: "Cibler la confusion évite la surcharge cognitive." },
+            { id: 5, patient: "Ma femme s'inquiète, mais moi je me trouve très bien.", soignant: "Vous devriez l'écouter, elle veut votre bien.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller / Sauveur", intention: "Prendre parti pour aider.", risque: "Renforcer le déni du patient.", reflexe: "Jugement de valeur.", astuce: "Restez neutre sur la divergence de perception." }, choixEducatifs: [{id:'A', texte:"Elle a raison, votre santé est en jeu."}, {id:'B', texte:"Qu'est-ce qui fait que vous, vous ne vous inquiétez pas ?"}, {id:'C', texte:"Pourquoi s'inquiète-t-elle selon vous ?"}], bonneReponse: 'B', explication: "Travailler sur l'ambivalence est la clé du changement." },
+            { id: 6, patient: "Avec le travail, je n'ai pas le temps de faire du sport.", soignant: "C'est une question de priorités et d'organisation.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller (Moralisateur)", intention: "Motiver par la logique.", risque: "Provoquer la culpabilité.", reflexe: "Le 'Ya ka'.", astuce: "Validez la difficulté avant de chercher." }, choixEducatifs: [{id:'A', texte:"À quoi ressemble une journée type ?"}, {id:'B', texte:"On trouve toujours 15 minutes."}, {id:'C', texte:"Le sport est indispensable au coeur."}], bonneReponse: 'A', explication: "L'analyse du quotidien permet de trouver des opportunités réalistes." },
+            { id: 7, patient: "Je n'arrive pas à suivre ce régime, c'est trop frustrant.", soignant: "Vous savez, on s'habitue au bout d'un moment.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller / Rassureur", intention: "Minimiser pour encourager.", risque: "Le patient ne se sent pas entendu.", reflexe: "Banalisation empathique.", astuce: "Nommez l'émotion pour la dépasser." }, choixEducatifs: [{id:'A', texte:"C'est difficile. Qu'est-ce qui vous manque ?"}, {id:'B', texte:"Soyez patient, les résultats viendront."}, {id:'C', texte:"Pensez aux bénéfices santé."}], bonneReponse: 'A', explication: "L'empathie renforce l'alliance thérapeutique." },
+            { id: 8, patient: "À quoi ça sert tout ça si je ne guéris pas ?", soignant: "Le but est d'éviter les complications.", bonnePosture: "Informer", analyse: { posture: "Informer", intention: "Recadrer les objectifs médicaux.", risque: "Éteindre l'espoir.", reflexe: "Vérité médicale brute.", astuce: "Explorez ce qui a du sens pour lui." }, choixEducatifs: [{id:'A', texte:"Sans ça, vous risquez l'amputation."}, {id:'B', texte:"Qu'est-ce qui vaudrait la peine pour vous ?"}, {id:'C', texte:"C'est le principe des maladies chroniques."}], bonneReponse: 'B', explication: "L'ETP vise la qualité de vie définie par le patient." },
+            { id: 9, patient: "J'ai lu que ce médicament était toxique.", soignant: "Il ne faut pas croire tout ce qu'on lit.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller / Défensif", intention: "Protéger le traitement.", risque: "Discréditer le patient.", reflexe: "Rejet de la source externe.", astuce: "Partez de sa crainte réelle." }, choixEducatifs: [{id:'A', texte:"Internet raconte n'importe quoi."}, {id:'B', texte:"Qu'est-ce qui vous a le plus inquiété ?"}, {id:'C', texte:"Fiez-vous à mon expertise."}], bonneReponse: 'B', explication: "Valider l'inquiétude permet de rééduquer sur les faits." },
+            { id: 10, patient: "Je me sens seul face à la maladie.", soignant: "Vous devriez rejoindre une association.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller", intention: "Solution immédiate.", risque: "Sauter l'écoute émotionnelle.", reflexe: "Réponse technique au relationnel.", astuce: "Laissez-le exprimer sa solitude." }, choixEducatifs: [{id:'A', texte:"Il y en a une juste à côté."}, {id:'B', texte:"Qu'est-ce qui est le plus lourd dans cette solitude ?"}, {id:'C', texte:"C'est normal de se sentir ainsi."}], bonneReponse: 'B', explication: "L'écoute active précède toute proposition." },
+            { id: 11, patient: "Mon fils dit que je ne fais pas attention.", soignant: "Et qu'en pensez-vous, vous ?", bonnePosture: "Éduquer", analyse: { posture: "Éduquer", intention: "Renvoyer à l'auto-observation.", risque: "Aucun.", reflexe: "Absence de réflexe correcteur.", astuce: "Posture idéale pour l'autonomie." }, choixEducatifs: [{id:'A', texte:"Il a raison de s'inquiéter."}, {id:'B', texte:"Avez-vous des exemples de réussite ?"}, {id:'C', texte:"Il ne devrait pas vous mettre la pression."}], bonneReponse: 'B', explication: "Chercher les exceptions positives renforce la compétence." },
+            { id: 12, patient: "C'est ma maladie, je fais ce que je veux.", soignant: "Bien sûr, mais vous en subirez les conséquences.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller (Menace)", intention: "Responsabiliser par la peur.", risque: "Renforcer la rébellion.", reflexe: "Bras de fer.", astuce: "Reconnaissez l'autonomie sans menacer." }, choixEducatifs: [{id:'A', texte:"Vous êtes le seul décideur."}, {id:'B', texte:"C'est irresponsable."}, {id:'C', texte:"On en reparlera à la prochaine crise."}], bonneReponse: 'A', explication: "L'accord paradoxal désamorce souvent la colère." },
+            { id: 13, patient: "Je n'ai pas pu noter mes résultats.", soignant: "Pourtant c'est indispensable pour adapter la dose.", bonnePosture: "Informer", analyse: { posture: "Informer / Rappel à l'ordre", intention: "Expliquer l'utilité technique.", risque: "Posture du prof qui réprimande.", reflexe: "Rappel de consigne.", astuce: "Cherchez l'obstacle au carnet." }, choixEducatifs: [{id:'A', texte:"Comment rendre la notation plus facile ?"}, {id:'B', texte:"Sans notes, je ne peux pas bien travailler."}, {id:'C', texte:"Faites un effort pour la fois prochaine."}], bonneReponse: 'A', explication: "Travailler sur l'ergonomie facilite l'observance." },
+            { id: 14, patient: "J'ai peur de faire une crise si je sors seul.", soignant: "Ne vous inquiétez pas, vous avez vos médicaments.", bonnePosture: "Conseiller", analyse: { posture: "Conseiller / Rassureur", intention: "Calmer par la logique.", risque: "Ignorer l'émotion.", reflexe: "Réassurance prématurée.", astuce: "Explorez le scénario de la peur." }, choixEducatifs: [{id:'A', texte:"Vous ne risquez rien avec ce traitement."}, {id:'B', texte:"Qu'est-ce qui vous fait le plus peur s'il arrivait quelque chose ?"}, {id:'C', texte:"Il faut affronter vos peurs."}], bonneReponse: 'B', explication: "L'exploration permet de verbaliser les besoins de sécurité." }
+        ];
 
-export default function App() {
-  const [view, setView] = useState('home'); 
-  const [tour, setTour] = useState(1);
-  const [step, setStep] = useState(1); // 1: Card, 2: Posture, 3: Analysis, 4: Educational
-  const [score, setScore] = useState(0);
-  const [currentCards, setCurrentCards] = useState([]);
-  const [selectedPosture, setSelectedPosture] = useState(null);
-  const [selectedEdu, setSelectedEdu] = useState(null);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+        // --- COMPOSANTS UI ---
+        const IconTarget = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>;
+        const IconPlay = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>;
+        const IconChevron = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>;
 
-  // Initialisation du jeu
-  const startGame = () => {
-    const shuffled = [...GAME_DATA].sort(() => 0.5 - Math.random()).slice(0, 7);
-    setCurrentCards(shuffled);
-    setTour(1);
-    setStep(1);
-    setScore(0);
-    setSelectedPosture(null);
-    setSelectedEdu(null);
-    setView('game');
-  };
+        function App() {
+            const [view, setView] = useState('home');
+            const [tour, setTour] = useState(1);
+            const [step, setStep] = useState(1);
+            const [score, setScore] = useState(0);
+            const [currentCards, setCurrentCards] = useState([]);
+            const [selectedPosture, setSelectedPosture] = useState(null);
+            const [selectedEdu, setSelectedEdu] = useState(null);
 
-  // Logique de progression corrigée
-  const nextStep = () => {
-    if (step < 4) {
-      setStep(step + 1);
-    } else {
-      if (tour < 7) {
-        // Passer au tour suivant et reset les choix
-        setTour(prev => prev + 1);
-        setStep(1);
-        setSelectedPosture(null);
-        setSelectedEdu(null);
-      } else {
-        setView('results');
-      }
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+            const start = () => {
+                const shuffled = [...GAME_DATA].sort(() => 0.5 - Math.random()).slice(0, 7);
+                setCurrentCards(shuffled);
+                setTour(1); setStep(1); setScore(0);
+                setSelectedPosture(null); setSelectedEdu(null);
+                setView('game');
+            };
 
-  const handlePostureClick = (posture) => {
-    if (selectedPosture) return;
-    setSelectedPosture(posture);
-    if (posture === currentCards[tour - 1].bonnePosture) {
-      setScore(prev => prev + 1);
-    }
-  };
+            const next = () => {
+                if (step < 4) setStep(step + 1);
+                else {
+                    if (tour < 7) {
+                        setTour(t => t + 1); setStep(1);
+                        setSelectedPosture(null); setSelectedEdu(null);
+                    } else setView('results');
+                }
+                window.scrollTo(0,0);
+            };
 
-  const handleEduClick = (id) => {
-    if (selectedEdu) return;
-    setSelectedEdu(id);
-    if (id === currentCards[tour - 1].bonneReponse) {
-      setScore(prev => prev + 1);
-    }
-  };
+            const handlePosture = (p) => {
+                if (selectedPosture) return;
+                setSelectedPosture(p);
+                if (p === currentCards[tour-1].bonnePosture) setScore(s => s + 1);
+            };
 
-  const getProfile = () => {
-    if (score <= 4) return { label: "Début d’exploration 🌱", desc: "Le réflexe correcteur est encore présent, mais l'analyse commence !" };
-    if (score <= 8) return { label: "Bon regard clinique 👀", desc: "Vous identifiez bien les intentions soignantes cachées." };
-    if (score <= 12) return { label: "Réflexe éducatif solide 🤝", desc: "L'alliance thérapeutique est au cœur de votre pratique." };
-    return { label: "Champion de l’ETP 🏆", desc: "Maîtrise totale de la posture éducative et de l'autonomie patient." };
-  };
+            const handleEdu = (id) => {
+                if (selectedEdu) return;
+                setSelectedEdu(id);
+                if (id === currentCards[tour-1].bonneReponse) setScore(s => s + 1);
+            };
 
-  // UI Helpers
-  const currentCard = currentCards[tour - 1];
+            const card = currentCards[tour-1];
 
-  return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans select-none">
-      <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden min-h-[600px] flex flex-col relative border border-white/20">
-        
-        {/* HEADER BAR */}
-        <div className="p-6 pb-2">
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="font-black text-xl text-slate-800 tracking-tighter">SOUS LA PHRASE</h1>
-            <div className="flex gap-2">
-              <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 bg-slate-50 rounded-full text-slate-400">
-                {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-              </button>
-              {view !== 'home' && (
-                <button onClick={() => setView('home')} className="p-2 bg-red-50 text-red-400 rounded-full">
-                  <RefreshCcw size={18} />
-                </button>
-              )}
-            </div>
-          </div>
-          {view === 'game' && (
-            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-blue-500 transition-all duration-500" 
-                style={{ width: `${(tour / 7) * 100}%` }} 
-              />
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 p-6 overflow-y-auto">
-          {/* HOME VIEW */}
-          {view === 'home' && (
-            <div className="flex flex-col items-center justify-center h-full text-center py-8 animate-in fade-in zoom-in duration-500">
-              <div className="w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center mb-8 rotate-3 shadow-xl">
-                <Target size={48} className="text-white -rotate-3" />
-              </div>
-              <h2 className="text-3xl font-black text-slate-800 leading-none mb-4">Décodez la posture éducative.</h2>
-              <p className="text-slate-500 mb-10 px-4">Un jeu sérieux pour soignants afin de maîtriser l'intention derrière les mots.</p>
-              
-              <button 
-                onClick={startGame}
-                className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-lg shadow-lg shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-3 mb-4"
-              >
-                <Play fill="white" size={20} /> Commencer
-              </button>
-              
-              <button 
-                onClick={() => setView('rules')}
-                className="w-full bg-white border-2 border-slate-100 text-slate-600 py-4 rounded-2xl font-bold active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
-                <BookOpen size={20} /> Règles du jeu
-              </button>
-            </div>
-          )}
-
-          {/* RULES VIEW */}
-          {view === 'rules' && (
-            <div className="animate-in slide-in-from-bottom duration-300">
-              <h3 className="text-2xl font-black mb-6">Comment jouer ?</h3>
-              <div className="space-y-6 mb-8">
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex-shrink-0 flex items-center justify-center font-black">1</div>
-                  <p className="text-slate-600 pt-1">Analysez une situation réelle entre un soignant et son patient.</p>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex-shrink-0 flex items-center justify-center font-black">2</div>
-                  <p className="text-slate-600 pt-1">Identifiez si le soignant veut <strong>informer</strong>, <strong>conseiller</strong> ou <strong>éduquer</strong>.</p>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex-shrink-0 flex items-center justify-center font-black">3</div>
-                  <p className="text-slate-600 pt-1">Proposez la meilleure alternative éducative pour gagner des points.</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setView('home')}
-                className="w-full bg-slate-800 text-white py-5 rounded-2xl font-bold shadow-lg active:scale-95 transition-all"
-              >
-                C'est parti !
-              </button>
-            </div>
-          )}
-
-          {/* GAME VIEW */}
-          {view === 'game' && currentCard && (
-            <div className="h-full">
-              {/* Step 1: Situation Presentation */}
-              {step === 1 && (
-                <div className="space-y-4 animate-in slide-in-from-right duration-300">
-                  <div className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Patient</span>
-                    <p className="text-lg text-slate-800 italic">"{currentCard.patient}"</p>
-                  </div>
-                  <div className="bg-blue-50 p-6 rounded-[1.5rem] border border-blue-100">
-                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest block mb-2">Soignant</span>
-                    <p className="text-lg text-blue-900 font-bold">"{currentCard.soignant}"</p>
-                  </div>
-                  <button onClick={nextStep} className="w-full mt-6 bg-blue-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2">
-                    Analyser la phrase <ChevronRight size={20} />
-                  </button>
-                </div>
-              )}
-
-              {/* Step 2: Posture Choice */}
-              {step === 2 && (
-                <div className="animate-in slide-in-from-right duration-300">
-                  <h3 className="text-lg font-black text-slate-800 mb-6 text-center">Cette réponse relève surtout de :</h3>
-                  <div className="space-y-3">
-                    {['Informer', 'Conseiller', 'Éduquer'].map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => handlePostureClick(p)}
-                        className={`w-full py-5 rounded-2xl font-black text-lg transition-all border-2 flex items-center justify-between px-6
-                          ${!selectedPosture ? 'bg-white border-slate-100 text-slate-600 hover:border-blue-200' : ''}
-                          ${selectedPosture === p && p === currentCard.bonnePosture ? 'bg-green-500 border-green-500 text-white shadow-lg shadow-green-100' : ''}
-                          ${selectedPosture === p && p !== currentCard.bonnePosture ? 'bg-red-500 border-red-500 text-white' : ''}
-                          ${selectedPosture && p === currentCard.bonnePosture && selectedPosture !== p ? 'bg-green-50 border-green-200 text-green-700' : ''}
-                          ${selectedPosture && p !== currentCard.bonnePosture && selectedPosture !== p ? 'opacity-40 border-slate-100 text-slate-400' : ''}
-                        `}
-                      >
-                        {p}
-                        {selectedPosture && p === currentCard.bonnePosture && <CheckCircle2 size={24} />}
-                        {selectedPosture === p && p !== currentCard.bonnePosture && <AlertCircle size={24} />}
-                      </button>
-                    ))}
-                  </div>
-                  {selectedPosture && (
-                    <button onClick={nextStep} className="w-full mt-8 bg-slate-800 text-white py-5 rounded-2xl font-bold">
-                      Voir l'analyse pédagogique
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Step 3: Analysis */}
-              {step === 3 && (
-                <div className="animate-in slide-in-from-right duration-300 space-y-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Lightbulb className="text-orange-400" />
-                    <h3 className="text-lg font-black text-slate-800">Décryptage</h3>
-                  </div>
-                  
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div className="text-[10px] font-black text-slate-400 uppercase mb-1">Posture</div>
-                    <div className="font-bold text-slate-700">{currentCard.analyse.posture}</div>
-                  </div>
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div className="text-[10px] font-black text-slate-400 uppercase mb-1">Intention</div>
-                    <div className="text-slate-700">{currentCard.analyse.intention}</div>
-                  </div>
-                  <div className="bg-red-50 p-4 rounded-xl border border-red-100">
-                    <div className="text-[10px] font-black text-red-400 uppercase mb-1">Risque</div>
-                    <div className="text-red-700 font-medium">{currentCard.analyse.risque}</div>
-                  </div>
-                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <div className="text-[10px] font-black text-blue-400 uppercase mb-1">Astuce</div>
-                    <div className="text-blue-700 italic">{currentCard.analyse.astuce}</div>
-                  </div>
-
-                  <button onClick={nextStep} className="w-full mt-6 bg-blue-600 text-white py-5 rounded-2xl font-bold">
-                    Choisir la réponse ETP
-                  </button>
-                </div>
-              )}
-
-              {/* Step 4: Educational Choice */}
-              {step === 4 && (
-                <div className="animate-in slide-in-from-right duration-300">
-                  <h3 className="text-lg font-black text-slate-800 mb-6 text-center">La réponse la plus éducative :</h3>
-                  <div className="space-y-4">
-                    {currentCard.choixEducatifs.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => handleEduClick(c.id)}
-                        className={`w-full p-5 rounded-2xl text-left border-2 transition-all flex gap-4
-                          ${!selectedEdu ? 'bg-white border-slate-100 text-slate-600' : ''}
-                          ${selectedEdu === c.id && c.id === currentCard.bonneReponse ? 'bg-green-500 border-green-500 text-white shadow-lg' : ''}
-                          ${selectedEdu === c.id && c.id !== currentCard.bonneReponse ? 'bg-red-500 border-red-500 text-white' : ''}
-                          ${selectedEdu && c.id === currentCard.bonneReponse && selectedEdu !== c.id ? 'border-green-500 bg-green-50 text-green-700' : ''}
-                        `}
-                      >
-                        <div className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs ${selectedEdu ? 'bg-white/20' : 'bg-slate-100'}`}>
-                          {c.id}
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4">
+                    <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden custom-shadow border border-slate-50 flex flex-col min-h-[650px]">
+                        
+                        {/* Header */}
+                        <div className="p-8 pb-4">
+                            <div className="flex justify-between items-center mb-6">
+                                <div>
+                                    <h1 className="font-black text-xl tracking-tighter text-slate-800 uppercase">Sous la Phrase</h1>
+                                    <div className="text-[10px] font-bold text-blue-500 tracking-widest uppercase">Formation ETP</div>
+                                </div>
+                                {view === 'game' && <div className="bg-slate-100 px-3 py-1 rounded-full text-xs font-bold text-slate-500 tracking-tighter">Tour {tour}/7</div>}
+                            </div>
+                            {view === 'game' && (
+                                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="h-full bg-blue-500 transition-all duration-500" style={{width: `${(tour/7)*100}%`}}></div>
+                                </div>
+                            )}
                         </div>
-                        <div className="font-bold leading-tight">{c.texte}</div>
-                      </button>
-                    ))}
-                  </div>
 
-                  {selectedEdu && (
-                    <div className="mt-8 animate-in fade-in slide-in-from-bottom duration-500">
-                      <div className="bg-blue-900 text-white p-5 rounded-2xl mb-6 shadow-xl">
-                        <div className="text-[10px] font-black opacity-50 uppercase tracking-widest mb-2">Explication</div>
-                        <p className="text-sm font-medium leading-relaxed">{currentCard.explication}</p>
-                      </div>
-                      <button 
-                        onClick={nextStep} 
-                        className="w-full bg-slate-800 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2"
-                      >
-                        {tour < 7 ? 'Situation Suivante' : 'Voir mon bilan'} <ChevronRight size={20} />
-                      </button>
+                        <div className="flex-1 p-8 pt-0 overflow-y-auto">
+                            {view === 'home' && (
+                                <div className="flex flex-col items-center justify-center h-full text-center py-10 animate-fade-in">
+                                    <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mb-8 rotate-3 shadow-xl shadow-blue-200 text-white">
+                                        <IconTarget />
+                                    </div>
+                                    <h2 className="text-3xl font-black text-slate-800 leading-[1.1] mb-4">Décodez l'intention du soignant.</h2>
+                                    <p className="text-slate-500 mb-10 text-sm font-medium leading-relaxed">Une application mobile-first pour s'entraîner à la posture éducative en équipe.</p>
+                                    <button onClick={start} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold text-lg shadow-lg active:scale-95 transition-all flex items-center justify-center gap-3">
+                                        Commencer la partie
+                                    </button>
+                                </div>
+                            )}
+
+                            {view === 'game' && card && (
+                                <div className="animate-fade-in">
+                                    {step === 1 && (
+                                        <div className="space-y-4">
+                                            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Patient</div>
+                                                <p className="text-lg italic text-slate-800">"{card.patient}"</p>
+                                            </div>
+                                            <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
+                                                <div className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Soignant</div>
+                                                <p className="text-lg font-bold text-blue-900">"{card.soignant}"</p>
+                                            </div>
+                                            <button onClick={next} className="w-full mt-6 bg-slate-800 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-all">
+                                                Analyser la phrase <IconChevron />
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {step === 2 && (
+                                        <div>
+                                            <h3 className="text-center font-black text-slate-800 mb-6 uppercase text-sm tracking-widest">Posture soignante :</h3>
+                                            <div className="space-y-3">
+                                                {['Informer', 'Conseiller', 'Éduquer'].map(p => (
+                                                    <button key={p} onClick={() => handlePosture(p)} className={`w-full py-5 rounded-2xl font-black border-2 transition-all flex justify-between px-6 ${!selectedPosture ? 'bg-white border-slate-100 text-slate-400' : (selectedPosture === p ? (p === card.bonnePosture ? 'bg-green-500 border-green-500 text-white' : 'bg-red-500 border-red-500 text-white') : (p === card.bonnePosture ? 'bg-green-50 border-green-200 text-green-700' : 'opacity-40 border-slate-50'))}`}>
+                                                        {p}
+                                                        {selectedPosture && p === card.bonnePosture && "✓"}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {selectedPosture && <button onClick={next} className="w-full mt-8 bg-slate-800 text-white py-5 rounded-2xl font-bold active:scale-95 transition-all">Voir l'analyse</button>}
+                                        </div>
+                                    )}
+
+                                    {step === 3 && (
+                                        <div className="space-y-3">
+                                            <h3 className="font-black text-slate-800 mb-4 uppercase text-xs tracking-widest text-center">Carte pédagogique</h3>
+                                            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                                <div className="text-[9px] font-black text-slate-400 uppercase mb-1">Posture</div>
+                                                <div className="font-bold text-slate-700 text-sm">{card.analyse.posture}</div>
+                                            </div>
+                                            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                                <div className="text-[9px] font-black text-slate-400 uppercase mb-1">Intention</div>
+                                                <div className="text-slate-700 text-sm leading-snug">{card.analyse.intention}</div>
+                                            </div>
+                                            <div className="bg-red-50 p-4 rounded-2xl border border-red-100">
+                                                <div className="text-[9px] font-black text-red-400 uppercase mb-1">Risque</div>
+                                                <div className="text-red-700 text-sm font-medium">{card.analyse.risque}</div>
+                                            </div>
+                                            <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                                <div className="text-[9px] font-black text-blue-400 uppercase mb-1">Astuce ETP</div>
+                                                <div className="text-blue-700 text-sm italic">{card.analyse.astuce}</div>
+                                            </div>
+                                            <button onClick={next} className="w-full mt-6 bg-blue-600 text-white py-5 rounded-2xl font-bold">Réponse éducative</button>
+                                        </div>
+                                    )}
+
+                                    {step === 4 && (
+                                        <div className="space-y-4">
+                                            <h3 className="text-center font-black text-slate-800 mb-4 uppercase text-sm tracking-widest">Quelle alternative ?</h3>
+                                            {card.choixEducatifs.map(c => (
+                                                <button key={c.id} onClick={() => handleEdu(c.id)} className={`w-full p-5 rounded-2xl text-left border-2 flex gap-4 transition-all ${!selectedEdu ? 'bg-white border-slate-100 text-slate-600' : (c.id === card.bonneReponse ? 'bg-green-500 border-green-500 text-white' : (selectedEdu === c.id ? 'bg-red-500 border-red-500 text-white' : 'opacity-40 border-slate-50'))}`}>
+                                                    <div className="font-black opacity-40">{c.id}</div>
+                                                    <div className="font-bold text-sm leading-tight">{c.texte}</div>
+                                                </button>
+                                            ))}
+                                            {selectedEdu && (
+                                                <div className="mt-6 bg-blue-900 text-white p-6 rounded-3xl animate-fade-in">
+                                                    <p className="text-xs leading-relaxed opacity-90">{card.explication}</p>
+                                                    <button onClick={next} className="w-full mt-6 bg-white text-blue-900 py-4 rounded-2xl font-black text-sm uppercase">{tour < 7 ? "Suivant" : "Bilan"}</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {view === 'results' && (
+                                <div className="flex flex-col items-center text-center py-10 animate-fade-in">
+                                    <div className="text-6xl mb-6">🏆</div>
+                                    <h2 className="text-3xl font-black text-slate-800 mb-1 leading-none">TERMINÉ !</h2>
+                                    <div className="text-5xl font-black text-blue-600 mb-8 tracking-tighter">{score}<span className="text-lg text-slate-300">/14</span></div>
+                                    <div className="bg-slate-50 p-6 rounded-[2rem] w-full mb-10 border border-slate-100">
+                                        <p className="text-sm text-slate-600 leading-relaxed italic">"Plus on décode l'intention, plus on libère l'action du patient."</p>
+                                    </div>
+                                    <button onClick={start} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 active:scale-95 transition-all">Rejouer</button>
+                                </div>
+                            )}
+                        </div>
+
+                        {view === 'game' && <div className="p-6 bg-slate-50 border-t border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Score Actuel : {score}</div>}
                     </div>
-                  )}
                 </div>
-              )}
-            </div>
-          )}
+            );
+        }
 
-          {/* RESULTS VIEW */}
-          {view === 'results' && (
-            <div className="flex flex-col items-center justify-center h-full text-center py-6 animate-in slide-in-from-bottom duration-700">
-              <div className="w-20 h-20 bg-yellow-400 rounded-full flex items-center justify-center mb-6 shadow-xl text-white">
-                <Trophy size={40} />
-              </div>
-              <h2 className="text-2xl font-black text-slate-800 mb-1">SESSION TERMINÉE</h2>
-              <div className="text-6xl font-black text-blue-600 mb-4 tracking-tighter">
-                {score}<span className="text-xl text-slate-300">/14</span>
-              </div>
-              
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 w-full mb-8">
-                <div className="text-blue-600 font-black text-lg mb-2">{getProfile().label}</div>
-                <p className="text-slate-500 text-sm leading-relaxed">{getProfile().desc}</p>
-              </div>
-
-              <div className="w-full grid grid-cols-3 gap-2 mb-10">
-                <div className="bg-blue-500 text-white p-3 rounded-xl text-[10px] font-bold">Informer<br/>Transmet</div>
-                <div className="bg-orange-400 text-white p-3 rounded-xl text-[10px] font-bold">Conseiller<br/>Oriente</div>
-                <div className="bg-green-600 text-white p-3 rounded-xl text-[10px] font-bold">Eduquer<br/>Aide à agir</div>
-              </div>
-
-              <button 
-                onClick={startGame}
-                className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold shadow-lg shadow-blue-100 flex items-center justify-center gap-3"
-              >
-                <RefreshCcw size={20} /> Rejouer une partie
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* FOOTER INFO */}
-        {view === 'game' && (
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tour {tour} / 7</span>
-            <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Score : {score}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
