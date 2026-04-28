@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Réflexes ETP</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    background: #fffdf7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    gap: 0;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 500;
+    color: #888;
+    margin-bottom: 28px;
+    letter-spacing: .03em;
+  }
+
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    max-width: 320px;
+    margin-bottom: 36px;
+  }
+
+  .btn {
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
+    border-radius: 14px;
+    border: 2px solid #e8e0d0;
+    background: white;
+    cursor: pointer;
+    transition: transform .1s, border-color .1s;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn:active { transform: scale(.92); }
+  .btn.active { border-color: #c4510a; background: #fff5ef; }
+
+  .card {
+    max-width: 320px;
+    width: 100%;
+    background: white;
+    border: 2px solid #e8e0d0;
+    border-radius: 16px;
+    padding: 24px 20px;
+    min-height: 120px;
+    display: none;
+  }
+
+  .card.visible { display: block; }
+
+  .card-num {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 8px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .card-body {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+  }
+
+  .ok  { color: #5a7a5e; }
+  .ko  { color: #c4510a; }
+</style>
+</head>
+<body>
+
+<h2>🧭 Réflexes ETP — tape un emoji</h2>
+
+<div class="grid" id="grid"></div>
+<div class="card" id="card">
+  <div class="card-num" id="cNum"></div>
+  <div class="card-title" id="cTitle"></div>
+  <div class="card-body" id="cBody"></div>
+</div>
+
+<script>
+const ASTUCES = [
+  {
+    e: "💬", title: "Remplacer « Est-ce que ? » par « Comment ? »",
+    body: `<span class="ko">✗ Est-ce que vous prenez le traitement ?</span><br>
+           <span class="ok">✓ Comment cela se passe avec le traitement ?</span><br><br>
+           Le patient raconte au lieu de répondre oui/non.`
+  },
+  {
+    e: "🚫", title: "Éviter « Pourquoi ? »",
+    body: `<span class="ko">✗ Pourquoi vous avez arrêté ?</span><br>
+           <span class="ok">✓ Comment cela s'est arrêté ?</span><br>
+           <span class="ok">✓ Qu'est-ce qui a compliqué les choses ?</span><br><br>
+           Moins de défense, plus d'explication.`
+  },
+  {
+    e: "💪", title: "Commencer par ce qui marche déjà",
+    body: `Qu'est-ce qui vous aide déjà ?<br>
+           Qu'est-ce que vous arrivez déjà à faire ?<br><br>
+           On s'appuie sur les forces existantes.`
+  },
+  {
+    e: "🔁", title: "Reformuler souvent",
+    body: `« Si je comprends bien… »<br>
+           « En fait, le plus dur pour vous c'est… »<br><br>
+           Le patient se sent compris.`
+  },
+  {
+    e: "🎯", title: "Relier l'objectif au projet de vie",
+    body: `<span class="ko">✗ Baisser la glycémie</span> → <span class="ok">avoir plus d'énergie au travail</span><br>
+           <span class="ko">✗ Perdre du poids</span> → <span class="ok">rejouer avec les petits-enfants</span><br><br>
+           Le patient s'engage quand le soin sert quelque chose d'important.`
+  },
+  {
+    e: "☝️", title: "Une seule question à la fois",
+    body: `<span class="ko">✗ Comment ça va et vous mangez mieux et vous marchez ?</span><br>
+           <span class="ok">✓ Qu'est-ce qui est le plus difficile en ce moment ?</span><br><br>
+           Plus clair, plus efficace.`
+  },
+  {
+    e: "🌱", title: "Valoriser les petits pas",
+    body: `« Vous avez repris rendez-vous. »<br>
+           « Vous avez essayé 2 jours. »<br><br>
+           La confiance augmente.`
+  },
+  {
+    e: "📊", title: "Utiliser l'échelle sur 10",
+    body: `« Aujourd'hui vous êtes à combien sur 10 ? »<br>
+           « Que faudrait-il pour passer à +1 ? »<br><br>
+           Fait émerger une action réaliste.`
+  },
+  {
+    e: "✅", title: "Finir par un mini objectif précis",
+    body: `<span class="ko">✗ Faire attention</span><br>
+           <span class="ok">✓ Marcher 10 min lundi et jeudi</span><br><br>
+           Petit objectif = plus de réussite.`
+  },
+  {
+    e: "🤫", title: "Parler moins, écouter plus",
+    body: `Si vous parlez plus que le patient → ralentir.<br><br>
+           Celui qui change est celui qui pense à voix haute.`
+  }
+];
+
+const grid = document.getElementById('grid');
+const card = document.getElementById('card');
+let active = -1;
+
+ASTUCES.forEach((a, i) => {
+  const b = document.createElement('button');
+  b.className = 'btn';
+  b.textContent = a.e;
+  b.onclick = () => {
+    if (active === i) {
+      card.classList.remove('visible');
+      b.classList.remove('active');
+      active = -1;
+      return;
+    }
+    document.querySelectorAll('.btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    active = i;
+    document.getElementById('cNum').textContent = `Astuce ${i+1} / 10`;
+    document.getElementById('cTitle').textContent = a.e + '  ' + a.title;
+    document.getElementById('cBody').innerHTML = a.body;
+    card.classList.add('visible');
+  };
+  grid.appendChild(b);
+});
+</script>
+</body>
+</html>
