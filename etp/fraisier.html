@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Fraisier de Vie 🍓</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@500;700&display=swap');
+
+  :root {
+    --vert-doux: #7bbf6a;
+    --vert-fonce: #4a8c3f;
+    --vert-feuille: #5aab48;
+    --rouge-fraise: #e8433a;
+    --rouge-doux: #f07070;
+    --jaune-chaud: #f7d154;
+    --blanc-casse: #fdfaf4;
+    --creme: #f5ede0;
+    --brun-terre: #8b5e3c;
+    --brun-clair: #c8956c;
+    --bleu-ciel: #a8d8f0;
+    --rose-pale: #fde8e8;
+    --shadow-soft: rgba(90, 171, 72, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(160deg, #f0f9e8 0%, #fdfaf4 40%, #fff5f0 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* Fond texture subtile */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 80%, rgba(123,191,106,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(232,67,58,0.05) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(247,209,84,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    margin-bottom: 10px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  header h1 {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 700;
+    color: var(--vert-fonce);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    text-shadow: 2px 3px 0px rgba(123,191,106,0.2);
+  }
+
+  header p {
+    font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+    color: #7a7060;
+    margin-top: 6px;
+    font-weight: 600;
+    font-style: italic;
+  }
+
+  /* ZONE FRAISIER */
+  .plant-stage {
+    position: relative;
+    width: min(680px, 95vw);
+    aspect-ratio: 1 / 1.1;
+    margin: 0 auto;
+    animation: fadeUp 1s ease 0.2s both;
+  }
+
+  /* LUCIOLES */
+  .luciole {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff9a0 0%, #f7d154 60%, transparent 100%);
+    box-shadow: 0 0 6px 2px rgba(247,209,84,0.7);
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .luciole:nth-child(1) { top: 15%; left: 8%; animation: luciole1 7s ease-in-out infinite; }
+  .luciole:nth-child(2) { top: 25%; right: 6%; animation: luciole2 9s ease-in-out infinite 1s; }
+  .luciole:nth-child(3) { top: 55%; left: 4%; animation: luciole3 8s ease-in-out infinite 2s; }
+  .luciole:nth-child(4) { top: 40%; right: 3%; animation: luciole4 10s ease-in-out infinite 0.5s; }
+  .luciole:nth-child(5) { top: 70%; left: 12%; animation: luciole1 11s ease-in-out infinite 3s; }
+
+  @keyframes luciole1 {
+    0%,100% { transform: translate(0,0) scale(1); opacity: 0.3; }
+    25% { transform: translate(12px,-18px) scale(1.3); opacity: 1; }
+    50% { transform: translate(-8px,-30px) scale(0.8); opacity: 0.5; }
+    75% { transform: translate(20px,-10px) scale(1.1); opacity: 0.9; }
+  }
+  @keyframes luciole2 {
+    0%,100% { transform: translate(0,0) scale(1); opacity: 0.4; }
+    30% { transform: translate(-15px,10px) scale(1.2); opacity: 0.9; }
+    60% { transform: translate(8px,20px) scale(0.9); opacity: 0.3; }
+    80% { transform: translate(-5px,5px) scale(1.4); opacity: 1; }
+  }
+  @keyframes luciole3 {
+    0%,100% { transform: translate(0,0); opacity: 0.2; }
+    40% { transform: translate(18px,-12px) scale(1.3); opacity: 1; }
+    70% { transform: translate(5px,8px) scale(0.7); opacity: 0.4; }
+  }
+  @keyframes luciole4 {
+    0%,100% { transform: translate(0,0) scale(1); opacity: 0.5; }
+    35% { transform: translate(-10px,-20px) scale(1.2); opacity: 0.8; }
+    65% { transform: translate(5px,15px) scale(0.9); opacity: 0.2; }
+  }
+
+  /* COCCINELLES */
+  .coccinelle {
+    position: absolute;
+    font-size: 1.2rem;
+    z-index: 21;
+    filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.15));
+  }
+  .coccinelle:nth-of-type(1) { animation: crawl1 14s linear infinite; }
+  .coccinelle:nth-of-type(2) { animation: crawl2 18s linear infinite 3s; }
+  .coccinelle:nth-of-type(3) { animation: crawl3 22s linear infinite 7s; }
+
+  @keyframes crawl1 {
+    0% { top: 70%; left: 10%; transform: rotate(20deg); opacity:0; }
+    5% { opacity: 1; }
+    30% { top: 45%; left: 20%; transform: rotate(-10deg); }
+    60% { top: 55%; left: 55%; transform: rotate(15deg); }
+    90% { top: 35%; left: 70%; transform: rotate(-5deg); opacity: 1; }
+    100% { top: 30%; left: 80%; opacity: 0; }
+  }
+  @keyframes crawl2 {
+    0% { top: 85%; left: 60%; transform: rotate(-15deg); opacity: 0; }
+    5% { opacity: 1; }
+    40% { top: 60%; left: 40%; transform: rotate(10deg); }
+    70% { top: 40%; left: 25%; transform: rotate(-20deg); }
+    95% { top: 25%; left: 15%; opacity: 1; }
+    100% { top: 20%; left: 10%; opacity: 0; }
+  }
+  @keyframes crawl3 {
+    0% { top: 30%; left: 75%; transform: rotate(5deg); opacity: 0; }
+    5% { opacity: 1; }
+    50% { top: 60%; left: 50%; transform: rotate(-15deg); }
+    95% { top: 75%; left: 20%; opacity: 1; }
+    100% { top: 80%; left: 15%; opacity: 0; }
+  }
+
+  /* SVG FRAISIER */
+  #fraisier-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Animations SVG */
+  .feuille-1 { transform-origin: 30% 80%; animation: sway1 4s ease-in-out infinite; }
+  .feuille-2 { transform-origin: 50% 85%; animation: sway2 5s ease-in-out infinite 0.5s; }
+  .feuille-3 { transform-origin: 70% 80%; animation: sway3 4.5s ease-in-out infinite 1s; }
+  .feuille-4 { transform-origin: 20% 70%; animation: sway1 6s ease-in-out infinite 0.8s; }
+  .feuille-5 { transform-origin: 80% 70%; animation: sway2 5.5s ease-in-out infinite 1.5s; }
+  .feuille-petite { transform-origin: 50% 90%; animation: sway3 3.5s ease-in-out infinite 0.3s; }
+
+  @keyframes sway1 {
+    0%,100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg) translateX(-2px); }
+    75% { transform: rotate(2deg) translateX(2px); }
+  }
+  @keyframes sway2 {
+    0%,100% { transform: rotate(0deg); }
+    33% { transform: rotate(2.5deg) translateX(1px); }
+    66% { transform: rotate(-2deg) translateX(-1px); }
+  }
+  @keyframes sway3 {
+    0%,100% { transform: rotate(0deg); }
+    40% { transform: rotate(-2deg) translateX(-3px); }
+    80% { transform: rotate(1.5deg) translateX(2px); }
+  }
+
+  .fleur-1 { animation: bloom1 6s ease-in-out infinite; }
+  .fleur-2 { animation: bloom1 7s ease-in-out infinite 1s; }
+  .fleur-3 { animation: bloom1 5.5s ease-in-out infinite 2s; }
+  .fleur-4 { animation: bloom1 8s ease-in-out infinite 0.5s; }
+
+  @keyframes bloom1 {
+    0%,100% { opacity: 0.85; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  .fraise-1 { animation: glimmer 3s ease-in-out infinite; }
+  .fraise-2 { animation: glimmer 4s ease-in-out infinite 0.7s; }
+  .fraise-3 { animation: glimmer 3.5s ease-in-out infinite 1.3s; }
+  .fraise-4 { animation: glimmer 4.5s ease-in-out infinite 0.3s; }
+
+  @keyframes glimmer {
+    0%,100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.12) saturate(1.1); }
+  }
+
+  .racine-1 { animation: pulse-root 5s ease-in-out infinite; }
+  .racine-2 { animation: pulse-root 6s ease-in-out infinite 1s; }
+  .racine-3 { animation: pulse-root 4.5s ease-in-out infinite 2s; }
+
+  @keyframes pulse-root {
+    0%,100% { opacity: 0.45; stroke-width: 2; }
+    50% { opacity: 0.7; stroke-width: 2.5; }
+  }
+
+  /* Sol */
+  .sol { animation: breathe-soil 8s ease-in-out infinite; }
+  @keyframes breathe-soil {
+    0%,100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.01); }
+  }
+
+  /* ICÔNES INTERACTIVES */
+  .icons-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 8px;
+    padding: 0 10px;
+    animation: fadeUp 0.8s ease 0.6s both;
+  }
+
+  .icon-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .icon-btn:hover { transform: translateY(-5px) scale(1.08); }
+  .icon-btn:active { transform: scale(0.95); }
+
+  .icon-circle {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.08);
+    border: 3px solid rgba(255,255,255,0.7);
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .icon-circle::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .icon-btn:hover .icon-circle::after { opacity: 1; }
+  .icon-btn:hover .icon-circle {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  .icon-c1 { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); }
+  .icon-c2 { background: linear-gradient(135deg, #86efac 0%, #22c55e 100%); }
+  .icon-c3 { background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%); }
+  .icon-c4 { background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%); }
+  .icon-c5 { background: linear-gradient(135deg, #67e8f9 0%, #22d3ee 100%); }
+  .icon-c6 { background: linear-gradient(135deg, #d9f99d 0%, #a3e635 100%); }
+  .icon-c7 { background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%); }
+
+  .icon-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #5a7050;
+    text-align: center;
+    max-width: 62px;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(60, 90, 50, 0.38);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-card {
+    background: var(--blanc-casse);
+    border-radius: 28px;
+    padding: 32px 28px 28px;
+    max-width: 460px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(60,90,50,0.25), 0 4px 16px rgba(0,0,0,0.1);
+    position: relative;
+    transform: scale(0.85) translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    border: 2px solid rgba(255,255,255,0.8);
+  }
+
+  .modal-overlay.active .modal-card {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-deco {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 8px;
+    animation: bounceIn 0.4s ease 0.1s both;
+    display: block;
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0); }
+    70% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .modal-title {
+    font-family: 'Caveat', cursive;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--vert-fonce);
+    margin-bottom: 14px;
+  }
+
+  .modal-line {
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--vert-doux), var(--jaune-chaud));
+    border-radius: 2px;
+    margin: 0 auto 18px;
+  }
+
+  .modal-question {
+    font-size: 1.08rem;
+    color: #4a5568;
+    text-align: center;
+    line-height: 1.65;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(123,191,106,0.1), rgba(247,209,84,0.08));
+    border-radius: 16px;
+    padding: 16px 14px;
+    border: 1.5px solid rgba(123,191,106,0.2);
+  }
+
+  .modal-textarea {
+    width: 100%;
+    margin-top: 16px;
+    min-height: 80px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(123,191,106,0.3);
+    background: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    color: #3d4a35;
+    padding: 12px 14px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .modal-textarea:focus {
+    border-color: var(--vert-doux);
+    box-shadow: 0 0 0 3px rgba(123,191,106,0.15);
+  }
+
+  .modal-textarea::placeholder {
+    color: #aab5a0;
+    font-style: italic;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: rgba(123,191,106,0.15);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+    color: var(--vert-fonce);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+  }
+
+  .modal-close:hover {
+    background: rgba(123,191,106,0.35);
+    transform: rotate(90deg);
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .btn-valider {
+    background: linear-gradient(135deg, var(--vert-doux) 0%, var(--vert-fonce) 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 28px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(74,140,63,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-valider:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74,140,63,0.45);
+  }
+
+  .btn-valider:active { transform: scale(0.97); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, #4a8c3f, #7bbf6a);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 24px rgba(74,140,63,0.4);
+    z-index: 200;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Animations globales */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .plant-stage { width: 95vw; }
+    .icon-circle { width: 50px; height: 50px; font-size: 1.4rem; }
+    .icons-row { gap: 10px; }
+    .icon-label { font-size: 0.62rem; max-width: 54px; }
+    .modal-card { padding: 26px 20px 22px; }
+    .modal-title { font-size: 1.5rem; }
+    .modal-question { font-size: 0.98rem; }
+  }
+
+  @media (max-width: 380px) {
+    .icon-circle { width: 44px; height: 44px; font-size: 1.2rem; }
+    .icons-row { gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <h1>Mon Fraisier de Vie 🍓</h1>
+    <p>Regardons ensemble ce qui pousse bien, ce qui gêne, et ce qui peut aider.</p>
+  </header>
+
+  <!-- SCÈNE FRAISIER -->
+  <div class="plant-stage">
+
+    <!-- Lucioles -->
+    <div class="luciole"></div>
+    <div class="luciole"></div>
+    <div class="luciole"></div>
+    <div class="luciole"></div>
+    <div class="luciole"></div>
+
+    <!-- Coccinelles -->
+    <span class="coccinelle" style="top:65%;left:12%">🐞</span>
+    <span class="coccinelle" style="top:80%;left:58%">🐞</span>
+    <span class="coccinelle" style="top:30%;right:10%">🐞</span>
+
+    <!-- SVG FRAISIER PRINCIPAL -->
+    <svg id="fraisier-svg" viewBox="0 0 600 660" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradients sol -->
+        <linearGradient id="solGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c8956c"/>
+          <stop offset="40%" stop-color="#a06840"/>
+          <stop offset="100%" stop-color="#7a4e28"/>
+        </linearGradient>
+        <linearGradient id="solSurface" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d4a574"/>
+          <stop offset="100%" stop-color="#b8845c"/>
+        </linearGradient>
+        <!-- Gradients feuilles -->
+        <linearGradient id="feuille1Grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#8dd15c"/>
+          <stop offset="100%" stop-color="#4a8c3f"/>
+        </linearGradient>
+        <linearGradient id="feuille2Grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#a8d860"/>
+          <stop offset="100%" stop-color="#5aab48"/>
+        </linearGradient>
+        <linearGradient id="feuille3Grad" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7bbf6a"/>
+          <stop offset="100%" stop-color="#3d7c35"/>
+        </linearGradient>
+        <!-- Fraise -->
+        <linearGradient id="fraiseGrad1" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#f87171"/>
+          <stop offset="100%" stop-color="#c0392b"/>
+        </linearGradient>
+        <linearGradient id="fraiseGrad2" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#ef4444"/>
+          <stop offset="100%" stop-color="#991b1b"/>
+        </linearGradient>
+        <linearGradient id="fraiseGrad3" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#fca5a5"/>
+          <stop offset="100%" stop-color="#e8433a"/>
+        </linearGradient>
+        <!-- Tige -->
+        <linearGradient id="tigeGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#3d7c35"/>
+          <stop offset="100%" stop-color="#5aab48"/>
+        </linearGradient>
+        <!-- Fleur -->
+        <radialGradient id="fleurCentre">
+          <stop offset="0%" stop-color="#fff176"/>
+          <stop offset="100%" stop-color="#f7d154"/>
+        </radialGradient>
+        <!-- Racines -->
+        <linearGradient id="racineGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8b5e3c"/>
+          <stop offset="100%" stop-color="#6b3e20" stop-opacity="0.4"/>
+        </linearGradient>
+        <!-- Pot / sol texture -->
+        <filter id="softShadow">
+          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#4a3020" flood-opacity="0.2"/>
+        </filter>
+        <filter id="leafGlow">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+
+      <!-- ===== SOL ===== -->
+      <g class="sol">
+        <!-- Surface sol arrondie -->
+        <ellipse cx="300" cy="530" rx="240" ry="28" fill="url(#solSurface)" filter="url(#softShadow)"/>
+        <!-- Corps sol -->
+        <path d="M60 530 Q80 528 120 535 Q180 545 240 538 Q300 530 360 538 Q420 545 480 535 Q520 528 540 530 L540 620 Q300 640 60 620 Z" fill="url(#solGrad)"/>
+        <!-- Petits cailloux déco -->
+        <ellipse cx="130" cy="528" rx="8" ry="4" fill="#b07840" opacity="0.6"/>
+        <ellipse cx="420" cy="527" rx="6" ry="3" fill="#a06030" opacity="0.5"/>
+        <ellipse cx="280" cy="533" rx="5" ry="2.5" fill="#c09060" opacity="0.4"/>
+        <ellipse cx="200" cy="530" rx="4" ry="2" fill="#b08050" opacity="0.5"/>
+        <ellipse cx="370" cy="531" rx="7" ry="3" fill="#9a5830" opacity="0.4"/>
+        <!-- Texture sol (petites herbes) -->
+        <path d="M100 528 Q98 518 96 510" stroke="#5aab48" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <path d="M105 527 Q106 515 110 508" stroke="#5aab48" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <path d="M450 527 Q448 517 446 509" stroke="#5aab48" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <path d="M460 526 Q462 514 465 507" stroke="#5aab48" stroke-width="1.5" fill="none" opacity="0.4"/>
+      </g>
+
+      <!-- ===== RACINES ===== -->
+      <!-- Racine centrale profonde -->
+      <path class="racine-1" d="M300 530 Q298 560 295 590 Q293 610 290 630" stroke="url(#racineGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Racine gauche principale -->
+      <path class="racine-2" d="M300 530 Q270 550 240 560 Q210 568 185 575 Q165 580 150 590" stroke="url(#racineGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Branche racine gauche haut -->
+      <path class="racine-3" d="M240 560 Q225 565 210 575 Q198 582 190 592" stroke="url(#racineGrad)" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <!-- Racine droite principale -->
+      <path class="racine-2" d="M300 530 Q330 550 360 560 Q390 568 415 575 Q435 580 450 590" stroke="url(#racineGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Branche racine droite -->
+      <path class="racine-1" d="M360 560 Q375 565 390 575 Q402 582 410 592" stroke="url(#racineGrad)" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <!-- Petites radicelles -->
+      <path class="racine-3" d="M295 590 Q285 600 278 612" stroke="#8b5e3c" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.5"/>
+      <path class="racine-3" d="M150 590 Q142 598 136 608" stroke="#8b5e3c" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.4"/>
+      <path class="racine-3" d="M450 590 Q458 598 464 610" stroke="#8b5e3c" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+      <!-- ===== TIGES PRINCIPALES ===== -->
+      <!-- Tige centrale -->
+      <path d="M300 530 Q302 490 300 450 Q298 410 300 370" stroke="url(#tigeGrad)" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <!-- Tige gauche -->
+      <path d="M285 520 Q255 490 230 460 Q210 438 200 410" stroke="url(#tigeGrad)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <!-- Tige droite -->
+      <path d="M315 520 Q345 490 370 460 Q390 438 400 410" stroke="url(#tigeGrad)" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <!-- Petites tiges latérales -->
+      <path d="M295 480 Q265 470 240 455 Q220 445 205 430" stroke="#5aab48" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M305 480 Q335 470 360 455 Q380 445 395 430" stroke="#5aab48" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- Tiges fleurs -->
+      <path d="M298 420 Q285 400 275 380 Q268 365 265 350" stroke="#5aab48" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M302 415 Q315 395 325 375 Q332 360 334 345" stroke="#5aab48" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M300 400 Q300 380 300 360 Q300 345 300 330" stroke="#5aab48" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Stolon gauche -->
+      <path d="M210 490 Q165 495 140 505 Q120 512 105 520" stroke="#6ab854" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="0"/>
+      <!-- Stolon droite -->
+      <path d="M390 490 Q435 495 460 505 Q480 512 495 520" stroke="#6ab854" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+      <!-- ===== GRANDES FEUILLES ===== -->
+      <!-- Feuille centrale grande -->
+      <g class="feuille-1">
+        <path d="M300 370 Q260 330 240 285 Q225 250 235 220 Q260 200 285 215 Q305 230 310 260 Q318 290 310 330 Z" fill="url(#feuille1Grad)" filter="url(#leafGlow)"/>
+        <!-- Nervure centrale -->
+        <path d="M300 370 Q270 320 250 270 Q240 240 238 225" stroke="#3d7c35" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <!-- Nervures latérales -->
+        <path d="M275 325 Q265 315 260 300" stroke="#3d7c35" stroke-width="1" fill="none" opacity="0.4"/>
+        <path d="M265 295 Q255 285 252 270" stroke="#3d7c35" stroke-width="1" fill="none" opacity="0.4"/>
+        <!-- Reflet lumière -->
+        <path d="M290 340 Q275 310 268 280 Q263 260 265 245" stroke="rgba(255,255,255,0.35)" stroke-width="4" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Feuille gauche grande -->
+      <g class="feuille-2">
+        <path d="M200 410 Q155 380 130 345 Q110 315 118 285 Q138 260 165 270 Q185 280 195 308 Q205 340 210 380 Z" fill="url(#feuille2Grad)"/>
+        <path d="M200 410 Q162 375 140 335 Q124 305 122 290" stroke="#3d7c35" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M178 385 Q165 370 158 350" stroke="#3d7c35" stroke-width="1" fill="none" opacity="0.4"/>
+        <path d="M190 345 Q175 330 162 312 Q155 300 152 288" stroke="rgba(255,255,255,0.3)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Feuille droite grande -->
+      <g class="feuille-3">
+        <path d="M400 410 Q445 380 470 345 Q490 315 482 285 Q462 260 435 270 Q415 280 405 308 Q395 340 390 380 Z" fill="url(#feuille1Grad)"/>
+        <path d="M400 410 Q438 375 460 335 Q476 305 478 290" stroke="#3d7c35" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M422 385 Q435 370 442 350" stroke="#3d7c35" stroke-width="1" fill="none" opacity="0.4"/>
+        <path d="M410 345 Q425 330 438 312 Q445 300 448 288" stroke="rgba(255,255,255,0.3)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Feuille centrale gauche (milieu) -->
+      <g class="feuille-4">
+        <path d="M270 460 Q225 435 205 400 Q188 372 198 350 Q215 332 238 342 Q255 352 262 375 Q270 400 272 440 Z" fill="url(#feuille3Grad)"/>
+        <path d="M270 460 Q228 428 210 393 Q196 368 200 355" stroke="#3d7c35" stroke-width="1.2" fill="none" opacity="0.5"/>
+        <path d="M248 425 Q237 410 232 390 Q228 375 229 362" stroke="rgba(255,255,255,0.25)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Feuille centrale droite (milieu) -->
+      <g class="feuille-5">
+        <path d="M330 460 Q375 435 395 400 Q412 372 402 350 Q385 332 362 342 Q345 352 338 375 Q330 400 328 440 Z" fill="url(#feuille2Grad)"/>
+        <path d="M330 460 Q372 428 390 393 Q404 368 400 355" stroke="#3d7c35" stroke-width="1.2" fill="none" opacity="0.5"/>
+        <path d="M352 425 Q363 410 368 390 Q372 375 371 362" stroke="rgba(255,255,255,0.25)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
+
+      <!-- Petites feuilles latérales stolons -->
+      <g class="feuille-petite">
+        <ellipse cx="115" cy="510" rx="22" ry="14" fill="#7bbf6a" transform="rotate(-25 115 510)"/>
+        <path d="M115 510 Q118 500 120 492" stroke="#3d7c35" stroke-width="1" fill="none" opacity="0.5"/>
+      </g>
+      <g class="feuille-petite" style="animation-delay:0.8s">
+        <ellipse cx="490" cy="510" rx="22" ry="14" fill="#7bbf6a" transform="rotate(25 490 510)"/>
+        <path d="M490 510 Q487 500 485 492" stroke="#3d7c35" stroke-width="1" fill="none" opacity="0.5"/>
+      </g>
+
+      <!-- ===== FLEURS ===== -->
+      <!-- Composant fleur réutilisable via <use> -->
+      <!-- Fleur 1 - gauche haut -->
+      <g class="fleur-1" transform="translate(265, 340)">
+        <circle cx="0" cy="0" r="16" fill="rgba(253,240,208,0.5)"/>
+        <ellipse cx="0" cy="-13" rx="6" ry="9" fill="white" opacity="0.92"/>
+        <ellipse cx="9" cy="-10" rx="6" ry="9" fill="white" opacity="0.88" transform="rotate(50 9 -10)"/>
+        <ellipse cx="12" cy="-2" rx="6" ry="9" fill="white" opacity="0.9" transform="rotate(100 12 -2)"/>
+        <ellipse cx="6" cy="9" rx="6" ry="9" fill="white" opacity="0.88" transform="rotate(150 6 9)"/>
+        <ellipse cx="-6" cy="9" rx="6" ry="9" fill="white" opacity="0.9" transform="rotate(-150 -6 9)"/>
+        <ellipse cx="-12" cy="-2" rx="6" ry="9" fill="white" opacity="0.88" transform="rotate(-100 -12 -2)"/>
+        <circle cx="0" cy="0" r="7" fill="url(#fleurCentre)"/>
+        <circle cx="0" cy="0" r="3.5" fill="#e8a020" opacity="0.8"/>
+      </g>
+
+      <!-- Fleur 2 - droite haut -->
+      <g class="fleur-2" transform="translate(334, 336)">
+        <circle cx="0" cy="0" r="14" fill="rgba(253,240,208,0.4)"/>
+        <ellipse cx="0" cy="-12" rx="5.5" ry="8.5" fill="white" opacity="0.9"/>
+        <ellipse cx="8.5" cy="-9" rx="5.5" ry="8.5" fill="white" opacity="0.87" transform="rotate(50 8.5 -9)"/>
+        <ellipse cx="11" cy="-2" rx="5.5" ry="8.5" fill="white" opacity="0.9" transform="rotate(100 11 -2)"/>
+        <ellipse cx="5.5" cy="8" rx="5.5" ry="8.5" fill="white" opacity="0.87" transform="rotate(150 5.5 8)"/>
+        <ellipse cx="-5.5" cy="8" rx="5.5" ry="8.5" fill="white" opacity="0.9" transform="rotate(-150 -5.5 8)"/>
+        <ellipse cx="-11" cy="-2" rx="5.5" ry="8.5" fill="white" opacity="0.87" transform="rotate(-100 -11 -2)"/>
+        <circle cx="0" cy="0" r="6.5" fill="url(#fleurCentre)"/>
+        <circle cx="0" cy="0" r="3" fill="#e8a020" opacity="0.8"/>
+      </g>
+
+      <!-- Fleur 3 - centrale haute -->
+      <g class="fleur-3" transform="translate(300, 322)">
+        <circle cx="0" cy="0" r="17" fill="rgba(253,240,208,0.45)"/>
+        <ellipse cx="0" cy="-14" rx="6.5" ry="10" fill="white" opacity="0.93"/>
+        <ellipse cx="10" cy="-11" rx="6.5" ry="10" fill="white" opacity="0.88" transform="rotate(50 10 -11)"/>
+        <ellipse cx="13" cy="-2" rx="6.5" ry="10" fill="white" opacity="0.91" transform="rotate(100 13 -2)"/>
+        <ellipse cx="7" cy="10" rx="6.5" ry="10" fill="white" opacity="0.88" transform="rotate(150 7 10)"/>
+        <ellipse cx="-7" cy="10" rx="6.5" ry="10" fill="white" opacity="0.91" transform="rotate(-150 -7 10)"/>
+        <ellipse cx="-13" cy="-2" rx="6.5" ry="10" fill="white" opacity="0.88" transform="rotate(-100 -13 -2)"/>
+        <circle cx="0" cy="0" r="8" fill="url(#fleurCentre)"/>
+        <circle cx="0" cy="0" r="4" fill="#e8a020" opacity="0.85"/>
+      </g>
+
+      <!-- Bouton floral (petite fleur en bouton) -->
+      <g class="fleur-4" transform="translate(230, 360)">
+        <circle cx="0" cy="0" r="9" fill="rgba(253,240,208,0.4)"/>
+        <ellipse cx="0" cy="-8" rx="4" ry="6" fill="white" opacity="0.85"/>
+        <ellipse cx="6.5" cy="-5" rx="4" ry="6" fill="white" opacity="0.82" transform="rotate(50 6.5 -5)"/>
+        <ellipse cx="7.5" cy="2" rx="4" ry="6" fill="white" opacity="0.85" transform="rotate(100 7.5 2)"/>
+        <ellipse cx="3" cy="7" rx="4" ry="6" fill="white" opacity="0.82" transform="rotate(150 3 7)"/>
+        <ellipse cx="-3" cy="7" rx="4" ry="6" fill="white" opacity="0.85" transform="rotate(-150 -3 7)"/>
+        <ellipse cx="-7.5" cy="2" rx="4" ry="6" fill="white" opacity="0.82" transform="rotate(-100 -7.5 2)"/>
+        <circle cx="0" cy="0" r="5" fill="url(#fleurCentre)"/>
+        <circle cx="0" cy="0" r="2.5" fill="#e8a020" opacity="0.8"/>
+      </g>
+
+      <!-- Bouton floral droite -->
+      <g class="fleur-1" transform="translate(370, 358)" style="animation-delay:1.5s">
+        <circle cx="0" cy="0" r="9" fill="rgba(253,240,208,0.4)"/>
+        <ellipse cx="0" cy="-8" rx="4" ry="6" fill="white" opacity="0.85"/>
+        <ellipse cx="6.5" cy="-5" rx="4" ry="6" fill="white" opacity="0.82" transform="rotate(50 6.5 -5)"/>
+        <ellipse cx="7.5" cy="2" rx="4" ry="6" fill="white" opacity="0.85" transform="rotate(100 7.5 2)"/>
+        <ellipse cx="3" cy="7" rx="4" ry="6" fill="white" opacity="0.82" transform="rotate(150 3 7)"/>
+        <ellipse cx="-3" cy="7" rx="4" ry="6" fill="white" opacity="0.85" transform="rotate(-150 -3 7)"/>
+        <ellipse cx="-7.5" cy="2" rx="4" ry="6" fill="white" opacity="0.82" transform="rotate(-100 -7.5 2)"/>
+        <circle cx="0" cy="0" r="5" fill="url(#fleurCentre)"/>
+        <circle cx="0" cy="0" r="2.5" fill="#e8a020" opacity="0.8"/>
+      </g>
+
+      <!-- ===== FRAISES ===== -->
+      <!-- Fraise 1 - principale gauche -->
+      <g class="fraise-1">
+        <!-- Sépales verts -->
+        <path d="M218 415 Q215 402 222 395 Q226 392 228 398" fill="#5aab48"/>
+        <path d="M228 398 Q232 390 240 394 Q244 398 240 405" fill="#5aab48"/>
+        <path d="M240 405 Q248 396 254 400 Q256 406 252 412" fill="#5aab48"/>
+        <path d="M218 415 Q220 408 228 405 Q238 403 248 408" fill="#3d7c35" opacity="0.5"/>
+        <!-- Corps fraise -->
+        <path d="M218 415 Q216 430 220 445 Q224 460 232 472 Q238 480 244 482 Q250 480 256 472 Q264 460 268 445 Q272 430 268 415 Q258 408 244 407 Q230 408 218 415 Z" fill="url(#fraiseGrad1)"/>
+        <!-- Petits grains -->
+        <circle cx="228" cy="430" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="240" cy="422" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="255" cy="428" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="234" cy="445" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="248" cy="440" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="262" cy="437" r="1.8" fill="#c0392b" opacity="0.6"/>
+        <circle cx="243" cy="458" r="1.8" fill="#991b1b" opacity="0.6"/>
+        <circle cx="257" cy="455" r="1.5" fill="#991b1b" opacity="0.5"/>
+        <!-- Reflet -->
+        <ellipse cx="230" cy="427" rx="6" ry="9" fill="rgba(255,220,220,0.3)" transform="rotate(-15 230 427)"/>
+      </g>
+
+      <!-- Fraise 2 - droite -->
+      <g class="fraise-2">
+        <path d="M340 415 Q337 403 344 396 Q348 393 350 399" fill="#5aab48"/>
+        <path d="M350 399 Q354 391 362 395 Q366 399 362 406" fill="#5aab48"/>
+        <path d="M362 406 Q370 397 376 401 Q378 407 374 413" fill="#5aab48"/>
+        <path d="M340 415 Q342 408 350 406 Q360 404 370 409" fill="#3d7c35" opacity="0.5"/>
+        <path d="M340 415 Q338 430 342 445 Q346 460 354 472 Q360 480 366 482 Q372 480 378 472 Q386 460 390 445 Q394 430 390 415 Q380 408 366 407 Q352 408 340 415 Z" fill="url(#fraiseGrad2)"/>
+        <circle cx="350" cy="430" r="1.8" fill="#991b1b" opacity="0.7"/>
+        <circle cx="362" cy="422" r="1.8" fill="#991b1b" opacity="0.7"/>
+        <circle cx="377" cy="428" r="1.8" fill="#991b1b" opacity="0.7"/>
+        <circle cx="356" cy="445" r="1.8" fill="#991b1b" opacity="0.7"/>
+        <circle cx="370" cy="440" r="1.8" fill="#991b1b" opacity="0.7"/>
+        <circle cx="384" cy="437" r="1.8" fill="#991b1b" opacity="0.6"/>
+        <circle cx="365" cy="458" r="1.8" fill="#7f1d1d" opacity="0.6"/>
+        <ellipse cx="352" cy="427" rx="6" ry="9" fill="rgba(255,210,210,0.3)" transform="rotate(-15 352 427)"/>
+      </g>
+
+      <!-- Fraise 3 - centrale basse -->
+      <g class="fraise-3">
+        <path d="M285 470 Q282 458 289 451 Q293 448 295 454" fill="#5aab48"/>
+        <path d="M295 454 Q299 446 307 450 Q311 454 307 461" fill="#5aab48"/>
+        <path d="M307 461 Q315 452 321 456 Q323 462 319 468" fill="#5aab48"/>
+        <path d="M285 470 Q287 463 295 461 Q305 459 315 464" fill="#3d7c35" opacity="0.5"/>
+        <path d="M285 470 Q283 485 287 500 Q291 515 299 527 Q305 535 311 537 Q317 535 323 527 Q331 515 335 500 Q339 485 335 470 Q325 463 311 462 Q297 463 285 470 Z" fill="url(#fraiseGrad1)"/>
+        <circle cx="295" cy="485" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="307" cy="477" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="322" cy="483" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="301" cy="500" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="315" cy="495" r="1.8" fill="#c0392b" opacity="0.7"/>
+        <circle cx="329" cy="492" r="1.8" fill="#c0392b" opacity="0.6"/>
+        <circle cx="310" cy="513" r="1.8" fill="#991b1b" opacity="0.6"/>
+        <ellipse cx="297" cy="482" rx="6" ry="9" fill="rgba(255,220,220,0.3)" transform="rotate(-15 297 482)"/>
+      </g>
+
+      <!-- Petite fraise verte (pas encore mûre) -->
+      <g class="fraise-4" opacity="0.8">
+        <path d="M175 490 Q173 482 178 477 Q181 475 182 480" fill="#5aab48"/>
+        <path d="M182 480 Q185 474 191 477 Q193 481 191 485" fill="#5aab48"/>
+        <path d="M191 485 Q196 479 200 482 Q201 486 199 490" fill="#5aab48"/>
+        <path d="M175 490 Q177 486 183 484 Q189 483 195 487" fill="#3d7c35" opacity="0.6"/>
+        <path d="M175 490 Q173 500 176 510 Q179 520 185 527 Q189 532 192 533 Q195 532 198 527 Q204 520 207 510 Q210 500 208 490 Q202 484 192 483 Q182 484 175 490 Z" fill="#7bbf6a"/>
+        <circle cx="183" cy="500" r="1.4" fill="#5aab48" opacity="0.7"/>
+        <circle cx="192" cy="495" r="1.4" fill="#5aab48" opacity="0.7"/>
+        <circle cx="201" cy="499" r="1.4" fill="#5aab48" opacity="0.7"/>
+      </g>
+
+      <!-- Petite fraise verte droite -->
+      <g class="fraise-4" opacity="0.8" style="animation-delay:2s">
+        <path d="M390 488 Q388 480 393 475 Q396 473 397 478" fill="#5aab48"/>
+        <path d="M397 478 Q400 472 406 475 Q408 479 406 483" fill="#5aab48"/>
+        <path d="M406 483 Q411 477 415 480 Q416 484 414 488" fill="#5aab48"/>
+        <path d="M390 488 Q392 484 398 482 Q404 481 410 485" fill="#3d7c35" opacity="0.6"/>
+        <path d="M390 488 Q388 498 391 508 Q394 518 400 525 Q404 530 407 531 Q410 530 413 525 Q419 518 422 508 Q425 498 423 488 Q417 482 407 481 Q397 482 390 488 Z" fill="#86efac"/>
+        <circle cx="398" cy="498" r="1.4" fill="#4ade80" opacity="0.7"/>
+        <circle cx="407" cy="493" r="1.4" fill="#4ade80" opacity="0.7"/>
+        <circle cx="416" cy="497" r="1.4" fill="#4ade80" opacity="0.7"/>
+      </g>
+
+    </svg>
+  </div><!-- end plant-stage -->
+
+  <!-- ICÔNES INTERACTIVES -->
+  <div class="icons-row">
+    <button class="icon-btn" onclick="openModal(0)" aria-label="Mes bons moments">
+      <div class="icon-circle icon-c1">🍓</div>
+      <span class="icon-label">Bons moments</span>
+    </button>
+    <button class="icon-btn" onclick="openModal(1)" aria-label="Ce qui m'aide">
+      <div class="icon-circle icon-c2">🌿</div>
+      <span class="icon-label">Ce qui m'aide</span>
+    </button>
+    <button class="icon-btn" onclick="openModal(2)" aria-label="Ce qui gêne">
+      <div class="icon-circle icon-c3">🐌</div>
+      <span class="icon-label">Ce qui gêne</span>
+    </button>
+    <button class="icon-btn" onclick="openModal(3)" aria-label="Les jours différents">
+      <div class="icon-circle icon-c4">☁️</div>
+      <span class="icon-label">Jours différents</span>
+    </button>
+    <button class="icon-btn" onclick="openModal(4)" aria-label="Ce qui nourrit">
+      <div class="icon-circle icon-c5">💧</div>
+      <span class="icon-label">Ce qui nourrit</span>
+    </button>
+    <button class="icon-btn" onclick="openModal(5)" aria-label="Mes forces cachées">
+      <div class="icon-circle icon-c6">🌱</div>
+      <span class="icon-label">Forces cachées</span>
+    </button>
+    <button class="icon-btn" onclick="openModal(6)" aria-label="Ma prochaine fraise">
+      <div class="icon-circle icon-c7">🎯</div>
+      <span class="icon-label">Prochaine fraise</span>
+    </button>
+  </div>
+
+</div><!-- end container -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeOnOverlay(event)">
+  <div class="modal-card" id="modalCard">
+    <button class="modal-close" onclick="closeModal()" aria-label="Fermer">✕</button>
+    <span class="modal-deco" id="modalEmoji">🍓</span>
+    <h2 class="modal-title" id="modalTitle">Titre</h2>
+    <div class="modal-line"></div>
+    <p class="modal-question" id="modalQuestion">Question ici</p>
+    <textarea class="modal-textarea" id="modalAnswer" placeholder="Tu peux écrire ta réponse ici… ou juste en parler 💬" rows="3"></textarea>
+    <div class="modal-footer">
+      <button class="btn-valider" onclick="saveAndClose()">C'est noté 🌱</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Super ! Ta réponse a été notée 🍓</div>
+
+<script>
+  const modals = [
+    {
+      emoji: '🍓',
+      title: 'Mes bons moments',
+      question: 'Quelles sont les choses agréables ou importantes dans ta vie en ce moment ?'
+    },
+    {
+      emoji: '🌿',
+      title: 'Ce qui m\'aide',
+      question: 'Qui ou quoi aide ton fraisier à aller mieux ?'
+    },
+    {
+      emoji: '🐌',
+      title: 'Ce qui gêne',
+      question: 'Qu\'est-ce qui embête ton fraisier parfois ?'
+    },
+    {
+      emoji: '☁️',
+      title: 'Les jours différents',
+      question: 'Il y a des jours soleil et des jours pluie ? Comment c\'est pour toi ?'
+    },
+    {
+      emoji: '💧',
+      title: 'Ce qui nourrit',
+      question: 'Qu\'est-ce qui aide ton corps ou ta vie chaque jour ?'
+    },
+    {
+      emoji: '🌱',
+      title: 'Mes forces cachées',
+      question: 'Quelles forces as-tu en toi, même quand c\'est difficile ?'
+    },
+    {
+      emoji: '🎯',
+      title: 'Ma prochaine fraise',
+      question: 'Quelle petite chose aimerais-tu réussir bientôt ?'
+    }
+  ];
+
+  const answers = new Array(7).fill('');
+
+  function openModal(index) {
+    const m = modals[index];
+    document.getElementById('modalEmoji').textContent = m.emoji;
+    document.getElementById('modalTitle').textContent = m.title;
+    document.getElementById('modalQuestion').textContent = m.question;
+    const ta = document.getElementById('modalAnswer');
+    ta.value = answers[index] || '';
+    ta.dataset.index = index;
+
+    const overlay = document.getElementById('modalOverlay');
+    overlay.classList.add('active');
+    overlay.dataset.index = index;
+
+    // Focus textarea after animation
+    setTimeout(() => ta.focus(), 350);
+
+    // Son discret
+    playTone(440, 0.05, 0.12);
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+
+  function closeOnOverlay(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function saveAndClose() {
+    const ta = document.getElementById('modalAnswer');
+    const idx = parseInt(ta.dataset.index);
+    if (!isNaN(idx)) answers[idx] = ta.value;
+    closeModal();
+    showToast();
+    playTone(528, 0.06, 0.18);
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Keyboard ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  // Son léger Web Audio
+  let audioCtx = null;
+  function playTone(freq, vol, dur) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  // Hover son très doux sur icônes
+  document.querySelectorAll('.icon-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', () => playTone(600, 0.02, 0.06));
+  });
+</script>
+</body>
+</html>
