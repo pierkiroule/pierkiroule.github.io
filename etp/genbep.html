@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur BEP / ETP — P.H. Garnier</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Outfit:wght@300;400;500;600&display=swap');
+
+  :root {
+    --sage: #7a9e7e;
+    --sage-light: #a8c5ab;
+    --sage-deep: #4a7050;
+    --cream: #f5f0e8;
+    --warm: #ede5d8;
+    --clay: #b87d5a;
+    --clay-light: #d9a87c;
+    --charcoal: #2c2c2c;
+    --mid: #666058;
+    --pale: #faf7f2;
+    --accent: #c8866a;
+    --border: rgba(122,158,126,0.25);
+    --shadow: rgba(74,112,80,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--pale);
+    color: var(--charcoal);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(122,158,126,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(184,125,90,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 40%, rgba(200,134,106,0.04) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Header */
+  header {
+    position: relative;
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(245,240,232,0.95) 0%, rgba(250,247,242,0) 100%);
+    z-index: 1;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage);
+    background: rgba(122,158,126,0.1);
+    border: 1px solid var(--sage-light);
+    padding: 0.35rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 1.25rem;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--charcoal);
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--sage-deep);
+  }
+
+  .header-sub {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--mid);
+    font-weight: 300;
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* Decorative leaf SVG */
+  .deco-leaf {
+    display: block;
+    margin: 0.75rem auto 0;
+    opacity: 0.4;
+  }
+
+  /* Layout */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  /* Form sections */
+  .form-section {
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+    backdrop-filter: blur(8px);
+    transition: box-shadow 0.3s;
+  }
+
+  .form-section:hover {
+    box-shadow: 0 4px 24px var(--shadow);
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--sage-deep);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--sage);
+    background: rgba(122,158,126,0.12);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* Grid layouts within sections */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+  @media (max-width: 600px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 400px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* Labels & inputs */
+  label.field-label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--mid);
+    letter-spacing: 0.03em;
+    margin-bottom: 0.4rem;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    background: rgba(245,240,232,0.6);
+    border: 1px solid rgba(122,158,126,0.3);
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    color: var(--charcoal);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px rgba(122,158,126,0.15);
+    background: rgba(255,255,255,0.9);
+  }
+
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a9e7e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    padding-right: 2.5rem;
+  }
+
+  /* Checkbox grid for themes */
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    transition: background 0.15s;
+    font-size: 0.82rem;
+    color: var(--charcoal);
+    user-select: none;
+  }
+
+  .checkbox-item:hover { background: rgba(122,158,126,0.1); }
+
+  .checkbox-item input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--sage);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* Range input */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, var(--sage) 0%, var(--sage) var(--range-pct, 58%), rgba(122,158,126,0.2) var(--range-pct, 58%), rgba(122,158,126,0.2) 100%);
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin-top: 0.75rem;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--sage-deep);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 1px 6px rgba(74,112,80,0.3);
+  }
+
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: var(--mid);
+    font-family: 'DM Mono', monospace;
+    margin-top: 0.4rem;
+  }
+
+  .range-value {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--sage-deep);
+    background: rgba(122,158,126,0.12);
+    padding: 0.1rem 0.6rem;
+    border-radius: 20px;
+    margin-left: 0.5rem;
+  }
+
+  /* Conditional field */
+  .conditional { display: none; margin-top: 0.75rem; }
+  .conditional.visible { display: block; }
+
+  /* Action buttons */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (max-width: 500px) {
+    .actions { grid-template-columns: 1fr; }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--sage-deep), var(--sage));
+    color: white;
+    box-shadow: 0 4px 16px rgba(74,112,80,0.3);
+    grid-column: 1 / -1;
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(74,112,80,0.4);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    background: rgba(245,240,232,0.9);
+    color: var(--mid);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--warm);
+    color: var(--charcoal);
+    border-color: var(--sage-light);
+  }
+
+  .btn-copy {
+    background: linear-gradient(135deg, var(--clay), var(--clay-light));
+    color: white;
+    box-shadow: 0 4px 16px rgba(184,125,90,0.25);
+    grid-column: 1 / -1;
+  }
+
+  .btn-copy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(184,125,90,0.35);
+  }
+
+  .btn-copy.copied {
+    background: linear-gradient(135deg, var(--sage-deep), var(--sage));
+  }
+
+  /* Output area */
+  .output-section {
+    background: rgba(44,44,44,0.96);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  }
+
+  .output-section.visible { display: block; }
+
+  .output-header {
+    padding: 0.9rem 1.25rem;
+    background: rgba(122,158,126,0.15);
+    border-bottom: 1px solid rgba(122,158,126,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .output-header-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage-light);
+  }
+
+  .output-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .output-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .output-dots span:nth-child(1) { background: #ff5f56; }
+  .output-dots span:nth-child(2) { background: #ffbd2e; }
+  .output-dots span:nth-child(3) { background: #27c93f; }
+
+  #promptOutput {
+    padding: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.75;
+    color: #d4e6d5;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  #promptOutput::-webkit-scrollbar { width: 4px; }
+  #promptOutput::-webkit-scrollbar-track { background: transparent; }
+  #promptOutput::-webkit-scrollbar-thumb { background: rgba(122,158,126,0.4); border-radius: 10px; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--sage-deep);
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 100;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Footer */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 1.5rem 2rem 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--mid);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  /* Animate in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-section {
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .form-section:nth-child(1) { animation-delay: 0.05s; }
+  .form-section:nth-child(2) { animation-delay: 0.1s; }
+  .form-section:nth-child(3) { animation-delay: 0.15s; }
+  .form-section:nth-child(4) { animation-delay: 0.2s; }
+  .form-section:nth-child(5) { animation-delay: 0.25s; }
+  .form-section:nth-child(6) { animation-delay: 0.3s; }
+  .form-section:nth-child(7) { animation-delay: 0.35s; }
+
+  /* Field group spacing */
+  .field-group { margin-bottom: 1rem; }
+  .field-group:last-child { margin-bottom: 0; }
+
+  .inline-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .info-pill {
+    font-size: 0.72rem;
+    color: var(--sage);
+    background: rgba(122,158,126,0.08);
+    border: 1px solid rgba(122,158,126,0.2);
+    padding: 0.2rem 0.7rem;
+    border-radius: 100px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+
+  /* Separator */
+  .sep {
+    height: 1px;
+    background: var(--border);
+    margin: 1rem 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">Outil ETP clinique — P.H. Garnier, Psychologue</div>
+  <h1>Générateur de support<br><em>BEP / ETP personnalisé</em></h1>
+  <p class="header-sub">Composez votre contexte clinique et générez un prompt prêt à l'emploi pour Claude AI — pour créer un support interactif adapté à votre public et à vos objectifs thérapeutiques.</p>
+  <svg class="deco-leaf" width="48" height="24" viewBox="0 0 48 24" fill="none">
+    <path d="M4 20 C10 8, 24 4, 44 4" stroke="#7a9e7e" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M44 4 C36 10, 28 14, 22 20" stroke="#7a9e7e" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M44 4 C40 14, 34 18, 22 20" stroke="#a8c5ab" stroke-width="0.8" stroke-linecap="round"/>
+    <circle cx="22" cy="20" r="2" fill="#7a9e7e" opacity="0.5"/>
+  </svg>
+</header>
+
+<main>
+
+  <!-- SECTION 1 : Public & contexte -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">1</span> Public cible & contexte</div>
+    <div class="grid-2">
+      <div class="field-group">
+        <label class="field-label" for="public">Public cible</label>
+        <select id="public">
+          <option value="">— Sélectionner —</option>
+          <option>Enfant</option>
+          <option>Adolescent</option>
+          <option>Adulte</option>
+          <option>Parent + enfant</option>
+          <option>Aidant</option>
+          <option>Couple</option>
+          <option>Famille</option>
+          <option>Groupe de patients</option>
+          <option>Professionnels en formation</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="age">Âge / tranche d'âge</label>
+        <input type="text" id="age" placeholder="ex. 10–14 ans, adultes 30–50 ans…">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="contexte">Contexte de la séance</label>
+        <select id="contexte">
+          <option value="">— Sélectionner —</option>
+          <option>BEP individuel</option>
+          <option>Atelier collectif ETP</option>
+          <option>Séance de suivi</option>
+          <option>Séance d'évaluation</option>
+          <option>Formation de soignants</option>
+          <option>Sensibilisation</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="pathologie">Pathologie / situation</label>
+        <input type="text" id="pathologie" placeholder="ex. douleur chronique, diabète, santé mentale…">
+      </div>
+    </div>
+    <div class="field-group" style="margin-top:0.75rem">
+      <label class="field-label" for="objectif">Objectif principal de la séance</label>
+      <input type="text" id="objectif" placeholder="ex. repérer les ressources, favoriser l'autonomie, construire un objectif…">
+    </div>
+  </div>
+
+  <!-- SECTION 2 : Métaphore -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">2</span> Métaphore centrale</div>
+    <div class="grid-2">
+      <div class="field-group">
+        <label class="field-label" for="metaphore">Métaphore souhaitée</label>
+        <select id="metaphore" onchange="toggleMetaphorePersonnalisee()">
+          <option value="">— Sélectionner —</option>
+          <option>Fraisier de vie</option>
+          <option>Jardin de santé</option>
+          <option>Arbre des forces</option>
+          <option>Boussole</option>
+          <option>Île au trésor</option>
+          <option>Météo intérieure</option>
+          <option>Fusée mission santé</option>
+          <option>Rivière du changement</option>
+          <option>Maison de vie</option>
+          <option>Aquarium émotionnel</option>
+          <option value="autre">Autre — personnalisée</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="visuel">Élément visuel central</label>
+        <input type="text" id="visuel" placeholder="ex. fraisier animé, arbre, rivière, carte…">
+      </div>
+    </div>
+    <div class="conditional" id="metaphorePersonnaliseeWrapper">
+      <label class="field-label" for="metaphorePersonnalisee">Décrire votre métaphore personnalisée</label>
+      <input type="text" id="metaphorePersonnalisee" placeholder="Décrivez librement la métaphore souhaitée…">
+    </div>
+  </div>
+
+  <!-- SECTION 3 : Contenu -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">3</span> Contenu & exploration</div>
+    <div class="field-group">
+      <label class="field-label">
+        Nombre d'icônes / questions
+        <span class="range-value" id="nbIconesVal">7</span>
+      </label>
+      <input type="range" id="nbIcones" min="3" max="12" value="7"
+        oninput="document.getElementById('nbIconesVal').textContent=this.value; updateRangeStyle(this)">
+      <div class="range-labels"><span>3 min</span><span>12 max</span></div>
+    </div>
+    <div class="sep"></div>
+    <label class="field-label" style="margin-bottom:0.75rem">Thèmes à explorer</label>
+    <div class="checkbox-grid" id="themesGrid">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <!-- SECTION 4 : Style & format -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">4</span> Style, format & langage</div>
+    <div class="grid-3">
+      <div class="field-group">
+        <label class="field-label" for="langage">Niveau de langage</label>
+        <select id="langage">
+          <option value="">— Choisir —</option>
+          <option>Très simple</option>
+          <option>Enfant</option>
+          <option>Adolescent</option>
+          <option>Adulte accessible</option>
+          <option>Professionnel</option>
+          <option>Poétique</option>
+          <option>Très concret</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="styleGraphique">Style graphique</label>
+        <select id="styleGraphique">
+          <option value="">— Choisir —</option>
+          <option>Doux aquarelle</option>
+          <option>Cartoon premium</option>
+          <option>Minimal médical moderne</option>
+          <option>Semi-réaliste</option>
+          <option>Nature poétique</option>
+          <option>Ludique sérieux</option>
+          <option>Adulte sobre</option>
+          <option>Formation professionnelle</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="format">Format final</label>
+        <select id="format">
+          <option value="">— Choisir —</option>
+          <option>HTML interactif</option>
+          <option>SVG animé</option>
+          <option>Feuille A4 imprimable</option>
+          <option>Tablette consultation</option>
+          <option>Mobile responsive</option>
+          <option>Support atelier collectif</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="animation">Niveau d'animation</label>
+      <select id="animation">
+        <option value="">— Choisir —</option>
+        <option>Statique</option>
+        <option>Léger</option>
+        <option>Immersif</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SECTION 5 : Contraintes -->
+  <div class="form-section">
+    <div class="section-title"><span class="section-num">5</span> Contraintes cliniques</div>
+    <div class="field-group">
+      <label class="field-label" for="contraintes">Précisions et contraintes cliniques</label>
+      <textarea id="contraintes" rows="4" placeholder="ex. éviter toute culpabilisation, valoriser les ressources, ne pas centrer uniquement sur la maladie, permettre une expression indirecte, favoriser le dialogue, adapter au niveau cognitif…"></textarea>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-primary" onclick="generatePrompt()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Générer mon prompt Claude AI
+    </button>
+    <button class="btn btn-secondary" onclick="loadExample()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4.5v3l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Exemple rapide
+    </button>
+    <button class="btn btn-secondary" onclick="resetForm()">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7a5 5 0 1 0 1.2-3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 2v2.5H4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Réinitialiser
+    </button>
+  </div>
+
+  <!-- Output -->
+  <div class="output-section" id="outputSection">
+    <div class="output-header">
+      <span class="output-header-title">Prompt Claude AI généré</span>
+      <div class="output-dots"><span></span><span></span><span></span></div>
+    </div>
+    <pre id="promptOutput"></pre>
+  </div>
+
+  <!-- Copy button (shown after generation) -->
+  <div class="actions" id="copyActions" style="display:none">
+    <button class="btn btn-copy" id="copyBtn" onclick="copyPrompt()">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="white" stroke-width="1.3"/><path d="M2 10V3a1 1 0 0 1 1-1h7" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Copier le prompt
+    </button>
+  </div>
+
+</main>
+
+<footer>
+  P.H. Garnier — Psychologue · Générateur BEP/ETP · Usage clinique et formatif
+</footer>
+
+<div class="toast" id="toast">✓ Prompt copié dans le presse-papiers</div>
+
+<script>
+const THEMES = [
+  "Ressources","Freins","Émotions","Symptômes","Douleur","Traitements",
+  "Entourage","Quotidien","École / Travail","Sommeil","Activité physique",
+  "Alimentation","Motivation","Autonomie","Objectifs","Rechutes",
+  "Réussites","Projet de vie","Qualité de vie"
+];
+
+// Build checkbox grid
+const grid = document.getElementById('themesGrid');
+THEMES.forEach(t => {
+  const label = document.createElement('label');
+  label.className = 'checkbox-item';
+  label.innerHTML = `<input type="checkbox" name="theme" value="${t}"> ${t}`;
+  grid.appendChild(label);
+});
+
+// Range style update
+function updateRangeStyle(el) {
+  const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+  el.style.setProperty('--range-pct', pct + '%');
+}
+// Init range
+const rangeEl = document.getElementById('nbIcones');
+updateRangeStyle(rangeEl);
+
+function toggleMetaphorePersonnalisee() {
+  const sel = document.getElementById('metaphore');
+  const wrapper = document.getElementById('metaphorePersonnaliseeWrapper');
+  wrapper.classList.toggle('visible', sel.value === 'autre');
+}
+
+function getCheckedThemes() {
+  return [...document.querySelectorAll('input[name="theme"]:checked')].map(c => c.value);
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function generatePrompt() {
+  const pub = val('public');
+  const age = val('age');
+  const ctx = val('contexte');
+  const patho = val('pathologie');
+  const obj = val('objectif');
+  const meta = val('metaphore') === 'autre' ? val('metaphorePersonnalisee') : val('metaphore');
+  const visuel = val('visuel');
+  const nb = document.getElementById('nbIcones').value;
+  const themes = getCheckedThemes();
+  const langage = val('langage');
+  const style = val('styleGraphique');
+  const format = val('format');
+  const anim = val('animation');
+  const contraintes = val('contraintes');
+
+  if (!pub && !patho && !obj) {
+    showToast('⚠️ Merci de renseigner au minimum : public, pathologie et objectif');
+    return;
+  }
+
+  const themesStr = themes.length > 0 ? themes.join(', ') : 'ressources, freins, émotions, quotidien';
+
+  const prompt = buildPrompt({pub,age,ctx,patho,obj,meta,visuel,nb,themesStr,langage,style,format,anim,contraintes});
+
+  document.getElementById('promptOutput').textContent = prompt;
+  document.getElementById('outputSection').classList.add('visible');
+  document.getElementById('copyActions').style.display = 'grid';
+  document.getElementById('outputSection').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function buildPrompt({pub,age,ctx,patho,obj,meta,visuel,nb,themesStr,langage,style,format,anim,contraintes}) {
+  const pubLabel = pub || 'public non précisé';
+  const ageLabel = age ? ` (${age})` : '';
+  const ctxLabel = ctx || 'contexte clinique';
+  const pathoLabel = patho || 'pathologie ou situation de santé non précisée';
+  const objLabel = obj || 'favoriser l\'expression et l\'alliance thérapeutique';
+  const metaLabel = meta || 'métaphore libre à choisir selon le contexte';
+  const visuelLabel = visuel || 'élément central adapté à la métaphore';
+  const nbLabel = nb || '7';
+  const langageLabel = langage || 'adapté au public';
+  const styleLabel = style || 'professionnel, chaleureux';
+  const formatLabel = format || 'HTML interactif responsive';
+  const animLabel = anim || 'léger';
+  const contraintesLabel = contraintes || 'Valoriser les ressources. Éviter la culpabilisation. Favoriser le dialogue.';
+
+  return `═══════════════════════════════════════════════════
+PROMPT — SUPPORT BEP/ETP INTERACTIF PERSONNALISÉ
+═══════════════════════════════════════════════════
+
+Tu es un expert en éducation thérapeutique du patient (ETP), en design d'interface clinique et en développement web.
+
+Crée un support interactif HTML/CSS/JS monofichier complet, autonome, professionnel et directement utilisable en contexte de soin ou de formation.
+
+───────────────────────────────────────────────────
+CONTEXTE CLINIQUE
+───────────────────────────────────────────────────
+
+• Public cible : ${pubLabel}${ageLabel}
+• Contexte : ${ctxLabel}
+• Pathologie / situation : ${pathoLabel}
+• Objectif principal : ${objLabel}
+
+───────────────────────────────────────────────────
+MÉTAPHORE ET DESIGN
+───────────────────────────────────────────────────
+
+• Métaphore centrale : ${metaLabel}
+  → Cette métaphore est le fil conducteur de tout le support.
+  → Elle doit agir comme médiateur de dialogue, non comme décor.
+  → Elle permet une expression indirecte, moins menaçante que l'approche directe.
+
+• Élément visuel central : ${visuelLabel}
+• Nombre d'icônes / points d'exploration : ${nbLabel}
+• Style graphique : ${styleLabel}
+• Niveau d'animation : ${animLabel}
+
+───────────────────────────────────────────────────
+THÈMES À EXPLORER
+───────────────────────────────────────────────────
+
+Les ${nbLabel} icônes/zones cliquables doivent couvrir les thèmes suivants, formulés de manière adaptée au public :
+
+${themesStr}
+
+Chaque icône/zone :
+  → Porte un titre court, évocateur (pas de jargon médical sauf si public professionnel)
+  → Révèle au clic une question ouverte, centrée ressources
+  → Peut proposer un espace de réponse libre ou des options visuelles
+  → Respecte la cohérence de la métaphore centrale
+
+───────────────────────────────────────────────────
+NIVEAU DE LANGAGE ET TON
+───────────────────────────────────────────────────
+
+• Niveau de langage : ${langageLabel}
+• Ton : non culpabilisant, bienveillant, curieux, soutenant
+• Le langage doit :
+  → Partir du vécu de la personne, pas des catégories médicales
+  → Valoriser ce qui fonctionne avant d'explorer ce qui pose problème
+  → Relier santé et vie quotidienne de manière concrète
+  → Éviter toute injonction, tout jugement implicite
+  → Favoriser l'émergence d'un objectif co-construit
+
+───────────────────────────────────────────────────
+FORMAT TECHNIQUE
+───────────────────────────────────────────────────
+
+• Format : ${formatLabel}
+• Fichier unique HTML/CSS/JS
+• SVG natif intégré (aucun CDN, aucun framework externe)
+• Responsive : mobile / tablette / desktop
+• Compatible impression si demandé
+• Animations CSS natives uniquement
+
+───────────────────────────────────────────────────
+CONTRAINTES CLINIQUES SPÉCIFIQUES
+───────────────────────────────────────────────────
+
+${contraintesLabel}
+
+───────────────────────────────────────────────────
+PRINCIPES ETP À RESPECTER IMPÉRATIVEMENT
+───────────────────────────────────────────────────
+
+1. Partir du vécu et de la représentation de la personne
+2. Explorer les ressources avant les freins
+3. Relier santé et vie quotidienne (pas uniquement la maladie)
+4. Favoriser l'alliance thérapeutique par la posture de la métaphore
+5. Co-construire un objectif réaliste et ancré dans la vie réelle
+6. Éviter l'injonction et le jugement — toujours
+7. Utiliser la métaphore comme médiateur, jamais comme illustration décorative
+8. Permettre une expression indirecte pour les sujets sensibles
+
+───────────────────────────────────────────────────
+LIVRABLES ATTENDUS
+───────────────────────────────────────────────────
+
+Produis directement le code complet et fonctionnel :
+  → Une seule page HTML avec CSS et JS intégrés
+  → SVG construit nattivement dans le HTML
+  → Design professionnel utilisable dès maintenant en consultation
+  → Aucune dépendance externe
+  → Code documenté avec commentaires courts
+  → Le support peut être utilisé sur écran ou imprimé
+
+═══════════════════════════════════════════════════
+FIN DU PROMPT — COLLER DIRECTEMENT DANS CLAUDE AI
+═══════════════════════════════════════════════════`;
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptOutput').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 7.5l4 4 6-7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Prompt copié !`;
+    showToast('✓ Prompt copié dans le presse-papiers');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="white" stroke-width="1.3"/><path d="M2 10V3a1 1 0 0 1 1-1h7" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg> Copier le prompt`;
+    }, 2500);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function loadExample() {
+  document.getElementById('public').value = 'Adolescent';
+  document.getElementById('age').value = '13–17 ans';
+  document.getElementById('contexte').value = 'BEP individuel';
+  document.getElementById('pathologie').value = 'Trouble anxieux, phobie scolaire, fatigue chronique';
+  document.getElementById('objectif').value = 'Explorer les ressources et les freins à la scolarité, co-construire un objectif de retour progressif';
+  document.getElementById('metaphore').value = 'Île au trésor';
+  toggleMetaphorePersonnalisee();
+  document.getElementById('visuel').value = 'Carte d\'île avec zones à découvrir';
+  document.getElementById('nbIcones').value = '8';
+  updateRangeStyle(document.getElementById('nbIcones'));
+  document.getElementById('nbIconesVal').textContent = '8';
+
+  // Check relevant themes
+  const toCheck = ['Ressources','Freins','Émotions','École / Travail','Sommeil','Entourage','Motivation','Objectifs'];
+  document.querySelectorAll('input[name="theme"]').forEach(cb => {
+    cb.checked = toCheck.includes(cb.value);
+  });
+
+  document.getElementById('langage').value = 'Adolescent';
+  document.getElementById('styleGraphique').value = 'Ludique sérieux';
+  document.getElementById('format').value = 'HTML interactif';
+  document.getElementById('animation').value = 'Léger';
+  document.getElementById('contraintes').value = 'Éviter toute référence directe à la maladie en début de séance. Valoriser ce qui fonctionne encore. Permettre de pointer sans formuler. Laisser des espaces de silence et d\'ambiguïté. Ne pas presser vers un objectif scolaire immédiat.';
+
+  showToast('Exemple chargé — cliquez sur Générer');
+}
+
+function resetForm() {
+  document.querySelectorAll('select').forEach(s => s.value = '');
+  document.querySelectorAll('input[type="text"]').forEach(i => i.value = '');
+  document.querySelectorAll('textarea').forEach(t => t.value = '');
+  document.querySelectorAll('input[name="theme"]').forEach(cb => cb.checked = false);
+  document.getElementById('nbIcones').value = 7;
+  document.getElementById('nbIconesVal').textContent = 7;
+  updateRangeStyle(document.getElementById('nbIcones'));
+  document.getElementById('metaphorePersonnaliseeWrapper').classList.remove('visible');
+  document.getElementById('outputSection').classList.remove('visible');
+  document.getElementById('copyActions').style.display = 'none';
+  document.getElementById('promptOutput').textContent = '';
+  showToast('Formulaire réinitialisé');
+}
+</script>
+</body>
+</html>
