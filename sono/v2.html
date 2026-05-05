@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Boussole des Résonances — BDR</title>
+
+<style>
+:root{
+  --bg:#f6f3ee;
+  --card:#ffffff;
+  --text:#25221e;
+  --muted:#6f675f;
+  --line:#d9d2c8;
+  --teal:#317f72;
+  --teal-light:#e8f4f1;
+  --gold:#c49a3a;
+  --red:#b85b50;
+  --blue:#3d74a8;
+  --violet:#7b5fa8;
+  --green:#4f8f63;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.55;
+}
+
+main{
+  width:min(100%,1100px);
+  margin:auto;
+  padding:20px;
+}
+
+section,header{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:24px;
+  margin-bottom:18px;
+  box-shadow:0 6px 22px rgba(0,0,0,.04);
+}
+
+h1,h2,h3{
+  font-family:Georgia,serif;
+  font-weight:400;
+  line-height:1.2;
+}
+
+h1{
+  font-size:clamp(2rem,6vw,3.8rem);
+  margin:0 0 8px;
+  color:var(--teal);
+}
+
+h2{
+  font-size:1.8rem;
+  margin:0 0 14px;
+}
+
+h3{
+  font-size:1.25rem;
+  margin:22px 0 8px;
+  color:var(--teal);
+}
+
+p{margin:0 0 12px}
+
+.lead{
+  color:var(--muted);
+  font-size:1.1rem;
+  max-width:780px;
+}
+
+.badge{
+  display:inline-block;
+  background:var(--teal-light);
+  color:var(--teal);
+  border:1px solid var(--teal);
+  border-radius:999px;
+  padding:5px 12px;
+  font-size:.8rem;
+  font-weight:700;
+  margin-bottom:12px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:14px;
+}
+
+.box{
+  background:#f9f7f2;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+}
+
+.box strong{color:var(--teal)}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin:14px 0;
+  font-size:.95rem;
+}
+
+th,td{
+  border:1px solid var(--line);
+  padding:10px;
+  text-align:left;
+  vertical-align:top;
+}
+
+th{background:#f1ede5}
+
+ul{padding-left:22px}
+li{margin:5px 0}
+
+.demo{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:18px;
+}
+
+@media(max-width:850px){
+  .demo{grid-template-columns:1fr}
+}
+
+.compass-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  min-height:320px;
+  background:#fbfaf6;
+  border:1px solid var(--line);
+  border-radius:20px;
+  overflow:hidden;
+  touch-action:none;
+}
+
+#compass{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+.word{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  border-radius:999px;
+  padding:8px 11px;
+  font-size:13px;
+  font-weight:700;
+  border:2px solid;
+  background:white;
+  cursor:grab;
+  user-select:none;
+  touch-action:none;
+  box-shadow:0 3px 10px rgba(0,0,0,.07);
+  max-width:110px;
+  text-align:center;
+}
+
+.word.dragging{
+  cursor:grabbing;
+  z-index:50;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+
+.sensoriel{border-color:var(--blue);color:var(--blue)}
+.corporel{border-color:var(--green);color:var(--green)}
+.presence{border-color:var(--violet);color:var(--violet)}
+
+.panel{
+  background:#f9f7f2;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+}
+
+.controls{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:12px 0;
+}
+
+button{
+  border:none;
+  background:var(--teal);
+  color:white;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button.secondary{
+  background:white;
+  color:var(--teal);
+  border:1px solid var(--teal);
+}
+
+button.danger{
+  background:white;
+  color:var(--red);
+  border:1px solid var(--red);
+}
+
+.phase{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.phase button{
+  flex:1;
+  background:#eee9df;
+  color:var(--muted);
+}
+
+.phase button.active{
+  background:var(--teal);
+  color:white;
+}
+
+.metric{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  padding:7px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.small{
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+.biblio{
+  display:grid;
+  gap:12px;
+}
+
+.ref{
+  border-left:4px solid var(--teal);
+  padding:10px 12px;
+  background:#f9f7f2;
+  border-radius:8px;
+}
+
+.ref strong{color:var(--teal)}
+
+.code{
+  background:#25221e;
+  color:#fff;
+  border-radius:12px;
+  padding:14px;
+  overflow:auto;
+  font-size:.9rem;
+}
+</style>
+</head>
+
+<body>
+<main>
+
+<header>
+  <span class="badge">BDR · Boussole des Résonances</span>
+  <h1>Boussole des Résonances</h1>
+  <p class="lead">
+    Outil d’évaluation et de recherche pour cartographier l’évolution du vécu
+    lors d’un parcours d’écoute sonore sensible.
+  </p>
+</header>
+
+<section>
+  <h2>1. Principe général</h2>
+  <p>
+    La <strong>Boussole des Résonances</strong> propose au participant de placer
+    des mots décrivant son expérience dans une carte à deux axes.
+  </p>
+
+  <div class="grid">
+    <div class="box">
+      <strong>Axe horizontal</strong><br>
+      Désagréable → Agréable<br>
+      <span class="small">Valence du vécu.</span>
+    </div>
+    <div class="box">
+      <strong>Axe vertical</strong><br>
+      Calme → Stimulant<br>
+      <span class="small">Activation du vécu.</span>
+    </div>
+    <div class="box">
+      <strong>Distance au centre</strong><br>
+      Faible → Forte intensité<br>
+      <span class="small">Niveau de résonance.</span>
+    </div>
+  </div>
+
+  <p>
+    Le participant réalise ce positionnement à trois temps :
+    <strong>avant</strong>, <strong>pendant</strong> et <strong>après</strong>
+    l’expérience. L’évaluation porte sur les déplacements des mots dans le temps.
+  </p>
+</section>
+
+<section>
+  <h2>2. Question d’évaluation</h2>
+  <p>
+    <strong>Comment l’expérience vécue se transforme-t-elle au cours du parcours
+    d’écoute sonore ?</strong>
+  </p>
+
+  <p>
+    L’outil cherche à rendre observable ce qui apparaît, disparaît, s’intensifie,
+    se calme, se déplace ou se transforme dans le vécu du participant.
+  </p>
+</section>
+
+<section>
+  <h2>3. Mots proposés</h2>
+  <p>
+    Les mots ne sont pas “positifs” ou “négatifs” en eux-mêmes. Ils sont
+    volontairement ambivalents. C’est leur position sur la boussole qui donne
+    leur sens.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Catégorie</th>
+        <th>Mots</th>
+        <th>Rôle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Sensoriel / perceptif</td>
+        <td>souffle, vibration, rythme, silence, intensité, texture</td>
+        <td>Décrire la qualité sensible de l’expérience.</td>
+      </tr>
+      <tr>
+        <td>Corporel</td>
+        <td>tension, relâchement, lourdeur, légèreté, chaleur, froid</td>
+        <td>Décrire le vécu du corps.</td>
+      </tr>
+      <tr>
+        <td>Présence / relation au monde</td>
+        <td>présence, distance, immersion, dispersion, attention, lien</td>
+        <td>Décrire la manière d’être engagé dans l’expérience.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>4. Démo interactive</h2>
+  <p>
+    Déplacez les mots sur la boussole. Changez de phase pour simuler une
+    évolution avant / pendant / après.
+  </p>
+
+  <div class="demo">
+    <div class="compass-wrap" id="wrap">
+      <canvas id="compass"></canvas>
+    </div>
+
+    <div class="panel">
+      <h3>Phase</h3>
+      <div class="phase">
+        <button data-phase="avant" class="active">Avant</button>
+        <button data-phase="pendant">Pendant</button>
+        <button data-phase="apres">Après</button>
+      </div>
+
+      <h3>Indicateurs</h3>
+      <div id="metrics"></div>
+
+      <div class="controls">
+        <button onclick="copyPhase()">Copier vers phase suivante</button>
+        <button class="secondary" onclick="exportJSON()">Exporter JSON</button>
+        <button class="danger" onclick="resetDemo()">Réinitialiser</button>
+      </div>
+
+      <p class="small">
+        Les données exportées contiennent les coordonnées, la valence,
+        l’activation, l’intensité et la phase.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>5. Données et indicateurs</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Critère</th>
+        <th>Indicateur</th>
+        <th>Interprétation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Valence</td>
+        <td>Position X</td>
+        <td>De désagréable à agréable.</td>
+      </tr>
+      <tr>
+        <td>Activation</td>
+        <td>Position Y</td>
+        <td>De calme à stimulant.</td>
+      </tr>
+      <tr>
+        <td>Intensité</td>
+        <td>Distance au centre</td>
+        <td>Force de résonance subjective.</td>
+      </tr>
+      <tr>
+        <td>Transformation</td>
+        <td>Distance parcourue avant → après</td>
+        <td>Amplitude du changement vécu.</td>
+      </tr>
+      <tr>
+        <td>Structuration du vécu</td>
+        <td>Répartition par catégories</td>
+        <td>Sensoriel, corporel, présence.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>6. Apports de l’outil</h2>
+
+  <div class="grid">
+    <div class="box">
+      <strong>Simple pour le terrain</strong>
+      <p>Interface visuelle, intuitive, sans questionnaire lourd.</p>
+    </div>
+    <div class="box">
+      <strong>Longitudinal</strong>
+      <p>Permet de comparer le vécu avant, pendant et après l’expérience.</p>
+    </div>
+    <div class="box">
+      <strong>Mixte</strong>
+      <p>Produit des données quantifiables et des supports de commentaire qualitatif.</p>
+    </div>
+    <div class="box">
+      <strong>Recherche-compatible</strong>
+      <p>Structure les données autour de dimensions reconnues : valence et activation.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>7. Limites méthodologiques</h2>
+
+  <ul>
+    <li>
+      <strong>Ce n’est pas une échelle psychométrique validée.</strong>
+      L’outil doit être présenté comme un dispositif évaluatif et exploratoire.
+    </li>
+    <li>
+      <strong>La position des mots reste subjective.</strong>
+      La comparaison intra-participant est plus robuste que la comparaison brute entre participants.
+    </li>
+    <li>
+      <strong>L’interface influence le recueil.</strong>
+      Le design doit rester stable entre les séances.
+    </li>
+    <li>
+      <strong>Les mots proposés cadrent l’expérience.</strong>
+      Il faut permettre l’ajout de mots libres pour limiter ce biais.
+    </li>
+    <li>
+      <strong>L’interprétation demande prudence.</strong>
+      Les coordonnées ne remplacent pas un entretien ou un commentaire libre.
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>8. Bibliographie commentée</h2>
+
+  <div class="biblio">
+    <div class="ref">
+      <strong>ISO 12913 — Soundscape</strong><br>
+      Cadre international définissant le soundscape comme environnement acoustique
+      perçu et vécu en contexte. Il fonde l’intérêt d’évaluer non seulement le son,
+      mais l’expérience du son.
+    </div>
+
+    <div class="ref">
+      <strong>Axelsson, Nilsson & Berglund (2010)</strong><br>
+      Travaux centraux sur les qualités affectives perçues du soundscape.
+      Ils montrent l’importance de dimensions proches de la valence
+      et de l’activation pour structurer le vécu sonore.
+    </div>
+
+    <div class="ref">
+      <strong>Russell (1980) — Circumplex Model of Affect</strong><br>
+      Modèle classique de psychologie affective organisant les émotions selon
+      deux axes : valence et activation. C’est la base théorique de la boussole.
+    </div>
+
+    <div class="ref">
+      <strong>Aletta, Kang, Axelsson et al.</strong><br>
+      Travaux récents sur les indicateurs perceptifs du soundscape et les
+      descripteurs affectifs standardisés. Ils soutiennent l’usage d’une carte
+      perceptive plutôt qu’un simple score.
+    </div>
+
+    <div class="ref">
+      <strong>COREQ / SRQR</strong><br>
+      Standards de reporting qualitatif utiles si l’outil est intégré à une
+      recherche avec entretiens, commentaires libres ou débriefs collectifs.
+    </div>
+
+    <div class="ref">
+      <strong>Micro-phénoménologie</strong><br>
+      Les travaux sur l’expérience vécue soutiennent l’intérêt d’aider les
+      participants à décrire finement sensations, attention, présence et
+      transformations subjectives.
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>9. Formulation synthétique</h2>
+  <p>
+    La <strong>Boussole des Résonances</strong> est un outil de cartographie
+    dynamique du vécu. Elle combine deux axes scientifiquement étayés
+    — valence et activation — avec une représentation projective des mots
+    d’expérience. Elle permet d’évaluer comment une expérience sonore est vécue,
+    transformée, mise en mots et potentiellement appropriée par les participants.
+  </p>
+</section>
+
+</main>
+
+<script>
+const WORDS = [
+  {label:"souffle",cat:"sensoriel"},
+  {label:"vibration",cat:"sensoriel"},
+  {label:"rythme",cat:"sensoriel"},
+  {label:"silence",cat:"sensoriel"},
+  {label:"intensité",cat:"sensoriel"},
+  {label:"texture",cat:"sensoriel"},
+
+  {label:"tension",cat:"corporel"},
+  {label:"relâchement",cat:"corporel"},
+  {label:"lourdeur",cat:"corporel"},
+  {label:"légèreté",cat:"corporel"},
+  {label:"chaleur",cat:"corporel"},
+  {label:"froid",cat:"corporel"},
+
+  {label:"présence",cat:"presence"},
+  {label:"distance",cat:"presence"},
+  {label:"immersion",cat:"presence"},
+  {label:"dispersion",cat:"presence"},
+  {label:"attention",cat:"presence"},
+  {label:"lien",cat:"presence"}
+];
+
+const wrap = document.getElementById("wrap");
+const canvas = document.getElementById("compass");
+const ctx = canvas.getContext("2d");
+const metrics = document.getElementById("metrics");
+
+let phase = "avant";
+let target = {x:0,y:0,r:0};
+let drag = null;
+
+let data = {
+  avant: [],
+  pendant: [],
+  apres: []
+};
+
+function initData(){
+  ["avant","pendant","apres"].forEach(ph=>{
+    data[ph] = WORDS.map((w,i)=>{
+      const angle = (i / WORDS.length) * Math.PI * 2 - Math.PI / 2;
+      return {
+        id: w.label,
+        label: w.label,
+        cat: w.cat,
+        x: 0,
+        y: 0,
+        valence: 0,
+        activation: 0,
+        intensity: 0
+      };
+    });
+  });
+}
+
+function resize(){
+  const rect = wrap.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + "px";
+  canvas.style.height = rect.height + "px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  target.x = rect.width / 2;
+  target.y = rect.height / 2;
+  target.r = Math.min(rect.width, rect.height) * 0.36;
+
+  data[phase].forEach((w,i)=>{
+    if(!w.x && !w.y){
+      const angle = (i / WORDS.length) * Math.PI * 2 - Math.PI / 2;
+      w.x = target.x + Math.cos(angle) * target.r * 1.25;
+      w.y = target.y + Math.sin(angle) * target.r * 1.25;
+    }
+  });
+
+  draw();
+  renderWords();
+}
+
+function draw(){
+  const rect = wrap.getBoundingClientRect();
+  ctx.clearRect(0,0,rect.width,rect.height);
+
+  drawCircle(target.r, "#fff8df", "#c49a3a");
+  drawCircle(target.r*0.66, "#eef8ec", "#4f8f63");
+  drawCircle(target.r*0.33, "#e8f4f1", "#317f72");
+
+  ctx.strokeStyle = "#9f978c";
+  ctx.lineWidth = 1.2;
+
+  ctx.beginPath();
+  ctx.moveTo(target.x-target.r*1.08,target.y);
+  ctx.lineTo(target.x+target.r*1.08,target.y);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(target.x,target.y-target.r*1.08);
+  ctx.lineTo(target.x,target.y+target.r*1.08);
+  ctx.stroke();
+
+  ctx.font = "13px system-ui";
+  ctx.fillStyle = "#6f675f";
+  ctx.textAlign = "center";
+
+  ctx.fillText("stimulant", target.x, target.y-target.r*1.14);
+  ctx.fillText("calme", target.x, target.y+target.r*1.20);
+
+  ctx.textAlign = "right";
+  ctx.fillText("désagréable", target.x-target.r*1.12, target.y-8);
+
+  ctx.textAlign = "left";
+  ctx.fillText("agréable", target.x+target.r*1.12, target.y-8);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#317f72";
+  ctx.fillText("fort", target.x, target.y+4);
+}
+
+function drawCircle(r, fill, stroke){
+  ctx.beginPath();
+  ctx.arc(target.x,target.y,r,0,Math.PI*2);
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function renderWords(){
+  wrap.querySelectorAll(".word").forEach(el=>el.remove());
+
+  data[phase].forEach(w=>{
+    const el = document.createElement("div");
+    el.className = `word ${w.cat}`;
+    el.textContent = w.label;
+    el.style.left = w.x + "px";
+    el.style.top = w.y + "px";
+    el.dataset.id = w.id;
+
+    el.addEventListener("pointerdown", e=>{
+      e.preventDefault();
+      drag = {
+        id:w.id,
+        startX:e.clientX,
+        startY:e.clientY,
+        x:w.x,
+        y:w.y
+      };
+      el.classList.add("dragging");
+      el.setPointerCapture(e.pointerId);
+    });
+
+    el.addEventListener("pointermove", e=>{
+      if(!drag || drag.id !== w.id) return;
+      e.preventDefault();
+      const dx = e.clientX - drag.startX;
+      const dy = e.clientY - drag.startY;
+      w.x = drag.x + dx;
+      w.y = drag.y + dy;
+      clamp(w);
+      updateComputed(w);
+      el.style.left = w.x + "px";
+      el.style.top = w.y + "px";
+      updateMetrics();
+    });
+
+    el.addEventListener("pointerup", ()=>{
+      drag = null;
+      el.classList.remove("dragging");
+      updateComputed(w);
+      updateMetrics();
+    });
+
+    wrap.appendChild(el);
+  });
+
+  updateMetrics();
+}
+
+function clamp(w){
+  const rect = wrap.getBoundingClientRect();
+  w.x = Math.max(35, Math.min(rect.width-35, w.x));
+  w.y = Math.max(25, Math.min(rect.height-25, w.y));
+}
+
+function updateComputed(w){
+  const dx = w.x - target.x;
+  const dy = target.y - w.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  w.valence = +(dx / target.r).toFixed(2);
+  w.activation = +(dy / target.r).toFixed(2);
+  w.intensity = +(Math.max(0, 1 - dist / (target.r*1.35))).toFixed(2);
+}
+
+function updateMetrics(){
+  data[phase].forEach(updateComputed);
+  const arr = data[phase];
+
+  const mean = key => arr.reduce((s,w)=>s+w[key],0)/arr.length;
+
+  const active = arr.filter(w=>w.intensity > .15).length;
+  const val = mean("valence").toFixed(2);
+  const act = mean("activation").toFixed(2);
+  const intensity = mean("intensity").toFixed(2);
+
+  metrics.innerHTML = `
+    <div class="metric"><span>Mots actifs</span><strong>${active}</strong></div>
+    <div class="metric"><span>Valence moyenne</span><strong>${val}</strong></div>
+    <div class="metric"><span>Activation moyenne</span><strong>${act}</strong></div>
+    <div class="metric"><span>Intensité moyenne</span><strong>${intensity}</strong></div>
+    <div class="metric"><span>Phase</span><strong>${phase}</strong></div>
+  `;
+}
+
+function setPhase(ph){
+  phase = ph;
+  document.querySelectorAll(".phase button").forEach(b=>{
+    b.classList.toggle("active", b.dataset.phase === ph);
+  });
+  draw();
+  renderWords();
+}
+
+document.querySelectorAll(".phase button").forEach(btn=>{
+  btn.addEventListener("click",()=>setPhase(btn.dataset.phase));
+});
+
+function copyPhase(){
+  const idx = ["avant","pendant","apres"].indexOf(phase);
+  if(idx >= 2) return;
+  const next = ["avant","pendant","apres"][idx+1];
+  data[next] = JSON.parse(JSON.stringify(data[phase]));
+  setPhase(next);
+}
+
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({
+    app:"Boussole des Résonances",
+    version:"demo-1",
+    exportedAt:new Date().toISOString(),
+    data
+  },null,2)], {type:"application/json"});
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "BDR_demo.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetDemo(){
+  if(!confirm("Réinitialiser la démo ?")) return;
+  initData();
+  resize();
+  setPhase("avant");
+}
+
+window.addEventListener("resize",resize);
+
+initData();
+resize();
+</script>
+
+</body>
+</html>
