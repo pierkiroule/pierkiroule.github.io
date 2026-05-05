@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Carte du Vécu Sonore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg:       #f4f1ec;
+  --surface:  #ffffff;
+  --border:   #d8d2c8;
+  --text:     #1a1814;
+  --muted:    #7a746c;
+  --accent:   #2a5c54;
+
+  --c-corps:    #1d6b8c;
+  --c-image:    #7a4f1d;
+  --c-espace:   #4a3d7a;
+  --c-relation: #7a2840;
+}
+
+html, body {
+  margin: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+.app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--border);
+  padding: 14px 16px 12px;
+  flex-shrink: 0;
+}
+
+.header-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+h1 {
+  margin: 0;
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: .01em;
+}
+
+.tagline {
+  font-size: 11px;
+  color: var(--muted);
+  font-style: italic;
+  font-family: 'DM Serif Display', serif;
+}
+
+.question {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.35;
+}
+
+/* ── CHIPS GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.col-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  margin-bottom: 5px;
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chip {
+  border: 1.5px solid transparent;
+  border-radius: 5px;
+  padding: 7px 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.2;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .1s;
+  background: var(--bg);
+}
+.chip:active { transform: scale(.93); }
+
+/* états inactif / actif par famille */
+.chip.corps    { color: var(--c-corps);    border-color: #c4dce8; }
+.chip.image    { color: var(--c-image);    border-color: #e0d0bb; }
+.chip.espace   { color: var(--c-espace);   border-color: #cdc8e4; }
+.chip.relation { color: var(--c-relation); border-color: #e4bfc8; }
+
+.chip.active.corps    { background: var(--c-corps);    color: #fff; border-color: var(--c-corps); }
+.chip.active.image    { background: var(--c-image);    color: #fff; border-color: var(--c-image); }
+.chip.active.espace   { background: var(--c-espace);   color: #fff; border-color: var(--c-espace); }
+.chip.active.relation { background: var(--c-relation); color: #fff; border-color: var(--c-relation); }
+
+/* ── ZONE ── */
+.zone {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  background: var(--bg);
+  min-height: 0;
+}
+
+canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* point central */
+.center-mark {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .35;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── BULLES ── */
+.bubble {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  user-select: none;
+  touch-action: none;
+  cursor: grab;
+  z-index: 2;
+  line-height: 1.15;
+  /* transition taille/opacité pendant le drag */
+  will-change: left, top, width, height, opacity;
+}
+.bubble:active { cursor: grabbing; }
+.bubble.drag   { z-index: 10; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--surface);
+  border-top: 1.5px solid var(--border);
+  padding: 9px 16px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  flex-shrink: 0;
+  font-style: italic;
+  font-family: 'DM Serif Display', serif;
+  line-height: 1.4;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <header>
+    <div class="header-top">
+      <h1>Carte du Vécu Sonore</h1>
+      <span class="tagline">écoute de paysage</span>
+    </div>
+    <div class="question">Ce que j'entends — qu'est-ce que ça éveille en moi ?</div>
+
+    <div class="grid">
+      <div>
+        <div class="col-label" style="color:var(--c-corps)">Corps</div>
+        <div id="chips-corps" class="chips"></div>
+      </div>
+      <div>
+        <div class="col-label" style="color:var(--c-image)">Images</div>
+        <div id="chips-image" class="chips"></div>
+      </div>
+      <div>
+        <div class="col-label" style="color:var(--c-espace)">Espace</div>
+        <div id="chips-espace" class="chips"></div>
+      </div>
+      <div>
+        <div class="col-label" style="color:var(--c-relation)">Lien</div>
+        <div id="chips-relation" class="chips"></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="zone" class="zone">
+    <canvas id="canvas"></canvas>
+    <div class="center-mark"></div>
+  </main>
+
+  <footer>
+    Touche un mot pour l'activer · Rapproche-le du centre s'il résonne fort · Les liens naissent par proximité
+  </footer>
+
+</div>
+<script>
+/* ── DONNÉES ── */
+const WORDS = {
+  corps:    ["souffle", "frisson", "tension", "chaleur", "flottement"],
+  image:    ["souvenir", "paysage", "silence", "rêve", "lumière"],
+  espace:   ["lointain", "enveloppé", "vaste", "intime", "dehors"],
+  relation: ["seul·e", "relié·e", "touché·e", "absent·e", "suspendu·e"]
+}
+
+const COLOR = {
+  corps:    "#1d6b8c",
+  image:    "#7a4f1d",
+  espace:   "#4a3d7a",
+  relation: "#7a2840"
+}
+
+/* ── STATE ── */
+const zone   = document.getElementById("zone")
+const canvas = document.getElementById("canvas")
+const ctx    = canvas.getContext("2d")
+
+let C  = { x: 0, y: 0, max: 0 }   // centre + rayon max
+let active = []
+let drag   = null
+
+/* ── HELPERS ── */
+function uid() { return Math.random().toString(36).slice(2, 9) }
+
+function hexRgba(hex, a) {
+  const h = hex.replace("#", "")
+  const r = parseInt(h.slice(0,2), 16)
+  const g = parseInt(h.slice(2,4), 16)
+  const b = parseInt(h.slice(4,6), 16)
+  return `rgba(${r},${g},${b},${a.toFixed(3)})`
+}
+
+function resonance(b) {
+  const dx = b.x - C.x, dy = b.y - C.y
+  return Math.max(0, Math.min(1, 1 - Math.sqrt(dx*dx + dy*dy) / C.max))
+}
+
+/* taille : 40px (périph) → 84px (centre) */
+function bSize(b) { return 40 + resonance(b) * 44 }
+
+/* opacité : 0.30 (périph) → 1.0 (centre) */
+function bOpacity(b) { return 0.30 + resonance(b) * 0.70 }
+
+function clamp(b) {
+  const r = zone.getBoundingClientRect()
+  const s = bSize(b) / 2
+  b.x = Math.max(s, Math.min(r.width  - s, b.x))
+  b.y = Math.max(s, Math.min(r.height - s, b.y))
+}
+
+/* ── CANVAS : anneaux de fond + liens ── */
+function drawCanvas() {
+  const W = canvas.clientWidth, H = canvas.clientHeight
+  ctx.clearRect(0, 0, W, H)
+
+  /* anneaux concentriques discrets */
+  for (let i = 1; i <= 3; i++) {
+    ctx.beginPath()
+    ctx.arc(C.x, C.y, C.max * (i / 3), 0, Math.PI * 2)
+    ctx.strokeStyle = `rgba(42,92,84,${0.055 - i * 0.012})`
+    ctx.lineWidth = 1
+    ctx.setLineDash([4, 8])
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
+
+  /* liens entre bulles actives */
+  const DIST = Math.min(zone.clientWidth, zone.clientHeight) * 0.52
+
+  for (let i = 0; i < active.length; i++) {
+    for (let j = i + 1; j < active.length; j++) {
+      const a = active[i], b = active[j]
+      const dx = a.x - b.x, dy = a.y - b.y
+      const d  = Math.sqrt(dx*dx + dy*dy)
+      if (d >= DIST) continue
+
+      const prox   = 1 - d / DIST
+      const shared = (resonance(a) + resonance(b)) / 2
+
+      /* épaisseur et opacité pilotées par résonance partagée */
+      const alpha = 0.08 + shared * 0.72 + prox * 0.12
+      const width = 1   + shared * 7    + prox * 2.5
+
+      const col = (a.family === b.family) ? COLOR[a.family] : "#2a5c54"
+
+      ctx.beginPath()
+      ctx.moveTo(a.x, a.y)
+      ctx.lineTo(b.x, b.y)
+      ctx.strokeStyle = hexRgba(col, Math.min(alpha, 0.92))
+      ctx.lineWidth   = width
+      ctx.lineCap     = "round"
+      ctx.stroke()
+    }
+  }
+}
+
+/* ── CHIPS ── */
+function renderChips() {
+  Object.entries(WORDS).forEach(([fam, words]) => {
+    document.getElementById("chips-" + fam).innerHTML = words.map(label => {
+      const on = active.some(a => a.label === label)
+      return `<button class="chip ${fam}${on ? " active" : ""}" onclick="toggle('${fam}','${label}')">${label}</button>`
+    }).join("")
+  })
+}
+
+function toggle(fam, label) {
+  const found = active.find(a => a.label === label)
+  if (found) {
+    active = active.filter(a => a.label !== label)
+    zone.querySelector(`[data-id="${found.id}"]`)?.remove()
+  } else {
+    const angle = Math.random() * Math.PI * 2
+    const dist  = C.max * 0.68
+    const b = {
+      id: uid(), label, family: fam,
+      x: C.x + Math.cos(angle) * dist,
+      y: C.y + Math.sin(angle) * dist
+    }
+    active.push(b)
+    spawnBubble(b)
+  }
+  renderChips()
+  drawCanvas()
+}
+
+/* ── BULLES ── */
+function applyStyle(el, b) {
+  const s   = bSize(b)
+  const res = resonance(b)
+  const col = COLOR[b.family]
+  el.style.width   = s + "px"
+  el.style.height  = s + "px"
+  el.style.left    = b.x + "px"
+  el.style.top     = b.y + "px"
+  el.style.opacity = bOpacity(b)
+  el.style.background = hexRgba(col, 0.12 + res * 0.82)
+  el.style.color      = res > 0.55 ? "#fff" : col
+  el.style.border     = `2px solid ${hexRgba(col, 0.35 + res * 0.60)}`
+  el.style.fontSize   = Math.max(9.5, Math.min(13.5, s / 4.2)) + "px"
+  el.style.boxShadow  = res > 0.15
+    ? `0 2px ${6 + res * 18}px ${hexRgba(col, 0.15 + res * 0.30)}`
+    : "none"
+}
+
+function spawnBubble(b) {
+  const el = document.createElement("div")
+  el.className  = "bubble"
+  el.dataset.id = b.id
+  el.textContent = b.label
+  applyStyle(el, b)
+
+  el.onpointerdown = e => {
+    e.preventDefault()
+    drag = { b, sx: e.clientX, sy: e.clientY, ox: b.x, oy: b.y }
+    el.classList.add("drag")
+    el.setPointerCapture(e.pointerId)
+  }
+  el.onpointermove = e => {
+    if (!drag || drag.b !== b) return
+    e.preventDefault()
+    b.x = drag.ox + e.clientX - drag.sx
+    b.y = drag.oy + e.clientY - drag.sy
+    clamp(b)
+    applyStyle(el, b)
+    drawCanvas()
+  }
+  el.onpointerup = () => {
+    drag = null
+    el.classList.remove("drag")
+  }
+
+  zone.appendChild(el)
+}
+
+/* ── RESIZE ── */
+function resize() {
+  const rect = zone.getBoundingClientRect()
+  const dpr  = window.devicePixelRatio || 1
+  canvas.width  = rect.width  * dpr
+  canvas.height = rect.height * dpr
+  canvas.style.width  = rect.width  + "px"
+  canvas.style.height = rect.height + "px"
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+  C.x   = rect.width  / 2
+  C.y   = rect.height / 2
+  C.max = Math.min(rect.width, rect.height) * 0.50
+  drawCanvas()
+}
+
+window.addEventListener("resize", resize)
+resize()
+renderChips()
+</script>
+</body>
+</html>
