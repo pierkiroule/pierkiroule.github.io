@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Carte Sonore du Vécu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet"/>
+
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --deep:#0b0e14;
+  --surface:#111520;
+  --panel:#171c2a;
+  --border:rgba(255,255,255,.08);
+  --gold:#c8a96e;
+  --teal:#4db8aa;
+  --lavender:#a08ed4;
+  --rose:#c47a8a;
+  --text:#e8e2d9;
+  --muted:rgba(232,226,217,.45);
+}
+
+html,body{
+  margin:0;height:100dvh;overflow:hidden;
+  background:var(--deep);
+  color:var(--text);
+  font-family:'Instrument Sans',sans-serif;
+}
+
+.app{
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── HEADER ── */
+header{
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  padding:12px 14px 10px;
+  flex-shrink:0;
+}
+
+.header-top{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+h1{
+  margin:0;
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;
+  font-weight:300;
+  letter-spacing:.04em;
+  color:var(--gold);
+  line-height:1;
+}
+
+.subtitle{
+  font-size:11px;
+  color:var(--muted);
+  font-style:italic;
+  font-family:'Cormorant Garamond',serif;
+}
+
+.question{
+  font-family:'Cormorant Garamond',serif;
+  font-size:15px;
+  font-weight:300;
+  font-style:italic;
+  color:var(--text);
+  margin-bottom:10px;
+  opacity:.9;
+}
+
+/* ── WORD GRID ── */
+.wordGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.family-label{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-bottom:5px;
+  font-weight:600;
+}
+
+.chips{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.chip{
+  border:0;
+  border-radius:6px;
+  padding:7px 5px;
+  font-size:11px;
+  font-weight:600;
+  font-family:'Instrument Sans',sans-serif;
+  cursor:pointer;
+  transition:opacity .15s, transform .1s;
+  letter-spacing:.01em;
+  line-height:1.2;
+  text-align:center;
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.chip:active{ transform:scale(.94) }
+
+/* famille = corps */
+.chip.corps{ background:rgba(77,184,170,.22); color:#4db8aa; border:1px solid rgba(77,184,170,.3) }
+.chip.corps.active{ background:#4db8aa; color:#0b0e14; border-color:#4db8aa }
+
+/* famille = image */
+.chip.image{ background:rgba(200,169,110,.18); color:#c8a96e; border:1px solid rgba(200,169,110,.28) }
+.chip.image.active{ background:#c8a96e; color:#0b0e14; border-color:#c8a96e }
+
+/* famille = espace */
+.chip.espace{ background:rgba(160,142,212,.18); color:#a08ed4; border:1px solid rgba(160,142,212,.28) }
+.chip.espace.active{ background:#a08ed4; color:#0b0e14; border-color:#a08ed4 }
+
+/* famille = relation */
+.chip.relation{ background:rgba(196,122,138,.18); color:#c47a8a; border:1px solid rgba(196,122,138,.28) }
+.chip.relation.active{ background:#c47a8a; color:#0b0e14; border-color:#c47a8a }
+
+/* ── ZONE ── */
+.zone{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  touch-action:none;
+  background:var(--deep);
+  min-height:0;
+}
+
+canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+/* ── BULLES ── */
+.bubble{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:4px;
+  font-size:11px;
+  font-weight:600;
+  font-family:'Instrument Sans',sans-serif;
+  user-select:none;
+  touch-action:none;
+  cursor:grab;
+  z-index:2;
+  transition:box-shadow .2s;
+  line-height:1.2;
+  letter-spacing:.01em;
+}
+.bubble:active{ cursor:grabbing }
+.bubble.drag{ z-index:10 }
+
+/* ── FOOTER ── */
+footer{
+  background:var(--panel);
+  border-top:1px solid var(--border);
+  padding:8px 14px;
+  font-size:10px;
+  color:var(--muted);
+  text-align:center;
+  flex-shrink:0;
+  font-style:italic;
+  font-family:'Cormorant Garamond',serif;
+  font-size:12px;
+  line-height:1.4;
+}
+
+/* center pulse */
+@keyframes pulse{
+  0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.28 }
+  50%{ transform:translate(-50%,-50%) scale(1.35); opacity:.14 }
+}
+.center-dot{
+  position:absolute;
+  left:50%;top:50%;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:var(--gold);
+  animation:pulse 3s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <header>
+    <div class="header-top">
+      <h1>Carte Sonore du Vécu</h1>
+      <span class="subtitle">écoute de paysage</span>
+    </div>
+    <div class="question">Cette écoute — qu'est-ce qu'elle éveille en toi ?</div>
+
+    <div class="wordGrid">
+      <div class="family">
+        <div class="family-label" style="color:#4db8aa">Corps</div>
+        <div id="chips-corps" class="chips"></div>
+      </div>
+      <div class="family">
+        <div class="family-label" style="color:#c8a96e">Images</div>
+        <div id="chips-image" class="chips"></div>
+      </div>
+      <div class="family">
+        <div class="family-label" style="color:#a08ed4">Espace</div>
+        <div id="chips-espace" class="chips"></div>
+      </div>
+      <div class="family">
+        <div class="family-label" style="color:#c47a8a">Lien</div>
+        <div id="chips-relation" class="chips"></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="zone" class="zone">
+    <canvas id="canvas"></canvas>
+    <div class="center-dot"></div>
+  </main>
+
+  <footer>
+    Déplace chaque actant selon son intensité — au cœur s'il résonne fort.<br>
+    Les liens s'épaississent à mesure que les nœuds convergent.
+  </footer>
+
+</div>
+
+<script>
+/* ─── DATA ─── */
+const WORDS = {
+  corps:    ["souffle","frisson","tension","chaleur","flottement"],
+  image:    ["souvenir","paysage","silence","rêve","lumière"],
+  espace:   ["lointain","enveloppé","vaste","intime","dehors"],
+  relation: ["seul·e","relié·e","touché·e","absent·e","suspendu·e"]
+}
+
+const FAMILY_COLOR = {
+  corps:    "#4db8aa",
+  image:    "#c8a96e",
+  espace:   "#a08ed4",
+  relation: "#c47a8a"
+}
+
+/* ─── STATE ─── */
+const zone   = document.getElementById("zone")
+const canvas = document.getElementById("canvas")
+const ctx    = canvas.getContext("2d")
+
+let center = { x:0, y:0, max:0 }
+let active = []
+let drag   = null
+
+/* ─── ANIMATED WAVE BACKGROUND ─── */
+let waveT = 0
+function drawBackground(){
+  const W = canvas.clientWidth
+  const H = canvas.clientHeight
+  ctx.clearRect(0,0,W,H)
+
+  /* subtle concentric rings */
+  const rings = 5
+  for(let i=0;i<rings;i++){
+    const t = waveT * .0003 + i
+    const r = center.max * (.22 + i*.18) + Math.sin(t)*6
+    const alpha = .035 - i*.005
+    ctx.beginPath()
+    ctx.arc(center.x,center.y,r,0,Math.PI*2)
+    ctx.strokeStyle = `rgba(200,169,110,${alpha})`
+    ctx.lineWidth = 1
+    ctx.stroke()
+  }
+
+  /* floating particles */
+  const seed = 17
+  for(let i=0;i<28;i++){
+    const si = (i*seed)%1000
+    const px = (si/1000)*W
+    const py = ((si*1.3)%1000)/1000*H
+    const ox = Math.sin(waveT*.0007 + i*1.3)*12
+    const oy = Math.cos(waveT*.0005 + i*0.9)*10
+    const a  = .07 + Math.sin(waveT*.001+i)*.04
+    const r  = 1.2 + Math.sin(waveT*.0008+i*2)*.6
+    ctx.beginPath()
+    ctx.arc(px+ox, py+oy, r, 0, Math.PI*2)
+    ctx.fillStyle = `rgba(200,169,110,${a})`
+    ctx.fill()
+  }
+}
+
+function drawLinks(){
+  /* seuil = toute la zone : les liens sont toujours potentiellement visibles */
+  const threshold = Math.min(zone.clientWidth,zone.clientHeight) * 0.55
+
+  for(let i=0;i<active.length;i++){
+    for(let j=i+1;j<active.length;j++){
+      const a = active[i], b = active[j]
+      const dx = a.x-b.x, dy = a.y-b.y
+      const d  = Math.sqrt(dx*dx+dy*dy)
+
+      if(d >= threshold) continue
+
+      const proximity = 1 - d/threshold           /* 0 = loin, 1 = superposés */
+      const shared    = (resonance(a)+resonance(b))/2  /* 0 = périph, 1 = cœur */
+
+      /* opacité et épaisseur pilotées par la résonance partagée + proximité */
+      const alpha = 0.06 + shared*0.70 + proximity*0.18
+      const width = 0.8  + shared*7    + proximity*3
+
+      const color = (a.family===b.family) ? FAMILY_COLOR[a.family] : "#c8a96e"
+
+      /* halo glow */
+      ctx.beginPath()
+      ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y)
+      ctx.strokeStyle = hexRgba(color, alpha*.4)
+      ctx.lineWidth   = width*3
+      ctx.lineCap     = "round"
+      ctx.filter      = "blur(5px)"
+      ctx.stroke()
+      ctx.filter      = "none"
+
+      /* ligne nette */
+      ctx.beginPath()
+      ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y)
+      ctx.strokeStyle = hexRgba(color, alpha)
+      ctx.lineWidth   = width
+      ctx.lineCap     = "round"
+      ctx.stroke()
+    }
+  }
+}
+
+function draw(){
+  drawBackground()
+  drawLinks()
+  waveT++
+  requestAnimationFrame(draw)
+}
+
+/* ─── HELPERS ─── */
+function hexRgba(hex,a){
+  const h=hex.replace("#","")
+  const r=parseInt(h.slice(0,2),16)
+  const g=parseInt(h.slice(2,4),16)
+  const b=parseInt(h.slice(4,6),16)
+  return `rgba(${r},${g},${b},${a})`
+}
+
+function resonance(b){
+  const dx=b.x-center.x, dy=b.y-center.y
+  const d=Math.sqrt(dx*dx+dy*dy)
+  return Math.max(0,Math.min(1,1-d/center.max))
+}
+
+function bubbleSize(b){
+  /* périphérie → petit (38px) ; centre → grand (90px) */
+  return 38 + resonance(b)*52
+}
+
+function bubbleOpacity(b){
+  /* périphérie → très transparent (0.22) ; centre → opaque (1.0) */
+  return 0.22 + resonance(b)*0.78
+}
+
+function uid(){ return Math.random().toString(36).slice(2,10) }
+
+/* ─── CHIPS ─── */
+function renderChips(){
+  Object.entries(WORDS).forEach(([family,words])=>{
+    const box = document.getElementById("chips-"+family)
+    box.innerHTML = words.map(label=>{
+      const on = active.some(a=>a.label===label)
+      return `<button class="chip ${family} ${on?"active":""}" onclick="toggleWord('${family}','${label}')">${label}</button>`
+    }).join("")
+  })
+}
+
+function toggleWord(family,label){
+  const found = active.find(a=>a.label===label)
+  if(found){
+    active = active.filter(a=>a.label!==label)
+    zone.querySelectorAll(".bubble").forEach(e=>{
+      if(e.dataset.id===found.id) e.remove()
+    })
+  } else {
+    const angle  = Math.random()*Math.PI*2
+    const rr     = center.max * .62
+    const newB   = {
+      id:uid(), label, family,
+      x:center.x + Math.cos(angle)*rr,
+      y:center.y + Math.sin(angle)*rr
+    }
+    active.push(newB)
+    createBubbleEl(newB)
+  }
+  renderChips()
+}
+
+/* ─── BUBBLES ─── */
+function createBubbleEl(b){
+  const size = bubbleSize(b)
+  const res  = resonance(b)
+  const el   = document.createElement("div")
+  el.className    = "bubble"
+  el.dataset.id   = b.id
+  el.textContent  = b.label
+
+  const col = FAMILY_COLOR[b.family]
+  el.style.width   = size+"px"
+  el.style.height  = size+"px"
+  el.style.left    = b.x+"px"
+  el.style.top     = b.y+"px"
+  el.style.opacity = bubbleOpacity(b)
+  /* fond : quasi transparent en périph, plein au centre */
+  el.style.background = hexRgba(col, 0.12 + res*0.72)
+  el.style.border  = `1.5px solid ${hexRgba(col, 0.3 + res*0.65)}`
+  el.style.color   = col
+  el.style.boxShadow = `0 0 ${12+res*28}px ${hexRgba(col, 0.1+res*0.45)}, inset 0 0 14px ${hexRgba(col,0.04+res*0.12)}`
+  el.style.backdropFilter = "blur(6px)"
+  el.style.fontSize = Math.max(9, Math.min(14, size/4.5))+"px"
+
+  bindDrag(el,b)
+  zone.appendChild(el)
+}
+
+function updateBubbleEl(el,b){
+  const size = bubbleSize(b)
+  const res  = resonance(b)
+  const col  = FAMILY_COLOR[b.family]
+  el.style.width      = size+"px"
+  el.style.height     = size+"px"
+  el.style.left       = b.x+"px"
+  el.style.top        = b.y+"px"
+  el.style.opacity    = bubbleOpacity(b)
+  el.style.background = hexRgba(col, 0.12 + res*0.72)
+  el.style.border     = `1.5px solid ${hexRgba(col, 0.3 + res*0.65)}`
+  el.style.boxShadow  = `0 0 ${12+res*28}px ${hexRgba(col, 0.1+res*0.45)}, inset 0 0 14px ${hexRgba(col,0.04+res*0.12)}`
+  el.style.fontSize   = Math.max(9, Math.min(14, size/4.5))+"px"
+}
+
+function bindDrag(el,b){
+  el.onpointerdown = e=>{
+    e.preventDefault()
+    drag = { b, sx:e.clientX, sy:e.clientY, ox:b.x, oy:b.y }
+    el.classList.add("drag")
+    el.setPointerCapture(e.pointerId)
+  }
+
+  el.onpointermove = e=>{
+    if(!drag||drag.b!==b) return
+    e.preventDefault()
+    b.x = drag.ox + e.clientX - drag.sx
+    b.y = drag.oy + e.clientY - drag.sy
+    clamp(b)
+    updateBubbleEl(el,b)
+  }
+
+  el.onpointerup = ()=>{
+    drag=null
+    el.classList.remove("drag")
+  }
+}
+
+function clamp(b){
+  const r = zone.getBoundingClientRect()
+  const s = bubbleSize(b)/2
+  b.x = Math.max(s, Math.min(r.width-s,  b.x))
+  b.y = Math.max(s, Math.min(r.height-s, b.y))
+}
+
+/* ─── RESIZE ─── */
+function resize(){
+  const rect = zone.getBoundingClientRect()
+  const dpr  = window.devicePixelRatio||1
+  canvas.width  = rect.width*dpr
+  canvas.height = rect.height*dpr
+  canvas.style.width  = rect.width+"px"
+  canvas.style.height = rect.height+"px"
+  ctx.setTransform(dpr,0,0,dpr,0,0)
+  center.x   = rect.width/2
+  center.y   = rect.height/2
+  center.max = Math.min(rect.width,rect.height)*.55
+}
+
+window.addEventListener("resize",resize)
+resize()
+renderChips()
+draw()
+</script>
+</body>
+</html>
