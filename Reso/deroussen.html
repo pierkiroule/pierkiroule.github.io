@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover">
 <title>Parc Heinlex · Parcours Sonore</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Spectral:ital,wght@0,200;0,300;1,200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #1a1a18;
@@ -26,7 +26,9 @@
   body {
     background: var(--paper);
     color: var(--ink);
-    font-family: 'Spectral', Georgia, serif;
+    font-family: 'Source Sans 3', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: clamp(1.08rem, 1rem + 0.55vw, 1.3rem);
+    line-height: 1.65;
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
@@ -54,7 +56,7 @@
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    font-size: clamp(0.9rem, 3.2vw, 1rem);
     letter-spacing: 0.22em;
     color: var(--slate);
     text-transform: uppercase;
@@ -93,7 +95,7 @@
   .composer {
     font-family: 'Spectral', serif;
     font-weight: 200;
-    font-size: clamp(0.75rem, 3vw, 0.85rem);
+    font-size: clamp(1rem, 3.2vw, 1.1rem);
     letter-spacing: 0.14em;
     color: var(--slate);
   }
@@ -111,7 +113,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
     font-style: italic;
-    font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+    font-size: clamp(1.2rem, 3.8vw, 1.45rem);
     color: var(--moss);
     line-height: 1.55;
     margin-bottom: 0.7rem;
@@ -120,8 +122,8 @@
   .intro-body {
     font-family: 'Spectral', serif;
     font-weight: 300;
-    font-size: clamp(0.88rem, 3.2vw, 0.95rem);
-    color: #2f3a41;
+    font-size: clamp(1.05rem, 3.3vw, 1.2rem);
+    color: #1f2a30;
     line-height: 1.75;
     letter-spacing: 0.02em;
   }
@@ -144,14 +146,14 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.8rem, 3.2vw, 0.88rem);
+    font-size: clamp(1rem, 3.2vw, 1.1rem);
     letter-spacing: 0.07em;
     color: var(--slate);
     cursor: pointer;
     position: relative;
     transition: color 0.25s;
     white-space: nowrap;
-    min-height: 48px;
+    min-height: 52px;
   }
 
   .col-tab.active { color: var(--moss); }
@@ -164,8 +166,28 @@
     content: '';
     position: absolute;
     bottom: -1px; left: 0; right: 0;
-    height: 2px;
+    height: 3px;
     background: var(--accent);
+  }
+
+
+  .collections-nav {
+    scrollbar-width: thin;
+  }
+
+  .col-tab {
+    min-height: 52px;
+  }
+
+  @media (max-width: 420px) {
+    .collection {
+      padding-left: 0.9rem;
+      padding-right: 0.9rem;
+    }
+
+    .piece-header {
+      gap: 0.65rem;
+    }
   }
 
   /* ── COLLECTIONS ── */
@@ -200,8 +222,8 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.84rem, 2.9vw, 0.9rem);
-    color: #2f3a41;
+    font-size: clamp(1rem, 3vw, 1.08rem);
+    color: #1f2a30;
     letter-spacing: 0.05em;
   }
 
@@ -256,9 +278,9 @@
   .piece-title {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
-    font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+    font-size: clamp(1.15rem, 3.8vw, 1.35rem);
     color: var(--ink);
-    line-height: 1.25;
+    line-height: 1.35;
   }
 
   .piece-title em {
@@ -266,7 +288,7 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.75rem, 2.8vw, 0.82rem);
+    font-size: clamp(0.95rem, 2.8vw, 1.02rem);
     letter-spacing: 0.09em;
     color: #426477;
     margin-top: 0.25rem;
@@ -286,7 +308,7 @@
     color: var(--paper);
     font-family: 'Spectral', serif;
     font-weight: 300;
-    font-size: clamp(0.78rem, 2.9vw, 0.84rem);
+    font-size: clamp(1rem, 2.9vw, 1.08rem);
     letter-spacing: 0.13em;
     cursor: pointer;
     text-transform: uppercase;
@@ -294,7 +316,7 @@
     text-decoration: none;
     transition: background 0.2s, transform 0.1s;
     /* zone tactile généreuse */
-    min-height: 48px;
+    min-height: 52px;
   }
 
   .play-btn:hover  { background: var(--accent); }
@@ -334,8 +356,8 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.82rem, 2.9vw, 0.9rem);
-    color: #2f3a41;
+    font-size: clamp(1rem, 2.9vw, 1.08rem);
+    color: #1f2a30;
     opacity: 0.75;
     line-height: 1.9;
   }
@@ -345,7 +367,7 @@
     margin-top: 1.2rem;
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: clamp(0.82rem, 3.2vw, 0.88rem);
+    font-size: clamp(1rem, 3.2vw, 1.08rem);
     letter-spacing: 0.08em;
     color: var(--moss);
     text-decoration: none;
