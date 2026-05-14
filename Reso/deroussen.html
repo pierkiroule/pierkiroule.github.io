@@ -18,7 +18,9 @@
     --accent: #7a9e6a;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { scroll-behavior: smooth; }
 
   body {
     background: var(--paper);
@@ -29,22 +31,20 @@
     position: relative;
   }
 
-  /* Texture de fond */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
     pointer-events: none;
     z-index: 0;
   }
 
-  /* Header */
+  /* ── HEADER ── */
   header {
     position: relative;
     z-index: 10;
-    padding: 3rem 2rem 2rem;
+    padding: clamp(2rem, 8vw, 3.5rem) clamp(1.2rem, 5vw, 2.5rem) 2rem;
     text-align: center;
     border-bottom: 1px solid rgba(74,92,58,0.2);
   }
@@ -53,8 +53,8 @@
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: 0.75rem;
-    letter-spacing: 0.25em;
+    font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    letter-spacing: 0.22em;
     color: var(--slate);
     text-transform: uppercase;
     margin-bottom: 1rem;
@@ -63,218 +63,196 @@
   h1 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: clamp(2.2rem, 7vw, 4rem);
-    line-height: 1.05;
+    font-size: clamp(2.4rem, 11vw, 4.2rem);
+    line-height: 1.0;
     color: var(--moss);
     letter-spacing: -0.01em;
   }
 
-  h1 em {
-    font-style: italic;
-    color: var(--ocre);
-  }
+  h1 em { font-style: italic; color: var(--ocre); }
 
-  .composer {
-    margin-top: 0.8rem;
-    font-family: 'Spectral', serif;
-    font-weight: 200;
-    font-size: 0.85rem;
-    letter-spacing: 0.15em;
-    color: var(--slate);
-  }
-
-  .composer span {
-    color: var(--moss);
-    font-weight: 300;
-  }
-
-  /* Séparateur ornemental */
   .ornament {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    margin: 1.5rem auto;
+    margin: 1.4rem auto;
     color: var(--brume);
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   .ornament::before, .ornament::after {
     content: '';
     display: block;
     height: 1px;
-    width: 60px;
-    background: linear-gradient(90deg, transparent, var(--brume));
+    width: 50px;
   }
-  .ornament::after { background: linear-gradient(90deg, var(--brume), transparent); }
+  .ornament::before { background: linear-gradient(90deg, transparent, var(--brume)); }
+  .ornament::after  { background: linear-gradient(90deg, var(--brume), transparent); }
+
+  .composer {
+    font-family: 'Spectral', serif;
+    font-weight: 200;
+    font-size: clamp(0.75rem, 3vw, 0.85rem);
+    letter-spacing: 0.14em;
+    color: var(--slate);
+  }
+  .composer span { color: var(--moss); font-weight: 300; }
 
   .intro-text {
     max-width: 480px;
     margin: 1.6rem auto 0;
     padding-top: 1.4rem;
     border-top: 1px solid rgba(74,92,58,0.12);
+    text-align: left;
   }
 
   .intro-lead {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
     font-style: italic;
-    font-size: 1.05rem;
+    font-size: clamp(0.95rem, 3.5vw, 1.05rem);
     color: var(--moss);
-    line-height: 1.5;
+    line-height: 1.55;
     margin-bottom: 0.7rem;
   }
 
   .intro-body {
     font-family: 'Spectral', serif;
     font-weight: 200;
-    font-size: 0.82rem;
+    font-size: clamp(0.78rem, 3vw, 0.82rem);
     color: var(--slate);
-    line-height: 1.8;
+    line-height: 1.85;
     letter-spacing: 0.02em;
   }
 
-  /* Navigation entre collections */
+  /* ── ONGLETS ── */
   .collections-nav {
     display: flex;
     justify-content: center;
-    gap: 0;
-    padding: 0 2rem;
-    margin-bottom: 0;
     position: relative;
     z-index: 10;
     border-bottom: 1px solid rgba(74,92,58,0.15);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .col-tab {
     background: none;
     border: none;
-    padding: 1rem 1.5rem;
+    padding: 1rem clamp(1rem, 4vw, 1.8rem);
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
+    font-size: clamp(0.8rem, 3.2vw, 0.88rem);
+    letter-spacing: 0.07em;
     color: var(--slate);
     cursor: pointer;
     position: relative;
-    transition: color 0.3s;
+    transition: color 0.25s;
     white-space: nowrap;
+    min-height: 48px;
   }
 
-  .col-tab.active {
-    color: var(--moss);
-  }
-
+  .col-tab.active { color: var(--moss); }
   .col-tab.active::after {
     content: '';
     position: absolute;
-    bottom: -1px;
-    left: 0; right: 0;
+    bottom: -1px; left: 0; right: 0;
     height: 2px;
     background: var(--accent);
   }
 
-  .col-tab:hover { color: var(--moss); }
-
-  /* Collections */
+  /* ── COLLECTIONS ── */
   .collection {
     display: none;
-    padding: 2.5rem 1.5rem;
+    padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.5rem);
     position: relative;
     z-index: 5;
-    animation: fadeIn 0.4s ease;
+    animation: fadeIn 0.35s ease;
   }
   .collection.active { display: block; }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   .collection-intro {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: clamp(1.5rem, 5vw, 2.5rem);
   }
 
   .collection-intro h2 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: 1.4rem;
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
     color: var(--moss);
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.35rem;
   }
 
   .collection-intro p {
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: 0.8rem;
+    font-size: clamp(0.72rem, 2.8vw, 0.8rem);
     color: var(--slate);
     letter-spacing: 0.05em;
   }
 
-  /* Grille des pièces */
+  /* ── GRILLE ── */
   .pieces-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.2rem;
+    gap: clamp(0.9rem, 3vw, 1.2rem);
     max-width: 640px;
     margin: 0 auto;
   }
 
-  @media (min-width: 580px) {
+  @media (min-width: 540px) {
     .pieces-grid { grid-template-columns: 1fr 1fr; }
   }
 
-  /* Carte d'une pièce */
+  /* ── CARTE ── */
   .piece-card {
-    background: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.52);
     border: 1px solid rgba(74,92,58,0.15);
-    border-radius: 2px;
+    border-radius: 3px;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
     position: relative;
+    transition: box-shadow 0.2s;
   }
 
   .piece-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, transparent 60%, rgba(107,143,163,0.05));
+    background: linear-gradient(135deg, transparent 55%, rgba(107,143,163,0.05));
     pointer-events: none;
   }
 
-  .piece-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(74,92,58,0.12);
-  }
+  .piece-card:active { box-shadow: 0 4px 20px rgba(74,92,58,0.1); }
 
   .piece-header {
-    padding: 1.2rem 1.4rem 0.8rem;
+    padding: clamp(1rem, 4vw, 1.3rem) clamp(1rem, 4vw, 1.4rem) 0.7rem;
     display: flex;
     align-items: flex-start;
-    gap: 0.8rem;
-    cursor: pointer;
+    gap: 0.75rem;
   }
 
   .piece-icon {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 3px;
   }
-
-  .piece-icon svg {
-    width: 100%;
-    height: 100%;
-  }
+  .piece-icon svg { width: 100%; height: 100%; }
 
   .piece-title {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
-    font-size: 1.05rem;
+    font-size: clamp(0.95rem, 3.8vw, 1.05rem);
     color: var(--ink);
-    line-height: 1.2;
+    line-height: 1.25;
   }
 
   .piece-title em {
@@ -282,117 +260,98 @@
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
+    font-size: clamp(0.62rem, 2.5vw, 0.7rem);
+    letter-spacing: 0.09em;
     color: var(--eau);
-    margin-top: 0.2rem;
+    margin-top: 0.25rem;
   }
 
-  /* Bouton play */
+  /* ── BOUTON ÉCOUTER ── */
   .play-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    margin: 0 1.4rem 1.2rem;
-    padding: 0.55rem 1rem;
+    margin: 0.2rem clamp(1rem, 4vw, 1.4rem) clamp(1rem, 4vw, 1.3rem);
+    padding: 0.75rem 1rem;
     background: var(--moss);
     border: none;
     border-radius: 2px;
     color: var(--paper);
     font-family: 'Spectral', serif;
     font-weight: 200;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
+    font-size: clamp(0.7rem, 2.8vw, 0.76rem);
+    letter-spacing: 0.13em;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
     text-transform: uppercase;
-    width: calc(100% - 2.8rem);
-    justify-content: center;
+    width: calc(100% - clamp(2rem, 8vw, 2.8rem));
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+    /* zone tactile généreuse */
+    min-height: 48px;
   }
 
-  .play-btn:hover { background: var(--accent); }
-  .play-btn:active { transform: scale(0.98); }
+  .play-btn:hover  { background: var(--accent); }
+  .play-btn:active { transform: scale(0.97); }
 
-  .play-btn svg {
-    width: 14px; height: 14px;
-    flex-shrink: 0;
+  .play-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* ── WAVE DÉCORATIVE ── */
+  .wave-bar {
+    height: 36px;
+    overflow: hidden;
+    opacity: 0.12;
+    margin-top: 1rem;
+  }
+  .wave-bar svg {
+    width: 200%;
+    animation: wavemove 10s linear infinite;
+  }
+  @keyframes wavemove {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
   }
 
-  /* Player iframe */
-  .player-wrapper {
-    display: none;
-    padding: 0 1.4rem 1.2rem;
-  }
-
-  .player-wrapper.open { display: block; }
-
-  .player-wrapper iframe {
-    width: 100%;
-    height: 80px;
-    border: none;
-    border-radius: 2px;
-    background: #1a1a18;
-  }
-
-  /* Note de bas */
+  /* ── FOOTER ── */
   footer {
     text-align: center;
-    padding: 3rem 2rem 4rem;
+    padding: 2.5rem clamp(1.2rem, 5vw, 2rem) clamp(3rem, 8vw, 4.5rem);
     position: relative;
     z-index: 5;
-  }
-
-  .footer-wave {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
   }
 
   footer p {
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: 0.75rem;
+    font-size: clamp(0.72rem, 2.8vw, 0.78rem);
     color: var(--slate);
-    opacity: 0.7;
-    line-height: 1.8;
+    opacity: 0.75;
+    line-height: 1.9;
   }
 
-  /* Indicateur collection */
-  .col-badge {
+  .footer-link {
     display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    margin-right: 0.4rem;
-    vertical-align: middle;
-    opacity: 0.6;
+    margin-top: 1.2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(0.82rem, 3.2vw, 0.88rem);
+    letter-spacing: 0.08em;
+    color: var(--moss);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(74,92,58,0.3);
+    padding-bottom: 1px;
+    transition: color 0.2s, border-color 0.2s;
   }
-  .col-tab.active .col-badge { opacity: 1; }
-
-  /* Wave animation décorative */
-  .wave-bar {
-    position: relative;
-    height: 40px;
-    overflow: hidden;
-    opacity: 0.15;
-  }
-
-  .wave-bar svg {
-    position: absolute;
-    bottom: 0;
-    width: 200%;
-    animation: wavemove 8s linear infinite;
-  }
-
-  @keyframes wavemove {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+  .footer-link:hover {
+    color: var(--accent);
+    border-color: var(--accent);
   }
 </style>
 </head>
 <body>
 
+<!-- ── HEADER ── -->
 <header>
   <p class="subtitle-top">Parc de Heinlex · Saint-Nazaire</p>
   <h1>Écoute<br><em>augmentée</em></h1>
@@ -404,25 +363,26 @@
   </div>
 </header>
 
-<!-- Navigation collections -->
+<!-- ── ONGLETS ── -->
 <nav class="collections-nav">
   <button class="col-tab active" onclick="showCollection('foret')" id="tab-foret">
-    <span class="col-badge"></span>Forêt & Vivant
+    Forêt &amp; Vivant
   </button>
   <button class="col-tab" onclick="showCollection('mer')" id="tab-mer">
-    <span class="col-badge"></span>Mémoire de la mer
+    Mémoire de la mer
   </button>
 </nav>
 
-<!-- Collection 1 : Forêt & Vivant -->
+<!-- ══ COLLECTION 1 : FORÊT & VIVANT ══ -->
 <section class="collection active" id="col-foret">
   <div class="collection-intro">
-    <h2>Forêt & Vivant</h2>
+    <h2>Forêt &amp; Vivant</h2>
     <p>7 pièces — sons du parc, de l'air et du temps</p>
   </div>
 
   <div class="pieces-grid">
 
+    <!-- AMPHIBIUS -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -432,20 +392,15 @@
             <path d="M12 20 Q16 12 20 20" stroke="#6b8fa3" stroke-width="0.8" fill="none" opacity="0.7"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Amphibius
-          <em>entre deux mondes</em>
-        </div>
+        <div class="piece-title">Amphibius<em>entre deux mondes</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZhDnvZNGnkepwmn60O5Cskb8UV5fLAx3XV')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZhDnvZNGnkepwmn60O5Cskb8UV5fLAx3XV" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- AQUAPHONIE -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -455,20 +410,15 @@
             <circle cx="16" cy="16" r="2" fill="#6b8fa3" opacity="0.5"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Aquaphonie
-          <em>voix des eaux</em>
-        </div>
+        <div class="piece-title">Aquaphonie<em>voix des eaux</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZSDnvZiVDfBuoOim4cks1vCV0CGkxmEU4k')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZSDnvZiVDfBuoOim4cks1vCV0CGkxmEU4k" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- SILENCE -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -478,20 +428,15 @@
             <circle cx="16" cy="16" r="1.5" fill="#8b7355" opacity="0.4"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Silence
-          <em>présence absolue</em>
-        </div>
+        <div class="piece-title">Silence<em>présence absolue</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZsDnvZpkpVJNFaTFVkSMWp8QukFbYGKm8V')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZsDnvZpkpVJNFaTFVkSMWp8QukFbYGKm8V" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- LA GRANDE SYMPHONIE -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -502,20 +447,15 @@
             <circle cx="24" cy="14" r="1.2" fill="#7a9e6a" opacity="0.5"/>
           </svg>
         </div>
-        <div class="piece-title">
-          La Grande Symphonie du Vivant
-          <em>le chœur de la nature</em>
-        </div>
+        <div class="piece-title">La Grande Symphonie du Vivant<em>le chœur de la nature</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZ9DnvZ4ue0hofiWtBRMSq0klxYlQu0IFty')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZ9DnvZ4ue0hofiWtBRMSq0klxYlQu0IFty" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- AVES MELODIA -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -525,20 +465,15 @@
             <circle cx="20" cy="11" r="1.5" fill="#4a5c3a" opacity="0.4"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Aves Melodia
-          <em>la voix des oiseaux</em>
-        </div>
+        <div class="piece-title">Aves Melodia<em>la voix des oiseaux</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZPDnvZ610j0TdJVLz9UicSlx8W2JlcBybk')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZPDnvZ610j0TdJVLz9UicSlx8W2JlcBybk" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- CE QUE DIT LE VENT -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -548,20 +483,15 @@
             <path d="M6 22 Q11 16 16 19" stroke="#c8d4c0" stroke-width="0.8" fill="none"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Ce que dit le vent
-          <em>murmures & rafales</em>
-        </div>
+        <div class="piece-title">Ce que dit le vent<em>murmures &amp; rafales</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZqDnvZQht4f8CCuTp6k8re8iAXy8odnnMV')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZqDnvZQht4f8CCuTp6k8re8iAXy8odnnMV" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- DES BRUITS DANS LA NUIT -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -572,24 +502,18 @@
             <circle cx="16" cy="20" r="1" fill="#1a1a18" opacity="0.3"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Des bruits dans la nuit
-          <em>l'invisible qui respire</em>
-        </div>
+        <div class="piece-title">Des bruits dans la nuit<em>l'invisible qui respire</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZUDnvZa8azxolN4bJv0dwQiu7lXQlczL9X')">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZUDnvZa8azxolN4bJv0dwQiu7lXQlczL9X" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
   </div>
 </section>
 
-<!-- Collection 2 : Mémoire de la mer -->
+<!-- ══ COLLECTION 2 : MÉMOIRE DE LA MER ══ -->
 <section class="collection" id="col-mer">
   <div class="collection-intro">
     <h2>Mémoire de la mer</h2>
@@ -598,6 +522,7 @@
 
   <div class="pieces-grid" style="max-width:480px;">
 
+    <!-- LA VAGUE -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -607,20 +532,15 @@
             <path d="M6 24 Q10 20 14 22" stroke="#6b8fa3" stroke-width="0.7" fill="none" opacity="0.5"/>
           </svg>
         </div>
-        <div class="piece-title">
-          La Vague
-          <em>le soulèvement perpétuel</em>
-        </div>
+        <div class="piece-title">La Vague<em>le soulèvement perpétuel</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZmsCiZloFI7FXQiGuiuxQx72xjSBftNuc7')" style="background:var(--slate);">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZmsCiZloFI7FXQiGuiuxQx72xjSBftNuc7" target="_blank" rel="noopener" style="background:var(--slate);">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- PROFONDEURS -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -631,20 +551,15 @@
             <circle cx="16" cy="18" r="1.2" fill="#6b8fa3" opacity="0.3"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Profondeurs
-          <em>ce qui dort sous l'eau</em>
-        </div>
+        <div class="piece-title">Profondeurs<em>ce qui dort sous l'eau</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZPsCiZK3MqD9eehoQyTpU1rPjIMbCEsQRX')" style="background:var(--slate);">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZPsCiZK3MqD9eehoQyTpU1rPjIMbCEsQRX" target="_blank" rel="noopener" style="background:var(--slate);">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
+    <!-- MARÉE BASSE -->
     <div class="piece-card">
       <div class="piece-header">
         <div class="piece-icon">
@@ -655,48 +570,35 @@
             <path d="M8 16 Q16 12 24 16" stroke="#8b7355" stroke-width="0.7" fill="none" opacity="0.4" stroke-dasharray="2 2"/>
           </svg>
         </div>
-        <div class="piece-title">
-          Marée basse
-          <em>l'estran révélé</em>
-        </div>
+        <div class="piece-title">Marée basse<em>l'estran révélé</em></div>
       </div>
-      <button class="play-btn" onclick="togglePlayer(this, 'https://e.pcloud.link/publink/show?code=XZDsCiZkx7BXxTQdMplbdiV1YMlgS1SIRYV')" style="background:var(--slate);">
+      <a class="play-btn" href="https://e.pcloud.link/publink/show?code=XZDsCiZkx7BXxTQdMplbdiV1YMlgS1SIRYV" target="_blank" rel="noopener" style="background:var(--slate);">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg>
         Écouter
-      </button>
-      <div class="player-wrapper">
-        <iframe allowfullscreen allow="autoplay"></iframe>
-      </div>
+      </a>
     </div>
 
   </div>
 </section>
 
-<!-- Wave décorative -->
+<!-- ── WAVE DÉCO ── -->
 <div class="wave-bar">
-  <svg viewBox="0 0 800 40" preserveAspectRatio="none">
-    <path d="M0 20 Q100 5 200 20 Q300 35 400 20 Q500 5 600 20 Q700 35 800 20 Q900 5 1000 20 Q1100 35 1200 20 Q1300 5 1400 20 Q1500 35 1600 20" stroke="#4a5c3a" stroke-width="1.5" fill="none"/>
-    <path d="M0 28 Q100 18 200 28 Q300 38 400 28 Q500 18 600 28 Q700 38 800 28 Q900 18 1000 28 Q1100 38 1200 28 Q1300 18 1400 28 Q1500 38 1600 28" stroke="#6b8fa3" stroke-width="0.8" fill="none" opacity="0.5"/>
+  <svg viewBox="0 0 800 36" preserveAspectRatio="none">
+    <path d="M0 18 Q100 4 200 18 Q300 32 400 18 Q500 4 600 18 Q700 32 800 18 Q900 4 1000 18 Q1100 32 1200 18 Q1300 4 1400 18 Q1500 32 1600 18" stroke="#4a5c3a" stroke-width="1.5" fill="none"/>
+    <path d="M0 26 Q100 16 200 26 Q300 36 400 26 Q500 16 600 26 Q700 36 800 26 Q900 16 1000 26 Q1100 36 1200 26 Q1300 16 1400 26 Q1500 36 1600 26" stroke="#6b8fa3" stroke-width="0.8" fill="none" opacity="0.5"/>
   </svg>
 </div>
 
+<!-- ── FOOTER ── -->
 <footer>
   <p>
     Compositions originales · <em>Fernand Deroussen</em><br>
     Parc de Heinlex · Saint-Nazaire<br>
     Parcours d'écoute augmentée
   </p>
-  <p style="margin-top:1.2rem;">
-    <a href="https://www.naturo-phonia.com/" target="_blank" rel="noopener"
-       style="font-family:'Cormorant Garamond',serif; font-weight:300; font-size:0.85rem;
-              letter-spacing:0.08em; color:var(--moss); text-decoration:none;
-              border-bottom:1px solid rgba(74,92,58,0.3); padding-bottom:1px;
-              transition:color 0.2s, border-color 0.2s;"
-       onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
-       onmouseout="this.style.color='var(--moss)';this.style.borderColor='rgba(74,92,58,0.3)'">
-      naturo-phonia.com
-    </a>
-  </p>
+  <a class="footer-link" href="https://www.naturo-phonia.com/" target="_blank" rel="noopener">
+    naturo-phonia.com
+  </a>
 </footer>
 
 <script>
@@ -705,42 +607,6 @@ function showCollection(id) {
   document.querySelectorAll('.col-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('col-' + id).classList.add('active');
   document.getElementById('tab-' + id).classList.add('active');
-  // Fermer tous les players ouverts
-  document.querySelectorAll('.player-wrapper.open').forEach(p => {
-    p.classList.remove('open');
-    p.querySelector('iframe').src = '';
-  });
-  document.querySelectorAll('.play-btn').forEach(b => {
-    b.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg> Écouter';
-  });
-}
-
-function togglePlayer(btn, url) {
-  const wrapper = btn.nextElementSibling;
-  const isOpen = wrapper.classList.contains('open');
-
-  // Fermer tous les autres
-  document.querySelectorAll('.player-wrapper.open').forEach(p => {
-    if (p !== wrapper) {
-      p.classList.remove('open');
-      p.querySelector('iframe').src = '';
-    }
-  });
-  document.querySelectorAll('.play-btn').forEach(b => {
-    if (b !== btn) {
-      b.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg> Écouter';
-    }
-  });
-
-  if (isOpen) {
-    wrapper.classList.remove('open');
-    wrapper.querySelector('iframe').src = '';
-    btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 3.5l10 4.5-10 4.5V3.5z"/></svg> Écouter';
-  } else {
-    wrapper.classList.add('open');
-    wrapper.querySelector('iframe').src = url;
-    btn.innerHTML = '<svg viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="3" width="3" height="10"/><rect x="9" y="3" width="3" height="10"/></svg> Pause';
-  }
 }
 </script>
 </body>
