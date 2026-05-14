@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, viewport-fit=cover">
 <title>Parc Heinlex · Parcours Sonore</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Spectral:ital,wght@0,200;0,300;1,200&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --ink: #1a1a18;
@@ -26,7 +26,9 @@
   body {
     background: var(--paper);
     color: var(--ink);
-    font-family: 'Spectral', Georgia, serif;
+    font-family: 'Source Sans 3', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: clamp(1.08rem, 1rem + 0.55vw, 1.3rem);
+    line-height: 1.65;
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
@@ -54,7 +56,7 @@
     font-family: 'Spectral', serif;
     font-weight: 200;
     font-style: italic;
-    font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    font-size: clamp(0.9rem, 3.2vw, 1rem);
     letter-spacing: 0.22em;
     color: var(--slate);
     text-transform: uppercase;
@@ -71,6 +73,41 @@
   }
 
   h1 em { font-style: italic; color: var(--ocre); }
+
+
+  .morse-echo {
+    width: min(300px, 86vw);
+    margin: 1.1rem auto 1.2rem;
+    position: relative;
+    border-radius: 999px;
+    border: 1px solid rgba(74,92,58,0.28);
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.88), rgba(200,212,192,0.34));
+    padding: 0.9rem 1rem;
+    color: #214550;
+    letter-spacing: 0.14em;
+    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+    font-weight: 700;
+    font-size: clamp(0.95rem, 3.2vw, 1.08rem);
+  }
+
+  .morse-echo::before,
+  .morse-echo::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 999px;
+    border: 1px solid rgba(107,143,163,0.22);
+    pointer-events: none;
+  }
+
+  .morse-echo::after {
+    inset: -16px;
+    border-color: rgba(107,143,163,0.14);
+  }
+
+  .morse-echo span {
+    white-space: nowrap;
+  }
 
   .ornament {
     display: flex;
@@ -93,7 +130,7 @@
   .composer {
     font-family: 'Spectral', serif;
     font-weight: 200;
-    font-size: clamp(0.75rem, 3vw, 0.85rem);
+    font-size: clamp(1rem, 3.2vw, 1.1rem);
     letter-spacing: 0.14em;
     color: var(--slate);
   }
@@ -111,7 +148,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
     font-style: italic;
-    font-size: clamp(0.95rem, 3.5vw, 1.05rem);
+    font-size: clamp(1.2rem, 3.8vw, 1.45rem);
     color: var(--moss);
     line-height: 1.55;
     margin-bottom: 0.7rem;
@@ -120,11 +157,66 @@
   .intro-body {
     font-family: 'Spectral', serif;
     font-weight: 300;
-    font-size: clamp(0.88rem, 3.2vw, 0.95rem);
-    color: #2f3a41;
+    font-size: clamp(1.05rem, 3.3vw, 1.2rem);
+    color: #1f2a30;
     line-height: 1.75;
     letter-spacing: 0.02em;
   }
+
+
+  .resonance-intro {
+    position: relative;
+    z-index: 10;
+    margin: 1.2rem auto 0.8rem;
+    max-width: 760px;
+    padding: 0 1rem;
+    text-align: center;
+  }
+  .resonance-cta {
+    margin-top: 0.6rem;
+    border: 1px solid rgba(74,92,58,0.3);
+    background: rgba(255,255,255,0.65);
+    color: #21435a;
+    font: 600 clamp(1rem, 3.2vw, 1.15rem)/1.5 'Source Sans 3', sans-serif;
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
+    width: min(100%, 640px);
+    min-height: 52px;
+    cursor: pointer;
+  }
+  .resonance-modal {
+    position: fixed; inset: 0; z-index: 60; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(18,35,44,0.62); padding: 1rem;
+  }
+  .resonance-modal.open { display: flex; }
+  .modal-card { width: min(94vw, 700px); background: radial-gradient(circle at top, #ffffff, #dff6ff 40%, #e8fff3 100%); border-radius: 16px; padding: 0.8rem; position: relative; }
+  .modal-close { position:absolute; right:0.6rem; top:0.6rem; border:0; background:#ffffffd9; border-radius:999px; width:40px; height:40px; font-size:1.25rem; cursor:pointer; }
+  .wrap { width: min(92vw, 620px); margin: 0 auto; }
+  .compass { width: 100%; overflow: visible; color: #21435a; }
+  .halo { fill: url(#glow); transform-origin: 250px 250px; animation: pulse 7s ease-in-out infinite; }
+  .halo2 { animation-delay: -3s; opacity: 0.5; }
+  .axis { stroke: #21435a; stroke-width: 2; stroke-linecap: round; opacity: 0.22; }
+  .ring { fill: none; stroke: #21435a; stroke-width: 2; stroke-dasharray: 4 10; opacity: 0.35; transform-origin: 250px 250px; animation: rotate 38s linear infinite; }
+  .needle { transform-origin: 250px 250px; animation: sway 6s ease-in-out infinite; }
+  .needle path { fill: #21435a; opacity: 0.1; }
+  .center circle, .pole circle { fill: rgba(255,255,255,0.78); stroke: rgba(33,67,90,0.16); stroke-width: 1; filter: drop-shadow(0 12px 20px rgba(33,67,90,0.12)); }
+  .center { transform-origin: 250px 250px; animation: breathe 5s ease-in-out infinite; }
+  .pole { cursor: pointer; transform-box: fill-box; transform-origin: center; transition: transform 0.25s ease, filter 0.25s ease; }
+  .pole:hover { transform: scale(1.08); filter: drop-shadow(0 0 18px rgba(60,150,180,0.35)); }
+  .emoji { font-size: 28px; }
+  .label, .centerText { font-size: 15px; font-weight: 700; fill: #21435a; }
+  .centerText { font-size: 14px; }
+  .dot { fill: #21435a; opacity: 0.35; }
+  .d1 { animation: moveNorth 5s ease-in-out infinite; } .d2 { animation: moveEast 5s ease-in-out infinite 1.2s; } .d3 { animation: moveSouth 5s ease-in-out infinite 2.4s; } .d4 { animation: moveWest 5s ease-in-out infinite 3.6s; }
+  @keyframes pulse { 0%,100% { transform: scale(0.85); opacity: 0.18; } 50% { transform: scale(1.2); opacity: 0.55; } }
+  @keyframes breathe { 0%,100% { transform: scale(0.96); } 50% { transform: scale(1.04); } }
+  @keyframes rotate { to { transform: rotate(360deg); } }
+  @keyframes sway { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  @keyframes moveNorth { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(0,-135px); opacity:0.55; } }
+  @keyframes moveEast { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(135px,0); opacity:0.55; } }
+  @keyframes moveSouth { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(0,135px); opacity:0.55; } }
+  @keyframes moveWest { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(-135px,0); opacity:0.55; } }
 
   /* ── ONGLETS ── */
   .collections-nav {
@@ -144,14 +236,14 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.8rem, 3.2vw, 0.88rem);
+    font-size: clamp(1rem, 3.2vw, 1.1rem);
     letter-spacing: 0.07em;
     color: var(--slate);
     cursor: pointer;
     position: relative;
     transition: color 0.25s;
     white-space: nowrap;
-    min-height: 48px;
+    min-height: 52px;
   }
 
   .col-tab.active { color: var(--moss); }
@@ -164,8 +256,28 @@
     content: '';
     position: absolute;
     bottom: -1px; left: 0; right: 0;
-    height: 2px;
+    height: 3px;
     background: var(--accent);
+  }
+
+
+  .collections-nav {
+    scrollbar-width: thin;
+  }
+
+  .col-tab {
+    min-height: 52px;
+  }
+
+  @media (max-width: 420px) {
+    .collection {
+      padding-left: 0.9rem;
+      padding-right: 0.9rem;
+    }
+
+    .piece-header {
+      gap: 0.65rem;
+    }
   }
 
   /* ── COLLECTIONS ── */
@@ -200,8 +312,8 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.84rem, 2.9vw, 0.9rem);
-    color: #2f3a41;
+    font-size: clamp(1rem, 3vw, 1.08rem);
+    color: #1f2a30;
     letter-spacing: 0.05em;
   }
 
@@ -256,9 +368,9 @@
   .piece-title {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
-    font-size: clamp(0.95rem, 3.8vw, 1.05rem);
+    font-size: clamp(1.15rem, 3.8vw, 1.35rem);
     color: var(--ink);
-    line-height: 1.25;
+    line-height: 1.35;
   }
 
   .piece-title em {
@@ -266,7 +378,7 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.75rem, 2.8vw, 0.82rem);
+    font-size: clamp(0.95rem, 2.8vw, 1.02rem);
     letter-spacing: 0.09em;
     color: #426477;
     margin-top: 0.25rem;
@@ -286,7 +398,7 @@
     color: var(--paper);
     font-family: 'Spectral', serif;
     font-weight: 300;
-    font-size: clamp(0.78rem, 2.9vw, 0.84rem);
+    font-size: clamp(1rem, 2.9vw, 1.08rem);
     letter-spacing: 0.13em;
     cursor: pointer;
     text-transform: uppercase;
@@ -294,7 +406,7 @@
     text-decoration: none;
     transition: background 0.2s, transform 0.1s;
     /* zone tactile généreuse */
-    min-height: 48px;
+    min-height: 52px;
   }
 
   .play-btn:hover  { background: var(--accent); }
@@ -334,8 +446,8 @@
     font-family: 'Spectral', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.82rem, 2.9vw, 0.9rem);
-    color: #2f3a41;
+    font-size: clamp(1rem, 2.9vw, 1.08rem);
+    color: #1f2a30;
     opacity: 0.75;
     line-height: 1.9;
   }
@@ -345,7 +457,7 @@
     margin-top: 1.2rem;
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
-    font-size: clamp(0.82rem, 3.2vw, 0.88rem);
+    font-size: clamp(1rem, 3.2vw, 1.08rem);
     letter-spacing: 0.08em;
     color: var(--moss);
     text-decoration: none;
@@ -377,6 +489,9 @@
 <header>
   <p class="subtitle-top">Parc de Heinlex · Saint-Nazaire</p>
   <h1>Écoute<br><em>augmentée</em></h1>
+  <div class="morse-echo" aria-label="Vivant en morse : ...- .. ...- .- -. -">
+    <span>...-</span> <span>..</span> <span>...-</span> <span>.-</span> <span>-.</span> <span>-</span>
+  </div>
   <div class="ornament">◈</div>
   <p class="composer">Compositions originales de <span>Fernand Deroussen</span></p>
   <div class="intro-text">
@@ -384,6 +499,32 @@
     <p class="intro-body">Dix compositions originales de Fernand Deroussen, nées de l'écoute patiente du parc de Heinlex — ses frondaisons, ses eaux, ses nuits. Un parcours sans fléchage ni destination&nbsp;: laissez le son vous orienter.</p>
   </div>
 </header>
+
+
+<div class="resonance-intro">
+  <button class="resonance-cta" id="openCompass" type="button">Ma boussole des Résonances. 4 axes pour écouter comment ces paysages sonores résonnent en nous.</button>
+</div>
+
+<div class="resonance-modal" id="compassModal" role="dialog" aria-modal="true" aria-label="Boussole des Résonances">
+  <div class="modal-card">
+    <button class="modal-close" id="closeCompass" aria-label="Fermer">✕</button>
+    <div class="wrap">
+      <svg class="compass" viewBox="0 0 500 500">
+        <defs><radialGradient id="glow"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="70%" stop-color="#bfefff" stop-opacity="0.25"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
+        <circle class="halo halo1" cx="250" cy="250" r="130"/><circle class="halo halo2" cx="250" cy="250" r="170"/>
+        <line class="axis" x1="90" y1="250" x2="410" y2="250"/><line class="axis" x1="250" y1="90" x2="250" y2="410"/>
+        <circle class="ring" cx="250" cy="250" r="160"/>
+        <g class="needle"><path d="M250 95 C270 170 270 330 250 405 C230 330 230 170 250 95Z"/></g>
+        <circle class="dot d1" cx="250" cy="250" r="5"/><circle class="dot d2" cx="250" cy="250" r="5"/><circle class="dot d3" cx="250" cy="250" r="5"/><circle class="dot d4" cx="250" cy="250" r="5"/>
+        <g class="center"><circle cx="250" cy="250" r="54"/><text x="250" y="242" text-anchor="middle" class="emoji">✨</text><text x="250" y="270" text-anchor="middle" class="centerText">Instant</text><text x="250" y="287" text-anchor="middle" class="centerText">présent</text></g>
+        <g class="pole north"><circle cx="250" cy="60" r="48"/><text x="250" y="55" text-anchor="middle" class="emoji">🌍</text><text x="250" y="84" text-anchor="middle" class="label">Se relier</text></g>
+        <g class="pole east"><circle cx="440" cy="250" r="48"/><text x="440" y="245" text-anchor="middle" class="emoji">💭</text><text x="440" y="274" text-anchor="middle" class="label">Imaginer</text></g>
+        <g class="pole south"><circle cx="250" cy="440" r="48"/><text x="250" y="435" text-anchor="middle" class="emoji">❤️</text><text x="250" y="464" text-anchor="middle" class="label">Ressentir</text></g>
+        <g class="pole west"><circle cx="60" cy="250" r="48"/><text x="60" y="245" text-anchor="middle" class="emoji">👂</text><text x="60" y="274" text-anchor="middle" class="label">Écouter</text></g>
+      </svg>
+    </div>
+  </div>
+</div>
 
 <!-- ── ONGLETS ── -->
 <nav class="collections-nav" role="tablist" aria-label="Collections sonores">
@@ -635,6 +776,18 @@ function showCollection(id) {
   activeTab.classList.add('active');
   activeTab.setAttribute('aria-selected', 'true');
 }
+
+const modal = document.getElementById('compassModal');
+document.getElementById('openCompass').addEventListener('click', () => modal.classList.add('open'));
+document.getElementById('closeCompass').addEventListener('click', () => modal.classList.remove('open'));
+modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.remove('open'); });
+document.querySelectorAll('.pole').forEach((pole) => {
+  pole.addEventListener('click', () => {
+    pole.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'ease-out' });
+  });
+});
+
 </script>
 </body>
 </html>
