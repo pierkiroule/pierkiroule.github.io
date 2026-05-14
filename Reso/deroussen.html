@@ -16,6 +16,7 @@
     --brume: #c8d4c0;
     --ocre: #8b7355;
     --accent: #7a9e6a;
+    --focus: #2f6f52;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -118,10 +119,10 @@
 
   .intro-body {
     font-family: 'Spectral', serif;
-    font-weight: 200;
-    font-size: clamp(0.78rem, 3vw, 0.82rem);
-    color: var(--slate);
-    line-height: 1.85;
+    font-weight: 300;
+    font-size: clamp(0.88rem, 3.2vw, 0.95rem);
+    color: #2f3a41;
+    line-height: 1.75;
     letter-spacing: 0.02em;
   }
 
@@ -141,7 +142,7 @@
     border: none;
     padding: 1rem clamp(1rem, 4vw, 1.8rem);
     font-family: 'Spectral', serif;
-    font-weight: 200;
+    font-weight: 300;
     font-style: italic;
     font-size: clamp(0.8rem, 3.2vw, 0.88rem);
     letter-spacing: 0.07em;
@@ -154,6 +155,11 @@
   }
 
   .col-tab.active { color: var(--moss); }
+  .col-tab:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+    background: rgba(122,158,106,0.12);
+  }
   .col-tab.active::after {
     content: '';
     position: absolute;
@@ -192,10 +198,10 @@
 
   .collection-intro p {
     font-family: 'Spectral', serif;
-    font-weight: 200;
+    font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.72rem, 2.8vw, 0.8rem);
-    color: var(--slate);
+    font-size: clamp(0.84rem, 2.9vw, 0.9rem);
+    color: #2f3a41;
     letter-spacing: 0.05em;
   }
 
@@ -258,11 +264,11 @@
   .piece-title em {
     display: block;
     font-family: 'Spectral', serif;
-    font-weight: 200;
+    font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.62rem, 2.5vw, 0.7rem);
+    font-size: clamp(0.75rem, 2.8vw, 0.82rem);
     letter-spacing: 0.09em;
-    color: var(--eau);
+    color: #426477;
     margin-top: 0.25rem;
   }
 
@@ -279,8 +285,8 @@
     border-radius: 2px;
     color: var(--paper);
     font-family: 'Spectral', serif;
-    font-weight: 200;
-    font-size: clamp(0.7rem, 2.8vw, 0.76rem);
+    font-weight: 300;
+    font-size: clamp(0.78rem, 2.9vw, 0.84rem);
     letter-spacing: 0.13em;
     cursor: pointer;
     text-transform: uppercase;
@@ -293,6 +299,10 @@
 
   .play-btn:hover  { background: var(--accent); }
   .play-btn:active { transform: scale(0.97); }
+  .play-btn:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
 
   .play-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
@@ -322,10 +332,10 @@
 
   footer p {
     font-family: 'Spectral', serif;
-    font-weight: 200;
+    font-weight: 300;
     font-style: italic;
-    font-size: clamp(0.72rem, 2.8vw, 0.78rem);
-    color: var(--slate);
+    font-size: clamp(0.82rem, 2.9vw, 0.9rem);
+    color: #2f3a41;
     opacity: 0.75;
     line-height: 1.9;
   }
@@ -347,6 +357,18 @@
     color: var(--accent);
     border-color: var(--accent);
   }
+  .footer-link:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .collection { animation: none; }
+    .wave-bar svg { animation: none; }
+    .play-btn { transition: none; }
+    .col-tab { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -364,17 +386,17 @@
 </header>
 
 <!-- ── ONGLETS ── -->
-<nav class="collections-nav">
-  <button class="col-tab active" onclick="showCollection('foret')" id="tab-foret">
+<nav class="collections-nav" role="tablist" aria-label="Collections sonores">
+  <button class="col-tab active" onclick="showCollection('foret')" id="tab-foret" role="tab" aria-selected="true" aria-controls="col-foret">
     Forêt &amp; Vivant
   </button>
-  <button class="col-tab" onclick="showCollection('mer')" id="tab-mer">
+  <button class="col-tab" onclick="showCollection('mer')" id="tab-mer" role="tab" aria-selected="false" aria-controls="col-mer">
     Mémoire de la mer
   </button>
 </nav>
 
 <!-- ══ COLLECTION 1 : FORÊT & VIVANT ══ -->
-<section class="collection active" id="col-foret">
+<section class="collection active" id="col-foret" role="tabpanel" aria-labelledby="tab-foret">
   <div class="collection-intro">
     <h2>Forêt &amp; Vivant</h2>
     <p>7 pièces — sons du parc, de l'air et du temps</p>
@@ -514,7 +536,7 @@
 </section>
 
 <!-- ══ COLLECTION 2 : MÉMOIRE DE LA MER ══ -->
-<section class="collection" id="col-mer">
+<section class="collection" id="col-mer" role="tabpanel" aria-labelledby="tab-mer">
   <div class="collection-intro">
     <h2>Mémoire de la mer</h2>
     <p>3 pièces — l'estuaire, ses marées, ses profondeurs</p>
@@ -604,9 +626,14 @@
 <script>
 function showCollection(id) {
   document.querySelectorAll('.collection').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('.col-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.col-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
   document.getElementById('col-' + id).classList.add('active');
-  document.getElementById('tab-' + id).classList.add('active');
+  const activeTab = document.getElementById('tab-' + id);
+  activeTab.classList.add('active');
+  activeTab.setAttribute('aria-selected', 'true');
 }
 </script>
 </body>
