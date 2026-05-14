@@ -74,41 +74,6 @@
 
   h1 em { font-style: italic; color: var(--ocre); }
 
-
-  .morse-echo {
-    width: min(300px, 86vw);
-    margin: 1.1rem auto 1.2rem;
-    position: relative;
-    border-radius: 999px;
-    border: 1px solid rgba(74,92,58,0.28);
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.88), rgba(200,212,192,0.34));
-    padding: 0.9rem 1rem;
-    color: #214550;
-    letter-spacing: 0.14em;
-    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
-    font-weight: 700;
-    font-size: clamp(0.95rem, 3.2vw, 1.08rem);
-  }
-
-  .morse-echo::before,
-  .morse-echo::after {
-    content: '';
-    position: absolute;
-    inset: -8px;
-    border-radius: 999px;
-    border: 1px solid rgba(107,143,163,0.22);
-    pointer-events: none;
-  }
-
-  .morse-echo::after {
-    inset: -16px;
-    border-color: rgba(107,143,163,0.14);
-  }
-
-  .morse-echo span {
-    white-space: nowrap;
-  }
-
   .ornament {
     display: flex;
     align-items: center;
@@ -205,14 +170,21 @@
   .pole { cursor: pointer; transform-box: fill-box; transform-origin: center; transition: transform 0.25s ease, filter 0.25s ease; }
   .pole:hover { transform: scale(1.08); filter: drop-shadow(0 0 18px rgba(60,150,180,0.35)); }
   .emoji { font-size: 28px; }
-  .label, .centerText { font-size: 15px; font-weight: 700; fill: #21435a; }
-  .centerText { font-size: 14px; }
+  .label { font-size: 15px; font-weight: 700; fill: #21435a; }
+  .centerTitle { font-size: 16px; font-weight: 700; fill: #21435a; }
+  .centerQuestion { font-size: 12px; fill: #21435a; opacity: 0.8; }
+  .center.flash { animation: centerFlash 0.45s ease; }
+  .pole.active { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(60,150,180,0.42)); }
   .dot { fill: #21435a; opacity: 0.35; }
   .d1 { animation: moveNorth 5s ease-in-out infinite; } .d2 { animation: moveEast 5s ease-in-out infinite 1.2s; } .d3 { animation: moveSouth 5s ease-in-out infinite 2.4s; } .d4 { animation: moveWest 5s ease-in-out infinite 3.6s; }
   @keyframes pulse { 0%,100% { transform: scale(0.85); opacity: 0.18; } 50% { transform: scale(1.2); opacity: 0.55; } }
   @keyframes breathe { 0%,100% { transform: scale(0.96); } 50% { transform: scale(1.04); } }
   @keyframes rotate { to { transform: rotate(360deg); } }
   @keyframes sway { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+  @keyframes centerFlash {
+    0% { transform: scale(0.85); opacity: 0.2; }
+    100% { transform: scale(1); opacity: 1; }
+  }
   @keyframes moveNorth { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(0,-135px); opacity:0.55; } }
   @keyframes moveEast { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(135px,0); opacity:0.55; } }
   @keyframes moveSouth { 0%,100% { transform: translate(0,0); opacity:0; } 45% { transform: translate(0,135px); opacity:0.55; } }
@@ -489,9 +461,6 @@
 <header>
   <p class="subtitle-top">Parc de Heinlex · Saint-Nazaire</p>
   <h1>Écoute<br><em>augmentée</em></h1>
-  <div class="morse-echo" aria-label="Vivant en morse : ...- .. ...- .- -. -">
-    <span>...-</span> <span>..</span> <span>...-</span> <span>.-</span> <span>-.</span> <span>-</span>
-  </div>
   <div class="ornament">◈</div>
   <p class="composer">Compositions originales de <span>Fernand Deroussen</span></p>
   <div class="intro-text">
@@ -516,11 +485,17 @@
         <circle class="ring" cx="250" cy="250" r="160"/>
         <g class="needle"><path d="M250 95 C270 170 270 330 250 405 C230 330 230 170 250 95Z"/></g>
         <circle class="dot d1" cx="250" cy="250" r="5"/><circle class="dot d2" cx="250" cy="250" r="5"/><circle class="dot d3" cx="250" cy="250" r="5"/><circle class="dot d4" cx="250" cy="250" r="5"/>
-        <g class="center"><circle cx="250" cy="250" r="54"/><text x="250" y="242" text-anchor="middle" class="emoji">✨</text><text x="250" y="270" text-anchor="middle" class="centerText">Instant</text><text x="250" y="287" text-anchor="middle" class="centerText">présent</text></g>
-        <g class="pole north"><circle cx="250" cy="60" r="48"/><text x="250" y="55" text-anchor="middle" class="emoji">🌍</text><text x="250" y="84" text-anchor="middle" class="label">Se relier</text></g>
-        <g class="pole east"><circle cx="440" cy="250" r="48"/><text x="440" y="245" text-anchor="middle" class="emoji">💭</text><text x="440" y="274" text-anchor="middle" class="label">Imaginer</text></g>
-        <g class="pole south"><circle cx="250" cy="440" r="48"/><text x="250" y="435" text-anchor="middle" class="emoji">❤️</text><text x="250" y="464" text-anchor="middle" class="label">Ressentir</text></g>
-        <g class="pole west"><circle cx="60" cy="250" r="48"/><text x="60" y="245" text-anchor="middle" class="emoji">👂</text><text x="60" y="274" text-anchor="middle" class="label">Écouter</text></g>
+        <g class="center" id="centerBox">
+          <circle cx="250" cy="250" r="62"/>
+          <text x="250" y="220" text-anchor="middle" class="emoji" id="centerEmoji">✨</text>
+          <text x="250" y="248" text-anchor="middle" class="centerTitle" id="centerTitle">Instant présent</text>
+          <text x="250" y="272" text-anchor="middle" class="centerQuestion" id="centerQuestion1">Touchez un axe</text>
+          <text x="250" y="290" text-anchor="middle" class="centerQuestion" id="centerQuestion2">pour explorer</text>
+        </g>
+        <g class="pole north" data-emoji="🌍" data-title="Se relier" data-q1="À quoi cela" data-q2="me relie-t-il ?"><circle cx="250" cy="60" r="48"/><text x="250" y="55" text-anchor="middle" class="emoji">🌍</text><text x="250" y="84" text-anchor="middle" class="label">Se relier</text></g>
+        <g class="pole east" data-emoji="💭" data-title="Imaginer" data-q1="Qu’est-ce que" data-q2="cela m’évoque ?"><circle cx="440" cy="250" r="48"/><text x="440" y="245" text-anchor="middle" class="emoji">💭</text><text x="440" y="274" text-anchor="middle" class="label">Imaginer</text></g>
+        <g class="pole south" data-emoji="❤️" data-title="Ressentir" data-q1="Qu’est-ce que" data-q2="je ressens ?"><circle cx="250" cy="440" r="48"/><text x="250" y="435" text-anchor="middle" class="emoji">❤️</text><text x="250" y="464" text-anchor="middle" class="label">Ressentir</text></g>
+        <g class="pole west" data-emoji="👂" data-title="Écouter" data-q1="Qu’est-ce que" data-q2="j’entends ?"><circle cx="60" cy="250" r="48"/><text x="60" y="245" text-anchor="middle" class="emoji">👂</text><text x="60" y="274" text-anchor="middle" class="label">Écouter</text></g>
       </svg>
     </div>
   </div>
@@ -782,10 +757,28 @@ document.getElementById('openCompass').addEventListener('click', () => modal.cla
 document.getElementById('closeCompass').addEventListener('click', () => modal.classList.remove('open'));
 modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.remove('open'); });
+const emoji = document.getElementById('centerEmoji');
+const title = document.getElementById('centerTitle');
+const q1 = document.getElementById('centerQuestion1');
+const q2 = document.getElementById('centerQuestion2');
+const center = document.getElementById('centerBox');
+
 document.querySelectorAll('.pole').forEach((pole) => {
-  pole.addEventListener('click', () => {
-    pole.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'ease-out' });
-  });
+  const activatePole = () => {
+    emoji.textContent = pole.dataset.emoji;
+    title.textContent = pole.dataset.title;
+    q1.textContent = pole.dataset.q1;
+    q2.textContent = pole.dataset.q2;
+
+    document.querySelectorAll('.pole').forEach((item) => item.classList.remove('active'));
+    pole.classList.add('active');
+
+    center.classList.remove('flash');
+    void center.offsetWidth;
+    center.classList.add('flash');
+  };
+
+  pole.addEventListener('click', activatePole);
 });
 
 </script>
