@@ -139,15 +139,30 @@
   }
   .resonance-cta {
     margin-top: 0.6rem;
-    border: 1px solid rgba(74,92,58,0.3);
-    background: rgba(255,255,255,0.65);
+    border: none;
+    background: transparent;
     color: #21435a;
-    font: 600 clamp(1rem, 3.2vw, 1.15rem)/1.5 'Source Sans 3', sans-serif;
     border-radius: 16px;
-    padding: 0.9rem 1rem;
+    padding: 0.3rem 0.6rem 0.6rem;
     width: min(100%, 640px);
-    min-height: 52px;
     cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .resonance-cta-label {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .resonance-cta-gif {
+    display: block;
+    width: min(220px, 78vw);
+    height: auto;
   }
   .resonance-modal {
     position: fixed; inset: 0; z-index: 60; display: none;
@@ -471,7 +486,10 @@
 
 
 <div class="resonance-intro">
-  <button class="resonance-cta" id="openCompass" type="button">Ma boussole des Résonances. 4 axes pour écouter comment ces paysages sonores résonnent en nous.</button>
+  <button class="resonance-cta" id="openCompass" type="button" aria-label="Ouvrir la boussole des Résonances">
+    <span class="resonance-cta-label">Ma boussole des Résonances. 4 axes pour écouter comment ces paysages sonores résonnent en nous.</span>
+    <img class="resonance-cta-gif" src="boussole.gif" alt="Boussole des Résonances animée">
+  </button>
 </div>
 
 <div class="resonance-modal" id="compassModal" role="dialog" aria-modal="true" aria-label="Boussole des Résonances">
