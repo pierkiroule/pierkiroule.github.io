@@ -2,16 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Boussole des Résonances</title>
 
-<link
-  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap"
-  rel="stylesheet"
-/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 *{
@@ -23,23 +17,16 @@
 
 :root{
   --bg:#f6f3ed;
-  --surface:#ffffff;
+  --surface:#fff;
   --ink:#0f1c2a;
   --ink-mid:#25394d;
   --ink-soft:#5d7082;
-
   --gold:#aa823a;
-  --gold-light:#cfa860;
 
   --nord:#2e5f85;
   --est:#337560;
   --sud:#a65424;
   --ouest:#55448c;
-
-  --tech:#aac4d4;
-  --morph:#6aaa90;
-  --semi:#d09050;
-  --onto:#f0e6c0;
 
   --shadow:0 8px 24px rgba(15,28,42,.08);
 }
@@ -58,8 +45,8 @@ body{
   max-width:430px;
   margin:0 auto;
   position:relative;
-  transform-origin:center center;
   touch-action:none;
+  transform-origin:center center;
 }
 
 /* screens */
@@ -71,7 +58,7 @@ body{
   flex-direction:column;
   opacity:0;
   pointer-events:none;
-  transition:opacity .28s ease;
+  transition:opacity .25s ease;
   background:var(--bg);
 }
 
@@ -82,71 +69,53 @@ body{
 
 /* home */
 
-#s-home{
-  align-items:center;
-}
-
 .home-header{
-  width:100%;
-  padding:14px 16px 0;
+  padding:16px 18px 0;
   text-align:center;
-  flex-shrink:0;
 }
 
-.home-eyebrow{
-  font-size:8.5px;
-  letter-spacing:.24em;
+.eyebrow{
+  font-size:9px;
+  letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--ink-soft);
   font-weight:600;
   margin-bottom:6px;
 }
 
-.home-title{
+.title{
   font-family:'Cormorant Garamond',serif;
-  font-size:28px;
-  line-height:1.08;
+  font-size:30px;
+  line-height:1.05;
   font-weight:600;
 }
 
-.home-title em{
+.title em{
   font-style:italic;
   font-weight:400;
-  color:var(--ink-mid);
 }
 
-.home-sub{
-  margin-top:6px;
-  font-size:10px;
+.subtitle{
+  margin-top:8px;
+  font-size:11px;
   line-height:1.45;
   color:var(--ink-soft);
 }
 
-.zoom-hint{
-  display:block;
-  margin-top:4px;
-  font-size:9px;
-  opacity:.8;
-}
-
-/* banner */
-
 .home-banner{
   width:calc(100% - 36px);
-  height:92px;
-  margin:10px auto 0;
-  border-radius:16px;
-  background:rgba(255,255,255,.65);
+  height:86px;
+  margin:12px auto 0;
+  border-radius:18px;
   overflow:hidden;
+  background:rgba(255,255,255,.65);
   box-shadow:var(--shadow);
-  flex-shrink:0;
 }
 
 .home-banner img{
   width:100%;
   height:100%;
   object-fit:contain;
-  background:rgba(255,255,255,.3);
   display:block;
 }
 
@@ -154,22 +123,19 @@ body{
 
 .compass-wrap{
   flex:1;
-  width:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:4px 6px 0;
-  min-height:0;
+  padding:4px 6px;
 }
 
-.compass-zoom-container{
+.compass-box{
   width:100%;
   max-width:410px;
   aspect-ratio:320 / 340;
-  position:relative;
 }
 
-.compass-svg{
+svg{
   width:100%;
   height:100%;
   display:block;
@@ -177,7 +143,6 @@ body{
 
 .tap-label{
   cursor:pointer;
-  user-select:none;
 }
 
 .tap-label text{
@@ -193,7 +158,9 @@ body{
 }
 
 .axis-sub{
-  font-size:13px;
+  font-family:'Cormorant Garamond',serif;
+  font-size:14px;
+  font-style:italic;
   font-weight:500;
 }
 
@@ -216,18 +183,18 @@ body{
 }
 
 @keyframes pulse{
-  0%,100%{opacity:1;}
-  50%{opacity:.75;}
+  0%,100%{opacity:1}
+  50%{opacity:.72}
 }
 
 @keyframes breathe{
-  0%,100%{transform:scale(1);}
-  50%{transform:scale(1.04);}
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
 }
 
-.ring-tech{ animation:pulse 6s ease-in-out infinite; }
-.ring-morph{ animation:pulse 5s ease-in-out infinite .7s; }
-.ring-semi{ animation:pulse 4s ease-in-out infinite 1.2s; }
+.ring-tech{animation:pulse 6s ease-in-out infinite}
+.ring-morph{animation:pulse 5s ease-in-out infinite .6s}
+.ring-semi{animation:pulse 4s ease-in-out infinite 1s}
 .core-breathe{
   transform-origin:center;
   animation:breathe 3s ease-in-out infinite;
@@ -235,50 +202,17 @@ body{
 
 /* credits */
 
-.credit-container{
+.credits{
   text-align:center;
-  padding:6px 16px 0;
-  flex-shrink:0;
-}
-
-.credit-authors{
   font-size:9px;
+  line-height:1.5;
   color:var(--ink-mid);
-  line-height:1.45;
-  font-weight:500;
+  padding:4px 16px 78px;
 }
 
-.credit-link{
-  font-size:9px;
+.credits a{
   color:var(--gold);
   text-decoration:none;
-}
-
-/* pills */
-
-.bottom-nav{
-  display:flex;
-  gap:8px;
-  padding:10px 0 84px;
-  flex-shrink:0;
-}
-
-.nav-pill{
-  border:none;
-  border-radius:999px;
-  padding:8px 16px;
-  font-size:9px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  font-weight:600;
-  background:rgba(255,255,255,.7);
-  color:var(--ink-mid);
-  box-shadow:0 2px 10px rgba(0,0,0,.05);
-}
-
-.nav-pill.active{
-  background:var(--ink);
-  color:#fff;
 }
 
 /* detail */
@@ -286,24 +220,22 @@ body{
 .detail-header{
   padding:18px 16px 14px;
   display:flex;
-  gap:12px;
   align-items:center;
+  gap:12px;
   border-bottom:1px solid rgba(15,28,42,.08);
-  flex-shrink:0;
 }
 
 .back-btn{
   width:38px;
   height:38px;
-  border-radius:50%;
   border:none;
-  background:rgba(255,255,255,.9);
-  box-shadow:0 2px 10px rgba(0,0,0,.05);
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
   font-size:18px;
-  color:var(--ink-mid);
 }
 
-.detail-title-group{
+.detail-title{
   flex:1;
 }
 
@@ -317,28 +249,26 @@ body{
 
 .detail-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:28px;
-  line-height:1.08;
+  font-size:30px;
+  line-height:1.05;
 }
 
-.detail-color-bar{
+.detail-bar{
   width:5px;
-  height:46px;
+  height:44px;
   border-radius:99px;
 }
 
-.detail-scroll{
+.scroll{
   flex:1;
   overflow-y:auto;
-  padding:0 16px 100px;
+  padding:0 16px 96px;
   -webkit-overflow-scrolling:touch;
 }
 
-.detail-scroll::-webkit-scrollbar{
+.scroll::-webkit-scrollbar{
   display:none;
 }
-
-/* sections */
 
 .section{
   margin-top:22px;
@@ -350,7 +280,7 @@ body{
   gap:8px;
   margin-bottom:10px;
   font-size:9px;
-  letter-spacing:.24em;
+  letter-spacing:.22em;
   text-transform:uppercase;
   color:var(--ink-soft);
   font-weight:600;
@@ -365,18 +295,18 @@ body{
 
 .desc-text{
   font-family:'Cormorant Garamond',serif;
-  font-size:19px;
-  line-height:1.55;
+  font-size:20px;
+  line-height:1.5;
   font-style:italic;
 }
 
-.obs-cloud{
+.chips{
   display:flex;
   flex-wrap:wrap;
   gap:8px;
 }
 
-.obs-chip{
+.chip{
   padding:7px 12px;
   border-radius:999px;
   background:#fff;
@@ -384,204 +314,67 @@ body{
   font-size:12px;
 }
 
-.question-list{
-  list-style:none;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.question-item{
-  padding:12px 14px;
+.question{
+  padding:13px 14px;
   border-left:4px solid var(--gold);
-  border-radius:12px;
-  background:rgba(255,255,255,.78);
+  border-radius:13px;
+  background:rgba(255,255,255,.82);
   font-family:'Cormorant Garamond',serif;
-  font-size:17px;
+  font-size:18px;
   font-style:italic;
-  line-height:1.45;
+  line-height:1.4;
+  margin-bottom:8px;
 }
 
-.lecture-block{
+.text-block{
   background:rgba(255,255,255,.82);
-  border-radius:14px;
+  border-radius:15px;
   padding:16px;
   border:1px solid rgba(15,28,42,.08);
-}
-
-.lecture-block p{
   font-size:14px;
   line-height:1.65;
   color:var(--ink-mid);
 }
 
-.example-card{
-  padding:14px;
-  border-radius:14px;
-  background:rgba(255,255,255,.82);
-  border-left:4px solid var(--gold-light);
-  margin-bottom:10px;
-}
-
-.example-situation{
-  font-size:10px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--gold);
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.example-text{
-  font-family:'Cormorant Garamond',serif;
-  font-size:16px;
-  line-height:1.55;
-  font-style:italic;
-}
-
 /* couches */
 
-.couche-header-bar{
-  padding:18px 16px 12px;
+.couche-header{
+  padding:18px 16px 14px;
   border-bottom:1px solid rgba(15,28,42,.08);
-  flex-shrink:0;
 }
 
-.couche-header-bar .home-title{
-  font-size:24px;
-  text-align:left;
-}
-
-.couche-header-bar .home-eyebrow{
-  text-align:left;
-}
-
-.couche-scroll{
-  flex:1;
-  overflow-y:auto;
-  padding:16px 16px 100px;
-  -webkit-overflow-scrolling:touch;
-}
-
-.couche-scroll::-webkit-scrollbar{
-  display:none;
-}
-
-.theory-card{
-  padding:18px;
-  border-radius:18px;
-  background:rgba(255,255,255,.82);
+.theory-card,
+.couche-card{
+  background:rgba(255,255,255,.84);
   border:1px solid rgba(15,28,42,.08);
+  border-radius:18px;
+  padding:18px;
   box-shadow:var(--shadow);
-  margin-bottom:16px;
-}
-
-.theory-eyebrow{
-  font-size:8px;
-  letter-spacing:.24em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-  font-weight:700;
-}
-
-.theory-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:24px;
-  margin:8px 0 12px;
+  margin-top:16px;
 }
 
 .theory-card p{
   font-size:13px;
   line-height:1.7;
   color:var(--ink-mid);
-  margin-bottom:10px;
 }
 
-.couche-item{
-  border-radius:16px;
-  overflow:hidden;
-  margin-bottom:12px;
+.couche-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;
+  margin-bottom:8px;
 }
 
-.couche-toggle{
-  width:100%;
-  border:none;
-  padding:16px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-}
-
-.couche-dot{
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:rgba(255,255,255,.8);
-  flex-shrink:0;
-}
-
-.couche-toggle-text{
-  flex:1;
-}
-
-.couche-sublabel{
+.couche-label{
   font-size:9px;
   letter-spacing:.2em;
   text-transform:uppercase;
-  font-weight:600;
+  color:var(--ink-soft);
+  font-weight:700;
+  margin-bottom:4px;
 }
 
-.couche-name{
-  font-family:'Cormorant Garamond',serif;
-  font-size:24px;
-  line-height:1.1;
-}
-
-.couche-arrow{
-  transition:.25s;
-}
-
-.couche-arrow.open{
-  transform:rotate(180deg);
-}
-
-.couche-body{
-  max-height:0;
-  overflow:hidden;
-  transition:max-height .35s ease;
-  background:rgba(255,255,255,.62);
-}
-
-.couche-body.open{
-  max-height:1200px;
-}
-
-.couche-body-inner{
-  padding:16px;
-}
-
-.bg-technose{
-  background:linear-gradient(135deg,#437d99,#76a0b8);
-  color:#fff;
-}
-
-.bg-morphose{
-  background:linear-gradient(135deg,#2b7058,#4b947a);
-  color:#fff;
-}
-
-.bg-semiose{
-  background:linear-gradient(135deg,#9e4c1b,#c46d3a);
-  color:#fff;
-}
-
-.bg-ontose{
-  background:linear-gradient(135deg,#96761c,#ba9732);
-  color:#fff;
-}
-
-/* global nav */
+/* nav */
 
 .global-nav{
   position:fixed;
@@ -595,95 +388,72 @@ body{
   backdrop-filter:blur(14px);
   border-top:1px solid rgba(15,28,42,.08);
   padding:8px 0 16px;
-  z-index:100;
+  z-index:50;
 }
 
-.gnav-btn{
+.nav-btn{
   flex:1;
   border:none;
   background:none;
+  color:var(--ink-soft);
+  opacity:.55;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:3px;
-  color:var(--ink-soft);
-  opacity:.55;
 }
 
-.gnav-btn.active{
+.nav-btn.active{
   opacity:1;
   color:var(--ink);
 }
 
-.gnav-icon{
+.nav-icon{
   font-size:18px;
 }
 
-.gnav-label{
+.nav-label{
   font-size:8px;
   letter-spacing:.1em;
   text-transform:uppercase;
   font-weight:700;
 }
 
-@media (max-height:760px){
-  .home-banner{
-    height:72px;
-  }
-
-  .home-title{
-    font-size:24px;
-  }
-
-  .compass-zoom-container{
-    max-width:390px;
-  }
-}
-
-@media (max-height:680px){
-  .home-banner{
-    display:none;
-  }
+@media(max-height:700px){
+  .home-banner{display:none}
+  .title{font-size:26px}
 }
 </style>
 </head>
-  
 
 <body>
 
-<div id="s-home" class="screen active">
+<!-- HOME -->
 
-<div class="home-header">
-    <div class="home-eyebrow">Guide d'observation clinique · Équithérapie</div>
-    <div class="home-title">Boussole des <em>Résonances</em></div>
-
-    <div class="home-sub">
-      Touchez une direction pour l'explorer
-      <span class="zoom-hint">
-        pincez pour zoomer · double tap pour réinitialiser
-      </span>
+<div id="home" class="screen active">
+  <div class="home-header">
+    <div class="eyebrow">Guide clinique · Équithérapie</div>
+    <div class="title">Boussole des <em>Résonances</em></div>
+    <div class="subtitle">
+      Touchez une direction pour guider l’observation.
     </div>
   </div>
 
   <div class="home-banner">
     <img
       src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/equiboussole/christie.jpg"
-      alt="Paysage équithérapie"
-      onerror="this.parentNode.style.display='none';"
+      alt="Équithérapie"
+      onerror="this.parentNode.style.display='none'"
     />
   </div>
 
   <div class="compass-wrap">
-    <div class="compass-zoom-container">
-      <svg
-        class="compass-svg"
-        viewBox="0 0 320 340"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+    <div class="compass-box">
+      <svg viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="g-tech">
             <stop offset="0%" stop-color="#bdd4e4"/>
-            <stop offset="100%" stop-color="#cce0ee" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="#cce0ee" stop-opacity=".45"/>
           </radialGradient>
 
           <radialGradient id="g-morph">
@@ -702,83 +472,23 @@ body{
           </radialGradient>
 
           <filter id="soft-shadow">
-            <feDropShadow
-              dx="0"
-              dy="3"
-              stdDeviation="7"
-              flood-color="#1a2c40"
-              flood-opacity="0.08"
-            />
+            <feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#1a2c40" flood-opacity=".08"/>
           </filter>
         </defs>
 
-        <!-- rings -->
-
-        <circle
-          class="ring-tech"
-          cx="160"
-          cy="170"
-          r="148"
-          fill="url(#g-tech)"
-          filter="url(#soft-shadow)"
-          opacity=".8"
-        />
-
-        <circle
-          class="ring-morph"
-          cx="160"
-          cy="170"
-          r="108"
-          fill="url(#g-morph)"
-          opacity=".85"
-        />
-
-        <circle
-          class="ring-semi"
-          cx="160"
-          cy="170"
-          r="72"
-          fill="url(#g-semi)"
-          opacity=".92"
-        />
+        <circle class="ring-tech" cx="160" cy="170" r="148" fill="url(#g-tech)" filter="url(#soft-shadow)" opacity=".8"/>
+        <circle class="ring-morph" cx="160" cy="170" r="108" fill="url(#g-morph)" opacity=".85"/>
+        <circle class="ring-semi" cx="160" cy="170" r="72" fill="url(#g-semi)" opacity=".92"/>
 
         <g class="core-breathe">
-          <circle
-            cx="160"
-            cy="170"
-            r="37"
-            fill="url(#g-onto)"
-          />
-          <circle
-            cx="160"
-            cy="170"
-            r="37"
-            fill="none"
-            stroke="#c9a84c"
-            stroke-width="1.7"
-            opacity=".55"
-          />
+          <circle cx="160" cy="170" r="37" fill="url(#g-onto)"/>
+          <circle cx="160" cy="170" r="37" fill="none" stroke="#c9a84c" stroke-width="1.7" opacity=".55"/>
         </g>
 
-        <!-- labels -->
-
-        <text class="ring-label" x="160" y="98" text-anchor="middle" font-size="14">
-          Technose
-        </text>
-
-        <text class="ring-label" x="160" y="126" text-anchor="middle" font-size="14">
-          Morphose
-        </text>
-
-        <text class="ring-label" x="160" y="152" text-anchor="middle" font-size="14">
-          Sémiose
-        </text>
-
-        <text class="core-label" x="160" y="175" text-anchor="middle" font-size="15">
-          Ontose
-        </text>
-
-        <!-- cardinal lines -->
+        <text class="ring-label" x="160" y="98" text-anchor="middle" font-size="14">Technose</text>
+        <text class="ring-label" x="160" y="126" text-anchor="middle" font-size="14">Morphose</text>
+        <text class="ring-label" x="160" y="152" text-anchor="middle" font-size="14">Sémiose</text>
+        <text class="core-label" x="160" y="175" text-anchor="middle" font-size="15">Ontose</text>
 
         <line x1="160" y1="22" x2="160" y2="58" stroke="var(--nord)" stroke-width="1.5"/>
         <circle cx="160" cy="24" r="3.5" fill="var(--nord)"/>
@@ -792,756 +502,28 @@ body{
         <line x1="268" y1="170" x2="308" y2="170" stroke="var(--est)" stroke-width="1.5"/>
         <circle cx="306" cy="170" r="3.5" fill="var(--est)"/>
 
-        <!-- north -->
-
         <g class="tap-label" onclick="openDir('nord')">
           <rect x="90" y="0" width="140" height="58" fill="transparent"/>
-          <text class="axis-title" x="160" y="13" text-anchor="middle" fill="var(--nord)">
-            TEMPS
-          </text>
-          <text
-            class="axis-sub"
-            x="160"
-            y="29"
-            text-anchor="middle"
-            fill="var(--nord)"
-            font-family="Cormorant Garamond, serif"
-            font-style="italic"
-          >
-            Le rythme
-          </text>
+          <text class="axis-title" x="160" y="13" text-anchor="middle" fill="var(--nord)">TEMPS</text>
+          <text class="axis-sub" x="160" y="30" text-anchor="middle" fill="var(--nord)">Rythme</text>
         </g>
-
-        <!-- south -->
 
         <g class="tap-label" onclick="openDir('sud')">
           <rect x="90" y="284" width="140" height="56" fill="transparent"/>
-          <text class="axis-title" x="160" y="301" text-anchor="middle" fill="var(--sud)">
-            ANCRAGE
-          </text>
-          <text
-            class="axis-sub"
-            x="160"
-            y="317"
-            text-anchor="middle"
-            fill="var(--sud)"
-            font-family="Cormorant Garamond, serif"
-            font-style="italic"
-          >
-            Corps & présence
-          </text>
+          <text class="axis-title" x="160" y="301" text-anchor="middle" fill="var(--sud)">ANCRAGE</text>
+          <text class="axis-sub" x="160" y="318" text-anchor="middle" fill="var(--sud)">Corps</text>
         </g>
-
-        <!-- west -->
 
         <g class="tap-label" onclick="openDir('ouest')">
           <rect x="0" y="140" width="74" height="60" fill="transparent"/>
-          <text class="axis-title" x="40" y="160" text-anchor="middle" fill="var(--ouest)">
-            HUMILITÉ
-          </text>
-          <text
-            class="axis-sub"
-            x="40"
-            y="176"
-            text-anchor="middle"
-            fill="var(--ouest)"
-            font-family="Cormorant Garamond, serif"
-            font-style="italic"
-          >
-            Le cheval
-          </text>
+          <text class="axis-title" x="40" y="160" text-anchor="middle" fill="var(--ouest)">HUMILITÉ</text>
+          <text class="axis-sub" x="40" y="177" text-anchor="middle" fill="var(--ouest)">Cheval</text>
         </g>
-
-        <!-- east -->
 
         <g class="tap-label" onclick="openDir('est')">
           <rect x="246" y="140" width="74" height="60" fill="transparent"/>
-          <text class="axis-title" x="280" y="160" text-anchor="middle" fill="var(--est)">
-            ESPACE
-          </text>
-          <text
-            class="axis-sub"
-            x="280"
-            y="176"
-            text-anchor="middle"
-            fill="var(--est)"
-            font-family="Cormorant Garamond, serif"
-            font-style="italic"
-          >
-            Distance
-          </text>
-        </g>
-
-        <!-- center click -->
-
-        <g onclick="showScreen('s-couches')">
-          <circle cx="160" cy="170" r="38" fill="transparent"/>
-        </g>
-
-      </svg>
-    </div>
-  </div>
-
-  <div class="credit-container">
-    <div class="credit-authors">
-      Emmanuelle Tizon · Claire Jarnoux · Pierre-Henri Garnier
-    </div>
-
-    <a
-      href="https://emmanuelletizon.zici.fr/"
-      class="credit-link"
-      target="_blank"
-    >
-      emmanuelletizon.zici.fr
-    </a>
-  </div>
-
-  <div class="bottom-nav">
-    <button class="nav-pill active" onclick="showScreen('s-home')">
-      Boussole
-    </button>
-
-    <button class="nav-pill" onclick="showScreen('s-couches')">
-      Couches
-    </button>
-  </div>
-</div>
-
-<!-- DETAIL -->
-
-<div id="s-detail" class="screen">
-  <div class="detail-header">
-    <button class="back-btn" onclick="goBack()">←</button>
-
-    <div class="detail-title-group">
-      <div class="detail-cardinal" id="d-cardinal"></div>
-      <div class="detail-name" id="d-name"></div>
-    </div>
-
-    <div class="detail-color-bar" id="d-bar"></div>
-  </div>
-
-  <div class="detail-scroll" id="d-scroll"></div>
-</div>
-
-<!-- COUCHES -->
-
-<div id="s-couches" class="screen">
-
-  <div class="couche-header-bar">
-    <div class="home-eyebrow">Modèle des Résonances</div>
-    <div class="home-title">Les <em>couches</em> de lecture</div>
-  </div>
-
-  <div class="couche-scroll">
-
-    <div class="theory-card">
-      <div class="theory-eyebrow">Ancrage théorique</div>
-      <div class="theory-title">Rosa · Latour · Régime de présence</div>
-
-      <p>
-        Cette boussole s’inspire d’Hartmut Rosa :
-        l’équithérapie n’est pas une simple application technique,
-        mais une rencontre résonante entre sujet, cheval, rythme et milieu.
-      </p>
-
-      <p>
-        Avec Bruno Latour, ce qui agit n’est jamais isolé :
-        cheval, cadre, météo, thérapeute, objets et espace composent
-        un réseau d’acteurs transformateur.
-      </p>
-
-      <p>
-        La boussole aide à lire un <strong>régime de présence</strong> :
-        comment le vivant se règle, comment du sens émerge,
-        comment une manière d’être au monde se déplace.
-      </p>
-    </div>
-
-    <!-- couches ici -->
-    <!-- on injectera tes blocs technose morphose semiose ontose inchangés -->
-
-  </div>
-</div>
-
-<nav class="global-nav">
-
-  <button class="gnav-btn active" id="gnav-home" onclick="showScreen('s-home')">
-    <span class="gnav-icon">⊙</span>
-    <span class="gnav-label">Boussole</span>
-  </button>
-
-  <button class="gnav-btn" id="gnav-couches" onclick="showScreen('s-couches')">
-    <span class="gnav-icon">◎</span>
-    <span class="gnav-label">Couches</span>
-  </button>
-
-</nav>
-
-<script>
-const DIR_DATA = {
-  nord: {
-    cardinal: 'Nord · Temps',
-    name: 'Le Rythme',
-    color: '#2e5f85',
-    description:
-      'Quel tempo est en train de se jouer ? Le rythme est souvent le premier signal clinique — avant les mots, avant les gestes. Il parle de l’état interne, de la régulation, du lien entre le patient et le cheval.',
-    obs: [
-      'pas du cheval',
-      'ralentissement',
-      'agitation',
-      'respiration',
-      'précipitation',
-      'hésitation',
-      'répétitions',
-      'moments où ça se pose',
-      'synchronisation cheval/humain',
-      'besoin de pause',
-      'besoin de mouvement'
-    ],
-    questions: [
-      'Faut-il ralentir, ou remettre du mouvement ?',
-      'Le cheval régule-t-il déjà à ma place ?',
-      'Qu’est-ce que ce rythme dit de l’état interne ?',
-      'Faut-il intervenir, ou laisser venir ?'
-    ],
-    lecture:
-      'Beaucoup de transformations commencent par un changement de rythme, bien avant toute verbalisation. Le corps sait avant que l’esprit ne formule. Le rythme partagé entre le patient et le cheval devient une forme de langage pré-verbal.',
-    examples: [
-      {
-        situation: 'Adolescent en crise',
-        text:
-          'Un garçon de 15 ans entre dans le manège en courant presque, voix forte, gestes brusques. Le thérapeute ne dit rien : il ralentit simplement lui-même, et guide le cheval au pas lent. En quelques minutes, le garçon ralentit aussi. Il n’a pas été calmé : il s’est co-régulé.'
-      },
-      {
-        situation: 'Enfant dissocié',
-        text:
-          'Une petite fille marche à côté du cheval sans le regarder, dans une sorte d’absence. La thérapeute remarque que son pas ne suit pas le rythme du cheval. Elle propose doucement : « Essaie de marcher en même temps que lui. » Le contact revient.'
-      },
-      {
-        situation: 'Adulte anxieux',
-        text:
-          'Un adulte fait tout vite, même donner les carottes. Le cheval mange lentement. La thérapeute dit : « Regardez son rythme à lui. » Long silence. Puis : « Je ne savais pas que j’avais oublié d’aller lentement. »'
-      }
-    ]
-  },
-
-  est: {
-    cardinal: 'Est · Espace',
-    name: 'Les Espaces',
-    color: '#337560',
-    description:
-      'Comment la relation se spatialise-t-elle ? La juste proximité choisie, subie ou négociée entre le patient et le cheval révèle souvent des patterns relationnels fondamentaux.',
-    obs: [
-      'approche',
-      'évitement',
-      'patient collé au cheval',
-      'patient trop loin',
-      'contourne',
-      'ose toucher',
-      'reste derrière',
-      'prend la tête',
-      'laisse le cheval venir',
-      'orientation du corps',
-      'occupation du manège'
-    ],
-    questions: [
-      'Quelle distance semble supportable pour cette personne ?',
-      'Qui s’ajuste à qui, dans cet espace ?',
-      'Le cheval ouvre-t-il ou ferme-t-il la relation ?',
-      'Est-ce que je force quelque chose dans cet espace ?'
-    ],
-    lecture:
-      'La relation apparaît souvent dans la géographie avant les mots. La façon dont une personne occupe l’espace avec le cheval — coller, fuir, contourner, se positionner en tête — peut devenir une carte sensible de son monde relationnel.',
-    examples: [
-      {
-        situation: 'Trouble de l’attachement',
-        text:
-          'Une adolescente ne quitte plus l’encolure du cheval. Elle s’y colle littéralement. Ce n’est pas forcément une fusion problématique : c’est peut-être la première fois qu’elle peut s’approcher de quelqu’un sans en avoir peur.'
-      },
-      {
-        situation: 'Hypercontrôle',
-        text:
-          'Un jeune homme se place systématiquement en tête du cheval, lui bloque la direction. La thérapeute lui propose de se mettre à côté, puis derrière. Il résiste, puis dit : « C’est bizarre, j’ai l’impression que je le contrôle moins. »'
-      },
-      {
-        situation: 'Timidité relationnelle',
-        text:
-          'Un enfant reste à deux mètres du cheval pendant toute la première séance, sans le toucher. La thérapeute ne force rien. À la troisième séance, il effleure la croupe du bout des doigts. Ça lui appartient.'
-      }
-    ]
-  },
-
-  sud: {
-    cardinal: 'Sud · Ancrage',
-    name: 'Corps & Présence',
-    color: '#a65424',
-    description:
-      'Qu’est-ce qui se passe dans le corps du patient ? Le cheval travaille d’abord avec le corps — avant l’histoire, avant le symptôme. L’ancrage corporel est à la fois un indicateur clinique et un levier thérapeutique.',
-    obs: [
-      'respiration',
-      'tonus',
-      'crispation',
-      'agitation motrice',
-      'immobilité figée',
-      'voix',
-      'posture',
-      'appuis au sol',
-      'qualité du toucher',
-      'gestes brusques',
-      'gestes fluides'
-    ],
-    questions: [
-      'Le corps est-il là — présent, engagé ?',
-      'Est-il trop activé, ou au contraire coupé ?',
-      'Le contact avec le cheval régule-t-il quelque chose ?',
-      'Qu’est-ce que je perçois dans mon propre corps en ce moment ?'
-    ],
-    lecture:
-      'Le cheval est un capteur corporel d’une sensibilité remarquable. Il perçoit le tonus, la respiration, la tension musculaire — et y répond. Ce qu’un thérapeute peut mettre du temps à voir, le cheval l’a souvent déjà ressenti.',
-    examples: [
-      {
-        situation: 'Dissociation',
-        text:
-          'Un adolescent panse le cheval mécaniquement : bons gestes, bonne technique, regard dans le vide. La thérapeute demande : « Tu sens sous tes mains ? » Long silence. Puis les yeux reviennent. Le corps aussi.'
-      },
-      {
-        situation: 'Hyperactivité',
-        text:
-          'Un garçon bouge sans cesse. Le cheval recule à chaque approche brusque. Le garçon observe. Il essaie plus doucement. Le cheval reste. Il a compris quelque chose que les mots n’auraient pas pu transmettre.'
-      },
-      {
-        situation: 'Enfant mutique',
-        text:
-          'Une petite fille pose sa joue contre l’encolure du cheval. Puis elle souffle lentement. Le cheval soupire en écho. Elle rit. Le silence se transforme.'
-      }
-    ]
-  },
-
-  ouest: {
-    cardinal: 'Ouest · Humilité',
-    name: 'Le Cheval informe',
-    color: '#55448c',
-    description:
-      'Qu’est-ce que le cheval nous montre de ce qui se passe réellement dans la séance ? Le cheval n’est pas un outil passif. Il informe sur l’état du patient, sur notre posture et sur la qualité de la rencontre.',
-    obs: [
-      'rapprochement spontané',
-      'évitement',
-      'tension perçue',
-      'immobilité',
-      'curiosité',
-      'micro-ajustements',
-      'agitation',
-      'retrait',
-      's’éloigne si tension monte',
-      'vient chercher le contact',
-      'renifle prolongé'
-    ],
-    questions: [
-      'Que me dit le cheval de ce qui se passe ?',
-      'Que perçoit-il que je ne vois pas encore ?',
-      'Suis-je en train de forcer quelque chose ?',
-      'Dois-je changer quelque chose — dans mon cadre, ma posture, mon intention ?'
-    ],
-    lecture:
-      'Le cheval ne ment pas. Il ne fait pas semblant de ne pas voir. Il n’a pas de théorie à défendre, mais une perception somatique et relationnelle fine. Chaque comportement du cheval peut devenir une donnée clinique.',
-    examples: [
-      {
-        situation: 'Signal d’alerte',
-        text:
-          'Le cheval s’arrête, tourne la tête vers le patient, et reste immobile. La thérapeute remarque : le patient venait de retenir sa respiration. Elle demande doucement : « Quelque chose se passe pour toi ? » Les larmes viennent.'
-      },
-      {
-        situation: 'Le cheval recule',
-        text:
-          'Chaque fois que la thérapeute approche avec un programme en tête, le cheval recule légèrement. Elle prend note : quelque chose dans son intention est perçu. Elle souffle, ralentit. Le cheval revient.'
-      },
-      {
-        situation: 'Le cheval choisit',
-        text:
-          'Dans un groupe, le cheval va spontanément vers l’enfant le plus silencieux. La thérapeute observe. Ce n’est pas de la magie. C’est de la perception animale. Elle s’en inspire pour la suite.'
-      }
-    ]
-  }
-};
-
-function coucheHTML({ bg, sublabel, name, desc, tags, example, question }) {
-  return `
-    <div class="couche-item">
-      <button class="couche-toggle ${bg}" onclick="toggleCouche(this)">
-        <div class="couche-dot"></div>
-        <div class="couche-toggle-text">
-          <div class="couche-sublabel">${sublabel}</div>
-          <div class="couche-name">${name}</div>
-        </div>
-        <span class="couche-arrow">▾</span>
-      </button>
-
-      <div class="couche-body">
-        <div class="couche-body-inner">
-          <p class="desc-text">${desc}</p>
-
-          <div class="obs-cloud" style="margin-top:14px;margin-bottom:14px;">
-            ${tags.map(tag => `<span class="obs-chip">${tag}</span>`).join('')}
-          </div>
-
-          <div class="example-card">
-            <div class="example-situation">Exemple clinique</div>
-            <div class="example-text">${example}</div>
-          </div>
-
-          <div class="question-item">${question}</div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-const COUCHES = [
-  {
-    bg: 'bg-technose',
-    sublabel: 'Le Cadre',
-    name: 'Technose',
-    desc:
-      'Ce qui contient la rencontre : l’environnement, les règles, la présence du thérapeute, les outils. La Technose n’est pas neutre — elle agit avant même que quelque chose commence.',
-    tags: [
-      'type de séance',
-      'liberté / consignes',
-      'pansage',
-      'marche / monte',
-      'travail à pied',
-      'environnement',
-      'météo',
-      'présence thérapeute',
-      'bruit',
-      'autres chevaux'
-    ],
-    example:
-      'Un adolescent en grande agitation arrive. La thérapeute change le cadre prévu : au lieu de monter, elle propose de simplement marcher avec le cheval en longe. Le simple fait de ne pas avoir de selle, de ne pas être en hauteur, modifie tout — corps, rythme, relation.',
-    question:
-      'Le cadre soutient-il la rencontre ou la parasite-t-il ?'
-  },
-  {
-    bg: 'bg-morphose',
-    sublabel: 'Le Corps',
-    name: 'Morphose',
-    desc:
-      'Ce qui change physiquement et perceptivement durant la séance : rythme, tonus, souffle, posture, engagement du corps. La Morphose, c’est le vivant en mouvement.',
-    tags: [
-      'rythme',
-      'tonus musculaire',
-      'souffle',
-      'posture',
-      'qualité du toucher',
-      'engagement corporel'
-    ],
-    example:
-      'Une jeune fille rigide et hypervigilante commence à peigner l’encolure. Après quelques minutes, ses épaules s’abaissent. Sa respiration se ralentit. Son dos se courbe légèrement vers l’avant — vers le cheval. Personne n’a parlé.',
-    question:
-      'Qu’est-ce qui bouge dans le vivant de cette personne ?'
-  },
-  {
-    bg: 'bg-semiose',
-    sublabel: 'Le Sens',
-    name: 'Sémiose',
-    desc:
-      'Ce qui émerge symboliquement : métaphores, récits, projections sur le cheval, images spontanées. La Sémiose, c’est la manière dont l’expérience devient histoire.',
-    tags: [
-      'métaphores',
-      'récits spontanés',
-      'projections',
-      'identification au cheval',
-      'images',
-      'nominations'
-    ],
-    example:
-      'Un garçon dit à voix basse : « Il a l’air triste, lui aussi. » Il ne parle pas du cheval — ou pas seulement. C’est sa première verbalisation depuis plusieurs séances. La thérapeute laisse la phrase exister, sans la rediriger.',
-    question:
-      'Qu’est-ce que cela raconte ? Quelle histoire se dépose ici ?'
-  },
-  {
-    bg: 'bg-ontose',
-    sublabel: 'Le Noyau existentiel',
-    name: 'Ontose',
-    desc:
-      'La transformation la plus profonde : repositionnement subjectif, regain d’agentivité, sentiment de compétence, confiance. L’Ontose apparaît quand quelque chose change dans la manière d’être au monde.',
-    tags: [
-      'agentivité',
-      'compétence perçue',
-      'confiance',
-      'repositionnement subjectif',
-      'je peux'
-    ],
-    example:
-      'À la fin d’une séance, une adolescente dit à sa mère : « J’ai réussi à le faire avancer avec juste ma voix. » Elle ne parle pas seulement du cheval — elle parle d’elle-même. Quelque chose s’est installé.',
-    question:
-      'Qu’est-ce qui change dans sa manière d’être — pas seulement de faire ?'
-  }
-];
-
-let prevScreen = 's-home';
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(screen => {
-    screen.classList.remove('active');
-  });
-
-  document.getElementById(id).classList.add('active');
-
-  document.querySelectorAll('.gnav-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-
-  if (id === 's-home') {
-    document.getElementById('gnav-home').classList.add('active');
-  }
-
-  if (id === 's-couches') {
-    document.getElementById('gnav-couches').classList.add('active');
-  }
-
-  document.querySelectorAll('.nav-pill').forEach(pill => {
-    pill.classList.remove('active');
-  });
-
-  if (id === 's-home') {
-    const pill = document.querySelector('.bottom-nav .nav-pill:first-child');
-    if (pill) pill.classList.add('active');
-  }
-
-  if (id === 's-couches') {
-    const pill = document.querySelector('.bottom-nav .nav-pill:last-child');
-    if (pill) pill.classList.add('active');
-  }
-
-  if (id !== 's-detail') {
-    prevScreen = id;
-  }
-}
-
-function goBack() {
-  showScreen(prevScreen);
-}
-
-function openDir(dir) {
-  const data = DIR_DATA[dir];
-
-  document.getElementById('d-cardinal').textContent = data.cardinal;
-  document.getElementById('d-name').textContent = data.name;
-  document.getElementById('d-bar').style.background = data.color;
-
-  document.getElementById('d-scroll').innerHTML = `
-    <div class="section">
-      <div class="section-head">Ce que c’est</div>
-      <p class="desc-text">${data.description}</p>
-    </div>
-
-    <div class="section">
-      <div class="section-head">Observer</div>
-      <div class="obs-cloud">
-        ${data.obs.map(item => `<span class="obs-chip">${item}</span>`).join('')}
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">Se demander</div>
-      <ul class="question-list">
-        ${data.questions.map(q => `<li class="question-item">${q}</li>`).join('')}
-      </ul>
-    </div>
-
-    <div class="section">
-      <div class="section-head">Lecture clinique</div>
-      <div class="lecture-block">
-        <p>${data.lecture}</p>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">Situations concrètes</div>
-      ${data.examples.map(example => `
-        <div class="example-card">
-          <div class="example-situation">${example.situation}</div>
-          <div class="example-text">${example.text}</div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-
-  showScreen('s-detail');
-}
-
-function toggleCouche(button) {
-  const body = button.nextElementSibling;
-  const arrow = button.querySelector('.couche-arrow');
-
-  if (body.classList.contains('open')) {
-    body.classList.remove('open');
-    arrow.classList.remove('open');
-    return;
-  }
-
-  document.querySelectorAll('.couche-body.open').forEach(openBody => {
-    openBody.classList.remove('open');
-    const openArrow = openBody.previousElementSibling.querySelector('.couche-arrow');
-    if (openArrow) openArrow.classList.remove('open');
-  });
-
-  body.classList.add('open');
-  arrow.classList.add('open');
-}
-
-function injectCouches() {
-  const container = document.querySelector('#s-couches .couche-scroll');
-
-  const footer = `
-    <div style="height:18px;"></div>
-
-    <div style="text-align:center;font-size:10px;color:var(--ink-soft);opacity:.85;letter-spacing:.05em;line-height:1.8;padding-bottom:16px;">
-      Boussole des Résonances · Équithérapie<br>
-      <span style="font-weight:500;color:var(--ink-mid);">
-        Emmanuelle Tizon · Claire Jarnoux · Pierre-Henri Garnier
-      </span><br>
-      <a href="https://emmanuelletizon.zici.fr/" style="color:var(--gold);text-decoration:none;" target="_blank">
-        emmanuelletizon.zici.fr
-      </a>
-    </div>
-  `;
-
-  container.insertAdjacentHTML(
-    'beforeend',
-    COUCHES.map(couche => coucheHTML(couche)).join('') + footer
-  );
-}
-
-/* Pinch global */
-
-let pageScale = 1;
-let lastPageScale = 1;
-let pageX = 0;
-let pageY = 0;
-let startX = 0;
-let startY = 0;
-let startDist = 0;
-let isPanning = false;
-let lastTap = 0;
-
-const app = document.body;
-
-function getTouchDistance(touches) {
-  return Math.hypot(
-    touches[0].clientX - touches[1].clientX,
-    touches[0].clientY - touches[1].clientY
-  );
-}
-
-function applyPageTransform() {
-  pageScale = Math.min(Math.max(1, pageScale), 3);
-
-  if (pageScale <= 1.02) {
-    pageScale = 1;
-    pageX = 0;
-    pageY = 0;
-  }
-
-  const maxX = (pageScale - 1) * window.innerWidth * 0.5;
-  const maxY = (pageScale - 1) * window.innerHeight * 0.5;
-
-  pageX = Math.min(Math.max(pageX, -maxX), maxX);
-  pageY = Math.min(Math.max(pageY, -maxY), maxY);
-
-  app.style.transform = `translate(${pageX}px, ${pageY}px) scale(${pageScale})`;
-}
-
-function resetPageZoom() {
-  pageScale = 1;
-  pageX = 0;
-  pageY = 0;
-  applyPageTransform();
-}
-
-document.addEventListener('touchstart', event => {
-  if (event.touches.length === 2) {
-    event.preventDefault();
-    startDist = getTouchDistance(event.touches);
-    lastPageScale = pageScale;
-    isPanning = false;
-    return;
-  }
-
-  if (event.touches.length === 1) {
-    const now = Date.now();
-
-    if (now - lastTap < 280) {
-      resetPageZoom();
-      lastTap = 0;
-      return;
-    }
-
-    lastTap = now;
-
-    if (pageScale > 1) {
-      isPanning = true;
-      startX = event.touches[0].clientX - pageX;
-      startY = event.touches[0].clientY - pageY;
-    }
-  }
-}, { passive: false });
-
-document.addEventListener('touchmove', event => {
-  if (event.touches.length === 2) {
-    event.preventDefault();
-
-    const currentDist = getTouchDistance(event.touches);
-    const zoomFactor = currentDist / startDist;
-
-    pageScale = lastPageScale * zoomFactor;
-    applyPageTransform();
-    return;
-  }
-
-  if (event.touches.length === 1 && isPanning && pageScale > 1) {
-    event.preventDefault();
-
-    pageX = event.touches[0].clientX - startX;
-    pageY = event.touches[0].clientY - startY;
-
-    applyPageTransform();
-  }
-}, { passive: false });
-
-document.addEventListener('touchend', event => {
-  if (event.touches.length === 0) {
-    isPanning = false;
-  }
-});
-
-document.addEventListener('dblclick', resetPageZoom);
-
-injectCouches();
-</script>
-
-</body>
-</html>
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          <text class="axis-title" x="280" y="160" text-anchor="middle" fill="var(--est)">ESPACE</text>
+          <text class="axis-sub" x="280" y="177" text-anchor="middle" fill="var(--est)">Distance</
 
 
   
