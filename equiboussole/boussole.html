@@ -45,9 +45,8 @@ body{
   font-family:'Jost',sans-serif;
   color:var(--ink);
   position:relative;
-  border-left: 1px solid var(--line);
-  border-right: 1px solid var(--line);
-  box-shadow: 0 0 40px rgba(17,29,42,0.06);
+  touch-action:none;
+  transform-origin:center center;
 }
 
 /* ÉCRANS */
@@ -169,14 +168,12 @@ body{
   width:100%;
   max-width:408px;
   aspect-ratio:320 / 340;
-  touch-action:none; /* Restriction du zoom tactile à la boussole */
 }
 
 svg{
   width:100%;
   height:100%;
   display:block;
-  transition: transform 0.1s ease-out;
 }
 
 .tap-zone{
@@ -188,15 +185,6 @@ svg{
   stroke:var(--bg);
   stroke-width:5px;
   stroke-linejoin:round;
-}
-
-.ring-interactive {
-  cursor: pointer;
-  transition: opacity 0.2s, stroke 0.2s;
-}
-
-.ring-interactive:hover {
-  opacity: 0.85;
 }
 
 .axis-title{
@@ -217,8 +205,7 @@ svg{
   fill:var(--ink);
   paint-order:stroke fill;
   stroke:white;
-  stroke-width:2.5px;
-  pointer-events: none;
+  stroke-width:2px;
 }
 
 .core-label{
@@ -226,8 +213,7 @@ svg{
   fill:var(--ink);
   paint-order:stroke fill;
   stroke:white;
-  stroke-width:2.5px;
-  pointer-events: none;
+  stroke-width:2px;
 }
 
 @keyframes breathe{
@@ -236,7 +222,7 @@ svg{
 }
 
 .core{
-  transform-origin: 160px 170px;
+  transform-origin:center;
   animation:breathe 3.2s ease-in-out infinite;
 }
 
@@ -273,7 +259,6 @@ svg{
   background:var(--card);
   box-shadow:0 3px 12px rgba(17,29,42,.08);
   font-size:20px;
-  cursor:pointer;
 }
 
 .detail-title{
@@ -380,7 +365,6 @@ svg{
   padding:18px;
   margin-top:16px;
   box-shadow:var(--shadow);
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .layer-label{
@@ -432,7 +416,6 @@ svg{
   gap:3px;
   color:var(--muted);
   opacity:.55;
-  cursor:pointer;
 }
 
 .nav button.active{
@@ -451,8 +434,7 @@ svg{
   font-weight:800;
 }
 
-/* Seuil rabaissé à 550px au lieu de 700px pour éviter de masquer l'image prématurément */
-@media(max-height:550px){
+@media(max-height:700px){
   .banner{
     display:none;
   }
@@ -467,6 +449,7 @@ svg{
 <body>
 
 <!-- ACCUEIL -->
+
 <main id="home" class="screen active">
   <header class="hero">
     <div class="kicker">Guide clinique · Équithérapie</div>
@@ -475,11 +458,10 @@ svg{
   </header>
 
   <section class="banner">
-    <!-- Image de Christie d'origine avec fallback de sécurité vers Unsplash si le chargement échoue -->
     <img
       src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/equiboussole/christie.jpg"
       alt="Équithérapie"
-      onerror="this.src='https://images.unsplash.com/photo-1598974357801-cbca100e6543?auto=format&fit=crop&w=600&q=80'"
+      onerror="this.parentNode.style.display='none'"
     />
     <div class="banner-caption">Observer · Ressentir · Ajuster</div>
   </section>
@@ -513,31 +495,20 @@ svg{
           </filter>
         </defs>
 
-        <!-- Cercles Concentriques Interactifs (Liaison vers les Couches) -->
-        <g class="ring-interactive" onclick="goToLayer('Technose')" title="Aller à la couche Technose">
-          <circle cx="160" cy="170" r="148" fill="url(#tech)" filter="url(#shadow)" opacity=".86"/>
-        </g>
-        
-        <g class="ring-interactive" onclick="goToLayer('Morphose')" title="Aller à la couche Morphose">
-          <circle cx="160" cy="170" r="108" fill="url(#morph)" opacity=".86"/>
-        </g>
-        
-        <g class="ring-interactive" onclick="goToLayer('Sémiose')" title="Aller à la couche Sémiose">
-          <circle cx="160" cy="170" r="72" fill="url(#semi)" opacity=".92"/>
-        </g>
+        <circle cx="160" cy="170" r="148" fill="url(#tech)" filter="url(#shadow)" opacity=".86"/>
+        <circle cx="160" cy="170" r="108" fill="url(#morph)" opacity=".86"/>
+        <circle cx="160" cy="170" r="72" fill="url(#semi)" opacity=".92"/>
 
-        <g class="ring-interactive core" onclick="goToLayer('Ontose')" title="Aller à la couche Ontose">
+        <g class="core">
           <circle cx="160" cy="170" r="37" fill="url(#onto)"/>
           <circle cx="160" cy="170" r="37" fill="none" stroke="#c9a84c" stroke-width="1.7" opacity=".6"/>
         </g>
 
-        <!-- Libellés des cercles -->
         <text class="ring-label" x="160" y="98" text-anchor="middle" font-size="14">Technose</text>
         <text class="ring-label" x="160" y="126" text-anchor="middle" font-size="14">Morphose</text>
         <text class="ring-label" x="160" y="152" text-anchor="middle" font-size="14">Sémiose</text>
         <text class="core-label" x="160" y="175" text-anchor="middle" font-size="15">Ontose</text>
 
-        <!-- Axes Cardinaux -->
         <line x1="160" y1="22" x2="160" y2="58" stroke="var(--nord)" stroke-width="1.5"/>
         <circle cx="160" cy="24" r="3.6" fill="var(--nord)"/>
 
@@ -550,7 +521,6 @@ svg{
         <line x1="268" y1="170" x2="308" y2="170" stroke="var(--est)" stroke-width="1.5"/>
         <circle cx="306" cy="170" r="3.6" fill="var(--est)"/>
 
-        <!-- Zones Tactiles des Axes -->
         <g class="tap-zone" onclick="openDir('nord')">
           <rect x="90" y="0" width="140" height="58" fill="transparent"/>
           <text class="axis-title" x="160" y="13" text-anchor="middle" fill="var(--nord)">TEMPS</text>
@@ -574,6 +544,10 @@ svg{
           <text class="axis-title" x="280" y="160" text-anchor="middle" fill="var(--est)">ESPACE</text>
           <text class="axis-sub" x="280" y="177" text-anchor="middle" fill="var(--est)">Distance</text>
         </g>
+
+        <g onclick="showScreen('layers')">
+          <circle cx="160" cy="170" r="40" fill="transparent"/>
+        </g>
       </svg>
     </div>
   </section>
@@ -585,6 +559,7 @@ svg{
 </main>
 
 <!-- DÉTAIL -->
+
 <section id="detail" class="screen">
   <header class="detail-header">
     <button class="back" onclick="showScreen('home')">←</button>
@@ -601,6 +576,7 @@ svg{
 </section>
 
 <!-- COUCHES -->
+
 <section id="layers" class="screen">
   <header class="hero">
     <div class="kicker">Modèle des Résonances</div>
@@ -612,6 +588,7 @@ svg{
 </section>
 
 <!-- NAV UNIQUE -->
+
 <nav class="nav">
   <button id="nav-home" class="active" onclick="showScreen('home')">
     <span class="nav-icon">⊙</span>
@@ -770,23 +747,6 @@ function openDir(dir){
   showScreen('detail');
 }
 
-function goToLayer(layerName) {
-  showScreen('layers');
-  setTimeout(() => {
-    const el = document.getElementById(`layer-${layerName}`);
-    if(el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Effet visuel temporaire d'illumination de la couche ciblée
-      el.style.borderColor = 'var(--gold)';
-      el.style.boxShadow = '0 0 20px rgba(169, 125, 50, 0.2)';
-      setTimeout(() => {
-        el.style.borderColor = 'var(--line)';
-        el.style.boxShadow = 'var(--shadow)';
-      }, 1500);
-    }
-  }, 100);
-}
-
 function renderLayers(){
   const intro = `
     <article class="layer-card">
@@ -800,7 +760,7 @@ function renderLayers(){
   `;
 
   const cards = LAYERS.map(layer => `
-    <article id="layer-${layer.name}" class="layer-card">
+    <article class="layer-card">
       <div class="layer-label">${layer.label}</div>
       <h3 class="layer-title">${layer.name}</h3>
       <p>${layer.text}</p>
@@ -816,10 +776,7 @@ function renderLayers(){
   document.getElementById('layers-content').innerHTML = intro + cards;
 }
 
-/* ZOOM SUR LA BOUSSOLE UNIQUEMENT (Sans bloquer le scroll du reste du site) */
-
-const compassBox = document.querySelector('.compass-box');
-const svgEl = compassBox.querySelector('svg');
+/* ZOOM GLOBAL */
 
 let scale = 1;
 let lastScale = 1;
@@ -847,17 +804,13 @@ function applyZoom(){
     posY = 0;
   }
 
-  const maxX = (scale - 1) * compassBox.clientWidth * .5;
-  const maxY = (scale - 1) * compassBox.clientHeight * .5;
+  const maxX = (scale - 1) * window.innerWidth * .5;
+  const maxY = (scale - 1) * window.innerHeight * .5;
 
   posX = Math.min(Math.max(posX, -maxX), maxX);
   posY = Math.min(Math.max(posY, -maxY), maxY);
 
-  if (svgEl) {
-    svgEl.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-    svgEl.style.transformOrigin = 'center center';
-    svgEl.style.transition = panning ? 'none' : 'transform 0.15s ease-out';
-  }
+  document.body.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
 }
 
 function resetZoom(){
@@ -867,7 +820,7 @@ function resetZoom(){
   applyZoom();
 }
 
-compassBox.addEventListener('touchstart', event => {
+document.addEventListener('touchstart', event => {
   if(event.touches.length === 2){
     event.preventDefault();
     startDist = distance(event.touches);
@@ -895,7 +848,7 @@ compassBox.addEventListener('touchstart', event => {
   }
 },{passive:false});
 
-compassBox.addEventListener('touchmove', event => {
+document.addEventListener('touchmove', event => {
   if(event.touches.length === 2){
     event.preventDefault();
     scale = lastScale * (distance(event.touches) / startDist);
@@ -911,11 +864,11 @@ compassBox.addEventListener('touchmove', event => {
   }
 },{passive:false});
 
-compassBox.addEventListener('touchend', () => {
+document.addEventListener('touchend', () => {
   panning = false;
 });
 
-compassBox.addEventListener('dblclick', resetZoom);
+document.addEventListener('dblclick', resetZoom);
 
 renderLayers();
 </script>
