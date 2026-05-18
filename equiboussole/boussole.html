@@ -4,26 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Boussole des Résonances</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 :root {
   --bg: #f6f3ed;
-  --ink: #1a2c40;
-  --ink-mid: #3a5268;
-  --ink-soft: #6a849a;
-  --gold: #b8934a;
-  --gold-light: #d4b06a;
+  /* Couleurs d'encre renforcées pour un contraste optimal */
+  --ink: #0f1c2a;
+  --ink-mid: #25394d;
+  --ink-soft: #50677c;
+  --gold: #aa823a;
+  --gold-light: #cfa860;
 
-  --nord-c: #4a7fa5;
-  --nord-l: #c8dde8;
-  --est-c:  #4e9a82;
-  --est-l:  #bfe0d4;
-  --sud-c:  #c07040;
-  --sud-l:  #ecd4c0;
-  --ouest-c:#7060a8;
-  --ouest-l:#d4ceec;
+  /* Couleurs des axes densifiées pour une lisibilité accrue */
+  --nord-c: #2e5f85;
+  --nord-l: #b2cedf;
+  --est-c:  #337560;
+  --est-l:  #abd5c7;
+  --sud-c:  #a65424;
+  --sud-l:  #e2bfab;
+  --ouest-c:#55448c;
+  --ouest-l:#c2bae2;
 
   --technose: #aac4d4;
   --morphose: #6aaa90;
@@ -35,7 +37,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); }
 
 body {
   font-family: 'Jost', sans-serif;
-  font-weight: 300;
+  font-weight: 400; /* Plus lisible que 300 sur mobile */
   color: var(--ink);
   display: flex;
   flex-direction: column;
@@ -81,19 +83,20 @@ body {
   text-transform: uppercase;
   color: var(--ink-soft);
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .home-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 26px;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--ink);
   line-height: 1.15;
 }
 .home-title em {
   font-style: italic;
   color: var(--ink-mid);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .home-sub {
@@ -101,7 +104,28 @@ body {
   color: var(--ink-soft);
   margin-top: 5px;
   line-height: 1.55;
-  font-weight: 300;
+  font-weight: 400;
+}
+
+/* Header Image Container */
+.home-banner {
+  width: calc(100% - 48px);
+  margin: 14px auto 0;
+  max-height: 130px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(26, 44, 64, 0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.home-banner-img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
 }
 
 /* ── COMPASS SVG AREA ── */
@@ -112,7 +136,7 @@ body {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 8px 20px 0;
+  padding: 4px 20px 0;
   min-height: 0;
   position: relative;
 }
@@ -120,24 +144,62 @@ body {
 /* Container enabling interactive zooming & panning */
 .compass-zoom-container {
   width: 100%;
-  max-width: 340px;
+  max-width: 320px;
   height: auto;
   aspect-ratio: 320 / 340;
   overflow: hidden;
   position: relative;
-  touch-action: none; /* Prevents browser scroll interference during gestures */
-  border-radius: 50%; /* Purely visual focus on the circle */
+  touch-action: none;
+  border-radius: 50%;
 }
 
 .compass-svg-el {
   width: 100%;
   height: 100%;
   transform-origin: center center;
-  transition: transform 0.1s ease-out; /* Smooth feedback while dragging/zooming */
+  transition: transform 0.1s ease-out;
   cursor: grab;
 }
 .compass-svg-el:active {
   cursor: grabbing;
+}
+
+/* SVG Text Outline & Styling for Perfect Legibility */
+.tap-label text {
+  paint-order: stroke fill;
+  stroke: var(--bg);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+.tap-label .axis-title {
+  font-weight: 600;
+  font-size: 10.5px;
+}
+.tap-label .axis-subtitle {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Inner rings text optimization (crisp white halo) */
+.ring-text-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 600;
+  fill: var(--ink);
+  paint-order: stroke fill;
+  stroke: #ffffff;
+  stroke-width: 2px;
+  stroke-linejoin: round;
+}
+
+.core-text-label {
+  font-family: 'Jost', sans-serif;
+  font-weight: 600;
+  fill: var(--ink);
+  paint-order: stroke fill;
+  stroke: #ffffff;
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
 }
 
 /* Zoom controls indicator / reset button */
@@ -145,11 +207,12 @@ body {
   position: absolute;
   top: 10px;
   right: 25px;
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(26,44,64,0.15);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(26,44,64,0.2);
   border-radius: 12px;
   padding: 4px 10px;
   font-size: 9px;
+  font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
@@ -157,6 +220,7 @@ body {
   pointer-events: none;
   transition: opacity 0.3s ease;
   z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 .zoom-indicator.visible {
   opacity: 1;
@@ -166,7 +230,7 @@ body {
 /* Ring animations */
 @keyframes pulse-ring {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  50% { opacity: 0.75; }
 }
 @keyframes breathe-core {
   0%, 100% { r: 36; }
@@ -178,7 +242,7 @@ body {
 .ring-semiose   { animation: pulse-ring 4s ease-in-out infinite 1.4s; }
 .core-breathe   {
   animation: breathe-core 3s ease-in-out infinite;
-  transform-origin: 160px 170px; /* Centered relative to viewbox (160, 170) */
+  transform-origin: 160px 170px;
 }
 
 .compass-btn-zone {
@@ -215,7 +279,7 @@ body {
   color: var(--ink-mid);
   cursor: pointer;
   font-family: 'Jost', sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   transition: all 0.2s;
 }
 .nav-pill.active {
@@ -262,11 +326,12 @@ body {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ink-soft);
+  font-weight: 500;
 }
 .detail-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--ink);
   line-height: 1.1;
 }
@@ -300,6 +365,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 500;
 }
 .section-head::after {
   content: '';
@@ -311,10 +377,11 @@ body {
 /* Description */
 .desc-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 17px;
+  font-size: 18px; /* Plus grand pour le confort */
+  font-weight: 500;
   font-style: italic;
-  color: var(--ink-mid);
-  line-height: 1.7;
+  color: var(--ink);
+  line-height: 1.65;
 }
 
 /* Observations chips */
@@ -324,14 +391,14 @@ body {
   gap: 7px;
 }
 .obs-chip {
-  font-size: 12.5px;
-  padding: 6px 12px;
+  font-size: 13px;
+  padding: 7px 14px;
   border-radius: 22px;
-  border: 1px solid rgba(26,44,64,0.12);
-  color: var(--ink-mid);
-  background: rgba(255,255,255,0.65);
-  line-height: 1;
-  font-weight: 300;
+  border: 1px solid rgba(26,44,64,0.15);
+  color: var(--ink);
+  background: #ffffff;
+  line-height: 1.2;
+  font-weight: 400;
 }
 
 /* Questions */
@@ -343,28 +410,30 @@ body {
 }
 .question-item {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 16.5px;
+  font-size: 17.5px;
+  font-weight: 500;
   font-style: italic;
   color: var(--ink);
-  padding: 11px 16px;
+  padding: 12px 18px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.55);
-  border-left: 3px solid var(--gold);
-  line-height: 1.45;
+  background: rgba(255,255,255,0.75);
+  border-left: 4px solid var(--gold);
+  line-height: 1.5;
 }
 
 /* Clinical reading */
 .lecture-block {
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.75);
   border-radius: 12px;
-  padding: 16px 18px;
-  border: 1px solid rgba(26,44,64,0.07);
+  padding: 18px 20px;
+  border: 1px solid rgba(26,44,64,0.12);
 }
 .lecture-block p {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--ink-mid);
   line-height: 1.7;
   margin-bottom: 14px;
+  font-weight: 400;
 }
 .lecture-block p:last-child { margin-bottom: 0; }
 
@@ -374,7 +443,7 @@ body {
   padding: 14px 16px;
   margin-bottom: 9px;
   border-left: 3px solid var(--gold-light);
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.75);
 }
 .example-situation {
   font-size: 11px;
@@ -382,14 +451,15 @@ body {
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 5px;
-  font-weight: 400;
+  font-weight: 500;
 }
 .example-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 15.5px;
+  font-size: 16px;
+  font-weight: 500;
   font-style: italic;
   color: var(--ink);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 /* ── COUCHES SCREEN ── */
@@ -437,29 +507,31 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.7);
   flex-shrink: 0;
 }
 
 .couche-toggle-text { flex: 1; }
 .couche-sublabel {
-  font-size: 9px;
-  letter-spacing: 0.2em;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  opacity: 0.65;
-  font-weight: 400;
+  opacity: 0.95;
+  font-weight: 500;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
 }
 .couche-name {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 21px;
-  font-weight: 400;
+  font-size: 22px;
+  font-weight: 600;
   line-height: 1.1;
   margin-top: 2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
 .couche-arrow {
   font-size: 13px;
-  opacity: 0.7;
+  opacity: 0.9;
   transition: transform 0.25s;
 }
 .couche-arrow.open { transform: rotate(180deg); }
@@ -473,7 +545,7 @@ body {
 .couche-body.open { max-height: 700px; }
 .couche-body-inner { padding: 16px 18px 20px; }
 
-.couche-body-inner .desc-text { font-size: 15.5px; margin-bottom: 14px; }
+.couche-body-inner .desc-text { font-size: 16px; margin-bottom: 14px; }
 
 .couche-obs-tags {
   display: flex;
@@ -482,40 +554,42 @@ body {
   margin-bottom: 14px;
 }
 .couche-obs-tags span {
-  font-size: 11.5px;
-  padding: 4px 10px;
+  font-size: 12px;
+  padding: 5px 11px;
   border-radius: 20px;
-  border: 1px solid rgba(26,44,64,0.1);
-  color: var(--ink-mid);
-  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(26,44,64,0.12);
+  color: var(--ink);
+  background: rgba(255,255,255,0.85);
+  font-weight: 400;
 }
 
 .couche-question {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
+  font-size: 16.5px;
+  font-weight: 500;
   font-style: italic;
   color: var(--ink);
   padding: 10px 14px;
   border-radius: 8px;
-  border-left: 2px solid var(--gold);
-  background: rgba(255,255,255,0.6);
+  border-left: 2.5px solid var(--gold);
+  background: rgba(255,255,255,0.75);
   line-height: 1.45;
 }
 
 /* Technose bg */
-.bg-technose { background: linear-gradient(135deg, #7aaac0 0%, #9abfd4 100%); color: white; }
+.bg-technose { background: linear-gradient(135deg, #437d99 0%, #76a0b8 100%); color: white; }
 .bg-technose .couche-sublabel, .bg-technose .couche-arrow { color: white; }
 .bg-technose .couche-name { color: white; }
 
-.bg-morphose { background: linear-gradient(135deg, #4e9a80 0%, #72b49a 100%); color: white; }
+.bg-morphose { background: linear-gradient(135deg, #2b7058 0%, #4b947a 100%); color: white; }
 .bg-morphose .couche-sublabel, .bg-morphose .couche-arrow { color: white; }
 .bg-morphose .couche-name { color: white; }
 
-.bg-semiose { background: linear-gradient(135deg, #c47040 0%, #d4885a 100%); color: white; }
+.bg-semiose { background: linear-gradient(135deg, #9e4c1b 0%, #c46d3a 100%); color: white; }
 .bg-semiose .couche-sublabel, .bg-semiose .couche-arrow { color: white; }
 .bg-semiose .couche-name { color: white; }
 
-.bg-ontose { background: linear-gradient(135deg, #c8a848 0%, #d8bc6c 100%); color: white; }
+.bg-ontose { background: linear-gradient(135deg, #96761c 0%, #ba9732 100%); color: white; }
 .bg-ontose .couche-sublabel, .bg-ontose .couche-arrow { color: white; }
 .bg-ontose .couche-name { color: white; }
 
@@ -525,21 +599,21 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 15px auto 10px;
+  margin: 12px auto 8px;
   font-size: 10px;
-  color: var(--ink-soft);
-  opacity: 0.65;
+  color: var(--ink-mid);
   text-align: center;
   line-height: 1.5;
   pointer-events: auto;
 }
 .credit-authors {
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.05em;
 }
 .credit-link {
   color: var(--gold);
   text-decoration: none;
+  font-weight: 500;
   border-bottom: 1px dotted var(--gold);
   transition: opacity 0.2s;
 }
@@ -574,13 +648,14 @@ body {
   background: none;
   cursor: pointer;
   color: var(--ink-soft);
-  opacity: 0.45;
+  opacity: 0.55;
   transition: opacity 0.2s;
   font-family: 'Jost', sans-serif;
+  font-weight: 500;
 }
 .gnav-btn.active { opacity: 1; color: var(--ink); }
 .gnav-icon { font-size: 19px; line-height: 1; }
-.gnav-label { font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400; }
+.gnav-label { font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
 
 /* Entry animation */
 @keyframes fadeIn {
@@ -602,7 +677,15 @@ body {
   <div class="home-header">
     <div class="home-eyebrow">Guide d'observation clinique · Équithérapie</div>
     <div class="home-title">Boussole des <em>Résonances</em></div>
-    <div class="home-sub">Touchez une direction pour l'explorer<br><span style="font-size:10px; opacity:0.8;">Pincez pour zoomer sur la boussole</span></div>
+    <div class="home-sub">Touchez une direction pour l'explorer<br><span style="font-size:10px; opacity:0.85; font-weight:500;">Pincez pour zoomer sur la boussole</span></div>
+  </div>
+
+  <!-- Intégration de l'image sous le titre principal -->
+  <div class="home-banner">
+    <img src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/equiboussole/christie.jpg" 
+         alt="[Image de Christie]" 
+         class="home-banner-img"
+         onerror="this.parentNode.style.display='none';">
   </div>
 
   <div class="compass-wrap">
@@ -650,53 +733,53 @@ body {
         <circle class="core-breathe" cx="160" cy="170" r="37" fill="url(#g-onto)"/>
         <circle cx="160" cy="170" r="37" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.55"/>
 
-        <!-- ── Ring labels (subtle) ── -->
-        <text x="160" y="100" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="13" fill="#1a2c40" opacity="0.55" font-style="italic">Technose</text>
-        <text x="160" y="127" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="13" fill="#1a2c40" opacity="0.65" font-style="italic">Morphose</text>
-        <text x="160" y="153" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="13" fill="#1a2c40" opacity="0.75" font-style="italic">Sémiose</text>
-        <text x="160" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="15" fill="#1a2c40" font-weight="500">Ontose</text>
+        <!-- ── Ring labels (optimisés pour un superbe contraste) ── -->
+        <text class="ring-text-label" x="160" y="99" text-anchor="middle" font-size="13.5" opacity="0.95">Technose</text>
+        <text class="ring-text-label" x="160" y="127" text-anchor="middle" font-size="13.5" opacity="0.95">Morphose</text>
+        <text class="ring-text-label" x="160" y="153" text-anchor="middle" font-size="13.5" opacity="0.95">Sémiose</text>
+        <text class="core-text-label" x="160" y="175" text-anchor="middle" font-size="15">Ontose</text>
 
         <!-- ── Cardinal axes (lines) ── -->
         <!-- Nord -->
-        <line x1="160" y1="22" x2="160" y2="56" stroke="#4a7fa5" stroke-width="1.3" opacity="0.7"/>
-        <circle cx="160" cy="24" r="3" fill="#4a7fa5" opacity="0.8"/>
+        <line x1="160" y1="22" x2="160" y2="56" stroke="var(--nord-c)" stroke-width="1.5" opacity="0.75"/>
+        <circle cx="160" cy="24" r="3.5" fill="var(--nord-c)" opacity="0.9"/>
         <!-- Sud -->
-        <line x1="160" y1="284" x2="160" y2="318" stroke="#c07040" stroke-width="1.3" opacity="0.7"/>
-        <circle cx="160" cy="316" r="3" fill="#c07040" opacity="0.8"/>
+        <line x1="160" y1="284" x2="160" y2="318" stroke="var(--sud-c)" stroke-width="1.5" opacity="0.75"/>
+        <circle cx="160" cy="316" r="3.5" fill="var(--sud-c)" opacity="0.9"/>
         <!-- Ouest (gauche) -->
-        <line x1="12" y1="170" x2="52" y2="170" stroke="#7060a8" stroke-width="1.3" opacity="0.7"/>
-        <circle cx="14" cy="170" r="3" fill="#7060a8" opacity="0.8"/>
+        <line x1="12" y1="170" x2="52" y2="170" stroke="var(--ouest-c)" stroke-width="1.5" opacity="0.75"/>
+        <circle cx="14" cy="170" r="3.5" fill="var(--ouest-c)" opacity="0.9"/>
         <!-- Est (droite) -->
-        <line x1="268" y1="170" x2="308" y2="170" stroke="#4e9a82" stroke-width="1.3" opacity="0.7"/>
-        <circle cx="306" cy="170" r="3" fill="#4e9a82" opacity="0.8"/>
+        <line x1="268" y1="170" x2="308" y2="170" stroke="var(--est-c)" stroke-width="1.5" opacity="0.75"/>
+        <circle cx="306" cy="170" r="3.5" fill="var(--est-c)" opacity="0.9"/>
 
-        <!-- ── Cardinal tap zones ── -->
+        <!-- ── Cardinal tap zones (Textes nets et contrastés avec contour anti-collision) ── -->
         <!-- NORD / Temps / Rythme -->
         <g class="tap-label" onclick="openDir('nord')">
-          <rect x="100" y="0" width="120" height="56" fill="transparent"/>
-          <text x="160" y="13" text-anchor="middle" font-family="Jost,sans-serif" font-size="10" font-weight="500" fill="#4a7fa5" letter-spacing="2">TEMPS</text>
-          <text x="160" y="26" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="13" font-style="italic" fill="#4a7fa5" opacity="0.7">Le Rythme</text>
+          <rect x="90" y="0" width="140" height="56" fill="transparent"/>
+          <text class="axis-title" x="160" y="13" text-anchor="middle" fill="var(--nord-c)" letter-spacing="2">TEMPS</text>
+          <text class="axis-subtitle" x="160" y="27" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--nord-c)">Le Rythme</text>
         </g>
 
         <!-- SUD / Ancrage / Corps -->
         <g class="tap-label" onclick="openDir('sud')">
-          <rect x="100" y="284" width="120" height="56" fill="transparent"/>
-          <text x="160" y="302" text-anchor="middle" font-family="Jost,sans-serif" font-size="10" font-weight="500" fill="#c07040" letter-spacing="2">ANCRAGE</text>
-          <text x="160" y="316" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="13" font-style="italic" fill="#c07040" opacity="0.75">Corps &amp; Présence</text>
+          <rect x="90" y="284" width="140" height="56" fill="transparent"/>
+          <text class="axis-title" x="160" y="302" text-anchor="middle" fill="var(--sud-c)" letter-spacing="2">ANCRAGE</text>
+          <text class="axis-subtitle" x="160" y="317" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--sud-c)">Corps &amp; Présence</text>
         </g>
 
-        <!-- OUEST (gauche) / Humilité / Le Cheval -->
+        <!-- OUEST (gauche) / Humilité / Le Cheval (Coordonnées horizontales décalées pour éviter tout rognage sur les bords) -->
         <g class="tap-label" onclick="openDir('ouest')">
-          <rect x="0" y="144" width="52" height="52" fill="transparent"/>
-          <text x="26" y="163" text-anchor="middle" font-family="Jost,sans-serif" font-size="9" font-weight="500" fill="#7060a8" letter-spacing="1.5">HUMILITÉ</text>
-          <text x="26" y="176" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="11" font-style="italic" fill="#7060a8" opacity="0.75">Le Cheval</text>
+          <rect x="0" y="144" width="60" height="52" fill="transparent"/>
+          <text class="axis-title" x="38" y="161" text-anchor="middle" fill="var(--ouest-c)" letter-spacing="1">HUMILITÉ</text>
+          <text class="axis-subtitle" x="38" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--ouest-c)">Le Cheval</text>
         </g>
 
-        <!-- EST (droite) / Espace / Distance -->
+        <!-- EST (droite) / Espace / Distance (Coordonnées horizontales recentrées pour une lecture confortable) -->
         <g class="tap-label" onclick="openDir('est')">
-          <rect x="268" y="144" width="52" height="52" fill="transparent"/>
-          <text x="294" y="163" text-anchor="middle" font-family="Jost,sans-serif" font-size="9" font-weight="500" fill="#4e9a82" letter-spacing="1.5">ESPACE</text>
-          <text x="294" y="176" text-anchor="middle" font-family="Cormorant Garamond,serif" font-size="11" font-style="italic" fill="#4e9a82" opacity="0.75">La Distance</text>
+          <rect x="260" y="144" width="60" height="52" fill="transparent"/>
+          <text class="axis-title" x="282" y="161" text-anchor="middle" fill="var(--est-c)" letter-spacing="1">ESPACE</text>
+          <text class="axis-subtitle" x="282" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--est-c)">La Distance</text>
         </g>
 
         <!-- Center tap (Ontose / Couches) -->
@@ -709,7 +792,7 @@ body {
 
   <!-- bottom credit inside home (above navigation) -->
   <div class="credit-container">
-    <span class="credit-authors">Par Emmanuelle Tizon &amp; Pierre-Henri Garnier</span>
+    <span class="credit-authors">Par Emmanuelle Tizon, Claire Jarnoux &amp; Pierre-Henri Garnier</span>
     <a href="https://emmanuelletizon.zici.fr/" class="credit-link" target="_blank">emmanuelletizon.zici.fr</a>
   </div>
 
@@ -848,9 +931,9 @@ body {
 
     <!-- Authors Section in Couches view as well -->
     <div style="height:15px"></div>
-    <div style="text-align:center;font-size:10px;color:var(--ink-soft);opacity:0.65;letter-spacing:0.05em;line-height:1.8;padding-bottom:12px">
+    <div style="text-align:center;font-size:10px;color:var(--ink-soft);opacity:0.85;letter-spacing:0.05em;line-height:1.8;padding-bottom:12px">
       Boussole des Résonances · Équithérapie<br>
-      <span style="font-weight: 500;">Emmanuelle Tizon &amp; Pierre-Henri Garnier</span><br>
+      <span style="font-weight: 500; color: var(--ink-mid);">Emmanuelle Tizon, Claire Jarnoux &amp; Pierre-Henri Garnier</span><br>
       <a href="https://emmanuelletizon.zici.fr/" style="color:var(--gold); text-decoration:none;" target="_blank">emmanuelletizon.zici.fr</a>
     </div>
   </div>
@@ -874,7 +957,7 @@ const DIR_DATA = {
   nord: {
     cardinal: 'Nord · Temps',
     name: 'Le Rythme',
-    color: '#4a7fa5',
+    color: '#2e5f85',
     description: 'Quel tempo est en train de se jouer ? Le rythme est souvent le premier signal clinique — avant les mots, avant les gestes. Il parle de l\'état interne, de la régulation, du lien entre le patient et le cheval.',
     obs: ['pas du cheval','ralentissement','agitation','respiration','précipitation','hésitation','répétitions','moments où "ça se pose"','synchronisation cheval/humain','besoin de pause','besoin de mouvement'],
     questions: [
@@ -893,7 +976,7 @@ const DIR_DATA = {
   est: {
     cardinal: 'Est · Espace',
     name: 'La Distance',
-    color: '#4e9a82',
+    color: '#337560',
     description: 'Comment la relation se spatialise-t-elle ? La distance choisie, subie, ou négociée entre le patient et le cheval révèle des patterns relationnels fondamentaux — bien avant et souvent à la place des mots.',
     obs: ['approche','évitement','patient collé au cheval','patient trop loin','contourne','ose toucher','reste derrière','prend la tête','laisse le cheval venir','orientation du corps','occupation du manège'],
     questions: [
@@ -912,7 +995,7 @@ const DIR_DATA = {
   sud: {
     cardinal: 'Sud · Ancrage',
     name: 'Corps & Présence',
-    color: '#c07040',
+    color: '#a65424',
     description: 'Qu\'est-ce qui se passe dans le corps du patient ? Le cheval travaille d\'abord avec le corps — avant l\'histoire, avant le symptôme. L\'ancrage corporel est à la fois un indicateur clinique et un levier thérapeutique.',
     obs: ['respiration','tonus','crispation','agitation motrice','immobilité figée','voix','posture','appuis au sol','qualité du toucher','gestes brusques','gestes fluides'],
     questions: [
@@ -931,7 +1014,7 @@ const DIR_DATA = {
   ouest: {
     cardinal: 'Ouest · Humilité',
     name: 'Le Cheval informe',
-    color: '#7060a8',
+    color: '#55448c',
     description: 'Qu\'est-ce que le cheval nous montre de ce qui se passe réellement dans la séance ? Le cheval n\'est pas un outil passif. Il est un informateur de précision — sur l\'état du patient, sur le nôtre, sur la qualité de la rencontre.',
     obs: ['rapprochement spontané','évitement','tension perçue','immobilité','curiosité','micro-ajustements','agitation','retrait','s\'éloigne si tension monte','vient chercher le contact','renifle prolongé'],
     questions: [
@@ -1038,7 +1121,6 @@ function toggleCouche(btn) {
     body.classList.remove('open');
     arrow.classList.remove('open');
   } else {
-    // Optional: close other open bodies to keep view clean
     document.querySelectorAll('.couche-body.open').forEach(b => {
       b.classList.remove('open');
       b.previousElementSibling.querySelector('.couche-arrow').classList.remove('open');
@@ -1061,7 +1143,6 @@ let startX = 0;
 let startY = 0;
 let isPanning = false;
 
-// Pinch gesture details
 let touchStartDist = 0;
 let isZooming = false;
 
@@ -1073,10 +1154,8 @@ function getDistance(touches) {
 }
 
 function updateTransform() {
-  // Constrain values to keep the compass readable and within bounds
   scale = Math.min(Math.max(1, scale), 4);
   
-  // If scale is back to 1, reset offset positions smoothly
   if (scale === 1) {
     pointX = 0;
     pointY = 0;
@@ -1085,7 +1164,6 @@ function updateTransform() {
     resetZoomBtn.classList.add('visible');
   }
 
-  // Bound panning offset relative to the zoom depth
   const maxOffset = (scale - 1) * 160; 
   pointX = Math.min(Math.max(-maxOffset, pointX), maxOffset);
   pointY = Math.min(Math.max(-maxOffset, pointY), maxOffset);
@@ -1100,7 +1178,6 @@ function resetZoom() {
   updateTransform();
 }
 
-// Mouse and Touch Pointer Handlers for Drag & Pinch
 zoomContainer.addEventListener('mousedown', (e) => {
   e.preventDefault();
   startX = e.clientX - pointX;
@@ -1119,7 +1196,6 @@ window.addEventListener('mouseup', () => {
   isPanning = false;
 });
 
-// Touch controls supporting multi-touch pinch to zoom
 zoomContainer.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     isZooming = true;
@@ -1148,6 +1224,8 @@ zoomContainer.addEventListener('touchmove', (e) => {
   }
 });
 
+zoomContainer.addEventListener('touchcallout', (e) => e.preventDefault());
+
 zoomContainer.addEventListener('touchend', (e) => {
   if (e.touches.length < 2) {
     isZooming = false;
@@ -1157,18 +1235,17 @@ zoomContainer.addEventListener('touchend', (e) => {
   }
 });
 
-// Also support trackpad/scrollwheel zoom actions on the compass container
 zoomContainer.addEventListener('wheel', (e) => {
   e.preventDefault();
   const zoomStep = 0.08;
   if (e.deltaY < 0) {
-    scale += zoomStep; // zoom in
+    scale += zoomStep;
   } else {
-    scale -= zoomStep; // zoom out
+    scale -= zoomStep;
   }
   updateTransform();
 }, { passive: false });
 
 </script>
 </body>
-</html>
+  </html>
