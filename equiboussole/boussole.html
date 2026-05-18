@@ -1,31 +1,32 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Boussole des Résonances</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
 
 :root {
   --bg: #f6f3ed;
-  /* Couleurs d'encre renforcées pour un contraste optimal */
   --ink: #0f1c2a;
   --ink-mid: #25394d;
   --ink-soft: #50677c;
   --gold: #aa823a;
   --gold-light: #cfa860;
 
-  /* Couleurs des axes densifiées pour une lisibilité accrue */
   --nord-c: #2e5f85;
-  --nord-l: #b2cedf;
-  --est-c:  #337560;
-  --est-l:  #abd5c7;
-  --sud-c:  #a65424;
-  --sud-l:  #e2bfab;
-  --ouest-c:#55448c;
-  --ouest-l:#c2bae2;
+  --est-c: #337560;
+  --sud-c: #a65424;
+  --ouest-c: #55448c;
 
   --technose: #aac4d4;
   --morphose: #6aaa90;
@@ -33,21 +34,26 @@
   --ontose: #f0e6c0;
 }
 
-html, body { height: 100%; overflow: hidden; background: var(--bg); }
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
 
 body {
   font-family: 'Jost', sans-serif;
-  font-weight: 400; /* Plus lisible que 300 sur mobile */
   color: var(--ink);
-  display: flex;
-  flex-direction: column;
   max-width: 430px;
   margin: 0 auto;
-  height: 100%;
   position: relative;
+  transform-origin: center center;
+  touch-action: none;
 }
 
-/* ── SCREENS ── */
+/* Screens */
+
 .screen {
   position: absolute;
   inset: 0;
@@ -55,44 +61,47 @@ body {
   flex-direction: column;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.3s ease;
   overflow: hidden;
+  background: var(--bg);
 }
+
 .screen.active {
   opacity: 1;
   pointer-events: all;
 }
 
-/* ── HOME SCREEN ── */
+/* Home */
+
 #s-home {
-  background: var(--bg);
   align-items: center;
   justify-content: flex-start;
-  padding-bottom: 0;
 }
 
 .home-header {
   width: 100%;
-  padding: 24px 24px 0;
+  padding: 14px 18px 0;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .home-eyebrow {
-  font-size: 9px;
-  letter-spacing: 0.28em;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--ink-soft);
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   font-weight: 500;
 }
 
 .home-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 500;
   color: var(--ink);
-  line-height: 1.15;
+  line-height: 1.1;
 }
+
 .home-title em {
   font-style: italic;
   color: var(--ink-mid);
@@ -100,87 +109,81 @@ body {
 }
 
 .home-sub {
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: var(--ink-soft);
-  margin-top: 5px;
-  line-height: 1.55;
+  margin-top: 4px;
+  line-height: 1.45;
   font-weight: 400;
 }
 
-/* Header Image Container */
+/* Image plus compacte */
+
 .home-banner {
-  width: calc(100% - 48px);
-  margin: 14px auto 0;
-  max-height: 130px;
+  width: calc(100% - 70px);
+  height: 70px;
+  margin: 9px auto 0;
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(26, 44, 64, 0.05);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(26, 44, 64, 0.06);
+  background: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
 }
 
 .home-banner-img {
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* ── COMPASS SVG AREA ── */
+/* Compass */
+
 .compass-wrap {
   flex: 1;
+  width: 100%;
+  padding: 0 6px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 4px 20px 0;
   min-height: 0;
-  position: relative;
 }
 
-/* Container enabling interactive zooming & panning */
 .compass-zoom-container {
   width: 100%;
-  max-width: 320px;
-  height: auto;
+  max-width: 392px;
   aspect-ratio: 320 / 340;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
-  touch-action: none;
-  border-radius: 50%;
 }
 
 .compass-svg-el {
   width: 100%;
   height: 100%;
-  transform-origin: center center;
-  transition: transform 0.1s ease-out;
-  cursor: grab;
-}
-.compass-svg-el:active {
-  cursor: grabbing;
+  display: block;
 }
 
-/* SVG Text Outline & Styling for Perfect Legibility */
+.tap-label {
+  cursor: pointer;
+  user-select: none;
+}
+
 .tap-label text {
   paint-order: stroke fill;
   stroke: var(--bg);
   stroke-width: 5px;
   stroke-linejoin: round;
 }
+
 .tap-label .axis-title {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 10.5px;
 }
+
 .tap-label .axis-subtitle {
   font-weight: 500;
   font-size: 13px;
 }
 
-/* Inner rings text optimization (crisp white halo) */
 .ring-text-label {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
@@ -202,77 +205,61 @@ body {
   stroke-linejoin: round;
 }
 
-/* Zoom controls indicator / reset button */
-.zoom-indicator {
-  position: absolute;
-  top: 10px;
-  right: 25px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(26,44,64,0.2);
-  border-radius: 12px;
-  padding: 4px 10px;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 10;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-.zoom-indicator.visible {
-  opacity: 1;
-  pointer-events: all;
-}
-
-/* Ring animations */
 @keyframes pulse-ring {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.75; }
+  50% { opacity: 0.76; }
 }
+
 @keyframes breathe-core {
   0%, 100% { r: 36; }
   50% { r: 38; }
 }
 
 .ring-technose { animation: pulse-ring 6s ease-in-out infinite; }
-.ring-morphose  { animation: pulse-ring 5s ease-in-out infinite 0.8s; }
-.ring-semiose   { animation: pulse-ring 4s ease-in-out infinite 1.4s; }
-.core-breathe   {
-  animation: breathe-core 3s ease-in-out infinite;
-  transform-origin: 160px 170px;
+.ring-morphose { animation: pulse-ring 5s ease-in-out infinite 0.8s; }
+.ring-semiose { animation: pulse-ring 4s ease-in-out infinite 1.4s; }
+.core-breathe { animation: breathe-core 3s ease-in-out infinite; }
+
+/* Credits */
+
+.credit-container {
+  flex-shrink: 0;
+  margin: 4px auto 4px;
+  font-size: 9px;
+  color: var(--ink-mid);
+  text-align: center;
+  line-height: 1.45;
+  padding: 0 18px;
 }
 
-.compass-btn-zone {
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.compass-btn-zone:active { opacity: 0.7; }
-
-/* Cardinal tap areas */
-.tap-label {
-  cursor: pointer;
-  user-select: none;
+.credit-authors {
+  font-weight: 500;
+  letter-spacing: 0.03em;
 }
 
-/* ── BOTTOM NAV ── */
+.credit-link {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--gold);
+}
+
+/* Bottom pills */
+
 .bottom-nav {
   width: 100%;
-  padding: 8px 0 20px;
+  padding: 4px 0 74px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: linear-gradient(0deg, var(--bg) 70%, transparent);
+  flex-shrink: 0;
 }
 
 .nav-pill {
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 7px 14px;
+  padding: 6px 13px;
   border-radius: 20px;
   border: 1px solid rgba(26,44,64,0.15);
   background: rgba(255,255,255,0.6);
@@ -280,27 +267,23 @@ body {
   cursor: pointer;
   font-family: 'Jost', sans-serif;
   font-weight: 500;
-  transition: all 0.2s;
 }
+
 .nav-pill.active {
   background: var(--ink);
   color: white;
   border-color: var(--ink);
 }
 
-/* ── DETAIL SCREEN ── */
-#s-detail {
-  background: var(--bg);
-}
+/* Detail */
 
 .detail-header {
   flex-shrink: 0;
-  padding: 20px 20px 16px;
+  padding: 18px 18px 14px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   border-bottom: 1px solid rgba(26,44,64,0.08);
-  position: relative;
 }
 
 .back-btn {
@@ -308,19 +291,20 @@ body {
   height: 36px;
   border-radius: 50%;
   border: 1px solid rgba(26,44,64,0.15);
-  background: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.75);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 17px;
   color: var(--ink-mid);
   flex-shrink: 0;
-  transition: background 0.2s;
 }
-.back-btn:active { background: rgba(255,255,255,1); }
 
-.detail-title-group { flex: 1; }
+.detail-title-group {
+  flex: 1;
+}
+
 .detail-cardinal {
   font-size: 9px;
   letter-spacing: 0.22em;
@@ -328,6 +312,7 @@ body {
   color: var(--ink-soft);
   font-weight: 500;
 }
+
 .detail-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 24px;
@@ -346,12 +331,16 @@ body {
 .detail-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 0 20px 100px;
+  padding: 0 18px 96px;
   -webkit-overflow-scrolling: touch;
 }
-.detail-scroll::-webkit-scrollbar { display: none; }
 
-/* ── SECTIONS ── */
+.detail-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sections */
+
 .section {
   margin-top: 22px;
 }
@@ -367,6 +356,7 @@ body {
   gap: 8px;
   font-weight: 500;
 }
+
 .section-head::after {
   content: '';
   flex: 1;
@@ -374,22 +364,21 @@ body {
   background: rgba(26,44,64,0.08);
 }
 
-/* Description */
 .desc-text {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 18px; /* Plus grand pour le confort */
+  font-size: 18px;
   font-weight: 500;
   font-style: italic;
   color: var(--ink);
-  line-height: 1.65;
+  line-height: 1.62;
 }
 
-/* Observations chips */
 .obs-cloud {
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
 }
+
 .obs-chip {
   font-size: 13px;
   padding: 7px 14px;
@@ -398,16 +387,15 @@ body {
   color: var(--ink);
   background: #ffffff;
   line-height: 1.2;
-  font-weight: 400;
 }
 
-/* Questions */
 .question-list {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
+
 .question-item {
   font-family: 'Cormorant Garamond', serif;
   font-size: 17.5px;
@@ -416,35 +404,32 @@ body {
   color: var(--ink);
   padding: 12px 18px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.78);
   border-left: 4px solid var(--gold);
   line-height: 1.5;
 }
 
-/* Clinical reading */
 .lecture-block {
-  background: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.78);
   border-radius: 12px;
   padding: 18px 20px;
   border: 1px solid rgba(26,44,64,0.12);
 }
+
 .lecture-block p {
   font-size: 14px;
   color: var(--ink-mid);
   line-height: 1.7;
-  margin-bottom: 14px;
-  font-weight: 400;
 }
-.lecture-block p:last-child { margin-bottom: 0; }
 
-/* Examples */
 .example-card {
   border-radius: 10px;
   padding: 14px 16px;
   margin-bottom: 9px;
   border-left: 3px solid var(--gold-light);
-  background: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.78);
 }
+
 .example-situation {
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -453,6 +438,7 @@ body {
   margin-bottom: 5px;
   font-weight: 500;
 }
+
 .example-text {
   font-family: 'Cormorant Garamond', serif;
   font-size: 16px;
@@ -462,26 +448,34 @@ body {
   line-height: 1.6;
 }
 
-/* ── COUCHES SCREEN ── */
-#s-couches {
-  background: var(--bg);
-}
+/* Couches */
 
 .couche-header-bar {
-  padding: 22px 20px 14px;
+  padding: 20px 18px 14px;
   border-bottom: 1px solid rgba(26,44,64,0.08);
   flex-shrink: 0;
 }
-.couche-header-bar .home-eyebrow { text-align: left; margin-bottom: 4px; }
-.couche-header-bar .home-title { text-align: left; font-size: 22px; }
+
+.couche-header-bar .home-eyebrow {
+  text-align: left;
+  margin-bottom: 4px;
+}
+
+.couche-header-bar .home-title {
+  text-align: left;
+  font-size: 22px;
+}
 
 .couche-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px 100px;
+  padding: 16px 18px 96px;
   -webkit-overflow-scrolling: touch;
 }
-.couche-scroll::-webkit-scrollbar { display: none; }
+
+.couche-scroll::-webkit-scrollbar {
+  display: none;
+}
 
 .couche-item {
   border-radius: 14px;
@@ -499,9 +493,7 @@ body {
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: filter 0.15s;
 }
-.couche-toggle:active { filter: brightness(0.95); }
 
 .couche-dot {
   width: 12px;
@@ -511,22 +503,24 @@ body {
   flex-shrink: 0;
 }
 
-.couche-toggle-text { flex: 1; }
+.couche-toggle-text {
+  flex: 1;
+}
+
 .couche-sublabel {
   font-size: 9.5px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   opacity: 0.95;
   font-weight: 500;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.15);
 }
+
 .couche-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 22px;
   font-weight: 600;
   line-height: 1.1;
   margin-top: 2px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 
 .couche-arrow {
@@ -534,18 +528,30 @@ body {
   opacity: 0.9;
   transition: transform 0.25s;
 }
-.couche-arrow.open { transform: rotate(180deg); }
+
+.couche-arrow.open {
+  transform: rotate(180deg);
+}
 
 .couche-body {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s ease;
+  transition: max-height 0.35s ease;
   background: rgba(255,255,255,0.55);
 }
-.couche-body.open { max-height: 700px; }
-.couche-body-inner { padding: 16px 18px 20px; }
 
-.couche-body-inner .desc-text { font-size: 16px; margin-bottom: 14px; }
+.couche-body.open {
+  max-height: 760px;
+}
+
+.couche-body-inner {
+  padding: 16px 18px 20px;
+}
+
+.couche-body-inner .desc-text {
+  font-size: 16px;
+  margin-bottom: 14px;
+}
 
 .couche-obs-tags {
   display: flex;
@@ -553,6 +559,7 @@ body {
   gap: 6px;
   margin-bottom: 14px;
 }
+
 .couche-obs-tags span {
   font-size: 12px;
   padding: 5px 11px;
@@ -560,7 +567,6 @@ body {
   border: 1px solid rgba(26,44,64,0.12);
   color: var(--ink);
   background: rgba(255,255,255,0.85);
-  font-weight: 400;
 }
 
 .couche-question {
@@ -576,52 +582,28 @@ body {
   line-height: 1.45;
 }
 
-/* Technose bg */
-.bg-technose { background: linear-gradient(135deg, #437d99 0%, #76a0b8 100%); color: white; }
-.bg-technose .couche-sublabel, .bg-technose .couche-arrow { color: white; }
-.bg-technose .couche-name { color: white; }
-
-.bg-morphose { background: linear-gradient(135deg, #2b7058 0%, #4b947a 100%); color: white; }
-.bg-morphose .couche-sublabel, .bg-morphose .couche-arrow { color: white; }
-.bg-morphose .couche-name { color: white; }
-
-.bg-semiose { background: linear-gradient(135deg, #9e4c1b 0%, #c46d3a 100%); color: white; }
-.bg-semiose .couche-sublabel, .bg-semiose .couche-arrow { color: white; }
-.bg-semiose .couche-name { color: white; }
-
-.bg-ontose { background: linear-gradient(135deg, #96761c 0%, #ba9732 100%); color: white; }
-.bg-ontose .couche-sublabel, .bg-ontose .couche-arrow { color: white; }
-.bg-ontose .couche-name { color: white; }
-
-/* ── FOOTER CREDIT ── */
-.credit-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 12px auto 8px;
-  font-size: 10px;
-  color: var(--ink-mid);
-  text-align: center;
-  line-height: 1.5;
-  pointer-events: auto;
-}
-.credit-authors {
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-.credit-link {
-  color: var(--gold);
-  text-decoration: none;
-  font-weight: 500;
-  border-bottom: 1px dotted var(--gold);
-  transition: opacity 0.2s;
-}
-.credit-link:hover {
-  opacity: 0.8;
+.bg-technose {
+  background: linear-gradient(135deg, #437d99 0%, #76a0b8 100%);
+  color: white;
 }
 
-/* ── GLOBAL NAV BAR ── */
+.bg-morphose {
+  background: linear-gradient(135deg, #2b7058 0%, #4b947a 100%);
+  color: white;
+}
+
+.bg-semiose {
+  background: linear-gradient(135deg, #9e4c1b 0%, #c46d3a 100%);
+  color: white;
+}
+
+.bg-ontose {
+  background: linear-gradient(135deg, #96761c 0%, #ba9732 100%);
+  color: white;
+}
+
+/* Global nav */
+
 .global-nav {
   position: fixed;
   bottom: 0;
@@ -634,7 +616,7 @@ body {
   border-top: 1px solid rgba(26,44,64,0.09);
   display: flex;
   z-index: 50;
-  padding: 6px 0 18px;
+  padding: 6px 0 16px;
 }
 
 .gnav-btn {
@@ -649,140 +631,227 @@ body {
   cursor: pointer;
   color: var(--ink-soft);
   opacity: 0.55;
-  transition: opacity 0.2s;
   font-family: 'Jost', sans-serif;
   font-weight: 500;
 }
-.gnav-btn.active { opacity: 1; color: var(--ink); }
-.gnav-icon { font-size: 19px; line-height: 1; }
-.gnav-label { font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
 
-/* Entry animation */
+.gnav-btn.active {
+  opacity: 1;
+  color: var(--ink);
+}
+
+.gnav-icon {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.gnav-label {
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Small screens */
+
+@media (max-height: 760px) {
+  .home-header {
+    padding-top: 10px;
+  }
+
+  .home-title {
+    font-size: 22px;
+  }
+
+  .home-sub {
+    font-size: 9.8px;
+  }
+
+  .home-banner {
+    height: 56px;
+    margin-top: 7px;
+  }
+
+  .compass-zoom-container {
+    max-width: 370px;
+  }
+
+  .credit-container {
+    font-size: 8.5px;
+    margin-top: 0;
+  }
+
+  .bottom-nav {
+    padding-bottom: 68px;
+  }
+}
+
+@media (max-height: 680px) {
+  .home-banner {
+    display: none;
+  }
+
+  .compass-zoom-container {
+    max-width: 382px;
+  }
+}
+
+/* Animation entrée */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(0); }
 }
+
 .screen.active .detail-scroll,
 .screen.active .couche-scroll {
   animation: fadeIn 0.3s ease;
 }
+.theory-card {
+  margin: 18px 0 20px;
+  padding: 18px 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(26, 44, 64, 0.12);
+  box-shadow: 0 6px 18px rgba(26, 44, 64, 0.05);
+}
 
+.theory-eyebrow {
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.theory-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+.theory-card p {
+  font-size: 13.5px;
+  color: var(--ink-mid);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+
+.theory-card p:last-child {
+  margin-bottom: 0;
+}
+
+.theory-card strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+  
 </style>
 </head>
+
 <body>
 
-<!-- ══════════════════════════════════ HOME ══════════════════════════════════ -->
 <div id="s-home" class="screen active">
 
   <div class="home-header">
     <div class="home-eyebrow">Guide d'observation clinique · Équithérapie</div>
     <div class="home-title">Boussole des <em>Résonances</em></div>
-    <div class="home-sub">Touchez une direction pour l'explorer<br><span style="font-size:10px; opacity:0.85; font-weight:500;">Pincez pour zoomer sur la boussole</span></div>
+    <div class="home-sub">
+      Touchez une direction pour l'explorer<br>
+      <span style="font-size:9.5px; opacity:0.85; font-weight:500;">Pincez pour zoomer sur toute la page · double-tap pour réinitialiser</span>
+    </div>
   </div>
 
-  <!-- Intégration de l'image sous le titre principal -->
   <div class="home-banner">
-    <img src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/equiboussole/christie.jpg" 
-         alt="[Image de Christie]" 
-         class="home-banner-img"
-         onerror="this.parentNode.style.display='none';">
+    <img
+      src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/equiboussole/christie.jpg"
+      alt="Paysage d'équithérapie"
+      class="home-banner-img"
+      onerror="this.parentNode.style.display='none';"
+    />
   </div>
 
   <div class="compass-wrap">
-    <div id="reset-zoom-btn" class="zoom-indicator" onclick="resetZoom()">Réinitialiser le zoom</div>
-    <div class="compass-zoom-container" id="zoom-container">
-      <svg class="compass-svg-el" id="compass-svg" viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
+    <div class="compass-zoom-container">
+      <svg class="compass-svg-el" viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <!-- Gradients matching the reference image exactly -->
           <radialGradient id="g-tech" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="#bdd4e4"/>
             <stop offset="100%" stop-color="#cce0ee" stop-opacity="0.5"/>
           </radialGradient>
+
           <radialGradient id="g-morph" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="#7ab8a2"/>
             <stop offset="100%" stop-color="#5a9e88"/>
           </radialGradient>
+
           <radialGradient id="g-semi" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="#e8a060"/>
             <stop offset="100%" stop-color="#d48848"/>
           </radialGradient>
+
           <radialGradient id="g-onto" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="#f6edcc"/>
             <stop offset="100%" stop-color="#eedea8"/>
           </radialGradient>
-          <radialGradient id="g-gold-ring" cx="50%" cy="50%" r="50%">
-            <stop offset="85%" stop-color="transparent"/>
-            <stop offset="100%" stop-color="#c9a84c"/>
-          </radialGradient>
+
           <filter id="soft-shadow">
             <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#1a2c40" flood-opacity="0.08"/>
           </filter>
         </defs>
 
-        <!-- ── Rings ── -->
-        <!-- Technose (outermost) -->
         <circle class="ring-technose" cx="160" cy="170" r="148" fill="url(#g-tech)" filter="url(#soft-shadow)" opacity="0.75"/>
-
-        <!-- Morphose -->
         <circle class="ring-morphose" cx="160" cy="170" r="108" fill="url(#g-morph)" opacity="0.82"/>
-
-        <!-- Sémiose -->
         <circle class="ring-semiose" cx="160" cy="170" r="72" fill="url(#g-semi)" opacity="0.9"/>
-
-        <!-- Ontose core -->
         <circle class="core-breathe" cx="160" cy="170" r="37" fill="url(#g-onto)"/>
         <circle cx="160" cy="170" r="37" fill="none" stroke="#c9a84c" stroke-width="1.8" opacity="0.55"/>
 
-        <!-- ── Ring labels (optimisés pour un superbe contraste) ── -->
-        <text class="ring-text-label" x="160" y="99" text-anchor="middle" font-size="13.5" opacity="0.95">Technose</text>
-        <text class="ring-text-label" x="160" y="127" text-anchor="middle" font-size="13.5" opacity="0.95">Morphose</text>
-        <text class="ring-text-label" x="160" y="153" text-anchor="middle" font-size="13.5" opacity="0.95">Sémiose</text>
+        <text class="ring-text-label" x="160" y="99" text-anchor="middle" font-size="13.5">Technose</text>
+        <text class="ring-text-label" x="160" y="127" text-anchor="middle" font-size="13.5">Morphose</text>
+        <text class="ring-text-label" x="160" y="153" text-anchor="middle" font-size="13.5">Sémiose</text>
         <text class="core-text-label" x="160" y="175" text-anchor="middle" font-size="15">Ontose</text>
 
-        <!-- ── Cardinal axes (lines) ── -->
-        <!-- Nord -->
         <line x1="160" y1="22" x2="160" y2="56" stroke="var(--nord-c)" stroke-width="1.5" opacity="0.75"/>
         <circle cx="160" cy="24" r="3.5" fill="var(--nord-c)" opacity="0.9"/>
-        <!-- Sud -->
+
         <line x1="160" y1="284" x2="160" y2="318" stroke="var(--sud-c)" stroke-width="1.5" opacity="0.75"/>
         <circle cx="160" cy="316" r="3.5" fill="var(--sud-c)" opacity="0.9"/>
-        <!-- Ouest (gauche) -->
+
         <line x1="12" y1="170" x2="52" y2="170" stroke="var(--ouest-c)" stroke-width="1.5" opacity="0.75"/>
         <circle cx="14" cy="170" r="3.5" fill="var(--ouest-c)" opacity="0.9"/>
-        <!-- Est (droite) -->
+
         <line x1="268" y1="170" x2="308" y2="170" stroke="var(--est-c)" stroke-width="1.5" opacity="0.75"/>
         <circle cx="306" cy="170" r="3.5" fill="var(--est-c)" opacity="0.9"/>
 
-        <!-- ── Cardinal tap zones (Textes nets et contrastés avec contour anti-collision) ── -->
-        <!-- NORD / Temps / Rythme -->
         <g class="tap-label" onclick="openDir('nord')">
           <rect x="90" y="0" width="140" height="56" fill="transparent"/>
           <text class="axis-title" x="160" y="13" text-anchor="middle" fill="var(--nord-c)" letter-spacing="2">TEMPS</text>
           <text class="axis-subtitle" x="160" y="27" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--nord-c)">Le Rythme</text>
         </g>
 
-        <!-- SUD / Ancrage / Corps -->
         <g class="tap-label" onclick="openDir('sud')">
           <rect x="90" y="284" width="140" height="56" fill="transparent"/>
           <text class="axis-title" x="160" y="302" text-anchor="middle" fill="var(--sud-c)" letter-spacing="2">ANCRAGE</text>
           <text class="axis-subtitle" x="160" y="317" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--sud-c)">Corps &amp; Présence</text>
         </g>
 
-        <!-- OUEST (gauche) / Humilité / Le Cheval (Coordonnées horizontales décalées pour éviter tout rognage sur les bords) -->
         <g class="tap-label" onclick="openDir('ouest')">
-          <rect x="0" y="144" width="60" height="52" fill="transparent"/>
-          <text class="axis-title" x="38" y="161" text-anchor="middle" fill="var(--ouest-c)" letter-spacing="1">HUMILITÉ</text>
-          <text class="axis-subtitle" x="38" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--ouest-c)">Le Cheval</text>
+          <rect x="0" y="144" width="70" height="52" fill="transparent"/>
+          <text class="axis-title" x="40" y="161" text-anchor="middle" fill="var(--ouest-c)" letter-spacing="1">HUMILITÉ</text>
+          <text class="axis-subtitle" x="40" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--ouest-c)">Le Cheval</text>
         </g>
 
-        <!-- EST (droite) / Espace / Distance (Coordonnées horizontales recentrées pour une lecture confortable) -->
         <g class="tap-label" onclick="openDir('est')">
-          <rect x="260" y="144" width="60" height="52" fill="transparent"/>
-          <text class="axis-title" x="282" y="161" text-anchor="middle" fill="var(--est-c)" letter-spacing="1">ESPACE</text>
-          <text class="axis-subtitle" x="282" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--est-c)">La Distance</text>
+          <rect x="250" y="144" width="70" height="52" fill="transparent"/>
+          <text class="axis-title" x="280" y="161" text-anchor="middle" fill="var(--est-c)" letter-spacing="1">ESPACE</text>
+          <text class="axis-subtitle" x="280" y="174" text-anchor="middle" font-family="Cormorant Garamond,serif" font-style="italic" fill="var(--est-c)">La Distance</text>
         </g>
 
-        <!-- Center tap (Ontose / Couches) -->
         <g class="tap-label" onclick="showScreen('s-couches')">
           <circle cx="160" cy="170" r="37" fill="transparent"/>
         </g>
@@ -790,20 +859,17 @@ body {
     </div>
   </div>
 
-  <!-- bottom credit inside home (above navigation) -->
   <div class="credit-container">
-    <span class="credit-authors">Par Emmanuelle Tizon, Claire Jarnoux &amp; Pierre-Henri Garnier</span>
+    <span class="credit-authors">Par Emmanuelle Tizon, Claire Jarnoux &amp; Pierre-Henri Garnier</span><br>
     <a href="https://emmanuelletizon.zici.fr/" class="credit-link" target="_blank">emmanuelletizon.zici.fr</a>
   </div>
 
-  <!-- bottom hint -->
   <div class="bottom-nav">
     <div class="nav-pill active" onclick="showScreen('s-home')">Boussole</div>
     <div class="nav-pill" onclick="showScreen('s-couches')">Couches</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════ DETAIL SCREEN ══════════════════════════════ -->
 <div id="s-detail" class="screen">
   <div class="detail-header">
     <div class="back-btn" onclick="goBack()">←</div>
@@ -814,16 +880,13 @@ body {
     <div class="detail-color-bar" id="d-bar"></div>
   </div>
 
-  <div class="detail-scroll" id="d-scroll">
-    <!-- populated by JS -->
-  </div>
+  <div class="detail-scroll" id="d-scroll"></div>
 </div>
 
-<!-- ══════════════════════════════ COUCHES SCREEN ════════════════════════════ -->
 <div id="s-couches" class="screen">
   <div class="couche-header-bar">
     <div class="home-eyebrow">Modèle des Résonances</div>
-    <div class="home-title" style="font-size:22px">Les <em>couches</em> de lecture</div>
+    <div class="home-title">Les <em>couches</em> de lecture</div>
   </div>
 
   <div class="couche-scroll">
@@ -837,6 +900,7 @@ body {
         </div>
         <span class="couche-arrow">▾</span>
       </button>
+
       <div class="couche-body">
         <div class="couche-body-inner">
           <p class="desc-text">Ce qui contient la rencontre : l'environnement, les règles, la présence du thérapeute, les outils. La Technose n'est pas neutre — elle agit avant même que quelque chose commence.</p>
@@ -852,6 +916,31 @@ body {
           <div class="couche-question">Le cadre soutient-il la rencontre ou la parasite-t-il ?</div>
         </div>
       </div>
+      <div class="theory-card">
+  <div class="theory-eyebrow">Ancrage théorique</div>
+  <div class="theory-title">Rosa · Latour · Régime de présence</div>
+
+  <p>
+    Cette boussole s’inspire de la pensée de la résonance d’Hartmut Rosa :
+    une séance d’équithérapie n’est pas seulement une technique appliquée,
+    mais une rencontre où un sujet, un cheval, un lieu et un rythme peuvent
+    entrer en relation vivante.
+  </p>
+
+  <p>
+    Elle rejoint aussi Bruno Latour : ce qui agit n’est jamais un seul élément
+    isolé. Le cheval, le cadre, les gestes, les distances, les objets, la météo,
+    le thérapeute et le patient forment un réseau d’acteurs qui transforme la
+    situation.
+  </p>
+
+  <p>
+    La boussole aide donc à lire le <strong>régime de présence</strong> :
+    comment chacun est là, comment le milieu répond, comment le corps se règle,
+    comment du sens émerge, et comment une manière d’être au monde peut se
+    déplacer.
+  </p>
+      </div>
     </div>
 
     <div class="couche-item">
@@ -863,6 +952,7 @@ body {
         </div>
         <span class="couche-arrow">▾</span>
       </button>
+
       <div class="couche-body">
         <div class="couche-body-inner">
           <p class="desc-text">Ce qui change physiquement et perceptivement durant la séance. Rythme, tonus, souffle, posture, engagement du corps. La Morphose, c'est le vivant en mouvement.</p>
@@ -888,6 +978,7 @@ body {
         </div>
         <span class="couche-arrow">▾</span>
       </button>
+
       <div class="couche-body">
         <div class="couche-body-inner">
           <p class="desc-text">Ce qui émerge symboliquement : métaphores, récits, projections sur le cheval, images spontanées. La Sémiose, c'est la dimension du sens — comment l'expérience devient histoire.</p>
@@ -913,6 +1004,7 @@ body {
         </div>
         <span class="couche-arrow">▾</span>
       </button>
+
       <div class="couche-body">
         <div class="couche-body-inner">
           <p class="desc-text">La transformation la plus profonde : repositionnement subjectif, regain d'agentivité, sentiment de compétence, confiance. L'Ontose, c'est quand quelque chose change dans la manière d'être au monde — et pas seulement dans le comportement.</p>
@@ -929,50 +1021,50 @@ body {
       </div>
     </div>
 
-    <!-- Authors Section in Couches view as well -->
     <div style="height:15px"></div>
+
     <div style="text-align:center;font-size:10px;color:var(--ink-soft);opacity:0.85;letter-spacing:0.05em;line-height:1.8;padding-bottom:12px">
       Boussole des Résonances · Équithérapie<br>
-      <span style="font-weight: 500; color: var(--ink-mid);">Emmanuelle Tizon, Claire Jarnoux &amp; Pierre-Henri Garnier</span><br>
-      <a href="https://emmanuelletizon.zici.fr/" style="color:var(--gold); text-decoration:none;" target="_blank">emmanuelletizon.zici.fr</a>
+      <span style="font-weight:500;color:var(--ink-mid);">Emmanuelle Tizon, Claire Jarnoux &amp; Pierre-Henri Garnier</span><br>
+      <a href="https://emmanuelletizon.zici.fr/" style="color:var(--gold);text-decoration:none;" target="_blank">emmanuelletizon.zici.fr</a>
     </div>
   </div>
 </div>
 
-<!-- ── GLOBAL NAV ── -->
 <nav class="global-nav" id="gnav">
   <button class="gnav-btn active" id="gnav-home" onclick="showScreen('s-home')">
     <span class="gnav-icon">⊙</span>
     <span class="gnav-label">Boussole</span>
   </button>
+
   <button class="gnav-btn" id="gnav-couches" onclick="showScreen('s-couches')">
     <span class="gnav-icon">◎</span>
     <span class="gnav-label">Couches</span>
   </button>
 </nav>
 
-<!-- ══════════════════════════════════ DATA + JS ══════════════════════════════════ -->
 <script>
 const DIR_DATA = {
   nord: {
     cardinal: 'Nord · Temps',
     name: 'Le Rythme',
     color: '#2e5f85',
-    description: 'Quel tempo est en train de se jouer ? Le rythme est souvent le premier signal clinique — avant les mots, avant les gestes. Il parle de l\'état interne, de la régulation, du lien entre le patient et le cheval.',
-    obs: ['pas du cheval','ralentissement','agitation','respiration','précipitation','hésitation','répétitions','moments où "ça se pose"','synchronisation cheval/humain','besoin de pause','besoin de mouvement'],
+    description: 'Quel tempo est en train de se jouer ? Le rythme est souvent le premier signal clinique — avant les mots, avant les gestes. Il parle de l’état interne, de la régulation, du lien entre le patient et le cheval.',
+    obs: ['pas du cheval','ralentissement','agitation','respiration','précipitation','hésitation','répétitions','moments où ça se pose','synchronisation cheval/humain','besoin de pause','besoin de mouvement'],
     questions: [
       'Faut-il ralentir, ou remettre du mouvement ?',
       'Le cheval régule-t-il déjà à ma place ?',
-      'Qu\'est-ce que ce rythme dit de l\'état interne ?',
+      'Qu’est-ce que ce rythme dit de l’état interne ?',
       'Faut-il intervenir, ou laisser venir ?'
     ],
-    lecture: 'Beaucoup de transformations commencent par un changement de rythme, bien avant toute verbalisation. Le corps sait avant que l\'esprit ne formule. Le rythme partagé entre le patient et le cheval est une forme de langage primitif, pré-verbal.',
+    lecture: 'Beaucoup de transformations commencent par un changement de rythme, bien avant toute verbalisation. Le corps sait avant que l’esprit ne formule. Le rythme partagé entre le patient et le cheval est une forme de langage primitif, pré-verbal.',
     examples: [
-      { situation: 'Adolescent en crise', text: 'Un garçon de 15 ans entre dans le manège en courant presque, voix forte, gestes brusques. Le thérapeute ne dit rien — il ralentit simplement lui-même, et guide le cheval au pas lent. En 4 minutes, le garçon a ralenti. Il n\'a pas été "calmé" : il s\'est co-régulé.' },
-      { situation: 'Enfant dissocié', text: 'Une petite fille de 9 ans marche à côté du cheval sans le regarder, dans une sorte d\'absence. La thérapeute remarque que son pas ne suit pas le rythme du cheval. Elle propose doucement : "Essaie de marcher en même temps que lui." Le contact revient.' },
-      { situation: 'Adulte anxieux', text: 'Un adulte en thérapie pour burn-out fait tout vite, même donner des carottes. Le cheval mange lentement. La thérapeute dit : "Regardez son rythme à lui." Long silence. Puis : "Je ne savais pas que j\'avais oublié d\'aller lentement."' }
+      { situation: 'Adolescent en crise', text: 'Un garçon de 15 ans entre dans le manège en courant presque, voix forte, gestes brusques. Le thérapeute ne dit rien — il ralentit simplement lui-même, et guide le cheval au pas lent. En 4 minutes, le garçon a ralenti. Il n’a pas été calmé : il s’est co-régulé.' },
+      { situation: 'Enfant dissocié', text: 'Une petite fille de 9 ans marche à côté du cheval sans le regarder, dans une sorte d’absence. La thérapeute remarque que son pas ne suit pas le rythme du cheval. Elle propose doucement : « Essaie de marcher en même temps que lui. » Le contact revient.' },
+      { situation: 'Adulte anxieux', text: 'Un adulte en thérapie pour burn-out fait tout vite, même donner des carottes. Le cheval mange lentement. La thérapeute dit : « Regardez son rythme à lui. » Long silence. Puis : « Je ne savais pas que j’avais oublié d’aller lentement. »' }
     ]
   },
+
   est: {
     cardinal: 'Est · Espace',
     name: 'La Distance',
@@ -981,53 +1073,55 @@ const DIR_DATA = {
     obs: ['approche','évitement','patient collé au cheval','patient trop loin','contourne','ose toucher','reste derrière','prend la tête','laisse le cheval venir','orientation du corps','occupation du manège'],
     questions: [
       'Quelle distance semble supportable pour cette personne ?',
-      'Qui s\'ajuste à qui, dans cet espace ?',
+      'Qui s’ajuste à qui, dans cet espace ?',
       'Le cheval ouvre-t-il ou ferme-t-il la relation ?',
       'Est-ce que je force quelque chose dans cet espace ?'
     ],
-    lecture: 'La relation apparaît souvent dans la géographie avant les mots. La façon dont un patient occupe l\'espace avec le cheval — coller, fuir, contourner, se positionner en tête — est une carte de son monde intérieur relationnel.',
+    lecture: 'La relation apparaît souvent dans la géographie avant les mots. La façon dont un patient occupe l’espace avec le cheval — coller, fuir, contourner, se positionner en tête — est une carte de son monde intérieur relationnel.',
     examples: [
-      { situation: 'Trouble de l\'attachement', text: 'Une adolescente placée en foyer ne quitte plus l\'encolure du cheval. Elle s\'y colle littéralement. La thérapeute note : ce n\'est pas une "fusion problématique" — c\'est peut-être la première fois qu\'elle peut s\'approcher de quelqu\'un sans en avoir peur.' },
-      { situation: 'Hypercontrôle', text: 'Un jeune homme se place systématiquement en tête du cheval, lui bloque la direction. Il ne le sait pas. La thérapeute lui propose de se mettre à côté, puis derrière. Il résiste — puis, à la deuxième tentative : "C\'est bizarre, j\'ai l\'impression que je le contrôle moins."' },
+      { situation: 'Trouble de l’attachement', text: 'Une adolescente placée en foyer ne quitte plus l’encolure du cheval. Elle s’y colle littéralement. La thérapeute note : ce n’est pas une fusion problématique — c’est peut-être la première fois qu’elle peut s’approcher de quelqu’un sans en avoir peur.' },
+      { situation: 'Hypercontrôle', text: 'Un jeune homme se place systématiquement en tête du cheval, lui bloque la direction. Il ne le sait pas. La thérapeute lui propose de se mettre à côté, puis derrière. Il résiste — puis, à la deuxième tentative : « C’est bizarre, j’ai l’impression que je le contrôle moins. »' },
       { situation: 'Timidité relationnelle', text: 'Un enfant de 10 ans reste à 2 mètres du cheval pendant toute la première séance, sans le toucher. La thérapeute ne demande rien. À la troisième séance, il effleure la croupe du bout des doigts. Ça lui appartient.' }
     ]
   },
+
   sud: {
     cardinal: 'Sud · Ancrage',
     name: 'Corps & Présence',
     color: '#a65424',
-    description: 'Qu\'est-ce qui se passe dans le corps du patient ? Le cheval travaille d\'abord avec le corps — avant l\'histoire, avant le symptôme. L\'ancrage corporel est à la fois un indicateur clinique et un levier thérapeutique.',
+    description: 'Qu’est-ce qui se passe dans le corps du patient ? Le cheval travaille d’abord avec le corps — avant l’histoire, avant le symptôme. L’ancrage corporel est à la fois un indicateur clinique et un levier thérapeutique.',
     obs: ['respiration','tonus','crispation','agitation motrice','immobilité figée','voix','posture','appuis au sol','qualité du toucher','gestes brusques','gestes fluides'],
     questions: [
       'Le corps est-il là — présent, engagé ?',
       'Est-il trop activé, ou au contraire coupé ?',
       'Le contact avec le cheval régule-t-il quelque chose ?',
-      'Qu\'est-ce que je perçois dans mon propre corps en ce moment ?'
+      'Qu’est-ce que je perçois dans mon propre corps en ce moment ?'
     ],
-    lecture: 'Le cheval est un capteur corporel d\'une sensibilité extrême. Il perçoit le tonus, la respiration, la tension musculaire — et y répond. Ce qu\'un thérapeute peut mettre du temps à voir, le cheval l\'a déjà ressenti et y a réagi.',
+    lecture: 'Le cheval est un capteur corporel d’une sensibilité extrême. Il perçoit le tonus, la respiration, la tension musculaire — et y répond. Ce qu’un thérapeute peut mettre du temps à voir, le cheval l’a déjà ressenti et y a réagi.',
     examples: [
-      { situation: 'Dissociation', text: 'Un adolescent avec un vécu traumatique panse le cheval mécaniquement — bons gestes, bonne technique, regard dans le vide. La thérapeute demande : "Tu sens sous tes mains ?" Long silence. Puis les yeux reviennent. Le corps aussi.' },
-      { situation: 'Hyperactivité', text: 'Un garçon de 8 ans, diagnostiqué TDAH, bouge sans cesse. Le cheval recule à chaque fois qu\'il s\'approche en brusquerie. La thérapeute ne dit rien. Le garçon observe. Il essaie plus doucement. Le cheval reste. Le garçon sourit. Il a compris quelque chose que les mots n\'auraient pas pu transmettre.' },
-      { situation: 'Enfant mutique', text: 'Une petite fille ne parle pas depuis 8 semaines à l\'école. Elle pose sa joue contre l\'encolure du cheval. Puis elle souffle — lentement, profondément. Le cheval soupire en écho. Elle rit. Le silence se transforme.' }
+      { situation: 'Dissociation', text: 'Un adolescent avec un vécu traumatique panse le cheval mécaniquement — bons gestes, bonne technique, regard dans le vide. La thérapeute demande : « Tu sens sous tes mains ? » Long silence. Puis les yeux reviennent. Le corps aussi.' },
+      { situation: 'Hyperactivité', text: 'Un garçon de 8 ans, diagnostiqué TDAH, bouge sans cesse. Le cheval recule à chaque fois qu’il s’approche en brusquerie. La thérapeute ne dit rien. Le garçon observe. Il essaie plus doucement. Le cheval reste. Le garçon sourit. Il a compris quelque chose que les mots n’auraient pas pu transmettre.' },
+      { situation: 'Enfant mutique', text: 'Une petite fille ne parle pas depuis 8 semaines à l’école. Elle pose sa joue contre l’encolure du cheval. Puis elle souffle — lentement, profondément. Le cheval soupire en écho. Elle rit. Le silence se transforme.' }
     ]
   },
+
   ouest: {
     cardinal: 'Ouest · Humilité',
     name: 'Le Cheval informe',
     color: '#55448c',
-    description: 'Qu\'est-ce que le cheval nous montre de ce qui se passe réellement dans la séance ? Le cheval n\'est pas un outil passif. Il est un informateur de précision — sur l\'état du patient, sur le nôtre, sur la qualité de la rencontre.',
-    obs: ['rapprochement spontané','évitement','tension perçue','immobilité','curiosité','micro-ajustements','agitation','retrait','s\'éloigne si tension monte','vient chercher le contact','renifle prolongé'],
+    description: 'Qu’est-ce que le cheval nous montre de ce qui se passe réellement dans la séance ? Le cheval n’est pas un outil passif. Il est un informateur de précision — sur l’état du patient, sur le nôtre, sur la qualité de la rencontre.',
+    obs: ['rapprochement spontané','évitement','tension perçue','immobilité','curiosité','micro-ajustements','agitation','retrait','s’éloigne si tension monte','vient chercher le contact','renifle prolongé'],
     questions: [
       'Que me dit le cheval de ce qui se passe ?',
       'Que perçoit-il que je ne vois pas encore ?',
       'Suis-je en train de forcer quelque chose ?',
       'Dois-je changer quelque chose — dans mon cadre, ma posture, mon intention ?'
     ],
-    lecture: 'Le cheval ne ment pas. Il ne fait pas semblant de ne pas voir. Il n\'a pas de contre-transfert inconscient — mais il a une perception somatique et émotionnelle d\'une précision que nous aurions tort de minimiser. Chaque comportement du cheval est une donnée clinique.',
+    lecture: 'Le cheval ne ment pas. Il ne fait pas semblant de ne pas voir. Il n’a pas de contre-transfert inconscient — mais il a une perception somatique et émotionnelle d’une précision que nous aurions tort de minimiser. Chaque comportement du cheval est une donnée clinique.',
     examples: [
-      { situation: 'Signal d\'alerte', text: 'En pleine séance, le cheval s\'arrête, tourne la tête vers le patient, et reste immobile. La thérapeute remarque : le patient venait de retenir sa respiration. Elle pose doucement : "Quelque chose se passe pour vous en ce moment ?" L\'adolescent fond en larmes — pour la première fois en trois mois de suivi.' },
-      { situation: 'Le cheval recule', text: 'Chaque fois que la thérapeute approche avec un programme en tête, le cheval recule légèrement. Elle prend note : quelque chose dans son intention — sa précipitation, sa volonté de "faire avancer" — est perçu. Elle souffle, ralentit. Le cheval revient.' },
-      { situation: 'Le cheval choisit', text: 'Dans un groupe de trois enfants, le cheval va spontanément vers l\'enfant le plus silencieux — celui que tout le monde oublie dans les dynamiques de groupe. La thérapeute observe. Ce n\'est pas de la magie. C\'est de la perception animale. Elle s\'en inspire pour la suite.' }
+      { situation: 'Signal d’alerte', text: 'En pleine séance, le cheval s’arrête, tourne la tête vers le patient, et reste immobile. La thérapeute remarque : le patient venait de retenir sa respiration. Elle pose doucement : « Quelque chose se passe pour vous en ce moment ? » L’adolescent fond en larmes — pour la première fois en trois mois de suivi.' },
+      { situation: 'Le cheval recule', text: 'Chaque fois que la thérapeute approche avec un programme en tête, le cheval recule légèrement. Elle prend note : quelque chose dans son intention — sa précipitation, sa volonté de faire avancer — est perçu. Elle souffle, ralentit. Le cheval revient.' },
+      { situation: 'Le cheval choisit', text: 'Dans un groupe de trois enfants, le cheval va spontanément vers l’enfant le plus silencieux — celui que tout le monde oublie dans les dynamiques de groupe. La thérapeute observe. Ce n’est pas de la magie. C’est de la perception animale. Elle s’en inspire pour la suite.' }
     ]
   }
 };
@@ -1035,23 +1129,34 @@ const DIR_DATA = {
 let prevScreen = 's-home';
 
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  
-  // Update nav buttons
-  document.querySelectorAll('.gnav-btn').forEach(b => b.classList.remove('active'));
-  if (id === 's-home') document.getElementById('gnav-home').classList.add('active');
-  if (id === 's-couches') document.getElementById('gnav-couches').classList.add('active');
-  
-  // Home nav pills update
-  document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+
+  document.querySelectorAll('.gnav-btn').forEach(btn => btn.classList.remove('active'));
+
   if (id === 's-home') {
-    document.querySelector('.bottom-nav .nav-pill:first-child').classList.add('active');
-  } else if (id === 's-couches') {
-    document.querySelector('.bottom-nav .nav-pill:last-child').classList.add('active');
+    document.getElementById('gnav-home').classList.add('active');
   }
 
-  prevScreen = id !== 's-detail' ? id : prevScreen;
+  if (id === 's-couches') {
+    document.getElementById('gnav-couches').classList.add('active');
+  }
+
+  document.querySelectorAll('.nav-pill').forEach(pill => pill.classList.remove('active'));
+
+  if (id === 's-home') {
+    const firstPill = document.querySelector('.bottom-nav .nav-pill:first-child');
+    if (firstPill) firstPill.classList.add('active');
+  }
+
+  if (id === 's-couches') {
+    const lastPill = document.querySelector('.bottom-nav .nav-pill:last-child');
+    if (lastPill) lastPill.classList.add('active');
+  }
+
+  if (id !== 's-detail') {
+    prevScreen = id;
+  }
 }
 
 function goBack() {
@@ -1060,21 +1165,19 @@ function goBack() {
 
 function openDir(dir) {
   const d = DIR_DATA[dir];
+
   document.getElementById('d-cardinal').textContent = d.cardinal;
   document.getElementById('d-name').textContent = d.name;
   document.getElementById('d-bar').style.background = d.color;
 
   const scroll = document.getElementById('d-scroll');
-  scroll.innerHTML = '';
 
   scroll.innerHTML = `
-    <!-- Description -->
     <div class="section">
       <div class="section-head">Ce que c'est</div>
       <p class="desc-text">${d.description}</p>
     </div>
 
-    <!-- Observer -->
     <div class="section">
       <div class="section-head">Observer</div>
       <div class="obs-cloud">
@@ -1082,7 +1185,6 @@ function openDir(dir) {
       </div>
     </div>
 
-    <!-- Questions -->
     <div class="section">
       <div class="section-head">Se demander</div>
       <ul class="question-list">
@@ -1090,7 +1192,6 @@ function openDir(dir) {
       </ul>
     </div>
 
-    <!-- Lecture clinique -->
     <div class="section">
       <div class="section-head">Lecture clinique</div>
       <div class="lecture-block">
@@ -1098,7 +1199,6 @@ function openDir(dir) {
       </div>
     </div>
 
-    <!-- Exemples -->
     <div class="section">
       <div class="section-head">Situations concrètes</div>
       ${d.examples.map(e => `
@@ -1116,136 +1216,126 @@ function openDir(dir) {
 function toggleCouche(btn) {
   const body = btn.nextElementSibling;
   const arrow = btn.querySelector('.couche-arrow');
-  
+
   if (body.classList.contains('open')) {
     body.classList.remove('open');
     arrow.classList.remove('open');
-  } else {
-    document.querySelectorAll('.couche-body.open').forEach(b => {
-      b.classList.remove('open');
-      b.previousElementSibling.querySelector('.couche-arrow').classList.remove('open');
-    });
-    body.classList.add('open');
-    arrow.classList.add('open');
+    return;
   }
+
+  document.querySelectorAll('.couche-body.open').forEach(openBody => {
+    openBody.classList.remove('open');
+    openBody.previousElementSibling.querySelector('.couche-arrow').classList.remove('open');
+  });
+
+  body.classList.add('open');
+  arrow.classList.add('open');
 }
 
-/* ════════════════════════ PINCH TO ZOOM & DRAG IMPLEMENTATION ════════════════════════ */
-const compassSvg = document.getElementById('compass-svg');
-const zoomContainer = document.getElementById('zoom-container');
-const resetZoomBtn = document.getElementById('reset-zoom-btn');
+/* Pinch global mobile-first */
 
-let scale = 1;
-let lastScale = 1;
-let pointX = 0;
-let pointY = 0;
+let pageScale = 1;
+let lastPageScale = 1;
+let pageX = 0;
+let pageY = 0;
 let startX = 0;
 let startY = 0;
+let startDist = 0;
 let isPanning = false;
+let lastTap = 0;
 
-let touchStartDist = 0;
-let isZooming = false;
+const app = document.body;
 
-function getDistance(touches) {
+function getTouchDistance(touches) {
   return Math.hypot(
     touches[0].clientX - touches[1].clientX,
     touches[0].clientY - touches[1].clientY
   );
 }
 
-function updateTransform() {
-  scale = Math.min(Math.max(1, scale), 4);
-  
-  if (scale === 1) {
-    pointX = 0;
-    pointY = 0;
-    resetZoomBtn.classList.remove('visible');
-  } else {
-    resetZoomBtn.classList.add('visible');
+function applyPageTransform() {
+  pageScale = Math.min(Math.max(1, pageScale), 3);
+
+  if (pageScale <= 1.02) {
+    pageScale = 1;
+    pageX = 0;
+    pageY = 0;
   }
 
-  const maxOffset = (scale - 1) * 160; 
-  pointX = Math.min(Math.max(-maxOffset, pointX), maxOffset);
-  pointY = Math.min(Math.max(-maxOffset, pointY), maxOffset);
+  const maxX = (pageScale - 1) * window.innerWidth * 0.5;
+  const maxY = (pageScale - 1) * window.innerHeight * 0.5;
 
-  compassSvg.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+  pageX = Math.min(Math.max(pageX, -maxX), maxX);
+  pageY = Math.min(Math.max(pageY, -maxY), maxY);
+
+  app.style.transform = `translate(${pageX}px, ${pageY}px) scale(${pageScale})`;
 }
 
-function resetZoom() {
-  scale = 1;
-  pointX = 0;
-  pointY = 0;
-  updateTransform();
+function resetPageZoom() {
+  pageScale = 1;
+  pageX = 0;
+  pageY = 0;
+  applyPageTransform();
 }
 
-zoomContainer.addEventListener('mousedown', (e) => {
-  e.preventDefault();
-  startX = e.clientX - pointX;
-  startY = e.clientY - pointY;
-  isPanning = true;
-});
-
-window.addEventListener('mousemove', (e) => {
-  if (!isPanning || isZooming) return;
-  pointX = e.clientX - startX;
-  pointY = e.clientY - startY;
-  updateTransform();
-});
-
-window.addEventListener('mouseup', () => {
-  isPanning = false;
-});
-
-zoomContainer.addEventListener('touchstart', (e) => {
+document.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
-    isZooming = true;
-    touchStartDist = getDistance(e.touches);
-    lastScale = scale;
-  } else if (e.touches.length === 1) {
-    const touch = e.touches[0];
-    startX = touch.clientX - pointX;
-    startY = touch.clientY - pointY;
-    isPanning = true;
-  }
-});
-
-zoomContainer.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 2 && isZooming) {
     e.preventDefault();
-    const currentDist = getDistance(e.touches);
-    const zoomFactor = currentDist / touchStartDist;
-    scale = lastScale * zoomFactor;
-    updateTransform();
-  } else if (e.touches.length === 1 && isPanning && !isZooming) {
-    const touch = e.touches[0];
-    pointX = touch.clientX - startX;
-    pointY = touch.clientY - startY;
-    updateTransform();
+    startDist = getTouchDistance(e.touches);
+    lastPageScale = pageScale;
+    isPanning = false;
+    return;
   }
-});
 
-zoomContainer.addEventListener('touchcallout', (e) => e.preventDefault());
+  if (e.touches.length === 1) {
+    const now = Date.now();
 
-zoomContainer.addEventListener('touchend', (e) => {
-  if (e.touches.length < 2) {
-    isZooming = false;
+    if (now - lastTap < 280) {
+      resetPageZoom();
+      lastTap = 0;
+      return;
+    }
+
+    lastTap = now;
+
+    if (pageScale > 1) {
+      isPanning = true;
+      startX = e.touches[0].clientX - pageX;
+      startY = e.touches[0].clientY - pageY;
+    }
   }
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+
+    const currentDist = getTouchDistance(e.touches);
+    const zoomFactor = currentDist / startDist;
+
+    pageScale = lastPageScale * zoomFactor;
+    applyPageTransform();
+    return;
+  }
+
+  if (e.touches.length === 1 && isPanning && pageScale > 1) {
+    e.preventDefault();
+
+    pageX = e.touches[0].clientX - startX;
+    pageY = e.touches[0].clientY - startY;
+
+    applyPageTransform();
+  }
+}, { passive: false });
+
+document.addEventListener('touchend', (e) => {
   if (e.touches.length === 0) {
     isPanning = false;
   }
 });
 
-zoomContainer.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const zoomStep = 0.08;
-  if (e.deltaY < 0) {
-    scale += zoomStep;
-  } else {
-    scale -= zoomStep;
-  }
-  updateTransform();
-}, { passive: false });
-
+document.addEventListener('dblclick', resetPageZoom);
 </script>
+
 </body>
-  </html>
+            </html>
