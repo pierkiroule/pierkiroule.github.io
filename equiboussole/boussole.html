@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Boussole des Résonances</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 *{
@@ -16,19 +16,19 @@
 }
 
 :root{
-  --bg:#f6f3ed;
-  --surface:#fff;
-  --ink:#0f1c2a;
-  --ink-mid:#25394d;
-  --ink-soft:#5d7082;
-  --gold:#aa823a;
+  --bg:#f6f2ea;
+  --card:#fffdf8;
+  --ink:#111d2a;
+  --muted:#667684;
+  --line:rgba(17,29,42,.1);
+  --gold:#a97d32;
 
   --nord:#2e5f85;
   --est:#337560;
   --sud:#a65424;
   --ouest:#55448c;
 
-  --shadow:0 8px 24px rgba(15,28,42,.08);
+  --shadow:0 12px 30px rgba(17,29,42,.09);
 }
 
 html,
@@ -40,26 +40,26 @@ body{
 }
 
 body{
-  font-family:'Jost',sans-serif;
-  color:var(--ink);
   max-width:430px;
   margin:0 auto;
+  font-family:'Jost',sans-serif;
+  color:var(--ink);
   position:relative;
   touch-action:none;
   transform-origin:center center;
 }
 
-/* screens */
+/* ÉCRANS */
 
 .screen{
   position:absolute;
   inset:0;
   display:flex;
   flex-direction:column;
+  background:var(--bg);
   opacity:0;
   pointer-events:none;
   transition:opacity .25s ease;
-  background:var(--bg);
 }
 
 .screen.active{
@@ -67,26 +67,36 @@ body{
   pointer-events:auto;
 }
 
-/* home */
-
-.home-header{
-  padding:16px 18px 0;
-  text-align:center;
+.scroll{
+  flex:1;
+  overflow-y:auto;
+  padding:0 18px 92px;
+  -webkit-overflow-scrolling:touch;
 }
 
-.eyebrow{
+.scroll::-webkit-scrollbar{
+  display:none;
+}
+
+/* HEADER */
+
+.hero{
+  padding:18px 18px 10px;
+}
+
+.kicker{
   font-size:9px;
   letter-spacing:.22em;
   text-transform:uppercase;
-  color:var(--ink-soft);
-  font-weight:600;
+  color:var(--muted);
+  font-weight:700;
   margin-bottom:6px;
 }
 
 .title{
   font-family:'Cormorant Garamond',serif;
-  font-size:30px;
-  line-height:1.05;
+  font-size:32px;
+  line-height:1.02;
   font-weight:600;
 }
 
@@ -97,41 +107,66 @@ body{
 
 .subtitle{
   margin-top:8px;
-  font-size:11px;
-  line-height:1.45;
-  color:var(--ink-soft);
+  font-size:12px;
+  line-height:1.5;
+  color:var(--muted);
 }
 
-.home-banner{
-  width:calc(100% - 36px);
-  height:86px;
-  margin:12px auto 0;
-  border-radius:18px;
+/* IMAGE */
+
+.banner{
+  margin:10px 18px 0;
+  height:104px;
+  border-radius:24px;
   overflow:hidden;
-  background:rgba(255,255,255,.65);
+  position:relative;
+  background:#eee4d6;
   box-shadow:var(--shadow);
 }
 
-.home-banner img{
+.banner img{
   width:100%;
   height:100%;
-  object-fit:contain;
+  object-fit:cover;
+  object-position:center;
   display:block;
+  filter:saturate(.9) contrast(.95) brightness(1.04);
 }
 
-/* compass */
+.banner::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(to top, rgba(17,29,42,.42), rgba(17,29,42,.02) 65%),
+    radial-gradient(circle at center, rgba(255,255,255,0) 45%, rgba(246,242,234,.28));
+}
 
-.compass-wrap{
+.banner-caption{
+  position:absolute;
+  left:14px;
+  bottom:12px;
+  z-index:2;
+  color:white;
+  font-size:10px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:700;
+}
+
+/* BOUSSOLE */
+
+.compass-area{
   flex:1;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:4px 6px;
+  padding:4px 6px 0;
 }
 
 .compass-box{
   width:100%;
-  max-width:410px;
+  max-width:408px;
   aspect-ratio:320 / 340;
 }
 
@@ -141,11 +176,11 @@ svg{
   display:block;
 }
 
-.tap-label{
+.tap-zone{
   cursor:pointer;
 }
 
-.tap-label text{
+.tap-zone text{
   paint-order:stroke fill;
   stroke:var(--bg);
   stroke-width:5px;
@@ -154,14 +189,13 @@ svg{
 
 .axis-title{
   font-size:10px;
-  font-weight:700;
+  font-weight:800;
 }
 
 .axis-sub{
   font-family:'Cormorant Garamond',serif;
   font-size:14px;
   font-style:italic;
-  font-weight:500;
 }
 
 .ring-label{
@@ -170,21 +204,16 @@ svg{
   font-weight:600;
   fill:var(--ink);
   paint-order:stroke fill;
-  stroke:#fff;
+  stroke:white;
   stroke-width:2px;
 }
 
 .core-label{
-  font-weight:700;
+  font-weight:800;
   fill:var(--ink);
   paint-order:stroke fill;
-  stroke:#fff;
+  stroke:white;
   stroke-width:2px;
-}
-
-@keyframes pulse{
-  0%,100%{opacity:1}
-  50%{opacity:.72}
 }
 
 @keyframes breathe{
@@ -192,22 +221,19 @@ svg{
   50%{transform:scale(1.04)}
 }
 
-.ring-tech{animation:pulse 6s ease-in-out infinite}
-.ring-morph{animation:pulse 5s ease-in-out infinite .6s}
-.ring-semi{animation:pulse 4s ease-in-out infinite 1s}
-.core-breathe{
+.core{
   transform-origin:center;
-  animation:breathe 3s ease-in-out infinite;
+  animation:breathe 3.2s ease-in-out infinite;
 }
 
-/* credits */
+/* CRÉDITS */
 
 .credits{
   text-align:center;
   font-size:9px;
   line-height:1.5;
-  color:var(--ink-mid);
-  padding:4px 16px 78px;
+  color:var(--muted);
+  padding:4px 16px 82px;
 }
 
 .credits a{
@@ -215,24 +241,24 @@ svg{
   text-decoration:none;
 }
 
-/* detail */
+/* DÉTAIL */
 
 .detail-header{
-  padding:18px 16px 14px;
+  padding:18px;
   display:flex;
-  align-items:center;
   gap:12px;
-  border-bottom:1px solid rgba(15,28,42,.08);
+  align-items:center;
+  border-bottom:1px solid var(--line);
 }
 
-.back-btn{
-  width:38px;
-  height:38px;
+.back{
+  width:40px;
+  height:40px;
   border:none;
   border-radius:50%;
-  background:#fff;
-  box-shadow:0 2px 10px rgba(0,0,0,.06);
-  font-size:18px;
+  background:var(--card);
+  box-shadow:0 3px 12px rgba(17,29,42,.08);
+  font-size:20px;
 }
 
 .detail-title{
@@ -241,33 +267,22 @@ svg{
 
 .detail-cardinal{
   font-size:9px;
-  letter-spacing:.2em;
+  letter-spacing:.22em;
   text-transform:uppercase;
-  color:var(--ink-soft);
-  font-weight:600;
+  color:var(--muted);
+  font-weight:700;
 }
 
 .detail-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:30px;
+  font-size:31px;
   line-height:1.05;
 }
 
 .detail-bar{
   width:5px;
-  height:44px;
+  height:48px;
   border-radius:99px;
-}
-
-.scroll{
-  flex:1;
-  overflow-y:auto;
-  padding:0 16px 96px;
-  -webkit-overflow-scrolling:touch;
-}
-
-.scroll::-webkit-scrollbar{
-  display:none;
 }
 
 .section{
@@ -282,22 +297,36 @@ svg{
   font-size:9px;
   letter-spacing:.22em;
   text-transform:uppercase;
-  color:var(--ink-soft);
-  font-weight:600;
+  color:var(--muted);
+  font-weight:700;
 }
 
 .section-head::after{
   content:'';
   flex:1;
   height:1px;
-  background:rgba(15,28,42,.08);
+  background:var(--line);
 }
 
-.desc-text{
+.lead{
   font-family:'Cormorant Garamond',serif;
-  font-size:20px;
-  line-height:1.5;
+  font-size:21px;
+  line-height:1.48;
   font-style:italic;
+}
+
+.card{
+  background:rgba(255,253,248,.86);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 8px 22px rgba(17,29,42,.05);
+}
+
+.card p{
+  font-size:14px;
+  line-height:1.65;
+  color:#2f4152;
 }
 
 .chips{
@@ -309,180 +338,170 @@ svg{
 .chip{
   padding:7px 12px;
   border-radius:999px;
-  background:#fff;
-  border:1px solid rgba(15,28,42,.1);
+  background:var(--card);
+  border:1px solid var(--line);
   font-size:12px;
+  color:#2f4152;
 }
 
 .question{
   padding:13px 14px;
+  border-radius:15px;
   border-left:4px solid var(--gold);
-  border-radius:13px;
-  background:rgba(255,255,255,.82);
+  background:rgba(255,253,248,.9);
   font-family:'Cormorant Garamond',serif;
   font-size:18px;
+  line-height:1.42;
   font-style:italic;
-  line-height:1.4;
   margin-bottom:8px;
 }
 
-.text-block{
-  background:rgba(255,255,255,.82);
-  border-radius:15px;
-  padding:16px;
-  border:1px solid rgba(15,28,42,.08);
-  font-size:14px;
-  line-height:1.65;
-  color:var(--ink-mid);
-}
+/* COUCHES */
 
-/* couches */
-
-.couche-header{
-  padding:18px 16px 14px;
-  border-bottom:1px solid rgba(15,28,42,.08);
-}
-
-.theory-card,
-.couche-card{
-  background:rgba(255,255,255,.84);
-  border:1px solid rgba(15,28,42,.08);
-  border-radius:18px;
+.layer-card{
+  background:rgba(255,253,248,.9);
+  border:1px solid var(--line);
+  border-radius:20px;
   padding:18px;
-  box-shadow:var(--shadow);
   margin-top:16px;
+  box-shadow:var(--shadow);
 }
 
-.theory-card p{
-  font-size:13px;
-  line-height:1.7;
-  color:var(--ink-mid);
-}
-
-.couche-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:26px;
-  margin-bottom:8px;
-}
-
-.couche-label{
+.layer-label{
   font-size:9px;
   letter-spacing:.2em;
   text-transform:uppercase;
-  color:var(--ink-soft);
-  font-weight:700;
+  color:var(--muted);
+  font-weight:800;
   margin-bottom:4px;
 }
 
-/* nav */
+.layer-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:27px;
+  line-height:1.05;
+  margin-bottom:8px;
+}
 
-.global-nav{
+.layer-card p{
+  font-size:14px;
+  line-height:1.65;
+  color:#2f4152;
+}
+
+/* NAV UNIQUE */
+
+.nav{
   position:fixed;
-  bottom:0;
   left:50%;
+  bottom:0;
   transform:translateX(-50%);
   width:100%;
   max-width:430px;
+  z-index:20;
   display:flex;
-  background:rgba(246,243,237,.96);
-  backdrop-filter:blur(14px);
-  border-top:1px solid rgba(15,28,42,.08);
-  padding:8px 0 16px;
-  z-index:50;
+  padding:8px 0 15px;
+  background:rgba(246,242,234,.94);
+  backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);
 }
 
-.nav-btn{
+.nav button{
   flex:1;
   border:none;
   background:none;
-  color:var(--ink-soft);
-  opacity:.55;
   display:flex;
   flex-direction:column;
   align-items:center;
   gap:3px;
+  color:var(--muted);
+  opacity:.55;
 }
 
-.nav-btn.active{
-  opacity:1;
+.nav button.active{
   color:var(--ink);
+  opacity:1;
 }
 
 .nav-icon{
-  font-size:18px;
+  font-size:20px;
 }
 
 .nav-label{
   font-size:8px;
-  letter-spacing:.1em;
+  letter-spacing:.12em;
   text-transform:uppercase;
-  font-weight:700;
+  font-weight:800;
 }
 
 @media(max-height:700px){
-  .home-banner{display:none}
-  .title{font-size:26px}
+  .banner{
+    display:none;
+  }
+
+  .title{
+    font-size:28px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- HOME -->
+<!-- ACCUEIL -->
 
-<div id="home" class="screen active">
-  <div class="home-header">
-    <div class="eyebrow">Guide clinique · Équithérapie</div>
-    <div class="title">Boussole des <em>Résonances</em></div>
-    <div class="subtitle">
-      Touchez une direction pour guider l’observation.
-    </div>
-  </div>
+<main id="home" class="screen active">
+  <header class="hero">
+    <div class="kicker">Guide clinique · Équithérapie</div>
+    <h1 class="title">Boussole des <em>Résonances</em></h1>
+    <p class="subtitle">Un repère simple pour observer, ressentir et ajuster la séance.</p>
+  </header>
 
-  <div class="home-banner">
+  <section class="banner">
     <img
       src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/refs/heads/master/equiboussole/christie.jpg"
       alt="Équithérapie"
       onerror="this.parentNode.style.display='none'"
     />
-  </div>
+    <div class="banner-caption">Observer · Ressentir · Ajuster</div>
+  </section>
 
-  <div class="compass-wrap">
+  <section class="compass-area">
     <div class="compass-box">
       <svg viewBox="0 0 320 340" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <radialGradient id="g-tech">
+          <radialGradient id="tech">
             <stop offset="0%" stop-color="#bdd4e4"/>
-            <stop offset="100%" stop-color="#cce0ee" stop-opacity=".45"/>
+            <stop offset="100%" stop-color="#cce0ee" stop-opacity=".42"/>
           </radialGradient>
 
-          <radialGradient id="g-morph">
+          <radialGradient id="morph">
             <stop offset="0%" stop-color="#7ab8a2"/>
             <stop offset="100%" stop-color="#5a9e88"/>
           </radialGradient>
 
-          <radialGradient id="g-semi">
+          <radialGradient id="semi">
             <stop offset="0%" stop-color="#e8a060"/>
             <stop offset="100%" stop-color="#d48848"/>
           </radialGradient>
 
-          <radialGradient id="g-onto">
+          <radialGradient id="onto">
             <stop offset="0%" stop-color="#f7efd4"/>
             <stop offset="100%" stop-color="#eedea8"/>
           </radialGradient>
 
-          <filter id="soft-shadow">
-            <feDropShadow dx="0" dy="3" stdDeviation="7" flood-color="#1a2c40" flood-opacity=".08"/>
+          <filter id="shadow">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#111d2a" flood-opacity=".08"/>
           </filter>
         </defs>
 
-        <circle class="ring-tech" cx="160" cy="170" r="148" fill="url(#g-tech)" filter="url(#soft-shadow)" opacity=".8"/>
-        <circle class="ring-morph" cx="160" cy="170" r="108" fill="url(#g-morph)" opacity=".85"/>
-        <circle class="ring-semi" cx="160" cy="170" r="72" fill="url(#g-semi)" opacity=".92"/>
+        <circle cx="160" cy="170" r="148" fill="url(#tech)" filter="url(#shadow)" opacity=".86"/>
+        <circle cx="160" cy="170" r="108" fill="url(#morph)" opacity=".86"/>
+        <circle cx="160" cy="170" r="72" fill="url(#semi)" opacity=".92"/>
 
-        <g class="core-breathe">
-          <circle cx="160" cy="170" r="37" fill="url(#g-onto)"/>
-          <circle cx="160" cy="170" r="37" fill="none" stroke="#c9a84c" stroke-width="1.7" opacity=".55"/>
+        <g class="core">
+          <circle cx="160" cy="170" r="37" fill="url(#onto)"/>
+          <circle cx="160" cy="170" r="37" fill="none" stroke="#c9a84c" stroke-width="1.7" opacity=".6"/>
         </g>
 
         <text class="ring-label" x="160" y="98" text-anchor="middle" font-size="14">Technose</text>
@@ -491,39 +510,368 @@ svg{
         <text class="core-label" x="160" y="175" text-anchor="middle" font-size="15">Ontose</text>
 
         <line x1="160" y1="22" x2="160" y2="58" stroke="var(--nord)" stroke-width="1.5"/>
-        <circle cx="160" cy="24" r="3.5" fill="var(--nord)"/>
+        <circle cx="160" cy="24" r="3.6" fill="var(--nord)"/>
 
         <line x1="160" y1="282" x2="160" y2="318" stroke="var(--sud)" stroke-width="1.5"/>
-        <circle cx="160" cy="316" r="3.5" fill="var(--sud)"/>
+        <circle cx="160" cy="316" r="3.6" fill="var(--sud)"/>
 
         <line x1="12" y1="170" x2="52" y2="170" stroke="var(--ouest)" stroke-width="1.5"/>
-        <circle cx="14" cy="170" r="3.5" fill="var(--ouest)"/>
+        <circle cx="14" cy="170" r="3.6" fill="var(--ouest)"/>
 
         <line x1="268" y1="170" x2="308" y2="170" stroke="var(--est)" stroke-width="1.5"/>
-        <circle cx="306" cy="170" r="3.5" fill="var(--est)"/>
+        <circle cx="306" cy="170" r="3.6" fill="var(--est)"/>
 
-        <g class="tap-label" onclick="openDir('nord')">
+        <g class="tap-zone" onclick="openDir('nord')">
           <rect x="90" y="0" width="140" height="58" fill="transparent"/>
           <text class="axis-title" x="160" y="13" text-anchor="middle" fill="var(--nord)">TEMPS</text>
           <text class="axis-sub" x="160" y="30" text-anchor="middle" fill="var(--nord)">Rythme</text>
         </g>
 
-        <g class="tap-label" onclick="openDir('sud')">
+        <g class="tap-zone" onclick="openDir('sud')">
           <rect x="90" y="284" width="140" height="56" fill="transparent"/>
           <text class="axis-title" x="160" y="301" text-anchor="middle" fill="var(--sud)">ANCRAGE</text>
           <text class="axis-sub" x="160" y="318" text-anchor="middle" fill="var(--sud)">Corps</text>
         </g>
 
-        <g class="tap-label" onclick="openDir('ouest')">
+        <g class="tap-zone" onclick="openDir('ouest')">
           <rect x="0" y="140" width="74" height="60" fill="transparent"/>
           <text class="axis-title" x="40" y="160" text-anchor="middle" fill="var(--ouest)">HUMILITÉ</text>
           <text class="axis-sub" x="40" y="177" text-anchor="middle" fill="var(--ouest)">Cheval</text>
         </g>
 
-        <g class="tap-label" onclick="openDir('est')">
+        <g class="tap-zone" onclick="openDir('est')">
           <rect x="246" y="140" width="74" height="60" fill="transparent"/>
           <text class="axis-title" x="280" y="160" text-anchor="middle" fill="var(--est)">ESPACE</text>
-          <text class="axis-sub" x="280" y="177" text-anchor="middle" fill="var(--est)">Distance</
+          <text class="axis-sub" x="280" y="177" text-anchor="middle" fill="var(--est)">Distance</text>
+        </g>
 
+        <g onclick="showScreen('layers')">
+          <circle cx="160" cy="170" r="40" fill="transparent"/>
+        </g>
+      </svg>
+    </div>
+  </section>
 
-  
+  <footer class="credits">
+    Emmanuelle Tizon · Claire Jarnoux · Pierre-Henri Garnier<br>
+    <a href="https://emmanuelletizon.zici.fr/" target="_blank">emmanuelletizon.zici.fr</a>
+  </footer>
+</main>
+
+<!-- DÉTAIL -->
+
+<section id="detail" class="screen">
+  <header class="detail-header">
+    <button class="back" onclick="showScreen('home')">←</button>
+
+    <div class="detail-title">
+      <div id="detail-cardinal" class="detail-cardinal"></div>
+      <div id="detail-name" class="detail-name"></div>
+    </div>
+
+    <div id="detail-bar" class="detail-bar"></div>
+  </header>
+
+  <div id="detail-content" class="scroll"></div>
+</section>
+
+<!-- COUCHES -->
+
+<section id="layers" class="screen">
+  <header class="hero">
+    <div class="kicker">Modèle des Résonances</div>
+    <h2 class="title">Les <em>4 couches</em></h2>
+    <p class="subtitle">Une grille courte pour lire ce qui agit dans la séance.</p>
+  </header>
+
+  <div id="layers-content" class="scroll"></div>
+</section>
+
+<!-- NAV UNIQUE -->
+
+<nav class="nav">
+  <button id="nav-home" class="active" onclick="showScreen('home')">
+    <span class="nav-icon">⊙</span>
+    <span class="nav-label">Boussole</span>
+  </button>
+
+  <button id="nav-layers" onclick="showScreen('layers')">
+    <span class="nav-icon">◎</span>
+    <span class="nav-label">Couches</span>
+  </button>
+</nav>
+
+<script>
+const DIRS = {
+  nord:{
+    cardinal:'Nord · Temps',
+    name:'Le Rythme',
+    color:'#2e5f85',
+    intro:'Observer le tempo de la séance : agitation, ralentissement, pause, synchronisation.',
+    obs:['pas du cheval','respiration','ralentissement','agitation','pause','synchronisation'],
+    questions:[
+      'Faut-il ralentir ?',
+      'Le cheval régule-t-il déjà ?',
+      'Quel rythme domine ?'
+    ],
+    lecture:'Le rythme révèle souvent l’état interne avant les mots. Il aide à ajuster la séance sans forcer.'
+  },
+
+  est:{
+    cardinal:'Est · Espace',
+    name:'Les Distances',
+    color:'#337560',
+    intro:'Observer comment la relation prend place : proche, loin, évitée, recherchée.',
+    obs:['approche','évitement','distance','contact','orientation','place'],
+    questions:[
+      'Quelle distance est supportable ?',
+      'Qui s’ajuste à qui ?',
+      'L’espace ouvre-t-il la relation ?'
+    ],
+    lecture:'La distance avec le cheval parle souvent de la relation. Elle montre ce qui est possible ici et maintenant.'
+  },
+
+  sud:{
+    cardinal:'Sud · Ancrage',
+    name:'Corps & Présence',
+    color:'#a65424',
+    intro:'Observer le corps : respiration, tonus, posture, appuis, toucher.',
+    obs:['souffle','tonus','posture','appuis','toucher','voix'],
+    questions:[
+      'Le corps est-il présent ?',
+      'Y a-t-il trop d’activation ?',
+      'Le contact régule-t-il quelque chose ?'
+    ],
+    lecture:'Le cheval répond au corps. Il rend visible ce qui se joue avant l’explication.'
+  },
+
+  ouest:{
+    cardinal:'Ouest · Humilité',
+    name:'Le Cheval informe',
+    color:'#55448c',
+    intro:'Observer ce que le cheval montre : approche, retrait, tension, curiosité, immobilité.',
+    obs:['rapprochement','retrait','tension','curiosité','immobilité','micro-ajustements'],
+    questions:[
+      'Que dit le cheval ?',
+      'Est-ce que je force quelque chose ?',
+      'Que dois-je ajuster ?'
+    ],
+    lecture:'Le cheval n’est pas un outil. Il informe la séance par ses réponses corporelles et relationnelles.'
+  }
+};
+
+const LAYERS = [
+  {
+    label:'Le cadre',
+    name:'Technose',
+    text:'Ce qui contient la rencontre : lieu, règles, objets, météo, thérapeute, consignes.',
+    tags:['cadre','milieu','outils','sécurité','présence'],
+    question:'Le cadre soutient-il la rencontre ?'
+  },
+  {
+    label:'Le corps',
+    name:'Morphose',
+    text:'Ce qui change dans le vivant : souffle, rythme, posture, tonus, mouvement.',
+    tags:['rythme','souffle','tonus','posture','mouvement'],
+    question:'Qu’est-ce qui bouge dans le corps ?'
+  },
+  {
+    label:'Le sens',
+    name:'Sémiose',
+    text:'Ce qui prend sens : images, mots, métaphores, projections, récits.',
+    tags:['mots','images','métaphores','récit','projection'],
+    question:'Qu’est-ce que cela raconte ?'
+  },
+  {
+    label:'Le noyau',
+    name:'Ontose',
+    text:'Ce qui change dans la manière d’être : confiance, agentivité, posture existentielle.',
+    tags:['confiance','agentivité','je peux','place','transformation'],
+    question:'Qu’est-ce qui change dans sa manière d’être ?'
+  }
+];
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.classList.remove('active');
+  });
+
+  document.getElementById(id).classList.add('active');
+
+  document.querySelectorAll('.nav button').forEach(button => {
+    button.classList.remove('active');
+  });
+
+  if(id === 'home' || id === 'detail'){
+    document.getElementById('nav-home').classList.add('active');
+  }
+
+  if(id === 'layers'){
+    document.getElementById('nav-layers').classList.add('active');
+  }
+}
+
+function openDir(dir){
+  const data = DIRS[dir];
+
+  document.getElementById('detail-cardinal').textContent = data.cardinal;
+  document.getElementById('detail-name').textContent = data.name;
+  document.getElementById('detail-bar').style.background = data.color;
+
+  document.getElementById('detail-content').innerHTML = `
+    <section class="section">
+      <div class="section-head">Repère</div>
+      <p class="lead">${data.intro}</p>
+    </section>
+
+    <section class="section">
+      <div class="section-head">Observer</div>
+      <div class="chips">
+        ${data.obs.map(item => `<span class="chip">${item}</span>`).join('')}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">Se demander</div>
+      ${data.questions.map(q => `<div class="question">${q}</div>`).join('')}
+    </section>
+
+    <section class="section">
+      <div class="section-head">Lecture clinique</div>
+      <div class="card">
+        <p>${data.lecture}</p>
+      </div>
+    </section>
+  `;
+
+  showScreen('detail');
+}
+
+function renderLayers(){
+  const intro = `
+    <article class="layer-card">
+      <div class="layer-label">Repère pratique</div>
+      <h3 class="layer-title">Lire une séance</h3>
+      <p>
+        La boussole aide à repérer quatre niveaux :
+        le cadre, le corps, le sens, puis la transformation de la manière d’être.
+      </p>
+    </article>
+  `;
+
+  const cards = LAYERS.map(layer => `
+    <article class="layer-card">
+      <div class="layer-label">${layer.label}</div>
+      <h3 class="layer-title">${layer.name}</h3>
+      <p>${layer.text}</p>
+
+      <div class="chips" style="margin-top:14px;margin-bottom:14px;">
+        ${layer.tags.map(tag => `<span class="chip">${tag}</span>`).join('')}
+      </div>
+
+      <div class="question">${layer.question}</div>
+    </article>
+  `).join('');
+
+  document.getElementById('layers-content').innerHTML = intro + cards;
+}
+
+/* ZOOM GLOBAL */
+
+let scale = 1;
+let lastScale = 1;
+let posX = 0;
+let posY = 0;
+let startX = 0;
+let startY = 0;
+let startDist = 0;
+let panning = false;
+let lastTap = 0;
+
+function distance(touches){
+  return Math.hypot(
+    touches[0].clientX - touches[1].clientX,
+    touches[0].clientY - touches[1].clientY
+  );
+}
+
+function applyZoom(){
+  scale = Math.min(Math.max(1, scale), 3);
+
+  if(scale <= 1.02){
+    scale = 1;
+    posX = 0;
+    posY = 0;
+  }
+
+  const maxX = (scale - 1) * window.innerWidth * .5;
+  const maxY = (scale - 1) * window.innerHeight * .5;
+
+  posX = Math.min(Math.max(posX, -maxX), maxX);
+  posY = Math.min(Math.max(posY, -maxY), maxY);
+
+  document.body.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+}
+
+function resetZoom(){
+  scale = 1;
+  posX = 0;
+  posY = 0;
+  applyZoom();
+}
+
+document.addEventListener('touchstart', event => {
+  if(event.touches.length === 2){
+    event.preventDefault();
+    startDist = distance(event.touches);
+    lastScale = scale;
+    panning = false;
+    return;
+  }
+
+  if(event.touches.length === 1){
+    const now = Date.now();
+
+    if(now - lastTap < 280){
+      resetZoom();
+      lastTap = 0;
+      return;
+    }
+
+    lastTap = now;
+
+    if(scale > 1){
+      panning = true;
+      startX = event.touches[0].clientX - posX;
+      startY = event.touches[0].clientY - posY;
+    }
+  }
+},{passive:false});
+
+document.addEventListener('touchmove', event => {
+  if(event.touches.length === 2){
+    event.preventDefault();
+    scale = lastScale * (distance(event.touches) / startDist);
+    applyZoom();
+    return;
+  }
+
+  if(event.touches.length === 1 && panning && scale > 1){
+    event.preventDefault();
+    posX = event.touches[0].clientX - startX;
+    posY = event.touches[0].clientY - startY;
+    applyZoom();
+  }
+},{passive:false});
+
+document.addEventListener('touchend', () => {
+  panning = false;
+});
+
+document.addEventListener('dblclick', resetZoom);
+
+renderLayers();
+</script>
+
+</body>
+</html>
