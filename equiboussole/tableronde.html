@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boussole d'Équithérapie — Épurée</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        [contenteditable="true"]:focus {
+            outline: none;
+            background-color: rgba(0,0,0,0.03);
+            border-radius: 4px;
+        }
+        .dark [contenteditable="true"]:focus {
+            background-color: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 min-h-screen selection:bg-neutral-200 dark:selection:bg-neutral-800">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-neutral-100 dark:border-neutral-900">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span class="text-xs tracking-widest uppercase font-bold text-neutral-400 dark:text-neutral-500">
+                L'Équithérapie du Vivant — Boussole
+            </span>
+            <div class="flex items-center gap-6 text-xs">
+                <button onclick="toggleDarkMode()" class="font-medium text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors" title="Changer le thème">
+                    ☀️/🌙 Thème
+                </button>
+                <button onclick="resetToDefault()" class="font-medium text-neutral-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors" title="Réinitialiser toutes les données">
+                    Réinitialiser
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 pt-32 pb-40">
+        
+        <!-- Questions / Concepts List -->
+        <div id="questions-feed" class="space-y-20">
+            <!-- Programmatically injected sections with flawless contrast -->
+        </div>
+
+    </main>
+
+    <!-- Subobtrusive alert notification at bottom -->
+    <div id="toast" class="fixed bottom-8 right-8 px-4 py-2 bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-xs font-mono rounded-lg opacity-0 pointer-events-none transition-all duration-300 shadow-xl">
+        Action validée
+    </div>
+
+    <script>
+        // Data optimized for projection: fewer, shorter and high-impact keywords
+        const DEFAULT_DATA = [
+            {
+                id: "sec1",
+                num: "01",
+                icon: "👥",
+                title: "Partir du réel",
+                subtitle: "Vignette clinique : une famille en impasse",
+                keywords: [
+                    "Famille en impasse",
+                    "Observation brute",
+                    "Ici et maintenant"
+                ]
+            },
+            {
+                id: "sec2",
+                num: "02",
+                icon: "❓",
+                title: "Qu’est-ce qui agit vraiment ?",
+                subtitle: "Question d'ouverture et d'observation",
+                keywords: [
+                    "Le cheval ?",
+                    "Le cadre ?",
+                    "Le corps ?",
+                    "Le lien ?",
+                    "Le vivant ?",
+                    "Pas d'interprétation",
+                    "Expérience d'abord"
+                ]
+            },
+            {
+                id: "sec3",
+                num: "03",
+                icon: "🌱",
+                title: "Accepter l’incertitude",
+                subtitle: "Le vivant ne suit pas de protocole",
+                keywords: [
+                    "Imprévisibilité",
+                    "Incertitude",
+                    "Ambiguïté",
+                    "Émergence"
+                ]
+            },
+            {
+                id: "sec4",
+                num: "04",
+                icon: "🕸️",
+                title: "Du dispositif au milieu vivant",
+                subtitle: "Déplacer le regard clinique",
+                keywords: [
+                    "Rythmes & distances",
+                    "Résonance",
+                    "Co-régulation",
+                    "Champ relationnel",
+                    "Milieu vivant",
+                    "Écologie relationnelle"
+                ]
+            },
+            {
+                id: "sec5",
+                num: "05",
+                icon: "⚓",
+                title: "Où agit le praticien ?",
+                subtitle: "Notre réelle prise sur la séance",
+                keywords: [
+                    "Temps (tempo)",
+                    "Espace (géographie)",
+                    "Humilité (non-savoir)",
+                    "Ancrage (présence)"
+                ]
+            },
+            {
+                id: "sec6",
+                num: "06",
+                icon: "🧭",
+                title: "La boussole d’équithérapie",
+                subtitle: "Une orientation simple pour s'accompagner",
+                keywords: [
+                    "Temps",
+                    "Espace",
+                    "Ancrage",
+                    "Humilité",
+                    "Sécurité intérieure",
+                    "Sécurité relationnelle"
+                ]
+            }
+        ];
+
+        let appData = [];
+
+        function initApp() {
+            const saved = localStorage.getItem('equi_pro_data_v2');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch(e) {
+                    appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                }
+            } else {
+                appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            }
+
+            if (localStorage.getItem('equi_pro_dark') === 'true') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            render();
+        }
+
+        function saveState() {
+            localStorage.setItem('equi_pro_data_v2', JSON.stringify(appData));
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('opacity-0');
+            t.classList.add('opacity-100');
+            setTimeout(() => {
+                t.classList.remove('opacity-100');
+                t.classList.add('opacity-0');
+            }, 1800);
+        }
+
+        function render() {
+            const container = document.getElementById('questions-feed');
+            container.innerHTML = '';
+
+            appData.forEach((sec, secIdx) => {
+                const sectionEl = document.createElement('section');
+                sectionEl.className = "group border-b border-neutral-100 dark:border-neutral-900 pb-12 last:border-0";
+
+                let html = `
+                    <div class="mb-6 space-y-1">
+                        <div class="flex items-start gap-4">
+                            <span class="text-sm font-mono font-semibold text-neutral-400 dark:text-neutral-600 pt-2">${sec.num}</span>
+                            <div class="space-y-0.5">
+                                <h2 contenteditable="true" 
+                                    onblur="updateTitle(${secIdx}, this.innerText)" 
+                                    class="text-2xl font-bold tracking-tight text-neutral-950 dark:text-white leading-tight cursor-text hover:bg-neutral-50 dark:hover:bg-neutral-900/50 p-1 rounded transition-all">
+                                    <span class="mr-2">${sec.icon}</span>${escapeHTML(sec.title)}
+                                </h2>
+                                <p contenteditable="true" 
+                                   onblur="updateSubtitle(${secIdx}, this.innerText)" 
+                                   class="text-xs font-medium text-neutral-500 dark:text-neutral-400 italic cursor-text hover:bg-neutral-50 dark:hover:bg-neutral-900/50 p-1 rounded inline-block transition-all">
+                                    ${escapeHTML(sec.subtitle)}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pl-12 flex flex-wrap gap-2 items-center">
+                `;
+
+                if (sec.keywords && sec.keywords.length > 0) {
+                    sec.keywords.forEach((keyword, kwIdx) => {
+                        html += `
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 rounded-full transition-all hover:bg-neutral-200 dark:hover:bg-neutral-800">
+                                <span>${escapeHTML(keyword)}</span>
+                                <button onclick="deleteKeyword(${secIdx}, ${kwIdx})" 
+                                    class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all" 
+                                    title="Supprimer">
+                                    &times;
+                                </button>
+                            </span>
+                        `;
+                    });
+                }
+
+                html += `
+                        <div class="inline-flex items-center ml-1">
+                            <input type="text" id="input-${sec.id}" 
+                                placeholder="+ Ajouter..." 
+                                class="w-24 focus:w-36 bg-transparent border-b border-dashed border-neutral-300 dark:border-neutral-700 py-0.5 text-xs text-neutral-500 dark:text-neutral-500 focus:text-neutral-950 dark:focus:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:border-neutral-900 dark:focus:border-neutral-300 focus:outline-none transition-all"
+                                onkeydown="if(event.key === 'Enter') addKeyword(${secIdx})">
+                        </div>
+                    </div>
+                `;
+
+                sectionEl.innerHTML = html;
+                container.appendChild(sectionEl);
+            });
+        }
+
+        function updateTitle(secIdx, newText) {
+            const cleaned = newText.trim();
+            if (cleaned && cleaned !== appData[secIdx].title) {
+                appData[secIdx].title = cleaned;
+                saveState();
+                showToast("Titre mis à jour");
+            }
+        }
+
+        function updateSubtitle(secIdx, newText) {
+            const cleaned = newText.trim();
+            if (cleaned !== appData[secIdx].subtitle) {
+                appData[secIdx].subtitle = cleaned;
+                saveState();
+                showToast("Description mise à jour");
+            }
+        }
+
+        function addKeyword(secIdx) {
+            const sec = appData[secIdx];
+            const input = document.getElementById(`input-${sec.id}`);
+            const text = input.value.trim();
+
+            if (text === "") return;
+
+            sec.keywords.push(text);
+            saveState();
+            render();
+            showToast("Concept ajouté");
+            
+            const nextInput = document.getElementById(`input-${sec.id}`);
+            if (nextInput) {
+                nextInput.focus();
+                nextInput.classList.add('w-36');
+            }
+        }
+
+        function deleteKeyword(secIdx, kwIdx) {
+            const sec = appData[secIdx];
+            if (sec && sec.keywords) {
+                sec.keywords.splice(kwIdx, 1);
+                saveState();
+                render();
+                showToast("Concept retiré");
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('equi_pro_dark', isDark ? 'true' : 'false');
+        }
+
+        function resetToDefault() {
+            if (confirm("Voulez-vous restaurer les mots-clés d'origine ? Toutes vos modifications personnalisées seront effacées.")) {
+                appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+                saveState();
+                render();
+                showToast("Boussole restaurée");
+            }
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
