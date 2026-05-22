@@ -33,6 +33,10 @@
         .dark [contenteditable="true"]:focus {
             background-color: rgba(255,255,255,0.05);
         }
+        /* Transition fluide pour l'accordéon */
+        .accordion-content {
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+        }
     </style>
 </head>
 <body class="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100 min-h-screen selection:bg-neutral-200 dark:selection:bg-neutral-800">
@@ -40,35 +44,38 @@
     <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-neutral-100 dark:border-neutral-900">
         <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
             <span class="text-xs tracking-widest uppercase font-bold text-neutral-400 dark:text-neutral-500">
-                L'Équithérapie du Vivant — Boussole
+                L'Équithérapie du Vivant
             </span>
             <div class="flex items-center gap-6 text-xs">
+                <button onclick="toggleAll(true)" class="font-medium text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                    Déplier tout
+                </button>
+                <button onclick="toggleAll(false)" class="font-medium text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors">
+                    Replier tout
+                </button>
                 <button onclick="toggleDarkMode()" class="font-medium text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white transition-colors" title="Changer le thème">
                     ☀️/🌙 Thème
                 </button>
-                <button onclick="resetToDefault()" class="font-medium text-neutral-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors" title="Réinitialiser toutes les données">
+                <button id="btn-reset" onclick="triggerReset()" class="font-medium text-neutral-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors">
                     Réinitialiser
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-6 pt-32 pb-40">
-        
-        <!-- Questions / Concepts List -->
-        <div id="questions-feed" class="space-y-20">
-            <!-- Programmatically injected sections with flawless contrast -->
+    <main class="max-w-4xl mx-auto px-6 pt-28 pb-40">
+        <!-- Accordion Feed -->
+        <div id="questions-feed" class="space-y-4">
+            <!-- Programmatically injected accordion items -->
         </div>
-
     </main>
 
     <!-- Subobtrusive alert notification at bottom -->
-    <div id="toast" class="fixed bottom-8 right-8 px-4 py-2 bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-xs font-mono rounded-lg opacity-0 pointer-events-none transition-all duration-300 shadow-xl">
+    <div id="toast" class="fixed bottom-8 right-8 px-4 py-2 bg-neutral-950 text-white dark:bg-white dark:text-neutral-950 text-xs font-mono rounded-lg opacity-0 pointer-events-none transition-all duration-300 shadow-xl z-50">
         Action validée
     </div>
 
     <script>
-        // Data optimized for projection: fewer, shorter and high-impact keywords
         const DEFAULT_DATA = [
             {
                 id: "sec1",
@@ -76,6 +83,7 @@
                 icon: "👥",
                 title: "Partir du réel",
                 subtitle: "Vignette clinique : une famille en impasse",
+                expanded: true,
                 keywords: [
                     "Famille en impasse",
                     "Observation brute",
@@ -87,13 +95,13 @@
                 num: "02",
                 icon: "❓",
                 title: "Qu’est-ce qui agit vraiment ?",
-                subtitle: "Question d'ouverture et d'observation",
+                subtitle: "Question d'ouverture et d'observation clinique",
+                expanded: false,
                 keywords: [
                     "Le cheval ?",
                     "Le cadre ?",
                     "Le corps ?",
                     "Le lien ?",
-                    "Le vivant ?",
                     "Pas d'interprétation",
                     "Expérience d'abord"
                 ]
@@ -103,12 +111,13 @@
                 num: "03",
                 icon: "🌱",
                 title: "Accepter l’incertitude",
-                subtitle: "Le vivant ne suit pas de protocole",
+                subtitle: "Le vivant ne suit pas de protocole pré-établi",
+                expanded: false,
                 keywords: [
                     "Imprévisibilité",
                     "Incertitude",
                     "Ambiguïté",
-                    "Émergence"
+                    "Émergence clinique"
                 ]
             },
             {
@@ -116,14 +125,14 @@
                 num: "04",
                 icon: "🕸️",
                 title: "Du dispositif au milieu vivant",
-                subtitle: "Déplacer le regard clinique",
+                subtitle: "Déplacer le regard vers l'écologie relationnelle",
+                expanded: false,
                 keywords: [
                     "Rythmes & distances",
                     "Résonance",
                     "Co-régulation",
                     "Champ relationnel",
-                    "Milieu vivant",
-                    "Écologie relationnelle"
+                    "Milieu vivant"
                 ]
             },
             {
@@ -131,7 +140,8 @@
                 num: "05",
                 icon: "⚓",
                 title: "Où agit le praticien ?",
-                subtitle: "Notre réelle prise sur la séance",
+                subtitle: "Nos réels points d'appui et leviers durant la séance",
+                expanded: false,
                 keywords: [
                     "Temps (tempo)",
                     "Espace (géographie)",
@@ -144,7 +154,8 @@
                 num: "06",
                 icon: "🧭",
                 title: "La boussole d’équithérapie",
-                subtitle: "Une orientation simple pour s'accompagner",
+                subtitle: "Une orientation simple pour s'accompagner soi-même",
+                expanded: false,
                 keywords: [
                     "Temps",
                     "Espace",
@@ -157,9 +168,10 @@
         ];
 
         let appData = [];
+        let isResetPending = false;
 
         function initApp() {
-            const saved = localStorage.getItem('equi_pro_data_v2');
+            const saved = localStorage.getItem('equi_pro_accordion_v1');
             if (saved) {
                 try {
                     appData = JSON.parse(saved);
@@ -180,7 +192,7 @@
         }
 
         function saveState() {
-            localStorage.setItem('equi_pro_data_v2', JSON.stringify(appData));
+            localStorage.setItem('equi_pro_accordion_v1', JSON.stringify(appData));
         }
 
         function showToast(msg) {
@@ -194,34 +206,67 @@
             }, 1800);
         }
 
+        function toggleSection(idx, event) {
+            // Empêcher l'ouverture/fermeture si l'utilisateur clique sur un élément éditable ou un bouton de suppression
+            if (event.target.closest('[contenteditable="true"]') || 
+                event.target.closest('.delete-kw-btn') || 
+                event.target.closest('.input-add-kw')) {
+                return;
+            }
+            appData[idx].expanded = !appData[idx].expanded;
+            saveState();
+            render();
+        }
+
+        function toggleAll(shouldExpand) {
+            appData.forEach(sec => sec.expanded = shouldExpand);
+            saveState();
+            render();
+            showToast(shouldExpand ? "Toutes les sections sont dépliées" : "Toutes les sections sont repliées");
+        }
+
         function render() {
             const container = document.getElementById('questions-feed');
             container.innerHTML = '';
 
             appData.forEach((sec, secIdx) => {
-                const sectionEl = document.createElement('section');
-                sectionEl.className = "group border-b border-neutral-100 dark:border-neutral-900 pb-12 last:border-0";
+                const sectionEl = document.createElement('div');
+                sectionEl.className = "border-b border-neutral-100 dark:border-neutral-900 py-3 last:border-0";
 
+                // Création du bloc d'en-tête (cliquable pour déplier)
                 let html = `
-                    <div class="mb-6 space-y-1">
-                        <div class="flex items-start gap-4">
-                            <span class="text-sm font-mono font-semibold text-neutral-400 dark:text-neutral-600 pt-2">${sec.num}</span>
-                            <div class="space-y-0.5">
+                    <div onclick="toggleSection(${secIdx}, event)" class="flex items-center justify-between py-3 cursor-pointer group hover:bg-neutral-50 dark:hover:bg-neutral-900/30 px-3 rounded-lg transition-all duration-150">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-mono font-bold text-neutral-400 dark:text-neutral-600">${sec.num}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">${sec.icon}</span>
                                 <h2 contenteditable="true" 
                                     onblur="updateTitle(${secIdx}, this.innerText)" 
-                                    class="text-2xl font-bold tracking-tight text-neutral-950 dark:text-white leading-tight cursor-text hover:bg-neutral-50 dark:hover:bg-neutral-900/50 p-1 rounded transition-all">
-                                    <span class="mr-2">${sec.icon}</span>${escapeHTML(sec.title)}
+                                    class="text-lg font-bold tracking-tight text-neutral-900 dark:text-white cursor-text focus:bg-neutral-100 dark:focus:bg-neutral-800 p-1 rounded transition-all">
+                                    ${escapeHTML(sec.title)}
                                 </h2>
-                                <p contenteditable="true" 
-                                   onblur="updateSubtitle(${secIdx}, this.innerText)" 
-                                   class="text-xs font-medium text-neutral-500 dark:text-neutral-400 italic cursor-text hover:bg-neutral-50 dark:hover:bg-neutral-900/50 p-1 rounded inline-block transition-all">
-                                    ${escapeHTML(sec.subtitle)}
-                                </p>
                             </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <!-- Indicateur d'état ultra minimaliste -->
+                            <span class="text-xs font-mono font-medium text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
+                                ${sec.expanded ? '▼' : '▲'}
+                            </span>
                         </div>
                     </div>
                     
-                    <div class="pl-12 flex flex-wrap gap-2 items-center">
+                    <!-- Conteneur Accordéon -->
+                    <div class="accordion-content overflow-hidden transition-all duration-200 ${sec.expanded ? 'max-h-[500px] opacity-100 mt-2 pb-4 pl-12 pr-4' : 'max-h-0 opacity-0 pointer-events-none'}">
+                        <div class="space-y-4">
+                            <!-- Sous-titre ou vignette -->
+                            <p contenteditable="true" 
+                               onblur="updateSubtitle(${secIdx}, this.innerText)" 
+                               class="text-xs font-medium text-neutral-500 dark:text-neutral-400 italic cursor-text hover:bg-neutral-50 dark:hover:bg-neutral-900/50 p-1 rounded inline-block transition-all">
+                                ${escapeHTML(sec.subtitle)}
+                            </p>
+                            
+                            <!-- Nuage de concepts -->
+                            <div class="flex flex-wrap gap-2 items-center">
                 `;
 
                 if (sec.keywords && sec.keywords.length > 0) {
@@ -230,7 +275,7 @@
                             <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium bg-neutral-100 text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 rounded-full transition-all hover:bg-neutral-200 dark:hover:bg-neutral-800">
                                 <span>${escapeHTML(keyword)}</span>
                                 <button onclick="deleteKeyword(${secIdx}, ${kwIdx})" 
-                                    class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all" 
+                                    class="delete-kw-btn w-4 h-4 rounded-full flex items-center justify-center text-[10px] text-neutral-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-all" 
                                     title="Supprimer">
                                     &times;
                                 </button>
@@ -240,11 +285,14 @@
                 }
 
                 html += `
-                        <div class="inline-flex items-center ml-1">
-                            <input type="text" id="input-${sec.id}" 
-                                placeholder="+ Ajouter..." 
-                                class="w-24 focus:w-36 bg-transparent border-b border-dashed border-neutral-300 dark:border-neutral-700 py-0.5 text-xs text-neutral-500 dark:text-neutral-500 focus:text-neutral-950 dark:focus:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:border-neutral-900 dark:focus:border-neutral-300 focus:outline-none transition-all"
-                                onkeydown="if(event.key === 'Enter') addKeyword(${secIdx})">
+                                <!-- Ajout intuitif de concept -->
+                                <div class="inline-flex items-center ml-1">
+                                    <input type="text" id="input-${sec.id}" 
+                                        placeholder="+ Ajouter..." 
+                                        class="input-add-kw w-24 focus:w-36 bg-transparent border-b border-dashed border-neutral-300 dark:border-neutral-700 py-0.5 text-xs text-neutral-500 dark:text-neutral-500 focus:text-neutral-950 dark:focus:text-white placeholder-neutral-400 dark:placeholder-neutral-600 focus:border-neutral-900 dark:focus:border-neutral-300 focus:outline-none transition-all"
+                                        onkeydown="if(event.key === 'Enter') addKeyword(${secIdx})">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -268,7 +316,7 @@
             if (cleaned !== appData[secIdx].subtitle) {
                 appData[secIdx].subtitle = cleaned;
                 saveState();
-                showToast("Description mise à jour");
+                showToast("Vignette mise à jour");
             }
         }
 
@@ -284,6 +332,7 @@
             render();
             showToast("Concept ajouté");
             
+            // Refocaliser le champ d'écriture pour saisie en série
             const nextInput = document.getElementById(`input-${sec.id}`);
             if (nextInput) {
                 nextInput.focus();
@@ -306,12 +355,34 @@
             localStorage.setItem('equi_pro_dark', isDark ? 'true' : 'false');
         }
 
-        function resetToDefault() {
-            if (confirm("Voulez-vous restaurer les mots-clés d'origine ? Toutes vos modifications personnalisées seront effacées.")) {
+        // Double confirmation sans boîte de dialogue native pour rester minimaliste et sans blocage
+        function triggerReset() {
+            const btn = document.getElementById('btn-reset');
+            if (!isResetPending) {
+                isResetPending = true;
+                btn.innerText = "Confirmer ?";
+                btn.classList.remove('text-neutral-400');
+                btn.classList.add('text-rose-600', 'font-bold');
+                
+                // Annuler l'état de confirmation après 3 secondes si pas de clic
+                setTimeout(() => {
+                    resetResetState();
+                }, 3000);
+            } else {
                 appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
                 saveState();
                 render();
-                showToast("Boussole restaurée");
+                resetResetState();
+                showToast("Boussole réinitialisée");
+            }
+        }
+
+        function resetResetState() {
+            isResetPending = false;
+            const btn = document.getElementById('btn-reset');
+            if (btn) {
+                btn.innerText = "Réinitialiser";
+                btn.className = "font-medium text-neutral-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors";
             }
         }
 
