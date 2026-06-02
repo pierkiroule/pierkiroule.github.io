@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L'effet papillon du patient partenaire</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --card: #ffffff;
+      --text: #242424;
+      --muted: #666;
+      --accent: #256f68;
+      --accent-soft: #e3f0ed;
+      --border: #ddd6c8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 18px 56px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--accent), #3f9a8d);
+      color: white;
+      padding: 34px 28px;
+      border-radius: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .label {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      font-size: 1.15rem;
+      max-width: 720px;
+      opacity: 0.95;
+    }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 1.35rem;
+    }
+
+    h3 {
+      margin: 18px 0 8px;
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .intro {
+      font-size: 1.08rem;
+    }
+
+    .highlight {
+      background: var(--accent-soft);
+      border-left: 5px solid var(--accent);
+      padding: 16px 18px;
+      border-radius: 14px;
+      margin-top: 12px;
+    }
+
+    .question {
+      font-weight: 700;
+      font-size: 1.08rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .mini-card {
+      background: #faf9f6;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .blank {
+      min-height: 48px;
+      border-bottom: 1px dashed #999;
+      margin-top: 12px;
+    }
+
+    .restitution {
+      background: #fff8e8;
+      border-color: #eed7a1;
+    }
+
+    .final-question {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--accent);
+      margin: 10px 0 0;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .page {
+        padding: 0;
+        max-width: none;
+      }
+
+      header,
+      section {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      header {
+        border-radius: 0;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      header,
+      section {
+        border-radius: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header>
+      <div class="label">Travail en sous-groupe · 30 minutes</div>
+      <h1>L'effet papillon du patient partenaire</h1>
+      <p class="subtitle">
+        Intégrer un patient partenaire dans un programme d'Éducation Thérapeutique du Patient.
+      </p>
+    </header>
+
+    <section>
+      <h2>Situation</h2>
+      <p class="intro">
+        Votre groupe a conçu un programme d'ETP composé de <strong>3 séances</strong>.
+      </p>
+      <p>
+        Vous apprenez aujourd'hui qu'un <strong>patient partenaire</strong> va rejoindre votre équipe.
+      </p>
+      <div class="highlight">
+        <p class="question">
+          Comme dans l'effet papillon, une petite modification peut parfois transformer tout un système.
+        </p>
+        <p>
+          Quels pourraient être les effets de son arrivée sur votre programme ?
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="step-title">
+        <span class="number">1</span>
+        <h2>Pourquoi faire appel à un patient partenaire ?</h2>
+      </div>
+      <p>Qu'espérez-vous apporter de plus grâce à sa présence ?</p>
+      <p><strong>Choisissez vos 3 attentes prioritaires.</strong></p>
+      <div class="blank"></div>
+      <div class="blank"></div>
+      <div class="blank"></div>
+    </section>
+
+    <section>
+      <div class="step-title">
+        <span class="number">2</span>
+        <h2>Quel patient partenaire recherchez-vous ?</h2>
+      </div>
+      <p>Décrivez le profil idéal pour votre programme.</p>
+      <ul>
+        <li>Quelles qualités devrait-il posséder ?</li>
+        <li>Quelles compétences ?</li>
+        <li>Quel recul sur son expérience de la maladie ?</li>
+      </ul>
+      <div class="blank"></div>
+      <div class="blank"></div>
+    </section>
+
+    <section>
+      <div class="step-title">
+        <span class="number">3</span>
+        <h2>Quelle serait sa place ?</h2>
+      </div>
+      <p>Comment pourrait-il contribuer à :</p>
+
+      <div class="grid">
+        <div class="mini-card">
+          <h3>Conception</h3>
+          <p>Comment pourrait-il enrichir la préparation du programme ?</p>
+        </div>
+        <div class="mini-card">
+          <h3>Animation</h3>
+          <p>Quelle place pourrait-il prendre dans les séances ?</p>
+        </div>
+        <div class="mini-card">
+          <h3>Évaluation</h3>
+          <p>Que pourrait-il aider à observer ou à questionner ?</p>
+        </div>
+        <div class="mini-card">
+          <h3>Amélioration</h3>
+          <p>Quels angles morts pourrait-il révéler ?</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="step-title">
+        <span class="number">4</span>
+        <h2>Quels bénéfices attendez-vous ?</h2>
+      </div>
+      <p>Identifiez les bénéfices possibles :</p>
+      <ul>
+        <li>pour les patients ;</li>
+        <li>pour l'équipe ;</li>
+        <li>pour le programme lui-même.</li>
+      </ul>
+      <div class="blank"></div>
+      <div class="blank"></div>
+    </section>
+
+    <section>
+      <div class="step-title">
+        <span class="number">5</span>
+        <h2>Quelles conditions pour réussir ce partenariat ?</h2>
+      </div>
+      <p>Identifiez :</p>
+      <ul>
+        <li>les principaux risques ou difficultés ;</li>
+        <li>les moyens de les prévenir.</li>
+      </ul>
+      <p>
+        Puis proposez <strong>5 règles essentielles</strong> pour construire une collaboration de qualité entre professionnels et patient partenaire.
+      </p>
+      <div class="blank"></div>
+      <div class="blank"></div>
+      <div class="blank"></div>
+    </section>
+
+    <section class="restitution">
+      <h2>Restitution · 5 minutes</h2>
+      <p>Votre groupe présentera :</p>
+      <ul>
+        <li><strong>Le profil recherché</strong> : qui est votre patient partenaire idéal ?</li>
+        <li><strong>Ses principales missions</strong> : que lui confiez-vous ?</li>
+        <li><strong>Les bénéfices attendus</strong> : qu'apporte-t-il de spécifique ?</li>
+        <li><strong>Les conditions de réussite</strong> : quelles règles rendent le partenariat possible ?</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Question finale</h2>
+      <p class="final-question">
+        Le patient partenaire est-il simplement un intervenant supplémentaire,
+        ou transforme-t-il la manière de concevoir, d'animer et d'évaluer un programme d'ETP ?
+      </p>
+    </section>
+  </main>
+</body>
+</html>
