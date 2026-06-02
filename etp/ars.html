@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tour de Contrôle ARS - Déclaration ETP</title>
+  <style>
+    :root {
+      --bg: #eef6ff;
+      --card: #ffffff;
+      --primary: #1e5b9a;
+      --secondary: #f2a900;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbeafe;
+      --ok: #16a34a;
+      --warn: #f59e0b;
+      --no: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #dbeafe, var(--bg));
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 980px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    header {
+      text-align: center;
+      padding: 28px 16px;
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(30, 91, 154, 0.12);
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: var(--primary);
+    }
+
+    header p {
+      margin: 10px auto 0;
+      max-width: 680px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #fff7d6;
+      color: #7c5200;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 22px rgba(30, 91, 154, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-size: 1.35rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 14px 0 6px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #f8fafc;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: 3px solid #bfdbfe;
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .radio-row label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      cursor: pointer;
+      background: #f8fafc;
+    }
+
+    .radio-row input {
+      width: auto;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 24px 0;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      color: white;
+      background: var(--primary);
+      box-shadow: 0 8px 18px rgba(30, 91, 154, 0.25);
+    }
+
+    button.secondary {
+      background: var(--secondary);
+      color: #3b2a00;
+    }
+
+    button.ghost {
+      background: #e5e7eb;
+      color: #111827;
+      box-shadow: none;
+    }
+
+    .result {
+      display: none;
+      background: #f8fafc;
+      border: 2px dashed #93c5fd;
+      border-radius: 22px;
+      padding: 20px;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .decision button {
+      box-shadow: none;
+      border-radius: 16px;
+    }
+
+    .ok {
+      background: var(--ok);
+    }
+
+    .warn {
+      background: var(--warn);
+      color: #3b2a00;
+    }
+
+    .no {
+      background: var(--no);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 30px 0 10px;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .actions,
+      .decision,
+      footer {
+        display: none;
+      }
+
+      .card,
+      header {
+        box-shadow: none;
+        border: 1px solid #ddd;
+      }
+
+      input,
+      textarea,
+      select {
+        border: none;
+        background: white;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .grid,
+      .decision {
+        grid-template-columns: 1fr;
+      }
+
+      .page {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header>
+      <div class="badge">✈️ Formation ETP 40h</div>
+      <h1>Tour de Contrôle ARS</h1>
+      <p>
+        Déclarez votre programme ETP avant embarquement des patients.
+        Objectif : obtenir l'autorisation de décollage.
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>📡 1. Identification du vol</h2>
+
+      <label>Nom du programme ETP</label>
+      <input id="nomProgramme" placeholder="Ex : Mieux vivre avec son diabète" />
+
+      <label>Maladie ou problématique concernée</label>
+      <input id="problematique" placeholder="Ex : diabète, asthme, douleur chronique..." />
+
+      <label>Objectif principal du voyage éducatif</label>
+      <textarea id="objectifPrincipal" placeholder="À la fin du programme, les patients pourront..."></textarea>
+    </section>
+
+    <section class="card">
+      <h2>👨‍✈️ 2. L'équipage</h2>
+
+      <div class="grid">
+        <div>
+          <label>Commandant de bord / coordonnateur</label>
+          <input id="coordonnateur" placeholder="Nom ou fonction" />
+        </div>
+
+        <div>
+          <label>Professionnels impliqués</label>
+          <input id="professionnels" placeholder="IDE, médecin, diététicien, psychologue..." />
+        </div>
+      </div>
+
+      <label>Un patient partenaire participe-t-il au voyage ?</label>
+      <div class="radio-row">
+        <label><input type="radio" name="patientPartenaire" value="Oui" /> Oui</label>
+        <label><input type="radio" name="patientPartenaire" value="Non" /> Non</label>
+        <label><input type="radio" name="patientPartenaire" value="À envisager" /> À envisager</label>
+      </div>
+
+      <label>Rôle du patient partenaire</label>
+      <textarea id="rolePatient" placeholder="Ex : co-animation, témoignage, aide à la conception, évaluation..."></textarea>
+    </section>
+
+    <section class="card">
+      <h2>🎫 3. Les passagers</h2>
+
+      <label>Public visé</label>
+      <textarea id="publicVise" placeholder="Ex : adultes diabétiques de type 2, adolescents asthmatiques..."></textarea>
+
+      <label>Comment connaître les besoins de chaque patient avant le départ ?</label>
+      <textarea id="bep" placeholder="Ex : bilan éducatif partagé, entretien individuel, questionnaire..."></textarea>
+    </section>
+
+    <section class="card">
+      <h2>🗺️ 4. Le plan de vol</h2>
+
+      <label>Nombre de séances prévues</label>
+      <input id="nbSeances" placeholder="Ex : 3 séances collectives + 1 entretien individuel" />
+
+      <label>Thème de la séance 1</label>
+      <input id="seance1" placeholder="Ex : Comprendre sa maladie" />
+
+      <label>Thème de la séance 2</label>
+      <input id="seance2" placeholder="Ex : Agir au quotidien" />
+
+      <label>Thème de la séance 3</label>
+      <input id="seance3" placeholder="Ex : Prévenir les situations à risque" />
+    </section>
+
+    <section class="card">
+      <h2>📊 5. Tableau de bord du pilote</h2>
+
+      <label>Activité : comment saurez-vous que le vol a bien eu lieu ?</label>
+      <textarea id="activite" placeholder="Ex : nombre de patients inclus, nombre de séances réalisées, taux de présence..."></textarea>
+
+      <label>Processus : comment saurez-vous que le voyage s'est bien déroulé ?</label>
+      <textarea id="processus" placeholder="Ex : satisfaction, coordination, participation, difficultés rencontrées..."></textarea>
+
+      <label>Effets éducatifs : comment saurez-vous que les passagers ont progressé ?</label>
+      <textarea id="effets" placeholder="Ex : compétences acquises, autonomie, confiance, objectifs personnalisés atteints..."></textarea>
+    </section>
+
+    <section class="card">
+      <h2>🛫 Décision de la Tour de Contrôle</h2>
+
+      <label>Décision</label>
+      <div class="decision">
+        <button class="ok" onclick="setDecision('Autorisation de décollage accordée ✅')">Accordée</button>
+        <button class="warn" onclick="setDecision('Autorisation accordée sous conditions ⚠️')">Sous conditions</button>
+        <button class="no" onclick="setDecision('Décollage refusé pour le moment ❌')">Refusée</button>
+      </div>
+
+      <label>Conditions ou recommandations</label>
+      <textarea id="recommandations" placeholder="Ex : préciser les objectifs éducatifs, renforcer le BEP, mieux définir les indicateurs..."></textarea>
+
+      <input id="decision" type="hidden" />
+    </section>
+
+    <div class="actions">
+      <button onclick="genererSynthese()">Générer la synthèse</button>
+      <button class="secondary" onclick="window.print()">Imprimer</button>
+      <button class="ghost" onclick="resetForm()">Réinitialiser</button>
+    </div>
+
+    <section id="resultat" class="result"></section>
+
+    <footer>
+      Outil pédagogique ludique — Formation ETP 40h
+    </footer>
+  </main>
+
+  <script>
+    function val(id) {
+      return document.getElementById(id).value.trim() || "Non renseigné";
+    }
+
+    function radioVal(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : "Non renseigné";
+    }
+
+    function setDecision(text) {
+      document.getElementById("decision").value = text;
+      alert(text);
+    }
+
+    function genererSynthese() {
+      const synthese = `
+✈️ DÉCLARATION À LA TOUR DE CONTRÔLE ARS
+
+1. IDENTIFICATION DU VOL
+Nom du programme : ${val("nomProgramme")}
+Problématique concernée : ${val("problematique")}
+Objectif principal : ${val("objectifPrincipal")}
+
+2. ÉQUIPAGE
+Coordonnateur : ${val("coordonnateur")}
+Professionnels impliqués : ${val("professionnels")}
+Patient partenaire : ${radioVal("patientPartenaire")}
+Rôle du patient partenaire : ${val("rolePatient")}
+
+3. PASSAGERS
+Public visé : ${val("publicVise")}
+Besoins des patients / BEP : ${val("bep")}
+
+4. PLAN DE VOL
+Nombre de séances : ${val("nbSeances")}
+Séance 1 : ${val("seance1")}
+Séance 2 : ${val("seance2")}
+Séance 3 : ${val("seance3")}
+
+5. TABLEAU DE BORD
+Activité - Le vol a-t-il eu lieu ?
+${val("activite")}
+
+Processus - Le voyage s'est-il bien déroulé ?
+${val("processus")}
+
+Effets éducatifs - Les passagers ont-ils progressé ?
+${val("effets")}
+
+6. DÉCISION DE LA TOUR
+${val("decision")}
+
+Recommandations :
+${val("recommandations")}
+      `.trim();
+
+      const resultat = document.getElementById("resultat");
+      resultat.textContent = synthese;
+      resultat.style.display = "block";
+      resultat.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function resetForm() {
+      if (!confirm("Réinitialiser toute la fiche ?")) return;
+
+      document.querySelectorAll("input, textarea").forEach(el => {
+        if (el.type === "radio") {
+          el.checked = false;
+        } else {
+          el.value = "";
+        }
+      });
+
+      const resultat = document.getElementById("resultat");
+      resultat.textContent = "";
+      resultat.style.display = "none";
+    }
+  </script>
+</body>
+</html>
