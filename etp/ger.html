@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mission ETP Aidants — BEP individuels</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      background: #f6f7fb;
+      color: #1f2937;
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb, #14b8a6);
+      color: white;
+      padding: 32px 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+
+    section {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h2 {
+      color: #2563eb;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .mission {
+      background: #fff7ed;
+      border-left: 6px solid #f97316;
+    }
+
+    .important {
+      background: #ecfdf5;
+      border-left: 6px solid #10b981;
+    }
+
+    .warning {
+      background: #fef2f2;
+      border-left: 6px solid #ef4444;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    textarea, input {
+      width: 100%;
+      min-height: 70px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-bottom: 14px;
+    }
+
+    input {
+      min-height: auto;
+    }
+
+    .small {
+      font-size: 0.95rem;
+      color: #4b5563;
+    }
+
+    .print-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      border: none;
+      background: #2563eb;
+      color: white;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      section {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+      }
+
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Mission ETP Aidants</h1>
+  <p>BEP individuels puis staff éducatif collectif</p>
+</header>
+
+<main>
+
+  <section class="important">
+    <span class="badge">Objectif</span>
+    <h2>But du travail</h2>
+    <p>
+      Réaliser un Bilan Éducatif Partagé individuel avec plusieurs proches aidants,
+      puis mettre en commun les informations lors d’un staff éducatif.
+    </p>
+    <p>
+      Le but final est de concevoir une action ETP pertinente pour des enfants aidants
+      dont le parent âgé est hospitalisé en gériatrie avec perspective de retour à domicile.
+    </p>
+  </section>
+
+  <section>
+    <h2>Contexte</h2>
+    <p>
+      Vous êtes dans un service de gériatrie. Plusieurs patients âgés vont prochainement rentrer à domicile.
+      Le service souhaite proposer une action éducative destinée aux enfants aidants.
+    </p>
+    <p>
+      Chaque aidant accompagne un parent différent.
+      Chaque aidant a donc sa propre situation, ses propres ressources et ses propres difficultés.
+    </p>
+  </section>
+
+  <section class="warning">
+    <h2>Point important</h2>
+    <p>
+      Il ne s’agit pas d’un BEP collectif.
+    </p>
+    <p>
+      Chaque aidant est rencontré individuellement.
+      Le staff éducatif sert ensuite à croiser les situations pour repérer les besoins communs
+      et construire une action ETP adaptée.
+    </p>
+  </section>
+
+  <section>
+    <h2>Répartition des rôles</h2>
+
+    <div class="grid">
+      <div class="card">
+        <h3>5 aidants</h3>
+        <p>
+          Chaque aidant joue l’enfant adulte d’un parent âgé hospitalisé.
+          Les situations sont improvisées.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>5 binômes BEP</h3>
+        <p>
+          Chaque binôme réalise un BEP individuel avec un aidant.
+          Chaque binôme peut inclure un professionnel et/ou un aidant partenaire formé ETP.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Observateurs</h3>
+        <p>
+          Ils observent la posture éducative, la qualité des questions,
+          la synthèse et la pertinence de l’action proposée.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mission">
+    <span class="badge">Étape 1</span>
+    <h2>Préparation des aidants — 5 minutes</h2>
+
+    <p><strong>Consigne aux aidants :</strong></p>
+    <p>
+      Vous êtes l’enfant adulte d’un parent âgé hospitalisé en gériatrie.
+      Votre parent va probablement rentrer à domicile prochainement.
+      Imaginez librement votre situation.
+    </p>
+
+    <ul>
+      <li>Qui est votre parent ?</li>
+      <li>Pourquoi est-il hospitalisé ?</li>
+      <li>Quel est son niveau d’autonomie ?</li>
+      <li>Qu’est-ce qui vous inquiète pour le retour à domicile ?</li>
+      <li>Qu’est-ce qui vous aide déjà ?</li>
+      <li>Qu’aimeriez-vous mieux comprendre ou mieux gérer ?</li>
+    </ul>
+  </section>
+
+  <section class="mission">
+    <span class="badge">Étape 2</span>
+    <h2>BEP individuel — 15 minutes</h2>
+
+    <p><strong>Consigne aux binômes BEP :</strong></p>
+    <p>
+      Vous rencontrez individuellement un aidant.
+      Votre mission est de réaliser un Bilan Éducatif Partagé.
+    </p>
+
+    <p><strong>Vous cherchez à comprendre :</strong></p>
+    <ul>
+      <li>ce que vit l’aidant ;</li>
+      <li>ce qu’il comprend de la situation ;</li>
+      <li>ce qu’il sait déjà faire ;</li>
+      <li>ce qui lui pose problème ;</li>
+      <li>ce qui l’inquiète ;</li>
+      <li>ce qui l’aide ;</li>
+      <li>ce qu’il aimerait apprendre ;</li>
+      <li>ce qui pourrait l’aider pour le retour à domicile.</li>
+    </ul>
+
+    <div class="warning">
+      <h3>Posture attendue</h3>
+      <p>
+        Ne pas donner de conseils trop vite.
+        Ne pas chercher à régler le problème immédiatement.
+        Écouter, reformuler, explorer, clarifier.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Fiche BEP individuel</h2>
+
+    <label><strong>Nom fictif de l’aidant</strong></label>
+    <input type="text" />
+
+    <label><strong>Situation du parent aidé</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Ce que vit l’aidant</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Difficultés principales</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Ressources disponibles</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Besoins exprimés</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Besoins éducatifs possibles</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Phrase de synthèse du BEP</strong></label>
+    <textarea placeholder="Exemple : Cet aidant a surtout besoin de mieux comprendre les signes d’alerte et de savoir quand demander de l’aide."></textarea>
+  </section>
+
+  <section class="mission">
+    <span class="badge">Étape 3</span>
+    <h2>Staff éducatif — 15 minutes</h2>
+
+    <p>
+      Tous les binômes se réunissent.
+      Chaque binôme présente rapidement la synthèse de son BEP.
+    </p>
+
+    <p><strong>Objectif du staff :</strong></p>
+    <ul>
+      <li>croiser les situations ;</li>
+      <li>repérer les besoins communs ;</li>
+      <li>repérer les besoins spécifiques ;</li>
+      <li>prioriser les besoins éducatifs ;</li>
+      <li>choisir une cible d’action ETP.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Grille de staff éducatif</h2>
+
+    <label><strong>Besoins communs repérés chez plusieurs aidants</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Besoins spécifiques à certains aidants</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Ce qui relève de l’information</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Ce qui relève du savoir-faire</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Ce qui relève de l’adaptation / posture / pouvoir d’agir</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Besoin éducatif prioritaire retenu</strong></label>
+    <textarea></textarea>
+  </section>
+
+  <section class="mission">
+    <span class="badge">Étape 4</span>
+    <h2>Conception de l’action ETP — 20 minutes</h2>
+
+    <p>
+      À partir du staff, concevez une action éducative destinée aux aidants.
+    </p>
+
+    <p><strong>Votre action doit préciser :</strong></p>
+    <ul>
+      <li>le public cible ;</li>
+      <li>l’objectif éducatif ;</li>
+      <li>les compétences visées ;</li>
+      <li>le déroulé ;</li>
+      <li>la place de l’aidant partenaire ;</li>
+      <li>la modalité d’évaluation.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Fiche action ETP</h2>
+
+    <label><strong>Titre de l’action</strong></label>
+    <input type="text" />
+
+    <label><strong>Public cible</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Objectif éducatif</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Compétences visées</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Déroulé de l’activité</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Rôle de l’aidant partenaire formé ETP</strong></label>
+    <textarea></textarea>
+
+    <label><strong>Modalité d’évaluation</strong></label>
+    <textarea></textarea>
+  </section>
+
+  <section class="mission">
+    <span class="badge">Étape 5</span>
+    <h2>Animation d’un extrait — 10 minutes</h2>
+
+    <p>
+      L’équipe anime un court extrait de l’action éducative conçue.
+    </p>
+
+    <p><strong>À montrer :</strong></p>
+    <ul>
+      <li>une posture éducative ;</li>
+      <li>une activité participative ;</li>
+      <li>un lien clair avec les besoins repérés en BEP ;</li>
+      <li>une place réelle donnée à l’aidant partenaire.</li>
+    </ul>
+  </section>
+
+  <section class="mission">
+    <span class="badge">Étape 6</span>
+    <h2>Évaluation — 5 minutes</h2>
+
+    <p>
+      L’équipe recueille le retour des aidants.
+    </p>
+
+    <p><strong>Questions possibles :</strong></p>
+    <ul>
+      <li>Qu’est-ce qui vous a été utile ?</li>
+      <li>Qu’avez-vous mieux compris ?</li>
+      <li>Qu’est-ce que vous vous sentez davantage capable de faire ?</li>
+      <li>Qu’est-ce qui manque encore ?</li>
+      <li>Qu’aimeriez-vous approfondir ?</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Grille observateurs</h2>
+
+    <label><strong>Qualité du BEP individuel</strong></label>
+    <textarea placeholder="Écoute, questions ouvertes, reformulation, exploration des besoins..."></textarea>
+
+    <label><strong>Qualité de la synthèse BEP</strong></label>
+    <textarea placeholder="Clarté, besoins éducatifs repérés, ressources identifiées..."></textarea>
+
+    <label><strong>Qualité du staff éducatif</strong></label>
+    <textarea placeholder="Croisement des situations, priorisation, distinction besoins communs/spécifiques..."></textarea>
+
+    <label><strong>Qualité de l’action proposée</strong></label>
+    <textarea placeholder="Objectif clair, activité cohérente, évaluation pertinente..."></textarea>
+
+    <label><strong>Place de l’aidant partenaire</strong></label>
+    <textarea placeholder="Co-animation, expertise expérientielle, complémentarité avec les professionnels..."></textarea>
+  </section>
+
+  <section class="important">
+    <h2>Question finale</h2>
+    <p>
+      À partir des BEP individuels et du staff éducatif,
+      quelle action ETP serait la plus utile pour aider ces proches aidants
+      à préparer le retour à domicile de leur parent âgé ?
+    </p>
+  </section>
+
+</main>
+
+<button class="print-btn" onclick="window.print()">Imprimer</button>
+
+</body>
+</html>
