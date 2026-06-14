@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La TIPBoX de l'animateur ETP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 md:p-8">
+
+    <div id="app" class="max-w-3xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-emerald-400">LA TIPBoX DE L'ANIMATEUR</h1>
+            <p class="text-slate-400 mt-2">"L'art de l'animation ETP, outil après outil."</p>
+        </header>
+
+        <div id="content"></div>
+    </div>
+
+    <script>
+        const missions = [
+            { id: 1, title: "Le Monopoliseur", sos: "C'est la troisième séance du programme. Dès que vous posez une question, le même participant s'empresse de répondre, souvent en racontant des anecdotes personnelles très longues. Vous sentez que les autres participants, plus réservés, se tassent sur leur chaise, évitent votre regard, et que l'énergie du groupe retombe. Vous avez l'impression que la parole est confisquée par cette seule personne.", pistes: ["Valider la richesse du participant tout en posant un cadre temporel strict.", "Solliciter explicitement un autre participant par son prénom : 'Et toi, comment vois-tu cela ?'", "Nommer le phénomène au groupe : 'Je remarque que nous fonctionnons en mode 1:1, comment inclure les autres ?'"] },
+            { id: 2, title: "Silence Radio", sos: "Vous venez de poser une question ouverte sur les difficultés du quotidien face au traitement. Un silence pesant s'installe. Le groupe baisse les yeux, personne ne semble vouloir engager la discussion. Vous vous sentez seul face à ce mur, avec la sensation que votre question était soit mal formulée, soit trop intrusive. Le malaise grandit.", pistes: ["Accepter le silence : 'Ce sujet demande réflexion, prenons une minute de silence.'", "Changer le format : 'Discutez-en 2 minutes en binôme avant de partager.'", "Auto-dérision ou humilité : 'Ma question est peut-être trop large, que voulez-vous éclaircir ?'"] },
+            { id: 3, title: "L'Émotion Vive", sos: "Alors que vous parlez de l'impact de la maladie sur la vie sociale, une participante fond en larmes, visiblement submergée par un souvenir douloureux. Le groupe est sidéré, un silence gêné envahit la salle. Personne ne bouge, et vous sentez le besoin d'agir pour protéger cette personne tout en maintenant le cadre du groupe.", pistes: ["Accueillir sans réparer : 'Je vois que c'est difficile, prenons un temps pour respirer.'", "Solliciter le groupe : 'Est-ce que l'un d'entre vous souhaite partager un soutien ?'", "Proposer une pause réelle : 'Je propose 5 minutes de respiration pour chacun.'"] },
+            { id: 4, title: "Le Contestataire", sos: "À chaque recommandation que vous présentez, un participant intervient pour dire que 'ce n'est pas réaliste' ou que 'les médecins ne savent pas tout'. Il conteste systématiquement, avec un ton un peu agressif. L'ambiance devient électrique, les autres participants commencent à se regarder, certains semblent agacés par ce comportement.", pistes: ["Empathie radicale : 'Je comprends votre désaccord, qu'est-ce qui vous semble inapproprié ?'", "Questionner le groupe : 'C'est un avis tranché, quel est le ressenti des autres ?'", "Cadrage clair : 'Je note ce retour. Pour avancer, nous allons aborder ce point précis.'"] },
+            { id: 5, title: "Le Duel d'Experts", sos: "Deux participants, très à l'aise avec le sujet, débattent depuis dix minutes sur une technique médicale précise. Ils ont totalement oublié le reste du groupe. Les autres participants ont décroché, certains regardent par la fenêtre ou leur téléphone. Le temps de la séance s'écoule et l'objectif pédagogique n'est pas atteint.", pistes: ["Médiation immédiate : 'Il semble que vous ayez un désaccord majeur, nous y reviendrons plus tard.'", "Recentrage sur l'objectif : 'Pour permettre à chacun d'avancer, revenons au thème.'", "Pause tactique : 'Prenons 5 minutes, et nous reprenons sur une autre base.'"] },
+            { id: 6, title: "L'Ombre du Parent", sos: "Vous animez un atelier pour adolescents. Cependant, un parent répond à toutes les questions à la place de son ado qui reste muet et semble de plus en plus fermé. Le parent est investi mais prend toute la place, empêchant le jeune d'exprimer son propre vécu ou ses propres besoins.", pistes: ["Inclusion douce : 'C'est un point de vue parent, j'aimerais maintenant écouter ton enfant.'", "Cadrage des rôles : 'J'aimerais beaucoup entendre le point de vue de chacun séparément.'", "Valorisation : 'C'est intéressant. Et toi, [prénom de l'ado], quel est ton avis ?'"] },
+            { id: 7, title: "Le Hors Sujet Sympa", sos: "Le groupe est très chaleureux et l'ambiance est excellente. Mais depuis 20 minutes, ils discutent de recettes de cuisine ou de jardinage au lieu d'aborder le thème de l'autogestion de la maladie. C'est convivial, mais vous savez que le temps est limité et que vous n'avez pas avancé sur le contenu prévu.", pistes: ["Validation et pivot : 'C'est passionnant, mais notre temps est limité. Notons cela pour plus tard.'", "Parking à idées : 'Notons ce sujet sur le tableau pour la fin de séance.'", "Recentrage : 'Comment pouvons-nous faire le lien avec notre thème initial ?'"] },
+            { id: 8, title: "La Critique Frontale", sos: "Au milieu de l'atelier, un participant lâche soudain : 'Franchement, votre atelier ne sert à rien, c'est du temps perdu'. La sentence est tombée, un silence glacial s'installe. Le groupe attend votre réaction. Vous vous sentez déstabilisé car vous aviez le sentiment que la séance se passait plutôt bien.", pistes: ["Accueil du mécontentement : 'Je comprends votre déception. Qu'est-ce qui serait utile pour vous aujourd'hui ?'", "Cadrage : 'Je note ce retour. Quels points spécifiques souhaiteriez-vous aborder ?'", "Miroir : 'Qu'en pensent les autres ? Est-ce un sentiment partagé ?'"] },
+            { id: 9, title: "Le Piège du Conseil", sos: "Une participante exprime une grande difficulté. Immédiatement, trois autres participants commencent à lui donner des conseils : 'Moi je fais ça', 'Tu devrais essayer ça'. La personne concernée ne parle plus, elle semble submergée par cette avalanche de solutions non sollicitées.", pistes: ["Cadrage bienveillant : 'Je propose que nous écoutions le vécu avant de chercher des solutions.'", "Recentrage sur l'écoute : 'Ici, nous favorisons le partage d'expérience plutôt que les conseils.'", "Méthode : 'Posons-nous une minute pour accueillir le ressenti de chacun.'"] },
+            { id: 10, title: "La Question Impossible", sos: "Un participant vous pose une question médicale très technique sur un nouveau traitement ou une interaction complexe. Vous n'avez pas la réponse et vous craignez de perdre votre crédibilité si vous l'admettez. Le groupe vous regarde, attendant une réponse experte.", pistes: ["Honnêteté : 'Je ne connais pas la réponse précise, cherchons ensemble ou vérifions avec un expert.'", "Référence : 'Excellente question, je vous propose de consulter votre médecin traitant.'", "Collective : 'Est-ce que quelqu'un ici a une expérience sur ce point ?'"] },
+            { id: 11, title: "Groupe Épuisé", sos: "Il est 16h30, la séance touche à sa fin. Vous voyez des visages marqués, des regards qui se perdent, des corps affalés sur les chaises. L'énergie est à zéro, les échanges sont laborieux. Vous aviez prévu une séquence importante pour la fin, mais vous réalisez que le groupe n'est plus en capacité d'apprendre.", pistes: ["Changer de format : 'La fatigue s'installe, faisons un exercice debout.'", "Synthèse flash : 'Faisons un point rapide sur ce qui est essentiel à retenir.'", "Honnêteté : 'Je sens que c'est difficile, que préférez-vous faire pour finir ?'"] },
+            { id: 12, title: "Le Patient Expert", sos: "Un participant en sait souvent plus que vous sur le sujet. Il vous corrige régulièrement avec des précisions très pointues, ce qui peut être perçu comme une volonté de vous décrédibiliser ou de montrer sa supériorité. Vous craignez que cela intimide les autres participants qui ont moins de connaissances.", pistes: ["Valorisation : 'C'est une précision importante, merci. Comment l'intègres-tu dans ton quotidien ?'", "Utilisation : 'Tu connais bien le sujet, aimerais-tu partager ton expérience sur ce point ?'", "Cadrage : 'Nous avons plusieurs points de vue, merci de laisser la parole à chacun.'"] },
+            { id: 13, title: "L'Intime", sos: "Un participant commence à raconter des détails très personnels sur sa vie privée, ses relations familiales ou des traumatismes passés, qui n'ont pas de lien direct avec l'objectif de la séance. Vous voyez le malaise s'installer : certains participants fixent le sol, d'autres semblent gênés par le caractère trop privé de la confidence.", pistes: ["Cadrage protecteur : 'C'est une confidence forte. Restons sur ce qui est aidant pour le groupe.'", "Sécurité : 'Je te remercie. Je veille à ce que nous restions dans un cadre de respect.'", "Recentrage : 'Comment ce vécu nous aide-t-il à avancer ensemble ?'"] },
+            { id: 14, title: "L'Appel au Sauveur", sos: "Après avoir travaillé sur une problématique, le groupe vous regarde avec insistance et demande : 'Mais dites-nous simplement quoi faire, c'est quoi la bonne méthode ?'. Vous sentez qu'ils veulent se décharger de la responsabilité de trouver leurs propres solutions et attendent que vous endossiez le rôle de celui qui détient la vérité.", pistes: ["Renvoi : 'Il n'y a pas de solution unique. Quelle serait la plus adaptée à votre vie ?'", "Posture : 'Mon rôle est de vous accompagner à trouver vos propres solutions.'", "Cadrage : 'Partageons nos idées, et chacun choisira ce qui lui convient.'"] },
+            { id: 15, title: "Le Désert de Participation", sos: "Vous enchaînez les questions, vous proposez des supports, mais rien n'y fait. Vous avez l'impression de tirer la séance tout seul, de faire un monologue. Vous finissez par vous épuiser à essayer de relancer la machine sans succès. Le silence dure, les participants attendent que vous parliez.", pistes: ["Questionnement : 'Je me sens seul à parler. Comment ressentez-vous cette séance ?'", "Format : 'Proposons un tour de table pour que chacun dise un mot.'", "Animation : 'Le groupe est silencieux, que se passe-t-il pour vous ?'"] },
+            { id: 16, title: "Le Blocage", sos: "Vous travaillez sur le changement d'habitude. Un participant coupe court en disant : 'De toute façon, j'ai toujours fait comme ça, je ne changerai jamais mes habitudes, ça ne sert à rien'. Il le dit avec un mélange de fatalisme et de défi. Les autres semblent un peu désarçonnés par cette position ferme.", pistes: ["Empathie : 'Je comprends. Qu'est-ce qui rend le changement difficile pour toi ?'", "Acceptation : 'Ton point de vue est tout à fait légitime.'", "Curiosité : 'Quelles seraient les conditions qui permettraient un tout petit changement ?'"] },
+            { id: 17, title: "Le Retardataire Chronique", sos: "Un participant arrive systématiquement avec 30 minutes de retard, interrompant la séance, s'excusant bruyamment, et demandant ensuite systématiquement un résumé de tout ce qui a été dit précédemment. Cela commence à irriter les participants ponctuels qui voient leur temps de travail réduit par ces interruptions.", pistes: ["Cadrage : 'Nous avons bien avancé, je t'invite à prendre le train en marche.'", "Bienvenue : 'Bienvenue. Nous en sommes là, n'hésite pas à poser une question.'", "Process : 'Désolé, nous ne pouvons pas tout reprendre, je ferai un point à la fin.'"] },
+            { id: 18, title: "Le Rire Ambigü", sos: "Une situation cocasse se produit et le groupe part en éclats de rire. C'est détendu. Mais vous remarquez une participante en retrait, les yeux baissés, qui ne rit pas et semble blessée. Vous craignez que la blague ait été perçue comme une moquerie par cette personne.", pistes: ["Intervention : 'Je sens un malaise. Ce rire était-il perçu comme une blague par tous ?'", "Bienveillance : 'Veillons à ce que chacun se sente respecté.'", "Médiation : 'Ce qui est drôle pour les uns peut être blessant. Qu'en dis-tu ?'"] },
+            { id: 19, title: "Le Convainqueur", sos: "Un participant est persuadé d'avoir trouvé LA solution miracle à son problème de santé. Il cherche à convaincre tout le groupe de faire exactement comme lui, critiquant implicitement ceux qui ne sont pas d'accord ou qui ont une autre approche. Il prend un ton professoral qui devient pesant.", pistes: ["Validation : 'C'est une méthode qui te convient. Quelles sont les alternatives ?'", "Élargissement : 'Le groupe a des profils variés, comparons les approches.'", "Cadrage : 'Nous ne cherchons pas une vérité unique, mais des solutions variées.'"] },
+            { id: 20, title: "Le Vertige de l'Animateur", sos: "À un moment donné, vous réalisez que vous avez perdu le fil. Vous ne savez plus si ce que vous faites a du sens, vous ne comprenez plus les dynamiques du groupe, vous vous sentez incapable de gérer la situation. C'est un moment de solitude intense où vous avez envie de quitter la pièce.", pistes: ["Méta : 'Je me sens un peu perdu. Que se passe-t-il dans le groupe ?'", "Pause : 'Je propose une pause de 10 min pour réfléchir.'", "Acceptation : 'C'est une situation complexe. Comment avancer ensemble ?'"] }
+        ];
+
+        let state = { 
+            screen: 'mission', 
+            currentMission: 0, 
+            selections: Array(missions.length).fill(null).map(() => []) 
+        };
+
+        function render() {
+            const el = document.getElementById('content');
+            if (state.screen === 'mission') {
+                const m = missions[state.currentMission];
+                el.innerHTML = `
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-emerald-400 font-bold tracking-widest text-sm">PRATIQUE ${m.id} / ${missions.length}</span>
+                            <h2 class="text-xl font-bold">${m.title}</h2>
+                        </div>
+                        <div class="bg-slate-900 p-6 rounded-xl mb-8 italic text-lg text-slate-300 border-l-4 border-emerald-500 shadow-inner">"${m.sos}"</div>
+                        <div class="space-y-4">
+                            ${m.pistes.map((p, pIdx) => `
+                                <div class="flex items-start gap-4 p-4 bg-slate-900 border ${state.selections[state.currentMission].includes(pIdx) ? 'border-emerald-500 bg-emerald-900/20' : 'border-slate-700'} rounded-lg hover:border-emerald-500 transition cursor-pointer" onclick="toggle(${state.currentMission}, ${pIdx})">
+                                    <input type="checkbox" ${state.selections[state.currentMission].includes(pIdx) ? 'checked' : ''} class="mt-1 w-5 h-5 accent-emerald-500 pointer-events-none">
+                                    <span class="text-base text-slate-200">${p}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="flex justify-between mt-8">
+                            <button ${state.currentMission === 0 ? 'disabled opacity-30' : ''} onclick="changeMission(-1)" class="px-6 py-2 bg-slate-700 rounded-lg font-bold hover:bg-slate-600 transition">Précédent</button>
+                            ${state.currentMission === missions.length - 1 
+                                ? `<button onclick="state.screen='final'; render()" class="px-6 py-2 bg-emerald-600 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg shadow-emerald-600/20">MA TIPBoX FINALE</button>`
+                                : `<button onclick="changeMission(1)" class="px-6 py-2 bg-emerald-600 rounded-lg font-bold hover:bg-emerald-500 transition shadow-lg shadow-emerald-600/20">Suivant</button>`}
+                        </div>
+                    </div>`;
+            } else {
+                el.innerHTML = `
+                    <div class="bg-white text-slate-900 p-8 rounded-2xl shadow-xl">
+                        <h2 class="text-3xl font-bold mb-8 text-emerald-700">Ma TIPBoX d'animateur</h2>
+                        <div class="space-y-6">
+                            ${missions.map((m, mIdx) => {
+                                const selected = state.selections[mIdx].map(i => m.pistes[i]);
+                                if(selected.length === 0) return '';
+                                return `
+                                    <div class="border-b border-slate-200 pb-4">
+                                        <h3 class="font-bold text-lg mb-2 text-emerald-800">${m.id}. ${m.title}</h3>
+                                        <ul class="list-disc pl-5 space-y-1 text-slate-700">
+                                            ${selected.map(s => `<li>${s}</li>`).join('')}
+                                        </ul>
+                                    </div>`;
+                            }).join('')}
+                        </div>
+                        <button onclick="window.print()" class="no-print w-full mt-8 bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-700 shadow-lg transition">Imprimer ma TIPBoX</button>
+                        <div class="text-center mt-4 text-slate-400 text-sm italic">"L'animation de groupe n'est pas l'art d'avoir la bonne réponse, c'est l'art de maintenir un espace où les réponses peuvent émerger."</div>
+                    </div>`;
+            }
+        }
+
+        function toggle(mIdx, pIdx) {
+            const arr = state.selections[mIdx];
+            if (arr.includes(pIdx)) {
+                state.selections[mIdx] = arr.filter(i => i !== pIdx);
+            } else {
+                state.selections[mIdx].push(pIdx);
+            }
+            render();
+        }
+
+        function changeMission(delta) {
+            state.currentMission t+= delta;
+            render();
+        }
+
+        render();
+    </script>
+</body>
+</html>
