@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La légende d’Eko — l’influenceur influencé</title>
+    <!-- Tailwind CSS pour un design fluide et responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500;1,600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; /* slate-950 */
+        }
+        .font-serif-poetic {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        /* Effet de lueur douce et mystérieuse */
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+        }
+        /* Transition douce pour les changements d'écran */
+        .screen-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Masquer la scrollbar pour une immersion console */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-purple-950 selection:text-cyan-300">
+
+    <!-- CONTENEUR GLOBAL SÉCURISÉ -->
+    <div id="game-container" class="flex-1 flex flex-col w-full max-w-xl mx-auto px-4 py-4 md:py-6 justify-between">
+        
+        <!-- HEADER DE L'APPLICATION -->
+        <header class="border-b border-slate-850 pb-3 mb-6 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('home')">
+                <span class="text-2xl animate-pulse">🧵</span>
+                <div>
+                    <h1 class="text-xs font-extrabold tracking-widest uppercase text-cyan-400">La Légende d'Eko</h1>
+                    <p class="text-[9px] text-slate-500 uppercase tracking-wider">Laboratoire de Cyber-Archéologie</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="anim-toggle" onclick="toggleAnimations()" class="text-[10px] px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 transition-all">
+                    ✨ Anim : ON
+                </button>
+                <button onclick="navigateTo('collection')" class="relative p-2 rounded-full hover:bg-slate-900 transition-colors" title="Consulter la collection">
+                    📂 <span id="collection-badge" class="absolute -top-1 -right-1 bg-cyan-500 text-slate-950 text-[9px] font-extrabold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ZONE D'EXPOSITION DU CONTENU DYNAMIQUE -->
+        <main id="main-content" class="flex-1 flex flex-col justify-center">
+            <!-- Injecté de manière dynamique par le script JS -->
+        </main>
+
+        <!-- PIED DE PAGE POÉTIQUE -->
+        <footer class="mt-8 border-t border-slate-900 pt-4 pb-2 text-center">
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest">
+                Atelier de médiation douce • Cadre protecteur et contenant
+            </p>
+            <p class="text-[9px] text-slate-600 mt-1">
+                L'exploration respecte votre propre rythme. Parlez, respirez, revenez à vous.
+            </p>
+        </footer>
+    </div>
+
+    <!-- NOTIFICATION SÉCURISÉE (TOAST) -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 border border-cyan-500/50 text-cyan-300 text-xs px-4 py-3 rounded-full shadow-lg shadow-cyan-950/50 flex items-center gap-2 max-w-[90%] text-center opacity-0 pointer-events-none transition-all duration-300">
+        <span class="text-cyan-400">✦</span> <span id="toast-text">Notification</span>
+    </div>
+
+    <!-- DIALOGUE DE CONFIRMATION SÉCURISÉ (MODALE CUSTOM) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl">
+            <h4 class="text-sm font-bold uppercase tracking-widest text-pink-400" id="confirm-title">Attention</h4>
+            <p class="text-xs text-slate-300 leading-relaxed" id="confirm-message">Message de confirmation</p>
+            <div class="flex gap-2 pt-2">
+                <button id="confirm-cancel-btn" class="flex-1 py-2 px-3 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-850 text-xs font-semibold text-slate-400 transition-colors">Annuler</button>
+                <button id="confirm-ok-btn" class="flex-1 py-2 px-3 rounded-xl bg-pink-950/40 hover:bg-pink-900/50 border border-pink-700/50 text-xs font-semibold text-pink-300 transition-colors">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DONNÉES DE LA MÉDIATION NARRATIVE ---
+        const ARCHETYPES = [
+            {
+                id: 1,
+                name: "L’Avatar Performant",
+                fossil: "Le Casque Fissuré",
+                icon: "🎧",
+                type: "Identité numérique",
+                power: "Donner une forme visible à ce qu’on veut montrer",
+                vulnerability: "Confondre son image avec sa valeur",
+                question: "Quand est-ce qu’on peut être très regardé sans se sentir vraiment rencontré ?",
+                wisdom: "Je ne suis pas seulement ce que je montre.",
+                resource: "Revenir au corps, au souffle, à la voix réelle.",
+                defaultPrompt: "Un casque fissuré flottant dans une chambre numérique crépusculaire, reflets violets et cyan, ambiance douce et contenante, symbole de l’avatar performant, présence fragile mais lumineuse, style conte initiatique transnumériste, aucun danger, composition centrée, atmosphère de retour à soi.",
+                // Liant narratif approfondi éclairant le vécu intime d'Eko
+                narrativeExcerpt: "<b>Fiche de fouille #1 — Journal intime d'Eko (Octobre 2021) :</b><br>« Quand je mets le casque, j'ai l'impression de devenir un super-héros. L'avatar Eko-3D chante sans jamais trembler, il sourit toujours sur l'écran. Mais quand j'éteins la console... le silence dans ma chambre me fait peur. Je me demande : qui est encore là quand le casque est posé sur la table ? Est-ce qu'on m'aime moi, ou seulement cette projection parfaite ? »"
+            },
+            {
+                id: 2,
+                name: "Le Scroll Hypnotique",
+                fossil: "Le Pouce Fantôme",
+                icon: "👆",
+                type: "Attention",
+                power: "Ouvrir des mondes sans fin",
+                vulnerability: "Glisser sans habiter ce que l’on vit",
+                question: "Qu’est-ce qui peut réveiller quelqu’un quand il est en pilote automatique ?",
+                wisdom: "Je peux revenir doucement.",
+                resource: "Poser l’écran et nommer trois choses présentes.",
+                defaultPrompt: "Une empreinte lumineuse de pouce suspendue au-dessus d’un écran sombre, traces de scroll comme des vagues hypnotiques, chambre calme de nuit, couleurs bleu profond et violet, symbole du pilote automatique numérique, style archéologie du futur, atmosphère douce et sécurisante.",
+                narrativeExcerpt: "<b>Fiche de fouille #2 — Analyse des métadonnées de connexion (Décembre 2021) :</b><br>« Les archives indiquent qu'Eko passait en moyenne 9 heures par jour à faire défiler son fil d'actualité. Il écrivait à un ami : 'Je glisse, je glisse sans fin... Mon pouce bouge tout seul, même quand je veux dormir. Je regarde des vies que je ne connais pas, je lis des phrases qui m'écorchent l'esprit. Je me sens comme un passager clandestin dans ma propre tête, incapable de m'arrêter.' »"
+            },
+            {
+                id: 3,
+                name: "Le Miroir Noir",
+                fossil: "La Dalle de Verre",
+                icon: "🪞",
+                type: "Reflet",
+                power: "Explorer ses images possibles",
+                vulnerability: "Chercher dans le reflet une preuve de valeur",
+                question: "Qu’est-ce qu’on cherche parfois dans un écran qu’une vraie relation pourrait mieux donner ?",
+                wisdom: "Je vaux plus que mon reflet.",
+                resource: "Retrouver une personne ou un lieu où je n’ai pas besoin de me mettre en scène.",
+                defaultPrompt: "Un miroir noir posé dans un paysage numérique silencieux, reflet flou et lumineux d’un adolescent, formes douces, halo cyan et rose, symbole du reflet numérique et de l’identité, ambiance de conte initiatique, aucun danger, impression de question intime et de lien possible.",
+                narrativeExcerpt: "<b>Fiche de fouille #3 — Enregistrement caméra d'Eko (Février 2022) :</b><br>« Nous observons que sur ses vidéos, Eko ne regarde plus l'objectif (qui symbolise les autres), mais fixe constamment son propre retour écran. Il confie à voix basse : 'J'ai peur que si les gens me voient sans filtre ou fatigué, ils découvrent que je n'ai rien de spécial. J'ai l'impression de n'exister que si je suis reflété par cette dalle de verre. Sans elle, je suis invisible.' »"
+            },
+            {
+                id: 4,
+                name: "Le Minotaure Algorithmique",
+                fossil: "La Boussole Détraquée",
+                icon: "🧭",
+                type: "Influence",
+                power: "Signaler les forces qui orientent nos choix",
+                vulnerability: "Obéir à trop de voix en même temps",
+                question: "Comment reconnaître une voix qui guide d’une voix qui enferme ?",
+                wisdom: "Je peux écouter sans obéir à toutes les voix.",
+                resource: "Distinguer ce qui m’aide, ce qui m’épuise, ce qui me remet en lien.",
+                defaultPrompt: "Un labyrinthe numérique vu de haut, lignes lumineuses violettes et bleues, boussole douce au premier plan, présence symbolique non menaçante au centre, style mythologique futuriste, symbole des voix algorithmiques, atmosphère contenant, aucun élément violent.",
+                narrativeExcerpt: "<b>Fiche de fouille #4 — Console système d'Eko (Avril 2022) :</b><br>« Une alerte automatique de sa plateforme d'hébergement s'est déclenchée : 'Baisse d'engagement de 14%. Publiez plus souvent pour rester visible.' Eko a répondu sur son journal intime : 'Je voulais juste prendre deux semaines pour écrire une chanson acoustique douce. Mais la machine me dit que si je ralentis, je vais disparaître. Je cours dans un labyrinthe invisible.' »"
+            },
+            {
+                id: 5,
+                name: "Le Passeur de Résonance",
+                fossil: "Le Fil Lumineux",
+                icon: "🧵",
+                type: "Ressource",
+                power: "Retrouver ce qui sonne juste",
+                vulnerability: "Oublier son fil quand les voix deviennent trop fortes",
+                question: "Quelle petite chose peut te ramener vers toi quand ça devient compliqué ?",
+                wisdom: "J’ai un fil pour revenir.",
+                resource: "Une personne, un lieu, un son, un geste, une phrase.",
+                defaultPrompt: "Un fil lumineux très fin traversant un paysage numérique nocturne, reliant des fragments doux comme un son, une main, une étoile, une respiration, couleurs cyan violet or, ambiance sécurisante et poétique, symbole de résonance et de retour à soi, style conte transnumériste initiatique.",
+                narrativeExcerpt: "<b>Fiche de fouille #5 — Journal audio enregistré hors-ligne (Juin 2022) :</b><br>« Nous trouvons ce fichier, enregistré loin d'internet. On entend Eko souffler : 'Aujourd'hui, j'ai débranché la connexion pendant deux heures. Au début, j'ai eu un vertige immense, une panique physique. Et puis, je me suis assis. J'ai écouté le vent dans les arbres de mon voisin. J'avais oublié que le vrai monde avait un bruit si simple. Un tout petit fil de calme s'est recousu en moi.' »"
+            },
+            {
+                id: 6,
+                name: "La Sentinelle du Corps",
+                fossil: "Le Capteur Endormi",
+                icon: "🫀",
+                type: "Corps",
+                power: "Sentir avant de comprendre",
+                vulnerability: "Ignorer les signaux faibles",
+                question: "Ton corps sait parfois quelque chose avant ta tête. Comment te le montre-t-il ?",
+                wisdom: "Mon corps peut être une boussole.",
+                resource: "Identifier une sensation simple : tension, chaleur, fatigue, appui, respiration.",
+                defaultPrompt: "Un petit capteur lumineux posé près d’un cœur symbolique, paysage intérieur doux, lignes de respiration, couleurs chaudes mêlées à du bleu nocturne, ambiance calme et protectrice, symbole du corps comme boussole, style poétique futuriste, aucun danger, présence apaisante.",
+                narrativeExcerpt: "<b>Fiche de fouille #6 — Rapports biométriques restaurés (Août 2022) :</b><br>« Son bracelet connecté affichait une tension cardiaque élevée et une respiration superficielle. Eko écrit : 'Mon corps essayait de me parler depuis des mois. J'avais la gorge serrée dès que j'ouvrais les applications, un nœud dans le ventre avant chaque stream. Aujourd'hui, j'ai posé ma main sur mon cœur. J'ai fermé les yeux et j'ai respiré, longuement, pour lui dire merci d'avoir tenu bon.' »"
+            },
+            {
+                id: 7,
+                name: "Le Jardinier des Liens",
+                fossil: "La Graine Connectée",
+                icon: "🌱",
+                type: "Relation",
+                power: "Transformer le réseau en lien vivant",
+                vulnerability: "Confondre contact et rencontre",
+                question: "Qui ou quoi t’aide à te sentir vraiment relié ?",
+                wisdom: "Le lien vivant se cultive.",
+                resource: "Nourrir une relation réelle, même par un petit geste.",
+                defaultPrompt: "Une graine lumineuse reliée à de fins fils numériques qui deviennent des racines vivantes, ambiance douce, terre nocturne et halos cyan, symbole du lien vivant dans le monde numérique, style conte écologique transnumériste, composition poétique, aucun danger, sentiment de croissance et de soin.",
+                narrativeExcerpt: "<b>Fiche de fouille #7 — Dernier mémo d'Eko avant sa transition saine (Octobre 2022) :</b><br>« Eko n'a pas abandonné le monde. Il a juste réajusté son équilibre. Il termine par ces mots lumineux : 'J'ai éteint la diffusion permanente de ma vie pour recommencer à la vivre. J'ai planté des herbes aromatiques sur mon balcon. Quand des amis viennent, nous laissons les téléphones dans une corbeille. Le numérique n'est plus ma cage, il est redevenu mon outil. Je suis revenu à la maison.' »"
+            }
+        ];
+
+        // --- ÉTAT GLOBAL DE L'APPLICATION ---
+        let state = {
+            screen: 'home', // 'home', 'intro', 'quest', 'collection'
+            currentArchetypeIndex: 0,
+            questSubStep: 1, // 1: Fossil & Narratif, 2: Question projective, 3: Fiche de l'archétype & Prompt
+            collection: {}, // Format: { archetypeId: { prompt: string, collectedAt: string } }
+            animations: true
+        };
+
+        // --- CHARGEMENT DU LOCALSTORAGE ---
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('eko_full_save');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.collection = parsed.collection || {};
+                    state.currentArchetypeIndex = parsed.currentArchetypeIndex || 0;
+                    state.questSubStep = parsed.questSubStep || 1;
+                }
+            } catch (e) {
+                console.error("Impossible de charger la sauvegarde locale :", e);
+            }
+            updateCollectionBadge();
+        }
+
+        // --- SAUVEGARDE DANS LE LOCALSTORAGE ---
+        function saveState() {
+            try {
+                localStorage.setItem('eko_full_save', JSON.stringify({
+                    collection: state.collection,
+                    currentArchetypeIndex: state.currentArchetypeIndex,
+                    questSubStep: state.questSubStep
+                }));
+            } catch (e) {
+                console.error("Erreur d'écriture dans localStorage :", e);
+            }
+            updateCollectionBadge();
+        }
+
+        // --- SYSTÈME DE NOTIFICATIONS CUSTOM (SANS ALERT) ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            toastText.textContent = message;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // --- SYSTÈME DE CONFIRMATION CUSTOM (SANS CONFIRM) ---
+        function showConfirmModal(title, message, onConfirm) {
+            const modal = document.getElementById('confirm-modal');
+            const modalTitle = document.getElementById('confirm-title');
+            const modalMessage = document.getElementById('confirm-message');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            const okBtn = document.getElementById('confirm-ok-btn');
+
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+
+            const closeModal = () => {
+                modal.classList.remove('opacity-100');
+                modal.classList.add('opacity-0', 'pointer-events-none');
+            };
+
+            cancelBtn.onclick = () => {
+                closeModal();
+            };
+
+            okBtn.onclick = () => {
+                closeModal();
+                onConfirm();
+            };
+        }
+
+        // --- GESTION DES ANIMATIONS GLOBALES ---
+        function toggleAnimations() {
+            state.animations = !state.animations;
+            const btn = document.getElementById('anim-toggle');
+            if (state.animations) {
+                btn.textContent = "✨ Anim : ON";
+                btn.classList.add('bg-slate-900');
+                btn.classList.remove('bg-slate-950', 'text-slate-500');
+            } else {
+                btn.textContent = "🔇 Anim : OFF";
+                btn.classList.remove('bg-slate-900');
+                btn.classList.add('bg-slate-950', 'text-slate-500');
+            }
+            // Force le rafraîchissement visuel pour appliquer ou stopper les animations
+            render();
+        }
+
+        // --- MISE À JOUR DE L'ICÔNE DE NOTIFICATION DU SAC À DOS ---
+        function updateCollectionBadge() {
+            const badge = document.getElementById('collection-badge');
+            const count = Object.keys(state.collection).length;
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // --- NAVIGATION DE L'APPLICATION (ROUTING SIMPLE) ---
+        function navigateTo(screen, index = null, subStep = null) {
+            state.screen = screen;
+            if (index !== null) state.currentArchetypeIndex = index;
+            if (subStep !== null) state.questSubStep = subStep;
+            
+            saveState();
+            render();
+            // Scroll doux vers le haut
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- RECONSTRUCTION DE L'INTERFACE SELON L'ÉTAT ---
+        function render() {
+            const main = document.getElementById('main-content');
+            
+            if (state.screen === 'home') {
+                main.innerHTML = renderHome();
+            } else if (state.screen === 'intro') {
+                main.innerHTML = renderIntro();
+            } else if (state.screen === 'quest') {
+                main.innerHTML = renderQuest();
+            } else if (state.screen === 'collection') {
+                main.innerHTML = renderCollection();
+            }
+        }
+
+        // --- GESTIONNAIRES D'ACTIONS DES UTILISATEURS ---
+        function actionAddCurrentToCollection() {
+            const currentArch = ARCHETYPES[state.currentArchetypeIndex];
+            const textarea = document.getElementById(`prompt-textarea-${currentArch.id}`);
+            const textToSave = textarea ? textarea.value : currentArch.defaultPrompt;
+
+            state.collection[currentArch.id] = {
+                prompt: textToSave,
+                collectedAt: new Date().toLocaleDateString('fr-FR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            saveState();
+            showToast(`✨ ${currentArch.name} ajouté à vos sagesses !`);
+            navigateTo('quest', state.currentArchetypeIndex, 3); // Reste sur la fiche mais recharge l'état
+        }
+
+        function actionResetPrompt(archId) {
+            const arch = ARCHETYPES.find(a => a.id === archId);
+            const textarea = document.getElementById(`prompt-textarea-${archId}`);
+            if (textarea && arch) {
+                textarea.value = arch.defaultPrompt;
+                showToast("🎨 Prompt d'origine rétabli.");
+            }
+        }
+
+        function actionCopyPrompt(archId) {
+            const textarea = document.getElementById(`prompt-textarea-${archId}`);
+            if (textarea) {
+                try {
+                    // Méthode fallback robuste pour iframe / environnements limités
+                    const el = document.createElement('textarea');
+                    el.value = textarea.value;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    showToast("📋 Copié dans le presse-papier !");
+                } catch (err) {
+                    showToast("Erreur lors de la copie.");
+                }
+            }
+        }
+
+        // --- LOGIQUE D'EXPORTATION ---
+        function actionExportCardJSON(archId) {
+            const arch = ARCHETYPES.find(a => a.id === archId);
+            const savedData = state.collection[archId] || { prompt: arch.defaultPrompt, collectedAt: "Non collecté" };
+            
+            const cardData = {
+                ...arch,
+                userPrompt: savedData.prompt,
+                collectedAt: savedData.collectedAt
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cardData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `eko_carte_${archId}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast("💾 Carte exportée au format JSON.");
+        }
+
+        function actionExportAllJSON() {
+            const allData = ARCHETYPES.map(arch => {
+                const collected = state.collection[arch.id];
+                return {
+                    id: arch.id,
+                    nom: arch.name,
+                    type: arch.type,
+                    fossile: arch.fossil,
+                    question: arch.question,
+                    sagesse: arch.wisdom,
+                    ressource: arch.resource,
+                    recit_archeologique: arch.narrativeExcerpt,
+                    prompt_final: collected ? collected.prompt : arch.defaultPrompt,
+                    statut: collected ? "Découvert" : "Non découvert",
+                    decouvert_le: collected ? collected.collectedAt : null
+                };
+            });
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "eko_collection_complete.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast("📂 Collection complète exportée en JSON !");
+        }
+
+        function actionExportAllTXT() {
+            let txt = `========================================================\n`;
+            txt += `LA LÉGENDE D'EKO - RAPPORT DE CYBER-ARCHÉOLOGIE\n`;
+            txt += `Bilan d'exploration & de médiation transnumériste\n`;
+            txt += `========================================================\n\n`;
+
+            ARCHETYPES.forEach(arch => {
+                const collected = state.collection[arch.id];
+                txt += `[${arch.icon}] ARCHÉTYPE ${arch.id} : ${arch.name}\n`;
+                txt += `  * Cyber-fossile identifié : ${arch.fossil}\n`;
+                txt += `  * Énergie / Type : ${arch.type}\n`;
+                txt += `  * Pouvoir protecteur : ${arch.power}\n`;
+                txt += `  * Vulnérabilité mise en lumière : ${arch.vulnerability}\n`;
+                txt += `  * Question de résonance : "${arch.question}"\n`;
+                txt += `  * Phrase-Mantra : "${arch.wisdom}"\n`;
+                txt += `  * Ressource d'ancrage : ${arch.resource}\n`;
+                txt += `  * Statut de l'exploration : ${collected ? `Récit restauré le ${collected.collectedAt}` : "Non décrypté"}\n`;
+                txt += `  * Journal intime d'Eko :\n    ${arch.narrativeExcerpt.replace(/<br>/g, '\n    ').replace(/<\/?[^>]+(>|$)/g, "")}\n`;
+                txt += `  * Prompt d'image généré :\n    "${collected ? collected.prompt : arch.defaultPrompt}"\n`;
+                txt += `\n--------------------------------------------------------\n\n`;
+            });
+
+            txt += `Ce document confidentiel témoigne d'un parcours de retour à soi.\n`;
+
+            const dataStr = "data:text/plain;charset=utf-8," + encodeURIComponent(txt);
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "eko_synthese_archeologie.txt");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+            showToast("📝 Synthèse texte exportée avec succès !");
+        }
+
+        function actionResetAll() {
+            showConfirmModal(
+                "Réinitialiser l'atelier", 
+                "Voulez-vous vraiment effacer toute trace de vos fouilles, vider votre sac de collection et recommencer l'histoire d'Eko à zéro ?",
+                () => {
+                    state.collection = {};
+                    state.currentArchetypeIndex = 0;
+                    state.questSubStep = 1;
+                    saveState();
+                    showToast("🧹 Base de données effacée. Bon retour au début.");
+                    navigateTo('home');
+                }
+            );
+        }
+
+        // --- RENDUS DES COMPOSANTS (VUES HTML) ---
+        
+        function renderHome() {
+            const hasStarted = Object.keys(state.collection).length > 0;
+            const bounceClass = state.animations ? 'animate-bounce' : '';
+            const pulseClass = state.animations ? 'animate-pulse' : '';
+
+            return `
+                <div class="text-center space-y-6 py-6 screen-transition">
+                    <!-- Symbole central -->
+                    <div class="relative inline-block my-2">
+                        <div class="absolute inset-0 bg-cyan-500/20 rounded-full blur-2xl ${pulseClass}"></div>
+                        <div class="relative border border-cyan-500/30 rounded-full p-8 bg-slate-900/60 w-32 h-32 flex items-center justify-center mx-auto glow-cyan">
+                            <span class="text-5xl ${bounceClass}">🎧</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <span class="text-[10px] uppercase tracking-widest text-cyan-400 font-extrabold bg-cyan-950/70 px-4 py-1.5 rounded-full border border-cyan-800/60">
+                            Atelier de médiation projective
+                        </span>
+                        <h2 class="text-3xl font-serif-poetic font-semibold text-transparent bg-clip-text bg-gradient-to-b from-cyan-300 via-purple-300 to-pink-300 px-2 leading-tight">
+                            La légende d’Eko —<br>l’influenceur influencé
+                        </h2>
+                        <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                            Plongez dans l'exploration poétique des archives oubliées d'un musicien hyperconnecté. Un chemin doux pour dénouer l'emprise numérique et retisser son fil intérieur.
+                        </p>
+                    </div>
+
+                    <!-- Cadre thérapeutique contenant -->
+                    <div class="bg-slate-900/60 border border-slate-850 p-4 rounded-xl text-left text-xs text-slate-400 space-y-2 max-w-sm mx-auto">
+                        <p class="font-bold text-slate-300 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-cyan-400">
+                            🛡️ Cadre protecteur de l'atelier :
+                        </p>
+                        <ul class="space-y-1 list-none pl-1">
+                            <li class="flex items-start gap-1.5"><span>•</span> <span>L'application est un support, l'animateur guide le dialogue.</span></li>
+                            <li class="flex items-start gap-1.5"><span>•</span> <span>Pas de compétition, pas de score, pas de temps limité.</span></li>
+                            <li class="flex items-start gap-1.5"><span>•</span> <span>L'objectif est d'ouvrir un espace de parole libre et d'écoute.</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="pt-4 flex flex-col gap-3 max-w-xs mx-auto">
+                        <button onclick="navigateTo('intro')" class="w-full py-4 px-6 rounded-xl font-bold bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-indigo-950/40 transition-all text-xs uppercase tracking-wider">
+                            Ouvrir le dossier d'archives
+                        </button>
+                        ${hasStarted ? `
+                            <button onclick="navigateTo('quest', ${state.currentArchetypeIndex}, ${state.questSubStep})" class="w-full py-3 px-6 rounded-xl font-semibold bg-slate-900 hover:bg-slate-850 border border-slate-850 text-slate-300 transition-colors text-xs uppercase tracking-wider">
+                                Reprendre la fouille (${Object.keys(state.collection).length}/7)
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderIntro() {
+            return `
+                <div class="space-y-6 py-2 text-left screen-transition">
+                    <div class="flex items-center gap-2 text-cyan-400 text-xs font-semibold uppercase tracking-widest">
+                        <span>🏺</span> Rapport d'exploration archéologique
+                    </div>
+
+                    <h3 class="text-2xl font-serif-poetic font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-purple-300">
+                        La trace d'un fil perdu
+                    </h3>
+
+                    <div class="space-y-4 text-slate-300 text-xs leading-relaxed bg-slate-900/40 p-5 rounded-2xl border border-slate-850">
+                        <p>
+                            Dans un futur très lointain, notre équipe de <strong class="text-cyan-300 font-medium">cyber-archéologues transnuméristes</strong> explore les serveurs abandonnés d'une ancienne civilisation hyperconnectée. 
+                        </p>
+                        <p>
+                            Au milieu du bruit numérique de l'époque, nous avons extrait la trace d'un musicien prodige : <strong class="text-purple-300 font-semibold text-[13px]">Eko</strong>. Admiré, suivi par des millions d'abonnés, il disposait d'un avatar virtuel parfait, de flux algorithmiques qui le portaient aux nues et d'une diffusion en direct continue. 
+                        </p>
+                        <p class="bg-slate-950/60 p-3.5 rounded-lg border-l-2 border-purple-500 italic text-slate-400 text-[11px] leading-relaxed">
+                            "Eko croyait chanter pour le monde et influencer son époque. Mais en secret, il s'épuisait. Il était devenu l'influenceur influencé : modelé par les statistiques, l'attente des écrans et le lissage de son reflet numérique, oubliant peu à peu sa propre voix."
+                        </p>
+                        <p>
+                            Notre mission n'est pas d'assister à sa défaite, mais de <strong class="text-cyan-400 font-medium">restaurer les indices d'une guérison invisible</strong>. Eko a semé derrière lui sept fossiles précieux pour retrouver son fil intérieur et nous apprendre, nous aussi, à revenir à nous-mêmes.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-2">
+                        <button onclick="navigateTo('quest', 0, 1)" class="w-full py-4 px-6 rounded-xl font-bold bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-indigo-950/30 transition-all text-xs uppercase tracking-wider text-center">
+                            Démarrer l'excavation du premier fossile
+                        </button>
+                        <button onclick="navigateTo('home')" class="w-full py-2.5 text-xs text-slate-500 hover:text-slate-400 text-center transition-colors">
+                            Retour à l'accueil
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderQuest() {
+            const arch = ARCHETYPES[state.currentArchetypeIndex];
+            const pulseClass = state.animations ? 'animate-pulse' : '';
+            const progressPercent = ((state.currentArchetypeIndex + 1) / 7) * 100;
+
+            let subStepContent = '';
+
+            // --- SOUS-ÉTAPE 1 : Découverte du cyber-fossile & Vécu intime d'Eko ---
+            if (state.questSubStep === 1) {
+                subStepContent = `
+                    <div class="space-y-6 text-center py-2">
+                        <div class="inline-block bg-cyan-950/50 border border-cyan-800/40 text-cyan-400 py-1.5 px-4 rounded-full text-[10px] font-extrabold uppercase tracking-widest">
+                            Excavation en cours : Strate ${state.currentArchetypeIndex + 1}
+                        </div>
+
+                        <!-- Visuel du fossile avec glow doux -->
+                        <div class="relative inline-block my-4">
+                            <div class="absolute inset-0 bg-cyan-500/10 rounded-full blur-3xl ${pulseClass}"></div>
+                            <div class="relative border border-slate-800 bg-slate-900 rounded-3xl p-8 w-40 h-40 flex flex-col items-center justify-center mx-auto shadow-inner glow-cyan">
+                                <span class="text-6xl mb-2">${arch.icon}</span>
+                                <span class="text-[9px] tracking-widest uppercase font-bold text-cyan-500">CYBER-FOSSILE</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <span class="text-slate-500 text-[10px] uppercase tracking-wider block">Fossile physique identifié</span>
+                            <h4 class="text-2xl font-serif-poetic text-white font-semibold">${arch.fossil}</h4>
+                        </div>
+
+                        <!-- LIANT NARRATIF CLÉ : Éclairer le vécu intime d'Eko à travers la fouille -->
+                        <div class="bg-slate-900/40 border border-slate-850 p-4 rounded-xl text-left text-xs text-slate-300 leading-relaxed max-w-md mx-auto space-y-2">
+                            <p class="text-[10px] uppercase font-bold text-purple-400 tracking-wider">📜 Mémoire de la console d'Eko :</p>
+                            <p class="italic font-serif-poetic text-[13px] text-slate-200">
+                                ${arch.narrativeExcerpt}
+                            </p>
+                        </div>
+
+                        <div class="pt-4">
+                            <button onclick="navigateTo('quest', ${state.currentArchetypeIndex}, 2)" class="w-full py-3.5 px-6 rounded-xl font-bold bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/30 text-cyan-300 text-xs uppercase tracking-wider transition-all">
+                                Ouvrir l'onde de résonance projective
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- SOUS-ÉTAPE 2 : Question résonante projective (Thérapie & parole) ---
+            else if (state.questSubStep === 2) {
+                subStepContent = `
+                    <div class="space-y-6 py-2 text-left">
+                        <div class="flex items-center gap-1.5 text-purple-400 text-xs font-bold uppercase tracking-wider">
+                            <span>💭</span> Phase d'écho et de résonance
+                        </div>
+
+                        <h4 class="text-xl font-serif-poetic font-semibold text-white">
+                            Le fossile se synchronise avec notre vécu...
+                        </h4>
+
+                        <div class="bg-gradient-to-br from-indigo-950/30 to-slate-900/60 border border-purple-500/30 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                            
+                            <div class="text-center text-4xl">${arch.icon}</div>
+
+                            <blockquote class="text-base md:text-lg text-purple-200 text-center font-serif-poetic italic leading-relaxed">
+                                « ${arch.question} »
+                            </blockquote>
+
+                            <!-- Cadre d'animation thérapeutique contenant -->
+                            <div class="border-t border-slate-800 pt-4 text-xs text-slate-400 space-y-2 leading-relaxed">
+                                <p class="font-bold text-slate-300 uppercase tracking-widest text-[9px] text-cyan-400">💡 Note pour l'atelier :</p>
+                                <p>Prenez un temps de silence. Laissez les idées voyager. Chacun a le droit de parler ou de garder ses pensées pour soi. Il n'existe pas de bonne ou de mauvaise réponse, seulement des résonances singulières.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2 pt-2">
+                            <button onclick="navigateTo('quest', ${state.currentArchetypeIndex}, 3)" class="w-full py-4 px-6 rounded-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg shadow-purple-950/40 transition-all text-xs uppercase tracking-wider text-center">
+                                Révéler la carte de Sagesse
+                            </button>
+                            <button onclick="navigateTo('quest', ${state.currentArchetypeIndex}, 1)" class="w-full py-2.5 text-xs text-slate-500 hover:text-slate-400 text-center transition-colors">
+                                Retourner au fossile et au récit d'Eko
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- SOUS-ÉTAPE 3 : Révélation de la carte rare & Édition du prompt ---
+            else if (state.questSubStep === 3) {
+                const collectedData = state.collection[arch.id];
+                const currentPromptValue = collectedData ? collectedData.prompt : arch.defaultPrompt;
+
+                subStepContent = `
+                    <div class="space-y-6 py-2 screen-transition">
+                        <div class="text-center">
+                            <span class="text-[9px] bg-purple-950/80 text-purple-300 font-extrabold px-3 py-1 rounded-full border border-purple-800/60 uppercase tracking-widest">
+                                Cyber-carte restaurée
+                              </span>
+                        </div>
+
+                        <!-- CARTE CYBER-ARCHÉOLOGIQUE DE COLLECTION -->
+                        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-cyan-500/20 rounded-2xl overflow-hidden shadow-2xl relative glow-purple">
+                            
+                            <!-- Bannière de carte -->
+                            <div class="bg-slate-950 px-4 py-2.5 border-b border-slate-850 flex items-center justify-between">
+                                <span class="text-[9px] text-slate-500 font-bold tracking-widest uppercase">
+                                    ${arch.type}
+                                </span>
+                                <span class="text-[9px] text-cyan-400 font-extrabold tracking-widest">
+                                    N°0${arch.id} • ARCHÉTYPE
+                                </span>
+                            </div>
+
+                            <div class="p-5 space-y-4">
+                                <!-- Titre & Icône -->
+                                <div class="flex items-center gap-4 border-b border-slate-850 pb-4">
+                                    <div class="w-14 h-14 rounded-xl bg-slate-950 border border-cyan-500/10 flex items-center justify-center text-3xl shadow">
+                                        ${arch.icon}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-white tracking-wide">${arch.name}</h4>
+                                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">Fossile : <span class="text-slate-300 font-medium">${arch.fossil}</span></p>
+                                    </div>
+                                </div>
+
+                                <!-- Grille des propriétés -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] leading-relaxed">
+                                    <div class="bg-cyan-950/10 border border-cyan-900/30 p-2.5 rounded-lg">
+                                        <span class="font-extrabold text-cyan-400 block mb-0.5 text-[9px] uppercase tracking-wider">⚡ Pouvoir créatif :</span>
+                                        <p class="text-slate-300">${arch.power}</p>
+                                    </div>
+                                    <div class="bg-pink-950/10 border border-pink-900/30 p-2.5 rounded-lg">
+                                        <span class="font-extrabold text-pink-400 block mb-0.5 text-[9px] uppercase tracking-wider">🥀 Point de vigilance :</span>
+                                        <p class="text-slate-300">${arch.vulnerability}</p>
+                                    </div>
+                                </div>
+
+                                <!-- SAGESSE RETROUVÉE (Mantra important pour l'adolescent) -->
+                                <div class="bg-slate-950/80 border border-slate-850 p-4 rounded-xl space-y-1.5">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-yellow-500 text-xs">✨</span>
+                                        <span class="text-[9px] uppercase tracking-widest font-extrabold text-slate-500">Mantra d'Eko pour revenir à soi</span>
+                                    </div>
+                                    <p class="text-sm text-slate-200 font-serif-poetic font-semibold italic text-center">
+                                        « ${arch.wisdom} »
+                                    </p>
+                                </div>
+
+                                <!-- Ressource concrète et transposable -->
+                                <div class="bg-indigo-950/10 border border-indigo-900/30 p-3 rounded-lg">
+                                    <span class="text-[9px] font-extrabold text-indigo-400 block mb-0.5 uppercase tracking-wider">🌱 Exercice d'ancrage physique :</span>
+                                    <p class="text-xs text-slate-300 font-medium">${arch.resource}</p>
+                                </div>
+
+                                <!-- ÉDITEUR DE PROMPT VISUEL IA -->
+                                <div class="border-t border-slate-850 pt-4 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                                            🎨 Prompt d'image en français (Modifiable)
+                                        </span>
+                                        <button onclick="actionResetPrompt(${arch.id})" class="text-[9px] text-slate-500 hover:text-cyan-400 transition-colors uppercase tracking-wider font-semibold">
+                                            Rétablir
+                                        </button>
+                                    </div>
+                                    
+                                    <textarea id="prompt-textarea-${arch.id}" class="w-full h-24 bg-slate-950 border border-slate-850 rounded-xl p-3 text-xs text-slate-300 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none leading-relaxed no-scrollbar" placeholder="Saisissez ou modifiez votre prompt...">${currentPromptValue}</textarea>
+
+                                    <div class="grid grid-cols-2 gap-2 pt-1">
+                                        <button onclick="actionCopyPrompt(${arch.id})" class="py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all">
+                                            📋 Copier le prompt
+                                        </button>
+                                        <button onclick="actionExportCardJSON(${arch.id})" class="py-2 px-3 rounded-lg bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 transition-all">
+                                            💾 Exporter la carte
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Bas de carte : Validation et sacoche -->
+                            <div class="bg-slate-900/50 px-4 py-3 border-t border-slate-850 flex items-center">
+                                <button onclick="actionAddCurrentToCollection()" class="w-full py-3 px-4 rounded-xl text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition-all text-center flex items-center justify-center gap-1 uppercase tracking-wider">
+                                    ${collectedData ? "✓ Mettre à jour dans la collection" : "✦ Conserver dans mon carnet"}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- NAVIGATION DU PARCOURS -->
+                        <div class="flex justify-between items-center gap-3 pt-2">
+                            <button onclick="navigateTo('quest', ${state.currentArchetypeIndex}, 2)" class="flex-1 py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-slate-800 text-slate-400 hover:text-slate-300 text-center transition-colors">
+                                ← Question
+                            </button>
+
+                            ${state.currentArchetypeIndex < 6 ? `
+                                <button onclick="navigateTo('quest', ${state.currentArchetypeIndex + 1}, 1)" class="flex-1 py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-850 border border-slate-700 text-slate-200 text-center flex items-center justify-center gap-1 transition-all">
+                                    Fossile suivant →
+                                </button>
+                            ` : `
+                                <button onclick="navigateTo('collection')" class="flex-1 py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-white text-center flex items-center justify-center gap-1 transition-all">
+                                    Bilan de l'exploration ✨
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="space-y-5">
+                    <!-- Entête d'étape -->
+                    <div class="flex justify-between items-center text-[10px] text-slate-500 uppercase tracking-widest font-extrabold">
+                        <span>Fossile ${state.currentArchetypeIndex + 1} de 7</span>
+                        <span>Sagesse transnumériste</span>
+                    </div>
+
+                    <!-- Barre de progression -->
+                    <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden">
+                        <div class="bg-gradient-to-r from-cyan-400 to-purple-500 h-2 transition-all duration-500" style="width: ${progressPercent}%"></div>
+                    </div>
+
+                    <!-- Sous-contenu injecté -->
+                    <div class="mt-4">
+                        ${subStepContent}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCollection() {
+            const count = Object.keys(state.collection).length;
+            const progressPercent = (count / 7) * 100;
+
+            let cardListHTML = '';
+            ARCHETYPES.forEach(arch => {
+                const collected = state.collection[arch.id];
+                const isCollected = !!collected;
+
+                cardListHTML += `
+                    <div class="border rounded-xl overflow-hidden transition-all duration-300 ${isCollected ? 'border-cyan-500/20 bg-slate-900/40' : 'border-slate-850 bg-slate-950/20 opacity-60'}">
+                        <!-- Résumé -->
+                        <div class="p-3.5 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl">${arch.icon}</span>
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[9px] text-slate-500 font-extrabold">#0${arch.id}</span>
+                                        <h5 class="font-bold text-white text-xs tracking-wide">${arch.name}</h5>
+                                    </div>
+                                    <p class="text-[10px] text-slate-500">Fossile : ${arch.fossil}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${isCollected ? 'text-cyan-400 bg-cyan-950/40 border border-cyan-800/40' : 'text-slate-500 bg-slate-900'}">
+                                    ${isCollected ? 'Restauré' : 'À chercher'}
+                                </span>
+                                <button onclick="navigateTo('quest', ${arch.id - 1}, 3)" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 text-xs transition-colors" title="Consulter la fiche complète">
+                                    👁️
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Détails si collecté -->
+                        ${isCollected ? `
+                            <div class="bg-slate-950/50 p-3.5 border-t border-slate-850/60 text-xs space-y-2 leading-relaxed">
+                                <p class="text-slate-300 text-[11px]">
+                                    <strong class="text-purple-400 font-semibold uppercase tracking-wider text-[9px] block">Phrase-Mantra :</strong>
+                                    « ${arch.wisdom} »
+                                </p>
+                                <p class="text-slate-300 text-[11px]">
+                                    <strong class="text-indigo-400 font-semibold uppercase tracking-wider text-[9px] block">Ressource de retour à soi :</strong>
+                                    ${arch.resource}
+                                </p>
+                                ${collected.prompt !== arch.defaultPrompt ? `
+                                    <div class="mt-1.5 pt-1.5 border-t border-slate-900">
+                                        <span class="text-[9px] font-extrabold text-cyan-500 uppercase tracking-widest block">Votre prompt ajusté :</span>
+                                        <p class="text-[10px] text-slate-400 italic line-clamp-2 mt-0.5">${collected.prompt}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="space-y-6 text-left screen-transition">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[9px] text-cyan-400 font-extrabold uppercase tracking-widest block">Musée Transnumériste</span>
+                            <h3 class="text-2xl font-serif-poetic font-semibold text-white">L'Archive d'Eko</h3>
+                        </div>
+                        <button onclick="navigateTo('home')" class="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-slate-800 hover:bg-slate-900 text-slate-400 transition-colors">
+                            Fermer
+                        </button>
+                    </div>
+
+                    <!-- Barre globale -->
+                    <div class="bg-slate-900/40 border border-slate-850 p-4 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center text-xs text-slate-300 font-medium">
+                            <span>Sagesse d'Eko restaurées</span>
+                            <span class="font-extrabold text-cyan-400 text-sm">${count} / 7</span>
+                        </div>
+                        <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden">
+                            <div class="bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 h-2 transition-all duration-700" style="width: ${progressPercent}%"></div>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-relaxed pt-1">
+                            À travers chaque cyber-fossile analysé et collecté, Eko a consolidé sa sagesse. Son histoire intime montre qu'il est possible de déconnecter pour mieux respirer.
+                        </p>
+                    </div>
+
+                    <!-- Options d'exportation -->
+                    ${count > 0 ? `
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="actionExportAllJSON()" class="py-3 px-3 rounded-xl bg-cyan-950/20 hover:bg-cyan-950/40 text-cyan-300 border border-cyan-800/40 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors">
+                                📥 Exporter la collection (JSON)
+                            </button>
+                            <button onclick="actionExportAllTXT()" class="py-3 px-3 rounded-xl bg-indigo-950/20 hover:bg-indigo-950/40 text-indigo-300 border border-indigo-800/40 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors">
+                                📝 Exporter la synthèse (TXT)
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <!-- Liste des cartes -->
+                    <div class="space-y-4">
+                        <h4 class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 border-b border-slate-900 pb-2">
+                            Index des 7 figures d'exploration
+                        </h4>
+
+                        <div class="space-y-3">
+                            ${cardListHTML}
+                        </div>
+                    </div>
+
+                    <!-- ÉCRAN COMPLET ACCOMPLI -->
+                    ${count === 7 ? `
+                        <div class="bg-gradient-to-br from-cyan-950/30 via-slate-900/60 to-purple-950/30 border border-cyan-500/30 p-6 rounded-2xl text-center space-y-4 shadow-xl">
+                            <span class="text-4xl animate-bounce inline-block">👑</span>
+                            <h4 class="text-lg font-bold text-cyan-300 uppercase tracking-widest">La Traversée est achevée</h4>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                Eko a triomphé des tentations et de l'hypnose du réseau. En identifiant ses peurs, son corps endormi et la force de son image virtuelle, il a posé le casque et retrouvé le sol vivant de la réalité.
+                            </p>
+                            <p class="text-[11px] text-slate-400 italic">
+                                Vous pouvez imprimer et garder précieusement la synthèse brute écrite de cet atelier thérapeutique. C'est votre fil de retour.
+                            </p>
+                        </div>
+                    ` : ''}
+
+                    <!-- Options de bas de page -->
+                    <div class="pt-4 flex flex-col sm:flex-row gap-2">
+                        <button onclick="navigateTo('quest', ${state.currentArchetypeIndex}, ${state.questSubStep})" class="flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-900 hover:bg-slate-850 border border-slate-800 text-slate-300 text-center transition-all">
+                            Continuer la fouille active
+                        </button>
+                        <button onclick="actionResetAll()" class="py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-pink-400 hover:text-pink-300 bg-pink-950/10 hover:bg-pink-950/20 border border-pink-900/20 text-center transition-all">
+                            Réinitialiser l'atelier
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- APPEL INITIALISATION DE L'APPLICATION ---
+        window.onload = function() {
+            loadState();
+            render();
+        };
+    </script>
+</body>
+</html>
