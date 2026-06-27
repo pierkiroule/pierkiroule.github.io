@@ -6,17 +6,14 @@
   <title>Soirée des Sosies presque parfait.e.s</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       width: 100%;
       min-height: 100%;
       overflow: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: system-ui, sans-serif;
       background: #020008;
       color: white;
     }
@@ -29,194 +26,134 @@
       z-index: 0;
     }
 
-    .screen {
+    .content {
       position: relative;
       z-index: 2;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 24px;
       text-align: center;
-      background:
-        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.28) 45%, rgba(0,0,0,.88) 100%);
+      pointer-events: none;
     }
 
-    .card {
-      width: min(940px, 100%);
-      padding: clamp(22px, 4vw, 42px);
-      border-radius: 34px;
-      background: rgba(5, 0, 18, .54);
-      border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(16px);
-      box-shadow:
-        0 0 45px rgba(255, 0, 200, .38),
-        0 0 90px rgba(0, 235, 255, .18);
+    .top {
+      padding-top: 8px;
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
+      display: inline-block;
+      padding: 7px 13px;
       border-radius: 999px;
-      background: rgba(255,255,255,.1);
-      color: #9fffff;
+      background: rgba(0, 234, 255, .12);
+      border: 1px solid rgba(0, 234, 255, .45);
+      color: #bfffff;
       text-transform: uppercase;
       letter-spacing: .18em;
       font-weight: 800;
-      font-size: .72rem;
-      box-shadow: 0 0 20px rgba(0, 235, 255, .45);
+      font-size: .7rem;
+      text-shadow: 0 0 12px #00eaff;
     }
 
     h1 {
-      margin: 18px 0 10px;
-      font-size: clamp(2.3rem, 9vw, 6.2rem);
+      margin: 16px auto 8px;
+      max-width: 920px;
+      font-size: clamp(2.4rem, 10vw, 6.6rem);
       line-height: .82;
       text-transform: uppercase;
       letter-spacing: -.06em;
       text-shadow:
         0 0 8px #fff,
         0 0 22px #ff2bd6,
-        0 0 60px #ff2bd6,
-        0 0 90px #00eaff;
+        0 0 54px #00eaff;
     }
 
     h1 span {
       display: block;
       margin-top: 10px;
       font-size: .43em;
-      color: #ff43c7;
+      color: #ff4bd8;
       letter-spacing: -.03em;
     }
 
     .infos {
       display: grid;
       gap: 6px;
-      margin: 16px 0 26px;
-      font-size: clamp(.98rem, 2.7vw, 1.35rem);
+      margin-top: 12px;
+      font-size: clamp(1rem, 3vw, 1.35rem);
       letter-spacing: .06em;
-    }
-
-    .date {
-      color: #ffffff;
+      text-shadow: 0 0 16px #000, 0 0 20px #00eaff;
     }
 
     .place {
-      color: #9fffff;
-      text-shadow: 0 0 18px #00eaff;
+      color: #aaffff;
+    }
+
+    .middle {
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      padding-bottom: 36px;
     }
 
     .countdown {
+      width: min(780px, 100%);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin: 26px 0 20px;
+      gap: 10px;
     }
 
     .timebox {
-      min-height: 115px;
-      display: grid;
-      place-items: center;
-      padding: 14px 8px;
-      border-radius: 24px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+      padding: 14px 6px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, .28);
       border: 1px solid rgba(255,255,255,.18);
-      box-shadow:
-        inset 0 0 30px rgba(255,255,255,.06),
-        0 0 28px rgba(255, 43, 214, .18);
+      box-shadow: 0 0 24px rgba(255, 43, 214, .25);
     }
 
     .number {
-      font-size: clamp(2.2rem, 8vw, 4.6rem);
+      font-size: clamp(2rem, 8vw, 4.3rem);
       font-weight: 950;
       line-height: 1;
-      color: white;
-      text-shadow:
-        0 0 14px #ff2bd6,
-        0 0 34px #00eaff;
+      text-shadow: 0 0 16px #ff2bd6, 0 0 34px #00eaff;
     }
 
     .label {
-      margin-top: 8px;
-      font-size: .68rem;
+      margin-top: 7px;
+      font-size: .66rem;
       text-transform: uppercase;
-      letter-spacing: .2em;
-      color: #caffff;
+      letter-spacing: .18em;
+      color: #d6ffff;
     }
 
-    .soundline {
-      margin-top: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
+    .bottom {
+      padding-bottom: 8px;
+      pointer-events: auto;
     }
 
     button {
       border: 0;
       border-radius: 999px;
-      padding: 14px 22px;
+      padding: 14px 24px;
       color: white;
       font-weight: 900;
       letter-spacing: .04em;
       background: linear-gradient(135deg, #ff2bd6, #00eaff);
-      box-shadow:
-        0 0 22px rgba(255, 43, 214, .85),
-        0 0 42px rgba(0, 234, 255, .45);
+      box-shadow: 0 0 28px rgba(255, 43, 214, .8);
       cursor: pointer;
     }
 
-    audio {
-      width: min(440px, 100%);
-      accent-color: #ff2bd6;
-    }
-
     .hint {
-      margin-top: 12px;
-      color: #ffd9fb;
-      font-size: .95rem;
-    }
-
-    .sliders {
-      margin-top: 22px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .slider {
-      padding: 13px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      text-align: left;
-      color: #e6ffff;
-      font-size: .72rem;
-      text-transform: uppercase;
-      letter-spacing: .13em;
-    }
-
-    input[type="range"] {
-      width: 100%;
       margin-top: 10px;
-      accent-color: #ff2bd6;
+      color: #ffd9fb;
+      font-size: .9rem;
+      text-shadow: 0 0 12px #000;
     }
 
-    @media (max-width: 680px) {
-      .countdown {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .sliders {
-        grid-template-columns: 1fr;
-      }
-
-      .timebox {
-        min-height: 98px;
-      }
+    @media (max-width: 640px) {
+      .content { padding: 18px; }
+      .countdown { grid-template-columns: repeat(2, 1fr); }
+      .middle { padding-bottom: 24px; }
     }
   </style>
 </head>
@@ -224,9 +161,9 @@
 <body>
   <canvas id="fx"></canvas>
 
-  <main class="screen">
-    <section class="card">
-      <div class="badge">◉ Audio party countdown</div>
+  <main class="content">
+    <section class="top">
+      <div class="badge">Audio party countdown</div>
 
       <h1>
         Soirée des Sosies
@@ -234,70 +171,29 @@
       </h1>
 
       <div class="infos">
-        <div class="date">27 juin 2026 · 19h30</div>
+        <div>27 juin 2026 · 19h30</div>
         <div class="place">13 rue des Papillons · Les Sorinières</div>
       </div>
+    </section>
 
-      <section class="countdown">
-        <div class="timebox">
-          <div>
-            <div id="days" class="number">00</div>
-            <div class="label">jours</div>
-          </div>
-        </div>
-
-        <div class="timebox">
-          <div>
-            <div id="hours" class="number">00</div>
-            <div class="label">heures</div>
-          </div>
-        </div>
-
-        <div class="timebox">
-          <div>
-            <div id="minutes" class="number">00</div>
-            <div class="label">minutes</div>
-          </div>
-        </div>
-
-        <div class="timebox">
-          <div>
-            <div id="seconds" class="number">00</div>
-            <div class="label">secondes</div>
-          </div>
-        </div>
-      </section>
-
-      <div class="soundline">
-        <button id="playBtn">▶ Lancer la soirée</button>
-
-        <audio id="audio" controls crossorigin="anonymous">
-          <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
-        </audio>
-      </div>
-
-      <div id="hint" class="hint">
-        Tape l’écran : le son démarre et les bulles deviennent audio-réactives.
-      </div>
-
-      <div class="sliders">
-        <label class="slider">
-          Bulles
-          <input id="bubblePower" type="range" min="40" max="260" value="150">
-        </label>
-
-        <label class="slider">
-          Visualizer
-          <input id="visualPower" type="range" min="40" max="220" value="140">
-        </label>
-
-        <label class="slider">
-          Chaos wahoo
-          <input id="chaosPower" type="range" min="0" max="120" value="70">
-        </label>
+    <section class="middle">
+      <div class="countdown">
+        <div class="timebox"><div id="days" class="number">00</div><div class="label">jours</div></div>
+        <div class="timebox"><div id="hours" class="number">00</div><div class="label">heures</div></div>
+        <div class="timebox"><div id="minutes" class="number">00</div><div class="label">minutes</div></div>
+        <div class="timebox"><div id="seconds" class="number">00</div><div class="label">secondes</div></div>
       </div>
     </section>
+
+    <section class="bottom">
+      <button id="playBtn">▶ Lancer la soirée</button>
+      <div id="hint" class="hint">Tape l’écran pour lancer le son et les bulles audio-réactives.</div>
+    </section>
   </main>
+
+  <audio id="audio" preload="auto" crossorigin="anonymous">
+    <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
+  </audio>
 
   <script>
     const targetDate = new Date("2026-06-27T19:30:00+02:00").getTime();
@@ -314,10 +210,6 @@
     const playBtn = document.getElementById("playBtn");
     const hint = document.getElementById("hint");
 
-    const bubblePower = document.getElementById("bubblePower");
-    const visualPower = document.getElementById("visualPower");
-    const chaosPower = document.getElementById("chaosPower");
-
     let width = 0;
     let height = 0;
 
@@ -326,7 +218,7 @@
     let source;
     let dataArray;
     let audioReady = false;
-    let hasStarted = false;
+    let started = false;
 
     const bubbles = [];
     const sparks = [];
@@ -354,22 +246,25 @@
     }
 
     function resize() {
-      width = canvas.width = window.innerWidth * window.devicePixelRatio;
-      height = canvas.height = window.innerHeight * window.devicePixelRatio;
-      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      const ratio = window.devicePixelRatio || 1;
       width = window.innerWidth;
       height = window.innerHeight;
+
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     }
 
     function makeBubble() {
       return {
         x: Math.random() * width,
         y: height + Math.random() * height,
-        r: 5 + Math.random() * 38,
-        speed: .35 + Math.random() * 1.9,
-        drift: -1.2 + Math.random() * 2.4,
-        hue: Math.random() > .5 ? 190 + Math.random() * 25 : 295 + Math.random() * 35,
-        alpha: .22 + Math.random() * .55
+        r: 5 + Math.random() * 42,
+        speed: .4 + Math.random() * 2,
+        drift: -1.4 + Math.random() * 2.8,
+        hue: Math.random() > .5 ? 190 + Math.random() * 25 : 300 + Math.random() * 30,
+        alpha: .2 + Math.random() * .55
       };
     }
 
@@ -377,9 +272,9 @@
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: -1.5 + Math.random() * 3,
-        vy: -1.5 + Math.random() * 3,
-        life: 20 + Math.random() * 50,
+        vx: -1.6 + Math.random() * 3.2,
+        vy: -1.6 + Math.random() * 3.2,
+        life: 20 + Math.random() * 60,
         hue: Math.random() > .5 ? 190 : 315
       };
     }
@@ -388,13 +283,8 @@
       bubbles.length = 0;
       sparks.length = 0;
 
-      for (let i = 0; i < 260; i++) {
-        bubbles.push(makeBubble());
-      }
-
-      for (let i = 0; i < 120; i++) {
-        sparks.push(makeSpark());
-      }
+      for (let i = 0; i < 180; i++) bubbles.push(makeBubble());
+      for (let i = 0; i < 120; i++) sparks.push(makeSpark());
     }
 
     function initAudio() {
@@ -423,22 +313,17 @@
 
         await audio.play();
 
-        hasStarted = true;
+        started = true;
         playBtn.textContent = "⏸ Ambiance lancée";
-        hint.textContent = "Les sosies presque parfait.e.s entrent dans la fréquence.";
-      } catch (error) {
+        hint.textContent = "Les bulles dansent sur Sozi Qui Sait.";
+      } catch {
         hint.textContent = "Clique sur le bouton pour lancer le son.";
       }
     }
 
     function getAudioData() {
       if (!audioReady) {
-        return {
-          level: .22,
-          bass: .18,
-          mid: .2,
-          treble: .25
-        };
+        return { level: .22, bass: .18, mid: .2, treble: .25 };
       }
 
       analyser.getByteFrequencyData(dataArray);
@@ -465,42 +350,36 @@
       };
     }
 
-    function drawBackground(audioData) {
-      const pulse = audioData.bass;
-
+    function drawBackground(a) {
       const gradient = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        0,
-        width / 2,
-        height / 2,
-        Math.max(width, height)
+        width / 2, height / 2, 0,
+        width / 2, height / 2, Math.max(width, height)
       );
 
-      gradient.addColorStop(0, `rgba(255, 0, 210, ${.18 + pulse * .35})`);
-      gradient.addColorStop(.34, `rgba(0, 235, 255, ${.10 + audioData.mid * .25})`);
-      gradient.addColorStop(.72, `rgba(40, 0, 90, ${.55})`);
+      gradient.addColorStop(0, `rgba(255, 0, 210, ${.18 + a.bass * .35})`);
+      gradient.addColorStop(.34, `rgba(0, 235, 255, ${.1 + a.mid * .25})`);
+      gradient.addColorStop(.72, "rgba(40, 0, 90, .55)");
       gradient.addColorStop(1, "#020008");
 
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
     }
 
-    function drawGrid(audioData) {
+    function drawGrid(a) {
       const gap = 46;
-      const yStart = height * .58;
-      const vanishingX = width / 2;
-      const vanishingY = height * .38;
+      const yStart = height * .56;
+      const vx = width / 2;
+      const vy = height * .38;
 
       ctx.save();
-      ctx.globalAlpha = .18 + audioData.level * .28;
+      ctx.globalAlpha = .14 + a.level * .28;
       ctx.strokeStyle = "#00eaff";
       ctx.lineWidth = 1;
 
       for (let x = -width; x < width * 2; x += gap) {
         ctx.beginPath();
         ctx.moveTo(x, height);
-        ctx.lineTo(vanishingX, vanishingY);
+        ctx.lineTo(vx, vy);
         ctx.stroke();
       }
 
@@ -514,37 +393,29 @@
       ctx.restore();
     }
 
-    function drawVisualizer(audioData) {
-      const bars = 160;
-      const visual = Number(visualPower.value) / 100;
-      const chaos = Number(chaosPower.value) / 100;
-
+    function drawVisualizer(a) {
+      const bars = 170;
       const cx = width / 2;
-      const cy = height / 2;
-      const baseRadius = Math.min(width, height) * .23;
+      const cy = height / 2 + 12;
+      const baseRadius = Math.min(width, height) * .24;
 
       ctx.save();
 
       for (let i = 0; i < bars; i++) {
         const value = audioReady
           ? dataArray[i % dataArray.length] / 255
-          : .15 + Math.random() * .2;
+          : .12 + Math.random() * .22;
 
         const angle = (i / bars) * Math.PI * 2;
-        const wobble = Math.sin(Date.now() * .004 + i) * chaos * 12;
-        const barHeight = 30 + value * 240 * visual + audioData.bass * 120;
+        const wobble = Math.sin(Date.now() * .004 + i) * 10;
+        const barHeight = 30 + value * 260 + a.bass * 120;
 
         const r1 = baseRadius + wobble;
         const r2 = baseRadius + barHeight + wobble;
 
-        const x1 = cx + Math.cos(angle) * r1;
-        const y1 = cy + Math.sin(angle) * r1;
-        const x2 = cx + Math.cos(angle) * r2;
-        const y2 = cy + Math.sin(angle) * r2;
-
         ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
+        ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
+        ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
 
         ctx.strokeStyle = i % 2 === 0
           ? `rgba(255, 43, 214, ${.32 + value})`
@@ -557,9 +428,9 @@
       }
 
       ctx.beginPath();
-      ctx.arc(cx, cy, baseRadius * (.92 + audioData.bass * .16), 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255,255,255,${.24 + audioData.level})`;
-      ctx.lineWidth = 2 + audioData.bass * 8;
+      ctx.arc(cx, cy, baseRadius * (.92 + a.bass * .16), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,255,255,${.24 + a.level})`;
+      ctx.lineWidth = 2 + a.bass * 8;
       ctx.shadowBlur = 35;
       ctx.shadowColor = "#ffffff";
       ctx.stroke();
@@ -567,23 +438,17 @@
       ctx.restore();
     }
 
-    function drawBubbles(audioData) {
-      const maxBubbles = Number(bubblePower.value);
-      const chaos = Number(chaosPower.value) / 100;
-
-      while (bubbles.length < maxBubbles) bubbles.push(makeBubble());
-      while (bubbles.length > maxBubbles) bubbles.pop();
-
+    function drawBubbles(a) {
       for (const b of bubbles) {
-        b.y -= b.speed + audioData.level * 8 + audioData.bass * 5;
-        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .015) * chaos * 2.8;
+        b.y -= b.speed + a.level * 8 + a.bass * 5;
+        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .015) * 2.4;
 
         if (b.y < -90 || b.x < -90 || b.x > width + 90) {
           Object.assign(b, makeBubble());
           b.y = height + 80;
         }
 
-        const radius = b.r * (1 + audioData.bass * 1.9);
+        const radius = b.r * (1 + a.bass * 1.8);
 
         const gradient = ctx.createRadialGradient(
           b.x - radius * .35,
@@ -604,40 +469,36 @@
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `hsla(${b.hue},100%,78%,${.18 + audioData.level})`;
-        ctx.lineWidth = 1.2 + audioData.treble * 2;
+        ctx.strokeStyle = `hsla(${b.hue},100%,78%,${.18 + a.level})`;
+        ctx.lineWidth = 1.2 + a.treble * 2;
         ctx.stroke();
       }
     }
 
-    function drawWave(audioData) {
-      const chaos = Number(chaosPower.value) / 100;
-      const amp = 30 + audioData.level * 130 + audioData.bass * 120;
-      const baseY = height * .79;
+    function drawWave(a) {
+      const amp = 30 + a.level * 130 + a.bass * 120;
+      const baseY = height * .8;
 
       ctx.save();
-      ctx.beginPath();
 
+      ctx.beginPath();
       for (let x = 0; x <= width; x += 7) {
         const y =
           baseY
           + Math.sin(x * .018 + Date.now() * .005) * amp
-          + Math.sin(x * .045 + Date.now() * .009) * amp * chaos * .75;
+          + Math.sin(x * .045 + Date.now() * .009) * amp * .55;
 
         if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
 
-      ctx.strokeStyle = `rgba(255, 43, 214, ${.35 + audioData.level})`;
-      ctx.lineWidth = 3 + audioData.bass * 7;
+      ctx.strokeStyle = `rgba(255, 43, 214, ${.35 + a.level})`;
+      ctx.lineWidth = 3 + a.bass * 7;
       ctx.shadowBlur = 34;
       ctx.shadowColor = "#ff2bd6";
       ctx.stroke();
 
       ctx.beginPath();
-
       for (let x = 0; x <= width; x += 7) {
         const y =
           baseY + 22
@@ -647,27 +508,25 @@
         else ctx.lineTo(x, y);
       }
 
-      ctx.strokeStyle = `rgba(0, 234, 255, ${.25 + audioData.mid})`;
+      ctx.strokeStyle = `rgba(0, 234, 255, ${.25 + a.mid})`;
       ctx.shadowColor = "#00eaff";
       ctx.stroke();
 
       ctx.restore();
     }
 
-    function drawSparks(audioData) {
-      const chaos = Number(chaosPower.value) / 100;
-
+    function drawSparks(a) {
       for (const s of sparks) {
-        s.x += s.vx * (1 + chaos * 2 + audioData.treble * 3);
-        s.y += s.vy * (1 + chaos * 2 + audioData.treble * 3);
-        s.life -= .35 + audioData.treble;
+        s.x += s.vx * (1 + a.treble * 3);
+        s.y += s.vy * (1 + a.treble * 3);
+        s.life -= .35 + a.treble;
 
         if (s.life <= 0 || s.x < 0 || s.x > width || s.y < 0 || s.y > height) {
           Object.assign(s, makeSpark());
         }
 
         ctx.beginPath();
-        ctx.arc(s.x, s.y, 1 + audioData.treble * 3, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, 1 + a.treble * 3, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${s.hue},100%,70%,${Math.min(1, s.life / 50)})`;
         ctx.shadowBlur = 18;
         ctx.shadowColor = s.hue === 190 ? "#00eaff" : "#ff2bd6";
@@ -677,23 +536,23 @@
       ctx.shadowBlur = 0;
     }
 
-    function drawBassFlash(audioData) {
-      if (audioData.bass > .55) {
-        ctx.fillStyle = `rgba(255,255,255,${(audioData.bass - .55) * .22})`;
+    function drawFlash(a) {
+      if (a.bass > .55) {
+        ctx.fillStyle = `rgba(255,255,255,${(a.bass - .55) * .22})`;
         ctx.fillRect(0, 0, width, height);
       }
     }
 
     function animate() {
-      const audioData = getAudioData();
+      const a = getAudioData();
 
-      drawBackground(audioData);
-      drawGrid(audioData);
-      drawVisualizer(audioData);
-      drawBubbles(audioData);
-      drawWave(audioData);
-      drawSparks(audioData);
-      drawBassFlash(audioData);
+      drawBackground(a);
+      drawGrid(a);
+      drawVisualizer(a);
+      drawBubbles(a);
+      drawWave(a);
+      drawSparks(a);
+      drawFlash(a);
 
       requestAnimationFrame(animate);
     }
@@ -706,7 +565,7 @@
     playBtn.addEventListener("click", startSound);
 
     document.body.addEventListener("pointerdown", () => {
-      if (!hasStarted) startSound();
+      if (!started) startSound();
     }, { once: true });
 
     updateCountdown();
