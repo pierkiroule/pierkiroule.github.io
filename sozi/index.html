@@ -6,81 +6,104 @@
   <title>Soirée des Sosies presque parfait.e.s</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
+    html,
     body {
       margin: 0;
-      min-height: 100vh;
+      width: 100%;
+      min-height: 100%;
       overflow: hidden;
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020008;
       color: white;
-      background: #03000a;
     }
 
     canvas {
       position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       z-index: 0;
     }
 
-    .overlay {
+    .screen {
       position: relative;
       z-index: 2;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
       text-align: center;
       background:
-        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.85) 100%);
+        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.28) 45%, rgba(0,0,0,.88) 100%);
     }
 
     .card {
-      width: min(920px, 100%);
-      padding: 32px 22px;
-      border-radius: 32px;
-      background: rgba(5, 0, 20, .45);
+      width: min(940px, 100%);
+      padding: clamp(22px, 4vw, 42px);
+      border-radius: 34px;
+      background: rgba(5, 0, 18, .54);
       border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 0 80px rgba(255,0,180,.45);
+      backdrop-filter: blur(16px);
+      box-shadow:
+        0 0 45px rgba(255, 0, 200, .38),
+        0 0 90px rgba(0, 235, 255, .18);
     }
 
-    .kicker {
-      letter-spacing: .28em;
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+      color: #9fffff;
       text-transform: uppercase;
-      color: #6ffcff;
+      letter-spacing: .18em;
       font-weight: 800;
-      font-size: .8rem;
+      font-size: .72rem;
+      box-shadow: 0 0 20px rgba(0, 235, 255, .45);
     }
 
     h1 {
-      margin: 16px 0 8px;
-      font-size: clamp(2.4rem, 9vw, 6rem);
-      line-height: .86;
+      margin: 18px 0 10px;
+      font-size: clamp(2.3rem, 9vw, 6.2rem);
+      line-height: .82;
       text-transform: uppercase;
+      letter-spacing: -.06em;
       text-shadow:
-        0 0 12px #ff2bd6,
-        0 0 34px #ff2bd6,
-        0 0 70px #00eaff;
+        0 0 8px #fff,
+        0 0 22px #ff2bd6,
+        0 0 60px #ff2bd6,
+        0 0 90px #00eaff;
     }
 
     h1 span {
       display: block;
-      font-size: .45em;
-      color: #ff4fcb;
+      margin-top: 10px;
+      font-size: .43em;
+      color: #ff43c7;
+      letter-spacing: -.03em;
     }
 
-    .date, .place {
-      font-size: clamp(1rem, 3vw, 1.4rem);
-      letter-spacing: .08em;
-      margin-top: 12px;
+    .infos {
+      display: grid;
+      gap: 6px;
+      margin: 16px 0 26px;
+      font-size: clamp(.98rem, 2.7vw, 1.35rem);
+      letter-spacing: .06em;
+    }
+
+    .date {
+      color: #ffffff;
     }
 
     .place {
-      color: #a9ffff;
+      color: #9fffff;
       text-shadow: 0 0 18px #00eaff;
     }
 
@@ -88,145 +111,193 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin: 30px 0 18px;
+      margin: 26px 0 20px;
     }
 
-    .box {
-      padding: 18px 8px;
-      border-radius: 22px;
-      background: rgba(255,255,255,.09);
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: inset 0 0 30px rgba(255,255,255,.08), 0 0 26px rgba(0,234,255,.25);
+    .timebox {
+      min-height: 115px;
+      display: grid;
+      place-items: center;
+      padding: 14px 8px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow:
+        inset 0 0 30px rgba(255,255,255,.06),
+        0 0 28px rgba(255, 43, 214, .18);
     }
 
     .number {
-      font-size: clamp(2rem, 8vw, 4.4rem);
-      font-weight: 900;
+      font-size: clamp(2.2rem, 8vw, 4.6rem);
+      font-weight: 950;
+      line-height: 1;
       color: white;
-      text-shadow: 0 0 18px #ff2bd6, 0 0 42px #00eaff;
+      text-shadow:
+        0 0 14px #ff2bd6,
+        0 0 34px #00eaff;
     }
 
     .label {
       margin-top: 8px;
+      font-size: .68rem;
       text-transform: uppercase;
-      letter-spacing: .18em;
-      font-size: .72rem;
-      color: #c7ffff;
+      letter-spacing: .2em;
+      color: #caffff;
     }
 
-    .audio {
-      margin-top: 22px;
+    .soundline {
+      margin-top: 18px;
       display: flex;
-      gap: 14px;
       align-items: center;
       justify-content: center;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
     button {
-      border: none;
+      border: 0;
       border-radius: 999px;
       padding: 14px 22px;
-      font-weight: 900;
       color: white;
+      font-weight: 900;
+      letter-spacing: .04em;
       background: linear-gradient(135deg, #ff2bd6, #00eaff);
-      box-shadow: 0 0 32px rgba(255,43,214,.8);
+      box-shadow:
+        0 0 22px rgba(255, 43, 214, .85),
+        0 0 42px rgba(0, 234, 255, .45);
       cursor: pointer;
     }
 
     audio {
-      width: min(420px, 100%);
+      width: min(440px, 100%);
       accent-color: #ff2bd6;
+    }
+
+    .hint {
+      margin-top: 12px;
+      color: #ffd9fb;
+      font-size: .95rem;
     }
 
     .sliders {
       margin-top: 22px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
+      gap: 12px;
     }
 
     .slider {
-      background: rgba(255,255,255,.08);
+      padding: 13px;
       border-radius: 18px;
-      padding: 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
       text-align: left;
-      font-size: .75rem;
+      color: #e6ffff;
+      font-size: .72rem;
       text-transform: uppercase;
-      letter-spacing: .12em;
-      color: #dff;
+      letter-spacing: .13em;
     }
 
     input[type="range"] {
       width: 100%;
+      margin-top: 10px;
       accent-color: #ff2bd6;
     }
 
-    .message {
-      margin-top: 18px;
-      font-size: 1.1rem;
-      color: #ffd6fb;
-    }
+    @media (max-width: 680px) {
+      .countdown {
+        grid-template-columns: repeat(2, 1fr);
+      }
 
-    @media (max-width: 640px) {
-      .countdown { grid-template-columns: repeat(2, 1fr); }
-      .sliders { grid-template-columns: 1fr; }
+      .sliders {
+        grid-template-columns: 1fr;
+      }
+
+      .timebox {
+        min-height: 98px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <canvas id="canvas"></canvas>
+  <canvas id="fx"></canvas>
 
-  <div class="overlay">
-    <main class="card">
-      <div class="kicker">Compte à rebours audio-réactif</div>
+  <main class="screen">
+    <section class="card">
+      <div class="badge">◉ Audio party countdown</div>
 
       <h1>
         Soirée des Sosies
         <span>presque parfait.e.s</span>
       </h1>
 
-      <div class="date">27 juin 2026 · 19h30</div>
-      <div class="place">13 rue des Papillons · Les Sorinières</div>
+      <div class="infos">
+        <div class="date">27 juin 2026 · 19h30</div>
+        <div class="place">13 rue des Papillons · Les Sorinières</div>
+      </div>
 
       <section class="countdown">
-        <div class="box"><div id="days" class="number">00</div><div class="label">jours</div></div>
-        <div class="box"><div id="hours" class="number">00</div><div class="label">heures</div></div>
-        <div class="box"><div id="minutes" class="number">00</div><div class="label">minutes</div></div>
-        <div class="box"><div id="seconds" class="number">00</div><div class="label">secondes</div></div>
+        <div class="timebox">
+          <div>
+            <div id="days" class="number">00</div>
+            <div class="label">jours</div>
+          </div>
+        </div>
+
+        <div class="timebox">
+          <div>
+            <div id="hours" class="number">00</div>
+            <div class="label">heures</div>
+          </div>
+        </div>
+
+        <div class="timebox">
+          <div>
+            <div id="minutes" class="number">00</div>
+            <div class="label">minutes</div>
+          </div>
+        </div>
+
+        <div class="timebox">
+          <div>
+            <div id="seconds" class="number">00</div>
+            <div class="label">secondes</div>
+          </div>
+        </div>
       </section>
 
-      <div class="audio">
-        <button id="playBtn">▶ Lancer le son</button>
+      <div class="soundline">
+        <button id="playBtn">▶ Lancer la soirée</button>
 
         <audio id="audio" controls crossorigin="anonymous">
           <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
         </audio>
       </div>
 
+      <div id="hint" class="hint">
+        Tape l’écran : le son démarre et les bulles deviennent audio-réactives.
+      </div>
+
       <div class="sliders">
         <label class="slider">
           Bulles
-          <input id="bubbleSlider" type="range" min="30" max="220" value="120">
+          <input id="bubblePower" type="range" min="40" max="260" value="150">
         </label>
 
         <label class="slider">
           Visualizer
-          <input id="barSlider" type="range" min="40" max="180" value="110">
+          <input id="visualPower" type="range" min="40" max="220" value="140">
         </label>
 
         <label class="slider">
-          Chaos Wahoo
-          <input id="chaosSlider" type="range" min="0" max="100" value="55">
+          Chaos wahoo
+          <input id="chaosPower" type="range" min="0" max="120" value="70">
         </label>
       </div>
-
-      <div id="message" class="message">
-        Active le son. Les bulles vont danser.
-      </div>
-    </main>
-  </div>
+    </section>
+  </main>
 
   <script>
     const targetDate = new Date("2026-06-27T19:30:00+02:00").getTime();
@@ -235,10 +306,33 @@
     const hoursEl = document.getElementById("hours");
     const minutesEl = document.getElementById("minutes");
     const secondsEl = document.getElementById("seconds");
-    const messageEl = document.getElementById("message");
 
-    function pad(n) {
-      return String(n).padStart(2, "0");
+    const canvas = document.getElementById("fx");
+    const ctx = canvas.getContext("2d");
+
+    const audio = document.getElementById("audio");
+    const playBtn = document.getElementById("playBtn");
+    const hint = document.getElementById("hint");
+
+    const bubblePower = document.getElementById("bubblePower");
+    const visualPower = document.getElementById("visualPower");
+    const chaosPower = document.getElementById("chaosPower");
+
+    let width = 0;
+    let height = 0;
+
+    let audioCtx;
+    let analyser;
+    let source;
+    let dataArray;
+    let audioReady = false;
+    let hasStarted = false;
+
+    const bubbles = [];
+    const sparks = [];
+
+    function pad(value) {
+      return String(value).padStart(2, "0");
     }
 
     function updateCountdown() {
@@ -249,7 +343,7 @@
         hoursEl.textContent = "00";
         minutesEl.textContent = "00";
         secondsEl.textContent = "00";
-        messageEl.textContent = "C’est maintenant. Les doubles entrent en scène.";
+        hint.textContent = "C’est maintenant. Que les doubles entrent en scène.";
         return;
       }
 
@@ -259,47 +353,48 @@
       secondsEl.textContent = pad(Math.floor(distance / 1000) % 60);
     }
 
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
-    const audio = document.getElementById("audio");
-    const playBtn = document.getElementById("playBtn");
-
-    const bubbleSlider = document.getElementById("bubbleSlider");
-    const barSlider = document.getElementById("barSlider");
-    const chaosSlider = document.getElementById("chaosSlider");
-
-    let w, h;
-    let audioCtx, analyser, source, dataArray;
-    let audioReady = false;
-
-    const bubbles = [];
-
     function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
+      width = canvas.width = window.innerWidth * window.devicePixelRatio;
+      height = canvas.height = window.innerHeight * window.devicePixelRatio;
+      ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+      width = window.innerWidth;
+      height = window.innerHeight;
     }
 
-    window.addEventListener("resize", resize);
-    resize();
-
-    function createBubble() {
+    function makeBubble() {
       return {
-        x: Math.random() * w,
-        y: h + Math.random() * h,
-        r: 4 + Math.random() * 36,
-        speed: .4 + Math.random() * 2.2,
-        drift: -1 + Math.random() * 2,
-        hue: Math.random() > .5 ? 190 : 310,
-        alpha: .25 + Math.random() * .65
+        x: Math.random() * width,
+        y: height + Math.random() * height,
+        r: 5 + Math.random() * 38,
+        speed: .35 + Math.random() * 1.9,
+        drift: -1.2 + Math.random() * 2.4,
+        hue: Math.random() > .5 ? 190 + Math.random() * 25 : 295 + Math.random() * 35,
+        alpha: .22 + Math.random() * .55
       };
     }
 
-    for (let i = 0; i < 220; i++) {
-      bubbles.push(createBubble());
+    function makeSpark() {
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: -1.5 + Math.random() * 3,
+        vy: -1.5 + Math.random() * 3,
+        life: 20 + Math.random() * 50,
+        hue: Math.random() > .5 ? 190 : 315
+      };
+    }
+
+    function initParticles() {
+      bubbles.length = 0;
+      sparks.length = 0;
+
+      for (let i = 0; i < 260; i++) {
+        bubbles.push(makeBubble());
+      }
+
+      for (let i = 0; i < 120; i++) {
+        sparks.push(makeSpark());
+      }
     }
 
     function initAudio() {
@@ -307,7 +402,8 @@
 
       audioCtx = new AudioContext();
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = .82;
 
       source = audioCtx.createMediaElementSource(audio);
       source.connect(analyser);
@@ -317,157 +413,307 @@
       audioReady = true;
     }
 
-    playBtn.addEventListener("click", async () => {
-      initAudio();
+    async function startSound() {
+      try {
+        initAudio();
 
-      if (audioCtx.state === "suspended") {
-        await audioCtx.resume();
+        if (audioCtx.state === "suspended") {
+          await audioCtx.resume();
+        }
+
+        await audio.play();
+
+        hasStarted = true;
+        playBtn.textContent = "⏸ Ambiance lancée";
+        hint.textContent = "Les sosies presque parfait.e.s entrent dans la fréquence.";
+      } catch (error) {
+        hint.textContent = "Clique sur le bouton pour lancer le son.";
       }
+    }
 
-      audio.play();
-      playBtn.textContent = "⏸ Ambiance lancée";
-    });
-
-    function getAudioLevel() {
-      if (!audioReady) return 0.25;
+    function getAudioData() {
+      if (!audioReady) {
+        return {
+          level: .22,
+          bass: .18,
+          mid: .2,
+          treble: .25
+        };
+      }
 
       analyser.getByteFrequencyData(dataArray);
 
       let sum = 0;
+      let bass = 0;
+      let mid = 0;
+      let treble = 0;
+
       for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
+        const value = dataArray[i] / 255;
+        sum += value;
+
+        if (i < dataArray.length * .14) bass += value;
+        else if (i < dataArray.length * .48) mid += value;
+        else treble += value;
       }
 
-      return sum / dataArray.length / 255;
+      return {
+        level: sum / dataArray.length,
+        bass: bass / (dataArray.length * .14),
+        mid: mid / (dataArray.length * .34),
+        treble: treble / (dataArray.length * .52)
+      };
     }
 
-    function drawBackground(level) {
-      const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h));
-      gradient.addColorStop(0, `rgba(255, 0, 190, ${0.16 + level * .3})`);
-      gradient.addColorStop(.35, `rgba(0, 234, 255, ${0.10 + level * .2})`);
-      gradient.addColorStop(1, "#03000a");
+    function drawBackground(audioData) {
+      const pulse = audioData.bass;
+
+      const gradient = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        0,
+        width / 2,
+        height / 2,
+        Math.max(width, height)
+      );
+
+      gradient.addColorStop(0, `rgba(255, 0, 210, ${.18 + pulse * .35})`);
+      gradient.addColorStop(.34, `rgba(0, 235, 255, ${.10 + audioData.mid * .25})`);
+      gradient.addColorStop(.72, `rgba(40, 0, 90, ${.55})`);
+      gradient.addColorStop(1, "#020008");
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillRect(0, 0, width, height);
     }
 
-    function drawBubbles(level) {
-      const desired = Number(bubbleSlider.value);
+    function drawGrid(audioData) {
+      const gap = 46;
+      const yStart = height * .58;
+      const vanishingX = width / 2;
+      const vanishingY = height * .38;
 
-      while (bubbles.length < desired) bubbles.push(createBubble());
-      while (bubbles.length > desired) bubbles.pop();
+      ctx.save();
+      ctx.globalAlpha = .18 + audioData.level * .28;
+      ctx.strokeStyle = "#00eaff";
+      ctx.lineWidth = 1;
 
-      const chaos = Number(chaosSlider.value) / 100;
-
-      bubbles.forEach(b => {
-        b.y -= b.speed + level * 8;
-        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .02) * chaos * 2;
-
-        if (b.y < -80) {
-          Object.assign(b, createBubble());
-          b.y = h + 80;
-        }
-
-        const pulse = 1 + level * 1.8;
-        const radius = b.r * pulse;
-
+      for (let x = -width; x < width * 2; x += gap) {
         ctx.beginPath();
-        ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
-
-        const g = ctx.createRadialGradient(b.x - radius / 3, b.y - radius / 3, 1, b.x, b.y, radius);
-        g.addColorStop(0, `rgba(255,255,255,${b.alpha})`);
-        g.addColorStop(.35, `hsla(${b.hue},100%,65%,${b.alpha * .7})`);
-        g.addColorStop(1, `rgba(255,255,255,0)`);
-
-        ctx.fillStyle = g;
-        ctx.fill();
-
-        ctx.strokeStyle = `hsla(${b.hue},100%,70%,${.2 + level})`;
-        ctx.lineWidth = 1.5;
+        ctx.moveTo(x, height);
+        ctx.lineTo(vanishingX, vanishingY);
         ctx.stroke();
-      });
+      }
+
+      for (let y = yStart; y < height; y += gap) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.quadraticCurveTo(width / 2, y - 60, width, y);
+        ctx.stroke();
+      }
+
+      ctx.restore();
     }
 
-    function drawVisualizer(level) {
-      const bars = 96;
-      const barBoost = Number(barSlider.value) / 100;
-      const chaos = Number(chaosSlider.value) / 100;
-      const centerX = w / 2;
-      const centerY = h / 2;
+    function drawVisualizer(audioData) {
+      const bars = 160;
+      const visual = Number(visualPower.value) / 100;
+      const chaos = Number(chaosPower.value) / 100;
+
+      const cx = width / 2;
+      const cy = height / 2;
+      const baseRadius = Math.min(width, height) * .23;
+
+      ctx.save();
 
       for (let i = 0; i < bars; i++) {
-        const value = audioReady ? dataArray[i % dataArray.length] / 255 : Math.random() * .4;
-        const angle = (i / bars) * Math.PI * 2;
-        const baseRadius = Math.min(w, h) * .26;
-        const barHeight = (40 + value * 230 * barBoost + level * 90) * (1 + chaos * .6);
+        const value = audioReady
+          ? dataArray[i % dataArray.length] / 255
+          : .15 + Math.random() * .2;
 
-        const x1 = centerX + Math.cos(angle) * baseRadius;
-        const y1 = centerY + Math.sin(angle) * baseRadius;
-        const x2 = centerX + Math.cos(angle) * (baseRadius + barHeight);
-        const y2 = centerY + Math.sin(angle) * (baseRadius + barHeight);
+        const angle = (i / bars) * Math.PI * 2;
+        const wobble = Math.sin(Date.now() * .004 + i) * chaos * 12;
+        const barHeight = 30 + value * 240 * visual + audioData.bass * 120;
+
+        const r1 = baseRadius + wobble;
+        const r2 = baseRadius + barHeight + wobble;
+
+        const x1 = cx + Math.cos(angle) * r1;
+        const y1 = cy + Math.sin(angle) * r1;
+        const x2 = cx + Math.cos(angle) * r2;
+        const y2 = cy + Math.sin(angle) * r2;
 
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
 
         ctx.strokeStyle = i % 2 === 0
-          ? `rgba(255, 43, 214, ${.35 + value})`
-          : `rgba(0, 234, 255, ${.35 + value})`;
+          ? `rgba(255, 43, 214, ${.32 + value})`
+          : `rgba(0, 234, 255, ${.32 + value})`;
 
-        ctx.lineWidth = 2 + value * 7;
-        ctx.shadowBlur = 22 + value * 40;
+        ctx.lineWidth = 1.5 + value * 7;
+        ctx.shadowBlur = 22 + value * 45;
         ctx.shadowColor = i % 2 === 0 ? "#ff2bd6" : "#00eaff";
         ctx.stroke();
       }
 
-      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(cx, cy, baseRadius * (.92 + audioData.bass * .16), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,255,255,${.24 + audioData.level})`;
+      ctx.lineWidth = 2 + audioData.bass * 8;
+      ctx.shadowBlur = 35;
+      ctx.shadowColor = "#ffffff";
+      ctx.stroke();
+
+      ctx.restore();
     }
 
-    function drawWave(level) {
+    function drawBubbles(audioData) {
+      const maxBubbles = Number(bubblePower.value);
+      const chaos = Number(chaosPower.value) / 100;
+
+      while (bubbles.length < maxBubbles) bubbles.push(makeBubble());
+      while (bubbles.length > maxBubbles) bubbles.pop();
+
+      for (const b of bubbles) {
+        b.y -= b.speed + audioData.level * 8 + audioData.bass * 5;
+        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .015) * chaos * 2.8;
+
+        if (b.y < -90 || b.x < -90 || b.x > width + 90) {
+          Object.assign(b, makeBubble());
+          b.y = height + 80;
+        }
+
+        const radius = b.r * (1 + audioData.bass * 1.9);
+
+        const gradient = ctx.createRadialGradient(
+          b.x - radius * .35,
+          b.y - radius * .35,
+          1,
+          b.x,
+          b.y,
+          radius
+        );
+
+        gradient.addColorStop(0, `rgba(255,255,255,${b.alpha})`);
+        gradient.addColorStop(.25, `hsla(${b.hue},100%,72%,${b.alpha * .65})`);
+        gradient.addColorStop(.68, `hsla(${b.hue},100%,50%,${b.alpha * .18})`);
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `hsla(${b.hue},100%,78%,${.18 + audioData.level})`;
+        ctx.lineWidth = 1.2 + audioData.treble * 2;
+        ctx.stroke();
+      }
+    }
+
+    function drawWave(audioData) {
+      const chaos = Number(chaosPower.value) / 100;
+      const amp = 30 + audioData.level * 130 + audioData.bass * 120;
+      const baseY = height * .79;
+
+      ctx.save();
       ctx.beginPath();
 
-      const amp = 40 + level * 160;
-      const chaos = Number(chaosSlider.value) / 100;
-      const yBase = h * .78;
-
-      for (let x = 0; x <= w; x += 8) {
+      for (let x = 0; x <= width; x += 7) {
         const y =
-          yBase
+          baseY
           + Math.sin(x * .018 + Date.now() * .005) * amp
-          + Math.sin(x * .045 + Date.now() * .009) * amp * chaos;
+          + Math.sin(x * .045 + Date.now() * .009) * amp * chaos * .75;
 
         if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
 
-      ctx.strokeStyle = `rgba(255, 43, 214, ${.35 + level})`;
-      ctx.lineWidth = 4;
-      ctx.shadowBlur = 35;
+      ctx.strokeStyle = `rgba(255, 43, 214, ${.35 + audioData.level})`;
+      ctx.lineWidth = 3 + audioData.bass * 7;
+      ctx.shadowBlur = 34;
       ctx.shadowColor = "#ff2bd6";
       ctx.stroke();
+
+      ctx.beginPath();
+
+      for (let x = 0; x <= width; x += 7) {
+        const y =
+          baseY + 22
+          + Math.cos(x * .014 + Date.now() * .004) * amp * .65;
+
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.strokeStyle = `rgba(0, 234, 255, ${.25 + audioData.mid})`;
+      ctx.shadowColor = "#00eaff";
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawSparks(audioData) {
+      const chaos = Number(chaosPower.value) / 100;
+
+      for (const s of sparks) {
+        s.x += s.vx * (1 + chaos * 2 + audioData.treble * 3);
+        s.y += s.vy * (1 + chaos * 2 + audioData.treble * 3);
+        s.life -= .35 + audioData.treble;
+
+        if (s.life <= 0 || s.x < 0 || s.x > width || s.y < 0 || s.y > height) {
+          Object.assign(s, makeSpark());
+        }
+
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, 1 + audioData.treble * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${s.hue},100%,70%,${Math.min(1, s.life / 50)})`;
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = s.hue === 190 ? "#00eaff" : "#ff2bd6";
+        ctx.fill();
+      }
 
       ctx.shadowBlur = 0;
     }
 
-    function drawFlash(level) {
-      if (level > .55) {
-        ctx.fillStyle = `rgba(255,255,255,${(level - .55) * .35})`;
-        ctx.fillRect(0, 0, w, h);
+    function drawBassFlash(audioData) {
+      if (audioData.bass > .55) {
+        ctx.fillStyle = `rgba(255,255,255,${(audioData.bass - .55) * .22})`;
+        ctx.fillRect(0, 0, width, height);
       }
     }
 
     function animate() {
-      const level = getAudioLevel();
+      const audioData = getAudioData();
 
-      drawBackground(level);
-      drawVisualizer(level);
-      drawBubbles(level);
-      drawWave(level);
-      drawFlash(level);
+      drawBackground(audioData);
+      drawGrid(audioData);
+      drawVisualizer(audioData);
+      drawBubbles(audioData);
+      drawWave(audioData);
+      drawSparks(audioData);
+      drawBassFlash(audioData);
 
       requestAnimationFrame(animate);
     }
 
+    window.addEventListener("resize", () => {
+      resize();
+      initParticles();
+    });
+
+    playBtn.addEventListener("click", startSound);
+
+    document.body.addEventListener("pointerdown", () => {
+      if (!hasStarted) startSound();
+    }, { once: true });
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    resize();
+    initParticles();
     animate();
   </script>
 </body>
