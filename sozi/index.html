@@ -6,9 +6,7 @@
   <title>Soirée des Sosies presque parfait.e.s</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -16,11 +14,7 @@
       overflow: hidden;
       font-family: system-ui, sans-serif;
       color: white;
-      background:
-        radial-gradient(circle at 20% 20%, #ff00cc, transparent 30%),
-        radial-gradient(circle at 80% 30%, #00f5ff, transparent 35%),
-        radial-gradient(circle at 50% 90%, #ffe600, transparent 30%),
-        linear-gradient(135deg, #050014, #120026 45%, #000);
+      background: #03000a;
     }
 
     canvas {
@@ -31,129 +25,152 @@
       z-index: 0;
     }
 
-    .screen {
+    .overlay {
       position: relative;
       z-index: 2;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
       text-align: center;
+      background:
+        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,.35) 45%, rgba(0,0,0,.85) 100%);
     }
 
     .card {
-      width: min(760px, 100%);
-      padding: 34px 22px;
-      border-radius: 34px;
-      background: rgba(0, 0, 0, 0.36);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      backdrop-filter: blur(16px);
-      box-shadow:
-        0 0 50px rgba(255, 0, 204, 0.4),
-        0 0 90px rgba(0, 245, 255, 0.25);
+      width: min(920px, 100%);
+      padding: 32px 22px;
+      border-radius: 32px;
+      background: rgba(5, 0, 20, .45);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 0 80px rgba(255,0,180,.45);
     }
 
-    .badge {
-      display: inline-block;
-      padding: 8px 16px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #ff00cc, #00f5ff);
-      font-weight: 800;
-      letter-spacing: 0.12em;
+    .kicker {
+      letter-spacing: .28em;
       text-transform: uppercase;
-      font-size: 0.78rem;
-      margin-bottom: 18px;
-      animation: pulse 1.8s infinite;
+      color: #6ffcff;
+      font-weight: 800;
+      font-size: .8rem;
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(2.3rem, 9vw, 5.7rem);
-      line-height: 0.88;
+      margin: 16px 0 8px;
+      font-size: clamp(2.4rem, 9vw, 6rem);
+      line-height: .86;
       text-transform: uppercase;
       text-shadow:
-        0 0 12px #ff00cc,
-        0 0 28px #00f5ff;
+        0 0 12px #ff2bd6,
+        0 0 34px #ff2bd6,
+        0 0 70px #00eaff;
     }
 
     h1 span {
       display: block;
-      margin-top: 14px;
-      font-size: 0.42em;
-      font-weight: 500;
-      text-transform: none;
-      letter-spacing: 0.03em;
+      font-size: .45em;
+      color: #ff4fcb;
     }
 
-    .date {
-      margin: 24px 0;
-      font-size: clamp(1.15rem, 4vw, 1.7rem);
-      font-weight: 700;
-      color: #fff3a3;
-      text-shadow: 0 0 14px #ffe600;
+    .date, .place {
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      letter-spacing: .08em;
+      margin-top: 12px;
+    }
+
+    .place {
+      color: #a9ffff;
+      text-shadow: 0 0 18px #00eaff;
     }
 
     .countdown {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      margin-top: 20px;
+      margin: 30px 0 18px;
     }
 
     .box {
       padding: 18px 8px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.13);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: inset 0 0 22px rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: inset 0 0 30px rgba(255,255,255,.08), 0 0 26px rgba(0,234,255,.25);
     }
 
     .number {
-      font-size: clamp(2.1rem, 9vw, 4.3rem);
+      font-size: clamp(2rem, 8vw, 4.4rem);
       font-weight: 900;
-      line-height: 1;
+      color: white;
+      text-shadow: 0 0 18px #ff2bd6, 0 0 42px #00eaff;
     }
 
     .label {
-      margin-top: 7px;
-      font-size: 0.76rem;
+      margin-top: 8px;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      opacity: 0.82;
+      letter-spacing: .18em;
+      font-size: .72rem;
+      color: #c7ffff;
     }
 
-    .message {
-      margin-top: 26px;
-      font-size: clamp(1.15rem, 4vw, 1.6rem);
-      font-weight: 800;
+    .audio {
+      margin-top: 22px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
     button {
-      margin-top: 20px;
-      border: 0;
+      border: none;
       border-radius: 999px;
-      padding: 14px 24px;
-      font-size: 1rem;
+      padding: 14px 22px;
       font-weight: 900;
+      color: white;
+      background: linear-gradient(135deg, #ff2bd6, #00eaff);
+      box-shadow: 0 0 32px rgba(255,43,214,.8);
       cursor: pointer;
-      color: #050014;
-      background: linear-gradient(90deg, #ffe600, #00f5ff, #ff00cc);
-      box-shadow: 0 0 28px rgba(255, 255, 255, 0.45);
     }
 
     audio {
-      display: none;
+      width: min(420px, 100%);
+      accent-color: #ff2bd6;
     }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.06); filter: brightness(1.35); }
+    .sliders {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
     }
 
-    @media (max-width: 560px) {
-      .countdown {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .slider {
+      background: rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding: 12px;
+      text-align: left;
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #dff;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #ff2bd6;
+    }
+
+    .message {
+      margin-top: 18px;
+      font-size: 1.1rem;
+      color: #ffd6fb;
+    }
+
+    @media (max-width: 640px) {
+      .countdown { grid-template-columns: repeat(2, 1fr); }
+      .sliders { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -161,9 +178,9 @@
 <body>
   <canvas id="canvas"></canvas>
 
-  <div class="screen">
+  <div class="overlay">
     <main class="card">
-      <div class="badge">Compte à rebours live</div>
+      <div class="kicker">Compte à rebours audio-réactif</div>
 
       <h1>
         Soirée des Sosies
@@ -171,35 +188,43 @@
       </h1>
 
       <div class="date">27 juin 2026 · 19h30</div>
+      <div class="place">13 rue des Papillons · Les Sorinières</div>
 
       <section class="countdown">
-        <div class="box">
-          <div class="number" id="days">00</div>
-          <div class="label">jours</div>
-        </div>
-        <div class="box">
-          <div class="number" id="hours">00</div>
-          <div class="label">heures</div>
-        </div>
-        <div class="box">
-          <div class="number" id="minutes">00</div>
-          <div class="label">minutes</div>
-        </div>
-        <div class="box">
-          <div class="number" id="seconds">00</div>
-          <div class="label">secondes</div>
-        </div>
+        <div class="box"><div id="days" class="number">00</div><div class="label">jours</div></div>
+        <div class="box"><div id="hours" class="number">00</div><div class="label">heures</div></div>
+        <div class="box"><div id="minutes" class="number">00</div><div class="label">minutes</div></div>
+        <div class="box"><div id="seconds" class="number">00</div><div class="label">secondes</div></div>
       </section>
 
-      <div class="message" id="message">
-        Prépare ton double. Le dancefloor ouvre bientôt.
+      <div class="audio">
+        <button id="playBtn">▶ Lancer le son</button>
+
+        <audio id="audio" controls crossorigin="anonymous">
+          <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
+        </audio>
       </div>
 
-      <button id="playBtn">▶ Lancer le son</button>
+      <div class="sliders">
+        <label class="slider">
+          Bulles
+          <input id="bubbleSlider" type="range" min="30" max="220" value="120">
+        </label>
 
-      <audio id="audio" crossorigin="anonymous">
-        <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
-      </audio>
+        <label class="slider">
+          Visualizer
+          <input id="barSlider" type="range" min="40" max="180" value="110">
+        </label>
+
+        <label class="slider">
+          Chaos Wahoo
+          <input id="chaosSlider" type="range" min="0" max="100" value="55">
+        </label>
+      </div>
+
+      <div id="message" class="message">
+        Active le son. Les bulles vont danser.
+      </div>
     </main>
   </div>
 
@@ -217,15 +242,14 @@
     }
 
     function updateCountdown() {
-      const now = Date.now();
-      const distance = targetDate - now;
+      const distance = targetDate - Date.now();
 
       if (distance <= 0) {
         daysEl.textContent = "00";
         hoursEl.textContent = "00";
         minutesEl.textContent = "00";
         secondsEl.textContent = "00";
-        messageEl.textContent = "C’est maintenant. Les sosies entrent en scène.";
+        messageEl.textContent = "C’est maintenant. Les doubles entrent en scène.";
         return;
       }
 
@@ -235,173 +259,211 @@
       secondsEl.textContent = pad(Math.floor(distance / 1000) % 60);
     }
 
-    updateCountdown();
     setInterval(updateCountdown, 1000);
+    updateCountdown();
 
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+
     const audio = document.getElementById("audio");
     const playBtn = document.getElementById("playBtn");
 
-    let width;
-    let height;
-    let audioCtx;
-    let analyser;
-    let dataArray;
-    let source;
+    const bubbleSlider = document.getElementById("bubbleSlider");
+    const barSlider = document.getElementById("barSlider");
+    const chaosSlider = document.getElementById("chaosSlider");
+
+    let w, h;
+    let audioCtx, analyser, source, dataArray;
     let audioReady = false;
 
     const bubbles = [];
 
     function resize() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
     }
 
     window.addEventListener("resize", resize);
     resize();
 
-    for (let i = 0; i < 90; i++) {
-      bubbles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        r: 3 + Math.random() * 16,
-        speed: 0.3 + Math.random() * 1.7,
-        drift: -0.7 + Math.random() * 1.4,
-        hue: Math.random() * 360,
-        alpha: 0.25 + Math.random() * 0.55
-      });
+    function createBubble() {
+      return {
+        x: Math.random() * w,
+        y: h + Math.random() * h,
+        r: 4 + Math.random() * 36,
+        speed: .4 + Math.random() * 2.2,
+        drift: -1 + Math.random() * 2,
+        hue: Math.random() > .5 ? 190 : 310,
+        alpha: .25 + Math.random() * .65
+      };
+    }
+
+    for (let i = 0; i < 220; i++) {
+      bubbles.push(createBubble());
+    }
+
+    function initAudio() {
+      if (audioReady) return;
+
+      audioCtx = new AudioContext();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+
+      source = audioCtx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      audioReady = true;
     }
 
     playBtn.addEventListener("click", async () => {
-      if (!audioReady) {
-        audioCtx = new AudioContext();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-
-        source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        audioReady = true;
-      }
+      initAudio();
 
       if (audioCtx.state === "suspended") {
         await audioCtx.resume();
       }
 
-      if (audio.paused) {
-        await audio.play();
-        playBtn.textContent = "⏸ Pause";
-      } else {
-        audio.pause();
-        playBtn.textContent = "▶ Relancer le son";
-      }
+      audio.play();
+      playBtn.textContent = "⏸ Ambiance lancée";
     });
 
-    function drawBackground(level) {
-      const gradient = ctx.createRadialGradient(
-        width / 2,
-        height / 2,
-        0,
-        width / 2,
-        height / 2,
-        Math.max(width, height)
-      );
+    function getAudioLevel() {
+      if (!audioReady) return 0.25;
 
-      gradient.addColorStop(0, `rgba(255, 0, 204, ${0.15 + level * 0.4})`);
-      gradient.addColorStop(0.45, `rgba(0, 245, 255, ${0.12 + level * 0.3})`);
-      gradient.addColorStop(1, "rgba(0, 0, 0, 0.92)");
+      analyser.getByteFrequencyData(dataArray);
+
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i];
+      }
+
+      return sum / dataArray.length / 255;
+    }
+
+    function drawBackground(level) {
+      const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h));
+      gradient.addColorStop(0, `rgba(255, 0, 190, ${0.16 + level * .3})`);
+      gradient.addColorStop(.35, `rgba(0, 234, 255, ${0.10 + level * .2})`);
+      gradient.addColorStop(1, "#03000a");
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, w, h);
     }
 
     function drawBubbles(level) {
-      bubbles.forEach(b => {
-        b.y -= b.speed + level * 4;
-        b.x += b.drift;
+      const desired = Number(bubbleSlider.value);
 
-        if (b.y < -40) {
-          b.y = height + 40;
-          b.x = Math.random() * width;
+      while (bubbles.length < desired) bubbles.push(createBubble());
+      while (bubbles.length > desired) bubbles.pop();
+
+      const chaos = Number(chaosSlider.value) / 100;
+
+      bubbles.forEach(b => {
+        b.y -= b.speed + level * 8;
+        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .02) * chaos * 2;
+
+        if (b.y < -80) {
+          Object.assign(b, createBubble());
+          b.y = h + 80;
         }
 
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.r + level * 12, 0, Math.PI * 2);
-        ctx.strokeStyle = `hsla(${b.hue}, 100%, 70%, ${b.alpha})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        const pulse = 1 + level * 1.8;
+        const radius = b.r * pulse;
 
         ctx.beginPath();
-        ctx.arc(b.x - b.r * 0.25, b.y - b.r * 0.25, b.r * 0.28, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${b.alpha})`;
+        ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
+
+        const g = ctx.createRadialGradient(b.x - radius / 3, b.y - radius / 3, 1, b.x, b.y, radius);
+        g.addColorStop(0, `rgba(255,255,255,${b.alpha})`);
+        g.addColorStop(.35, `hsla(${b.hue},100%,65%,${b.alpha * .7})`);
+        g.addColorStop(1, `rgba(255,255,255,0)`);
+
+        ctx.fillStyle = g;
         ctx.fill();
+
+        ctx.strokeStyle = `hsla(${b.hue},100%,70%,${.2 + level})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
       });
     }
 
     function drawVisualizer(level) {
-      if (!audioReady) return;
-
-      analyser.getByteFrequencyData(dataArray);
-
-      const bars = dataArray.length;
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.25;
+      const bars = 96;
+      const barBoost = Number(barSlider.value) / 100;
+      const chaos = Number(chaosSlider.value) / 100;
+      const centerX = w / 2;
+      const centerY = h / 2;
 
       for (let i = 0; i < bars; i++) {
-        const value = dataArray[i];
+        const value = audioReady ? dataArray[i % dataArray.length] / 255 : Math.random() * .4;
         const angle = (i / bars) * Math.PI * 2;
-        const barLength = value * 0.9;
+        const baseRadius = Math.min(w, h) * .26;
+        const barHeight = (40 + value * 230 * barBoost + level * 90) * (1 + chaos * .6);
 
-        const x1 = centerX + Math.cos(angle) * radius;
-        const y1 = centerY + Math.sin(angle) * radius;
-        const x2 = centerX + Math.cos(angle) * (radius + barLength);
-        const y2 = centerY + Math.sin(angle) * (radius + barLength);
+        const x1 = centerX + Math.cos(angle) * baseRadius;
+        const y1 = centerY + Math.sin(angle) * baseRadius;
+        const x2 = centerX + Math.cos(angle) * (baseRadius + barHeight);
+        const y2 = centerY + Math.sin(angle) * (baseRadius + barHeight);
 
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
-        ctx.strokeStyle = `hsla(${i * 3}, 100%, 65%, ${0.35 + level})`;
-        ctx.lineWidth = 3;
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = `hsl(${i * 3}, 100%, 65%)`;
+
+        ctx.strokeStyle = i % 2 === 0
+          ? `rgba(255, 43, 214, ${.35 + value})`
+          : `rgba(0, 234, 255, ${.35 + value})`;
+
+        ctx.lineWidth = 2 + value * 7;
+        ctx.shadowBlur = 22 + value * 40;
+        ctx.shadowColor = i % 2 === 0 ? "#ff2bd6" : "#00eaff";
         ctx.stroke();
-        ctx.shadowBlur = 0;
       }
+
+      ctx.shadowBlur = 0;
     }
 
-    function drawCenterPulse(level) {
-      const r = 90 + level * 130;
-
+    function drawWave(level) {
       ctx.beginPath();
-      ctx.arc(width / 2, height / 2, r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 255, 255, ${0.14 + level * 0.5})`;
+
+      const amp = 40 + level * 160;
+      const chaos = Number(chaosSlider.value) / 100;
+      const yBase = h * .78;
+
+      for (let x = 0; x <= w; x += 8) {
+        const y =
+          yBase
+          + Math.sin(x * .018 + Date.now() * .005) * amp
+          + Math.sin(x * .045 + Date.now() * .009) * amp * chaos;
+
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.strokeStyle = `rgba(255, 43, 214, ${.35 + level})`;
       ctx.lineWidth = 4;
+      ctx.shadowBlur = 35;
+      ctx.shadowColor = "#ff2bd6";
       ctx.stroke();
 
-      ctx.beginPath();
-      ctx.arc(width / 2, height / 2, r * 0.55, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 230, 0, ${0.12 + level * 0.5})`;
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    function drawFlash(level) {
+      if (level > .55) {
+        ctx.fillStyle = `rgba(255,255,255,${(level - .55) * .35})`;
+        ctx.fillRect(0, 0, w, h);
+      }
     }
 
     function animate() {
-      let level = 0.15;
-
-      if (audioReady) {
-        analyser.getByteFrequencyData(dataArray);
-        const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-        level = avg / 255;
-      }
+      const level = getAudioLevel();
 
       drawBackground(level);
-      drawBubbles(level);
-      drawCenterPulse(level);
       drawVisualizer(level);
+      drawBubbles(level);
+      drawWave(level);
+      drawFlash(level);
 
       requestAnimationFrame(animate);
     }
