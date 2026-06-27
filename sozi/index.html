@@ -26,134 +26,167 @@
       z-index: 0;
     }
 
-    .content {
+    .screen {
       position: relative;
       z-index: 2;
       min-height: 100vh;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
       text-align: center;
       pointer-events: none;
     }
 
+    .content {
+      width: min(980px, 100%);
+      pointer-events: auto;
+    }
+
     .top {
-      padding-top: 8px;
+      margin-bottom: 22px;
     }
 
     .badge {
-      display: inline-block;
-      padding: 7px 13px;
-      border-radius: 999px;
-      background: rgba(0, 234, 255, .12);
-      border: 1px solid rgba(0, 234, 255, .45);
-      color: #bfffff;
+      font-size: .75rem;
+      letter-spacing: .22em;
       text-transform: uppercase;
-      letter-spacing: .18em;
-      font-weight: 800;
-      font-size: .7rem;
+      color: #9fffff;
+      font-weight: 900;
       text-shadow: 0 0 12px #00eaff;
     }
 
     h1 {
-      margin: 16px auto 8px;
-      max-width: 920px;
-      font-size: clamp(2.4rem, 10vw, 6.6rem);
-      line-height: .82;
+      margin: 12px 0 6px;
+      font-size: clamp(2.5rem, 10vw, 7rem);
+      line-height: .78;
+      letter-spacing: -.07em;
       text-transform: uppercase;
-      letter-spacing: -.06em;
       text-shadow:
-        0 0 8px #fff,
+        0 0 10px #fff,
         0 0 22px #ff2bd6,
-        0 0 54px #00eaff;
+        0 0 55px #ff2bd6,
+        0 0 90px #00eaff;
     }
 
     h1 span {
       display: block;
-      margin-top: 10px;
-      font-size: .43em;
-      color: #ff4bd8;
-      letter-spacing: -.03em;
+      margin-top: 12px;
+      font-size: .42em;
+      color: #ff43c7;
+      letter-spacing: -.04em;
     }
 
     .infos {
+      margin-top: 20px;
       display: grid;
-      gap: 6px;
-      margin-top: 12px;
-      font-size: clamp(1rem, 3vw, 1.35rem);
-      letter-spacing: .06em;
-      text-shadow: 0 0 16px #000, 0 0 20px #00eaff;
+      gap: 8px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-shadow: 0 0 14px black, 0 0 18px #00eaff;
+    }
+
+    .date {
+      font-size: clamp(1.2rem, 4vw, 2.2rem);
+      color: #fff46b;
     }
 
     .place {
-      color: #aaffff;
-    }
-
-    .middle {
-      display: flex;
-      align-items: end;
-      justify-content: center;
-      padding-bottom: 36px;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: #9fffff;
     }
 
     .countdown {
-      width: min(780px, 100%);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 12px;
+      margin: 28px auto 24px;
+      width: min(820px, 100%);
     }
 
     .timebox {
-      padding: 14px 6px;
-      border-radius: 20px;
-      background: rgba(0, 0, 0, .28);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 0 24px rgba(255, 43, 214, .25);
+      padding: 12px 6px;
+      border-left: 1px solid rgba(255,255,255,.45);
+      border-right: 1px solid rgba(255,255,255,.18);
     }
 
     .number {
-      font-size: clamp(2rem, 8vw, 4.3rem);
+      font-size: clamp(2.5rem, 9vw, 5.5rem);
       font-weight: 950;
       line-height: 1;
-      text-shadow: 0 0 16px #ff2bd6, 0 0 34px #00eaff;
+      color: white;
+      text-shadow:
+        0 0 12px #ff2bd6,
+        0 0 30px #00eaff,
+        0 0 60px #ff2bd6;
     }
 
     .label {
-      margin-top: 7px;
-      font-size: .66rem;
+      margin-top: 8px;
+      font-size: .72rem;
       text-transform: uppercase;
-      letter-spacing: .18em;
-      color: #d6ffff;
-    }
-
-    .bottom {
-      padding-bottom: 8px;
-      pointer-events: auto;
-    }
-
-    button {
-      border: 0;
-      border-radius: 999px;
-      padding: 14px 24px;
-      color: white;
+      letter-spacing: .22em;
       font-weight: 900;
-      letter-spacing: .04em;
-      background: linear-gradient(135deg, #ff2bd6, #00eaff);
-      box-shadow: 0 0 28px rgba(255, 43, 214, .8);
+      color: white;
+      text-shadow: 0 0 12px black;
+    }
+
+    .play-zone {
+      margin: 10px auto 0;
+      display: grid;
+      place-items: center;
+      gap: 10px;
+    }
+
+    .play {
+      width: 86px;
+      height: 86px;
+      display: grid;
+      place-items: center;
+      border: 3px solid #ff4bd8;
+      border-radius: 50%;
+      background: rgba(0,0,0,.42);
+      color: white;
+      font-size: 2.6rem;
+      box-shadow:
+        0 0 22px #ff2bd6,
+        0 0 50px rgba(0,234,255,.8);
       cursor: pointer;
     }
 
     .hint {
-      margin-top: 10px;
-      color: #ffd9fb;
-      font-size: .9rem;
-      text-shadow: 0 0 12px #000;
+      font-size: .95rem;
+      font-weight: 900;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: white;
+      text-shadow: 0 0 14px black, 0 0 18px #ff2bd6;
     }
 
-    @media (max-width: 640px) {
-      .content { padding: 18px; }
-      .countdown { grid-template-columns: repeat(2, 1fr); }
-      .middle { padding-bottom: 24px; }
+    .footer {
+      margin-top: 18px;
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      font-weight: 900;
+      color: #ff55dc;
+      text-shadow: 0 0 12px #ff2bd6, 0 0 20px black;
+    }
+
+    audio {
+      display: none;
+    }
+
+    @media (max-width: 680px) {
+      .countdown {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+
+      .play {
+        width: 72px;
+        height: 72px;
+        font-size: 2.1rem;
+      }
     }
   </style>
 </head>
@@ -161,39 +194,58 @@
 <body>
   <canvas id="fx"></canvas>
 
-  <main class="content">
-    <section class="top">
-      <div class="badge">Audio party countdown</div>
+  <main class="screen">
+    <section class="content">
+      <div class="top">
+        <div class="badge">Clique n’importe où pour lancer le son</div>
 
-      <h1>
-        Soirée des Sosies
-        <span>presque parfait.e.s</span>
-      </h1>
+        <h1>
+          Soirée des Sosies
+          <span>presque parfait.e.s</span>
+        </h1>
 
-      <div class="infos">
-        <div>27 juin 2026 · 19h30</div>
-        <div class="place">13 rue des Papillons · Les Sorinières</div>
+        <div class="infos">
+          <div class="date">27 juin 2026 · 19h30</div>
+          <div class="place">13 rue des Papillons · Les Sorinières</div>
+        </div>
       </div>
-    </section>
 
-    <section class="middle">
-      <div class="countdown">
-        <div class="timebox"><div id="days" class="number">00</div><div class="label">jours</div></div>
-        <div class="timebox"><div id="hours" class="number">00</div><div class="label">heures</div></div>
-        <div class="timebox"><div id="minutes" class="number">00</div><div class="label">minutes</div></div>
-        <div class="timebox"><div id="seconds" class="number">00</div><div class="label">secondes</div></div>
+      <section class="countdown">
+        <div class="timebox">
+          <div id="days" class="number">00</div>
+          <div class="label">jours</div>
+        </div>
+
+        <div class="timebox">
+          <div id="hours" class="number">00</div>
+          <div class="label">heures</div>
+        </div>
+
+        <div class="timebox">
+          <div id="minutes" class="number">00</div>
+          <div class="label">minutes</div>
+        </div>
+
+        <div class="timebox">
+          <div id="seconds" class="number">00</div>
+          <div class="label">secondes</div>
+        </div>
+      </section>
+
+      <div class="play-zone">
+        <button id="playBtn" class="play">▶</button>
+        <div id="hint" class="hint">Active le son · les bulles vont danser</div>
       </div>
-    </section>
 
-    <section class="bottom">
-      <button id="playBtn">▶ Lancer la soirée</button>
-      <div id="hint" class="hint">Tape l’écran pour lancer le son et les bulles audio-réactives.</div>
+      <div class="footer">
+        Qui sera le plus ressemblant sans l’être vraiment ?
+      </div>
+
+      <audio id="audio" crossorigin="anonymous">
+        <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
+      </audio>
     </section>
   </main>
-
-  <audio id="audio" preload="auto" crossorigin="anonymous">
-    <source src="https://raw.githubusercontent.com/pierkiroule/pierkiroule.github.io/master/sozi/Sozi%20Qui%20Sait.mp3" type="audio/mpeg">
-  </audio>
 
   <script>
     const targetDate = new Date("2026-06-27T19:30:00+02:00").getTime();
@@ -210,8 +262,8 @@
     const playBtn = document.getElementById("playBtn");
     const hint = document.getElementById("hint");
 
-    let width = 0;
-    let height = 0;
+    let w = 0;
+    let h = 0;
 
     let audioCtx;
     let analyser;
@@ -223,8 +275,8 @@
     const bubbles = [];
     const sparks = [];
 
-    function pad(value) {
-      return String(value).padStart(2, "0");
+    function pad(n) {
+      return String(n).padStart(2, "0");
     }
 
     function updateCountdown() {
@@ -235,7 +287,7 @@
         hoursEl.textContent = "00";
         minutesEl.textContent = "00";
         secondsEl.textContent = "00";
-        hint.textContent = "C’est maintenant. Que les doubles entrent en scène.";
+        hint.textContent = "C’est maintenant. Les sosies entrent en scène.";
         return;
       }
 
@@ -247,35 +299,39 @@
 
     function resize() {
       const ratio = window.devicePixelRatio || 1;
-      width = window.innerWidth;
-      height = window.innerHeight;
 
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
+      canvas.width = window.innerWidth * ratio;
+      canvas.height = window.innerHeight * ratio;
+
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
 
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+      w = window.innerWidth;
+      h = window.innerHeight;
     }
 
     function makeBubble() {
       return {
-        x: Math.random() * width,
-        y: height + Math.random() * height,
+        x: Math.random() * w,
+        y: h + Math.random() * h,
         r: 5 + Math.random() * 42,
-        speed: .4 + Math.random() * 2,
-        drift: -1.4 + Math.random() * 2.8,
-        hue: Math.random() > .5 ? 190 + Math.random() * 25 : 300 + Math.random() * 30,
-        alpha: .2 + Math.random() * .55
+        speed: .4 + Math.random() * 2.1,
+        drift: -1.3 + Math.random() * 2.6,
+        hue: Math.random() > .5 ? 190 + Math.random() * 25 : 300 + Math.random() * 35,
+        alpha: .25 + Math.random() * .6
       };
     }
 
     function makeSpark() {
       return {
-        x: Math.random() * width,
-        y: Math.random() * height,
-        vx: -1.6 + Math.random() * 3.2,
-        vy: -1.6 + Math.random() * 3.2,
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: -2 + Math.random() * 4,
+        vy: -2 + Math.random() * 4,
         life: 20 + Math.random() * 60,
-        hue: Math.random() > .5 ? 190 : 315
+        hue: Math.random() > .5 ? 195 : 315
       };
     }
 
@@ -283,7 +339,7 @@
       bubbles.length = 0;
       sparks.length = 0;
 
-      for (let i = 0; i < 180; i++) bubbles.push(makeBubble());
+      for (let i = 0; i < 170; i++) bubbles.push(makeBubble());
       for (let i = 0; i < 120; i++) sparks.push(makeSpark());
     }
 
@@ -314,16 +370,21 @@
         await audio.play();
 
         started = true;
-        playBtn.textContent = "⏸ Ambiance lancée";
-        hint.textContent = "Les bulles dansent sur Sozi Qui Sait.";
+        playBtn.textContent = "⏸";
+        hint.textContent = "Ambiance lancée · mode wahoo activé";
       } catch {
-        hint.textContent = "Clique sur le bouton pour lancer le son.";
+        hint.textContent = "Clique encore une fois pour lancer le son.";
       }
     }
 
     function getAudioData() {
-      if (!audioReady) {
-        return { level: .22, bass: .18, mid: .2, treble: .25 };
+      if (!audioReady || !started) {
+        return {
+          level: .22,
+          bass: .18,
+          mid: .22,
+          treble: .25
+        };
       }
 
       analyser.getByteFrequencyData(dataArray);
@@ -334,105 +395,141 @@
       let treble = 0;
 
       for (let i = 0; i < dataArray.length; i++) {
-        const value = dataArray[i] / 255;
-        sum += value;
+        const v = dataArray[i] / 255;
+        sum += v;
 
-        if (i < dataArray.length * .14) bass += value;
-        else if (i < dataArray.length * .48) mid += value;
-        else treble += value;
+        if (i < dataArray.length * .14) bass += v;
+        else if (i < dataArray.length * .5) mid += v;
+        else treble += v;
       }
 
       return {
         level: sum / dataArray.length,
         bass: bass / (dataArray.length * .14),
-        mid: mid / (dataArray.length * .34),
-        treble: treble / (dataArray.length * .52)
+        mid: mid / (dataArray.length * .36),
+        treble: treble / (dataArray.length * .5)
       };
     }
 
     function drawBackground(a) {
-      const gradient = ctx.createRadialGradient(
-        width / 2, height / 2, 0,
-        width / 2, height / 2, Math.max(width, height)
+      const g = ctx.createRadialGradient(
+        w / 2, h / 2, 0,
+        w / 2, h / 2, Math.max(w, h)
       );
 
-      gradient.addColorStop(0, `rgba(255, 0, 210, ${.18 + a.bass * .35})`);
-      gradient.addColorStop(.34, `rgba(0, 235, 255, ${.1 + a.mid * .25})`);
-      gradient.addColorStop(.72, "rgba(40, 0, 90, .55)");
-      gradient.addColorStop(1, "#020008");
+      g.addColorStop(0, `rgba(255,0,210,${.18 + a.bass * .35})`);
+      g.addColorStop(.34, `rgba(0,235,255,${.12 + a.mid * .25})`);
+      g.addColorStop(.7, "rgba(45,0,100,.65)");
+      g.addColorStop(1, "#020008");
 
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, w, h);
     }
 
-    function drawGrid(a) {
-      const gap = 46;
-      const yStart = height * .56;
-      const vx = width / 2;
-      const vy = height * .38;
+    function drawStarTunnel(a) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const lines = 120;
 
       ctx.save();
-      ctx.globalAlpha = .14 + a.level * .28;
-      ctx.strokeStyle = "#00eaff";
-      ctx.lineWidth = 1;
 
-      for (let x = -width; x < width * 2; x += gap) {
-        ctx.beginPath();
-        ctx.moveTo(x, height);
-        ctx.lineTo(vx, vy);
-        ctx.stroke();
-      }
+      for (let i = 0; i < lines; i++) {
+        const angle = (i / lines) * Math.PI * 2;
+        const dist = Math.min(w, h) * (.28 + Math.random() * .55);
+        const pulse = 1 + a.level * 1.2;
 
-      for (let y = yStart; y < height; y += gap) {
+        const x1 = cx + Math.cos(angle) * dist * .22;
+        const y1 = cy + Math.sin(angle) * dist * .22;
+        const x2 = cx + Math.cos(angle) * dist * pulse;
+        const y2 = cy + Math.sin(angle) * dist * pulse;
+
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.quadraticCurveTo(width / 2, y - 60, width, y);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+
+        ctx.strokeStyle = i % 2
+          ? `rgba(255,43,214,${.12 + a.treble * .7})`
+          : `rgba(0,234,255,${.12 + a.treble * .7})`;
+
+        ctx.lineWidth = 1 + a.treble * 3;
         ctx.stroke();
       }
 
       ctx.restore();
     }
 
-    function drawVisualizer(a) {
-      const bars = 170;
-      const cx = width / 2;
-      const cy = height / 2 + 12;
-      const baseRadius = Math.min(width, height) * .24;
+    function drawEqualizerSides(a) {
+      const bars = 46;
+      const maxH = h * .34;
+
+      for (let side = 0; side < 2; side++) {
+        for (let i = 0; i < bars; i++) {
+          const v = audioReady && started
+            ? dataArray[(i * 3) % dataArray.length] / 255
+            : .2 + Math.random() * .25;
+
+          const x = side === 0
+            ? 18 + i * 7
+            : w - 18 - i * 7;
+
+          const barH = 20 + v * maxH + a.bass * 80;
+          const y = h - barH;
+
+          ctx.fillStyle = i % 2
+            ? `rgba(255,43,214,${.45 + v})`
+            : `rgba(0,234,255,${.45 + v})`;
+
+          ctx.shadowBlur = 18 + v * 20;
+          ctx.shadowColor = i % 2 ? "#ff2bd6" : "#00eaff";
+          ctx.fillRect(x, y, 4, barH);
+        }
+      }
+
+      ctx.shadowBlur = 0;
+    }
+
+    function drawCircularVisualizer(a) {
+      const cx = w / 2;
+      const cy = h / 2;
+      const bars = 180;
+      const base = Math.min(w, h) * .28;
 
       ctx.save();
 
       for (let i = 0; i < bars; i++) {
-        const value = audioReady
+        const v = audioReady && started
           ? dataArray[i % dataArray.length] / 255
-          : .12 + Math.random() * .22;
+          : .12 + Math.random() * .18;
 
         const angle = (i / bars) * Math.PI * 2;
-        const wobble = Math.sin(Date.now() * .004 + i) * 10;
-        const barHeight = 30 + value * 260 + a.bass * 120;
+        const r1 = base;
+        const r2 = base + 25 + v * 220 + a.bass * 90;
 
-        const r1 = baseRadius + wobble;
-        const r2 = baseRadius + barHeight + wobble;
+        const x1 = cx + Math.cos(angle) * r1;
+        const y1 = cy + Math.sin(angle) * r1;
+        const x2 = cx + Math.cos(angle) * r2;
+        const y2 = cy + Math.sin(angle) * r2;
 
         ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
-        ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
 
-        ctx.strokeStyle = i % 2 === 0
-          ? `rgba(255, 43, 214, ${.32 + value})`
-          : `rgba(0, 234, 255, ${.32 + value})`;
+        ctx.strokeStyle = i % 2
+          ? `rgba(255,43,214,${.28 + v})`
+          : `rgba(0,234,255,${.28 + v})`;
 
-        ctx.lineWidth = 1.5 + value * 7;
-        ctx.shadowBlur = 22 + value * 45;
-        ctx.shadowColor = i % 2 === 0 ? "#ff2bd6" : "#00eaff";
+        ctx.lineWidth = 1.4 + v * 6;
+        ctx.shadowBlur = 20 + v * 40;
+        ctx.shadowColor = i % 2 ? "#ff2bd6" : "#00eaff";
         ctx.stroke();
       }
 
       ctx.beginPath();
-      ctx.arc(cx, cy, baseRadius * (.92 + a.bass * .16), 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255,255,255,${.24 + a.level})`;
+      ctx.arc(cx, cy, base * (.9 + a.bass * .2), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255,255,255,${.25 + a.level})`;
       ctx.lineWidth = 2 + a.bass * 8;
       ctx.shadowBlur = 35;
-      ctx.shadowColor = "#ffffff";
+      ctx.shadowColor = "#fff";
       ctx.stroke();
 
       ctx.restore();
@@ -441,95 +538,83 @@
     function drawBubbles(a) {
       for (const b of bubbles) {
         b.y -= b.speed + a.level * 8 + a.bass * 5;
-        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .015) * 2.4;
+        b.x += b.drift + Math.sin(Date.now() * .002 + b.y * .015) * 2.2;
 
-        if (b.y < -90 || b.x < -90 || b.x > width + 90) {
+        if (b.y < -100 || b.x < -100 || b.x > w + 100) {
           Object.assign(b, makeBubble());
-          b.y = height + 80;
+          b.y = h + 90;
         }
 
-        const radius = b.r * (1 + a.bass * 1.8);
+        const r = b.r * (1 + a.bass * 1.7);
 
-        const gradient = ctx.createRadialGradient(
-          b.x - radius * .35,
-          b.y - radius * .35,
-          1,
-          b.x,
-          b.y,
-          radius
+        const g = ctx.createRadialGradient(
+          b.x - r * .35, b.y - r * .35, 1,
+          b.x, b.y, r
         );
 
-        gradient.addColorStop(0, `rgba(255,255,255,${b.alpha})`);
-        gradient.addColorStop(.25, `hsla(${b.hue},100%,72%,${b.alpha * .65})`);
-        gradient.addColorStop(.68, `hsla(${b.hue},100%,50%,${b.alpha * .18})`);
-        gradient.addColorStop(1, "rgba(255,255,255,0)");
+        g.addColorStop(0, `rgba(255,255,255,${b.alpha})`);
+        g.addColorStop(.25, `hsla(${b.hue},100%,72%,${b.alpha * .65})`);
+        g.addColorStop(.7, `hsla(${b.hue},100%,50%,${b.alpha * .18})`);
+        g.addColorStop(1, "rgba(255,255,255,0)");
 
         ctx.beginPath();
-        ctx.arc(b.x, b.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
+        ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = g;
         ctx.fill();
 
-        ctx.strokeStyle = `hsla(${b.hue},100%,78%,${.18 + a.level})`;
+        ctx.strokeStyle = `hsla(${b.hue},100%,80%,${.2 + a.level})`;
         ctx.lineWidth = 1.2 + a.treble * 2;
         ctx.stroke();
       }
     }
 
-    function drawWave(a) {
-      const amp = 30 + a.level * 130 + a.bass * 120;
-      const baseY = height * .8;
+    function drawWaves(a) {
+      const baseY = h * .8;
+      const amp = 30 + a.level * 150 + a.bass * 80;
 
       ctx.save();
 
-      ctx.beginPath();
-      for (let x = 0; x <= width; x += 7) {
-        const y =
-          baseY
-          + Math.sin(x * .018 + Date.now() * .005) * amp
-          + Math.sin(x * .045 + Date.now() * .009) * amp * .55;
+      for (let wave = 0; wave < 3; wave++) {
+        ctx.beginPath();
 
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+        for (let x = 0; x <= w; x += 7) {
+          const y =
+            baseY
+            + wave * 18
+            + Math.sin(x * (.014 + wave * .006) + Date.now() * (.004 + wave * .002)) * amp * (1 - wave * .18);
+
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+
+        ctx.strokeStyle = wave % 2
+          ? `rgba(0,234,255,${.28 + a.mid})`
+          : `rgba(255,43,214,${.28 + a.level})`;
+
+        ctx.lineWidth = 2.5 + a.bass * 5;
+        ctx.shadowBlur = 32;
+        ctx.shadowColor = wave % 2 ? "#00eaff" : "#ff2bd6";
+        ctx.stroke();
       }
-
-      ctx.strokeStyle = `rgba(255, 43, 214, ${.35 + a.level})`;
-      ctx.lineWidth = 3 + a.bass * 7;
-      ctx.shadowBlur = 34;
-      ctx.shadowColor = "#ff2bd6";
-      ctx.stroke();
-
-      ctx.beginPath();
-      for (let x = 0; x <= width; x += 7) {
-        const y =
-          baseY + 22
-          + Math.cos(x * .014 + Date.now() * .004) * amp * .65;
-
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-
-      ctx.strokeStyle = `rgba(0, 234, 255, ${.25 + a.mid})`;
-      ctx.shadowColor = "#00eaff";
-      ctx.stroke();
 
       ctx.restore();
     }
 
     function drawSparks(a) {
       for (const s of sparks) {
-        s.x += s.vx * (1 + a.treble * 3);
-        s.y += s.vy * (1 + a.treble * 3);
-        s.life -= .35 + a.treble;
+        s.x += s.vx * (1.2 + a.treble * 4);
+        s.y += s.vy * (1.2 + a.treble * 4);
+        s.life -= .45 + a.treble;
 
-        if (s.life <= 0 || s.x < 0 || s.x > width || s.y < 0 || s.y > height) {
+        if (s.life <= 0 || s.x < 0 || s.x > w || s.y < 0 || s.y > h) {
           Object.assign(s, makeSpark());
         }
 
         ctx.beginPath();
         ctx.arc(s.x, s.y, 1 + a.treble * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${s.hue},100%,70%,${Math.min(1, s.life / 50)})`;
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = s.hue === 190 ? "#00eaff" : "#ff2bd6";
+        ctx.fillStyle = `hsla(${s.hue},100%,70%,${Math.min(1, s.life / 55)})`;
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = s.hue === 195 ? "#00eaff" : "#ff2bd6";
         ctx.fill();
       }
 
@@ -538,8 +623,8 @@
 
     function drawFlash(a) {
       if (a.bass > .55) {
-        ctx.fillStyle = `rgba(255,255,255,${(a.bass - .55) * .22})`;
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = `rgba(255,255,255,${(a.bass - .55) * .25})`;
+        ctx.fillRect(0, 0, w, h);
       }
     }
 
@@ -547,10 +632,11 @@
       const a = getAudioData();
 
       drawBackground(a);
-      drawGrid(a);
-      drawVisualizer(a);
+      drawStarTunnel(a);
+      drawEqualizerSides(a);
+      drawCircularVisualizer(a);
+      drawWaves(a);
       drawBubbles(a);
-      drawWave(a);
       drawSparks(a);
       drawFlash(a);
 
@@ -566,7 +652,7 @@
 
     document.body.addEventListener("pointerdown", () => {
       if (!started) startSound();
-    }, { once: true });
+    });
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
