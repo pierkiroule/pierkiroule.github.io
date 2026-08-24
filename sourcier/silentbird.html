@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Silent Bird</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;600&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #050b0a;
+    color: #e9f1ee;
+    font-family: 'Outfit', sans-serif;
+    touch-action: none;
+    overscroll-behavior: none;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  .glass-panel {
+    background: rgba(12, 24, 22, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(154, 205, 185, 0.15);
+  }
+  .glow-btn {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 20px rgba(62, 180, 137, 0.15);
+  }
+  .glow-btn:hover, .glow-btn:active {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 35px rgba(62, 180, 137, 0.35);
+    border-color: rgba(180, 235, 210, 0.5);
+  }
+  .flow-pulse {
+    animation: pulseGlow 2s infinite alternate ease-in-out;
+  }
+  @keyframes pulseGlow {
+    0% { opacity: 0.4; transform: scale(0.98); }
+    100% { opacity: 0.8; transform: scale(1.02); }
+  }
+</style>
+</head>
+<body class="bg-[#050b0a] text-slate-100 flex flex-col justify-between select-none overflow-hidden">
+
+<!-- Audio elements -->
+<audio id="city" preload="metadata" loop playsinline src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Ambient_sound_street_traffic_Berlin_2026-05-17.oga?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"></audio>
+<audio id="birds" preload="metadata" loop playsinline src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Sylvia_atricapilla_-_Eurasian_Blackcap_XC559969.mp3?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"></audio>
+
+<canvas id="game" class="absolute inset-0 z-0"></canvas>
+
+<!-- HUD Header -->
+<div id="hud" class="fixed top-0 left-0 right-0 z-20 p-4 sm:p-6 flex justify-between items-center pointer-events-none transition-opacity duration-500">
+  <div class="flex items-center gap-3">
+    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400/80 shadow-[0_0_10px_#34d399]"></div>
+    <span class="tracking-[0.25em] text-xs font-semibold text-emerald-100/90 uppercase">Silent Bird</span>
+  </div>
+
+  <!-- Flow Quality Meter -->
+  <div class="flex items-center gap-4">
+    <div class="hidden sm:flex flex-col items-end gap-1">
+      <span id="bestScoreText" class="text-[10px] tracking-widest text-emerald-300/60 font-mono">RECORD: 0.0s</span>
+      <div class="w-32 h-1.5 bg-emerald-950/60 rounded-full overflow-hidden border border-emerald-500/20 p-[1px]">
+        <div id="flowBar" class="h-full bg-gradient-to-r from-teal-500 to-emerald-300 rounded-full w-0 transition-all duration-150 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+      </div>
+    </div>
+    <span id="state" class="glass-panel px-3 py-1.5 rounded-full text-[10px] tracking-[0.2em] font-medium text-emerald-200 border border-emerald-500/20 shadow-lg uppercase">ÉCOUTE</span>
+  </div>
+</div>
+
+<!-- Bottom Control Hint -->
+<div id="hint" class="fixed bottom-6 left-0 right-0 z-20 text-center pointer-events-none text-[10px] tracking-[0.25em] text-emerald-200/50 uppercase transition-opacity duration-500">
+  MAINTENIR [ ESPACE / CLIC ] = MONTER &bull; RELÂCHER = PLANER
+</div>
+
+<!-- Cover / Start Screen Overlay -->
+<div id="cover" class="fixed inset-0 z-30 flex flex-col items-center justify-center text-center p-6 bg-[#050b0a]/90 backdrop-blur-xl transition-all duration-700">
+  <div class="max-w-md w-full glass-panel p-8 sm:p-10 rounded-3xl flex flex-col items-center border border-emerald-500/20 shadow-2xl relative overflow-hidden">
+    <!-- Ambient background glow behind modal -->
+    <div class="absolute -top-20 -left-20 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -right-20 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <h1 class="text-5xl sm:text-7xl font-extralight tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-emerald-100 via-teal-200 to-emerald-500/70 mb-1">
+      Silent<br><span class="font-normal italic">Bird</span>
+    </h1>
+    
+    <div class="text-[10px] tracking-[0.35em] text-emerald-400/80 font-medium my-4 uppercase">
+      Suis la Veine Vivante
+    </div>
+    
+    <p class="text-sm text-slate-300/80 leading-relaxed font-light my-3">
+      La ville étouffe le monde.<br>
+      Une veine pure de chants d'oiseaux serpente dans le ciel.<br><br>
+      Plus ton vol épousera cette veine, plus la nature réinvestira le paysage.
+    </p>
+
+    <div id="bestContainer" class="hidden my-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300 font-mono tracking-wider">
+      Meilleure Harmonie: <span id="bestScore" class="font-bold text-emerald-200">0.0</span>s
+    </div>
+
+    <button id="play" class="glow-btn mt-6 px-10 py-4 rounded-full bg-gradient-to-r from-emerald-800/80 to-teal-900/80 text-emerald-100 font-medium text-xs tracking-[0.25em] border border-emerald-400/30 uppercase cursor-pointer">
+      S'envoler
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var canvas = document.getElementById("game");
+var ctx = canvas.getContext("2d");
+var cover = document.getElementById("cover");
+var play = document.getElementById("play");
+var state = document.getElementById("state");
+var flowBar = document.getElementById("flowBar");
+var bestScoreEl = document.getElementById("bestScore");
+var bestScoreText = document.getElementById("bestScoreText");
+var bestContainer = document.getElementById("bestContainer");
+var city = document.getElementById("city");
+var birds = document.getElementById("birds");
+
+var W = 360, H = 640, D = 1, last = 0;
+var running = false, holding = false;
+var time = 0, world = 0, good = 0, currentFlowTime = 0;
+var bestFlowTime = parseFloat(localStorage.getItem("sb_best_flow") || "0");
+
+var bird = { x: 90, y: 320, vy: 0 };
+var feathers = [], seeds = [], echoes = [], cityBuildings = [], floraBlooms = [];
+var audioStarted = false;
+
+if(bestFlowTime > 0) {
+  bestScoreEl.textContent = bestFlowTime.toFixed(1);
+  bestScoreText.textContent = "RECORD: " + bestFlowTime.toFixed(1) + "s";
+  bestContainer.classList.remove("hidden");
+}
+
+function generateCitySkyline() {
+  cityBuildings = [];
+  var x = 0;
+  while(x < 2500) {
+    var width = 35 + Math.random() * 55;
+    var height = H * (0.2 + Math.random() * 0.35);
+    cityBuildings.push({
+      x: x,
+      w: width,
+      h: height,
+      windows: Math.random() > 0.3
+    });
+    x += width + Math.random() * 8;
+  }
+}
+
+function resize(){
+  W = window.innerWidth || 360;
+  H = window.innerHeight || 640;
+  D = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W * D);
+  canvas.height = Math.round(H * D);
+  ctx.setTransform(D, 0, 0, D, 0, 0);
+  bird.x = W * 0.25;
+  if(!running) bird.y = H * 0.5;
+  generateCitySkyline();
+}
+
+function terrain(x){
+  var u = (world + x) / W;
+  var a = Math.sin(u * 1.31 + Math.sin(u * 0.29) * 2.1);
+  var b = Math.sin(u * 3.73 + 1.6) * 0.48;
+  var c = Math.sin(u * 8.91 + Math.sin(u * 0.73)) * 0.17;
+  var center = H * (0.50 + a * 0.145 + b * 0.095 + c * 0.035);
+
+  var breathing = 0.5 + 0.5 * Math.sin(u * 0.83 + 2.4);
+  var pocket = Math.pow(0.5 + 0.5 * Math.sin(u * 0.37 + 0.5), 3);
+  var width = H * (0.067 + breathing * 0.047 + pocket * 0.038);
+  width = Math.max(45, Math.min(H * 0.18, width));
+  return { y: center, w: width };
+}
+
+function quality(){
+  var z = terrain(bird.x);
+  var d = Math.abs(bird.y - z.y);
+  return Math.max(0, Math.min(1, 1 - d / z.w));
+}
+
+function startAudio(){
+  city.volume = 0.72;
+  birds.volume = 0.02;
+  city.muted = false;
+  birds.muted = false;
+
+  try { city.currentTime = 0; } catch(e){}
+  try { birds.currentTime = 0; } catch(e){}
+
+  var p1 = city.play();
+  var p2 = birds.play();
+
+  if(p1 && p1.catch) p1.catch(function(){});
+  if(p2 && p2.catch) p2.catch(function(){});
+
+  audioStarted = true;
+}
+
+function mixAudio(q){
+  if(!audioStarted) return;
+  var m = Math.max(0, Math.min(1, (q - 0.10) / 0.72));
+  m = m * m * (3 - 2 * m);
+
+  var cityTarget = 0.72 * (1 - m);
+  var birdTarget = 0.85 * m;
+
+  city.volume += (cityTarget - city.volume) * 0.10;
+  birds.volume += (birdTarget - birds.volume) * 0.10;
+}
+
+function audioEnergy(){
+  var q = quality();
+  var pulse = 0.48
+    + Math.sin(time * 5.7) * 0.16
+    + Math.sin(time * 11.3 + 1.2) * 0.09
+    + Math.sin(time * 2.1 + 0.7) * 0.07;
+  return Math.max(0.08, Math.min(1, pulse * q));
+}
+
+function reset(){
+  holding = false;
+  time = 0;
+  world = 0;
+  good = 0;
+  currentFlowTime = 0;
+  bird.x = W * 0.25;
+  bird.y = H * 0.5;
+  bird.vy = 0;
+  feathers = [];
+  seeds = [];
+  echoes = [];
+  floraBlooms = [];
+}
+
+function down(e){
+  if(!running) return;
+  if(city.paused || birds.paused){
+    var p1 = city.play(), p2 = birds.play();
+    if(p1 && p1.catch) p1.catch(function(){});
+    if(p2 && p2.catch) p2.catch(function(){});
+    audioStarted = true;
+  }
+  holding = true;
+  if(e && e.cancelable && e.type !== 'keydown') e.preventDefault();
+}
+
+function up(e){
+  holding = false;
+  if(e && e.cancelable && e.type !== 'keyup') e.preventDefault();
+}
+
+window.addEventListener("keydown", function(e){
+  if(e.code === "Space" || e.code === "ArrowUp") down(e);
+});
+window.addEventListener("keyup", function(e){
+  if(e.code === "Space" || e.code === "ArrowUp") up(e);
+});
+
+canvas.addEventListener("touchstart", down, {passive: false});
+canvas.addEventListener("touchend", up, {passive: false});
+canvas.addEventListener("touchcancel", up, {passive: false});
+canvas.addEventListener("mousedown", down);
+window.addEventListener("mouseup", up);
+
+function emitLiving(q, energy){
+  if(q > 0.72){
+    good = Math.min(1, good + 0.018);
+    currentFlowTime += 0.016;
+
+    if(currentFlowTime > bestFlowTime) {
+      bestFlowTime = currentFlowTime;
+      localStorage.setItem("sb_best_flow", bestFlowTime.toString());
+      bestScoreEl.textContent = bestFlowTime.toFixed(1);
+      bestScoreText.textContent = "RECORD: " + bestFlowTime.toFixed(1) + "s";
+    }
+
+    if(Math.random() < 0.15 + energy * 0.20){
+      seeds.push({
+        x: bird.x - 5,
+        y: bird.y,
+        vx: -20 - Math.random() * 30,
+        vy: (Math.random() - 0.5) * 25,
+        life: 1,
+        r: 1.2 + Math.random() * 2.2,
+        color: Math.random() > 0.4 ? "#34d399" : "#6ee7b7"
+      });
+    }
+    if(Math.random() < 0.03 + energy * 0.04){
+      echoes.push({ x: bird.x, y: bird.y, r: 8, a: 0.35 });
+    }
+    if(Math.random() < 0.02) {
+      floraBlooms.push({
+        x: W + 10,
+        y: H - (20 + Math.random() * 120),
+        size: 3 + Math.random() * 6,
+        life: 1
+      });
+    }
+  } else {
+    good = Math.max(0, good - 0.022);
+  }
+}
+
+function update(dt){
+  time += dt;
+  world += 58 * dt;
+
+  bird.vy += (holding ? -150 : 85) * dt;
+  bird.vy *= Math.pow(0.982, dt * 60);
+  bird.vy = Math.max(-90, Math.min(80, bird.vy));
+  bird.y += bird.vy * dt;
+
+  if(bird.y < 40){ bird.y = 40; bird.vy = 10; }
+  if(bird.y > H - 40){ bird.y = H - 40; bird.vy = -12; }
+
+  var q = quality();
+  mixAudio(q);
+  var energy = audioEnergy();
+
+  flowBar.style.width = Math.round(q * 100) + "%";
+  state.textContent = q > 0.78 ? "HARMONIE" : q > 0.42 ? "ÉCOUTE" : "BRUIT URBAIN";
+  state.style.borderColor = q > 0.78 ? "rgba(52, 211, 153, 0.6)" : "rgba(154, 205, 185, 0.2)";
+
+  emitLiving(q, energy);
+
+  feathers.unshift({ x: bird.x - 8, y: bird.y, a: 0.25 + q * 0.25 });
+  if(feathers.length > 40) feathers.pop();
+
+  for(var i = seeds.length - 1; i >= 0; i--){
+    var s = seeds[i];
+    s.life -= dt * 0.5;
+    s.x += s.vx * dt;
+    s.y += s.vy * dt + Math.sin(time * 3 + i) * 4 * dt;
+    if(s.life <= 0) seeds.splice(i, 1);
+  }
+  for(i = echoes.length - 1; i >= 0; i--){
+    var e = echoes[i];
+    e.r += dt * (30 + energy * 30);
+    e.a -= dt * 0.22;
+    if(e.a <= 0) echoes.splice(i, 1);
+  }
+  for(i = floraBlooms.length - 1; i >= 0; i--){
+    var fb = floraBlooms[i];
+    fb.x -= 58 * dt;
+    if(fb.x < -20) floraBlooms.splice(i, 1);
+  }
+}
+
+function edgePath(side, phase, energy){
+  ctx.beginPath();
+  for(var x = 0; x <= W + 10; x += 8){
+    var z = terrain(x);
+    var u = (world + x) * 0.045;
+    var wave = Math.sin(u * 2.1 + phase) * (2 + energy * 3.5) +
+               Math.sin(u * 5.9 + phase * 0.7) * (0.8 + energy * 2.0);
+    var y = z.y + side * z.w + wave;
+    if(x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+}
+
+function drawBird(q, energy){
+  var flap = Math.sin(time * (holding ? 9 : 3.5));
+  var angle = Math.max(-0.35, Math.min(0.35, bird.vy / 170));
+  var wing = q > 0.72 ? 1 + energy * 0.25 : 1;
+
+  ctx.save();
+  ctx.translate(bird.x, bird.y);
+  ctx.rotate(angle);
+
+  // Bioluminescent bird aura when in flow
+  if(q > 0.45) {
+    var glowGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 28);
+    glowGrad.addColorStop(0, "rgba(52, 211, 153, " + (q * 0.45) + ")");
+    glowGrad.addColorStop(1, "rgba(52, 211, 153, 0)");
+    ctx.fillStyle = glowGrad;
+    ctx.beginPath(); ctx.arc(0, 0, 28, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Tail feathers
+  ctx.strokeStyle = "rgba(167, 243, 208, 0.6)";
+  ctx.lineWidth = 1.2;
+  for(var i = 0; i < 3; i++){
+    ctx.beginPath();
+    ctx.moveTo(-8, 2 + i * 2);
+    ctx.quadraticCurveTo(-22 - i * 3, 5 + flap * 3, -38 - i * 5, 2 + i * 3);
+    ctx.stroke();
+  }
+
+  // Back Wing
+  ctx.fillStyle = "rgba(110, 231, 183, 0.45)";
+  ctx.beginPath();
+  ctx.moveTo(-2, 2);
+  ctx.quadraticCurveTo(-10, -14 - flap * 9 * wing, -28, -16 - flap * 5 * wing);
+  ctx.quadraticCurveTo(-14, -2, -2, 5);
+  ctx.fill();
+
+  // Bird Body
+  ctx.fillStyle = "#ecfdf5";
+  ctx.beginPath();
+  ctx.moveTo(18, 0);
+  ctx.quadraticCurveTo(4, -9, -14, -3);
+  ctx.quadraticCurveTo(-7, 10, 18, 0);
+  ctx.fill();
+
+  // Main Wing
+  ctx.fillStyle = "rgba(52, 211, 153, 0.85)";
+  ctx.beginPath();
+  ctx.moveTo(1, 2);
+  ctx.quadraticCurveTo(2, -20 + flap * 12 * wing, -20, -26 + flap * 7 * wing);
+  ctx.quadraticCurveTo(-9, -5, 1, 5);
+  ctx.fill();
+
+  // Beak
+  ctx.fillStyle = "#fbbf24";
+  ctx.beginPath();
+  ctx.moveTo(16, -1); ctx.lineTo(24, 2); ctx.lineTo(16, 4); ctx.closePath(); ctx.fill();
+
+  // Eye
+  ctx.fillStyle = "#064e3b";
+  ctx.beginPath(); ctx.arc(11, -2, 1.4, 0, Math.PI * 2); ctx.fill();
+
+  ctx.restore();
+}
+
+function drawCitySkyline() {
+  var offset = (world * 0.3) % 2500;
+  ctx.save();
+  ctx.fillStyle = "rgba(15, 28, 25, 0.85)";
+  
+  for(var i = 0; i < cityBuildings.length; i++) {
+    var b = cityBuildings[i];
+    var bx = b.x - offset;
+    if(bx < -b.w) bx += 2500;
+    
+    ctx.fillRect(bx, H - b.h, b.w, b.h);
+
+    // Render city window lights (fades as nature returns)
+    if(b.windows && good < 0.85) {
+      ctx.fillStyle = "rgba(251, 191, 36, " + ((1 - good) * 0.12) + ")";
+      for(var wy = H - b.h + 12; wy < H - 20; wy += 18) {
+        for(var wx = bx + 6; wx < bx + b.w - 10; wx += 12) {
+          if((wx + wy) % 3 === 0) ctx.fillRect(wx, wy, 4, 6);
+        }
+      }
+      ctx.fillStyle = "rgba(15, 28, 25, 0.85)";
+    }
+  }
+  ctx.restore();
+}
+
+function draw(){
+  // Atmospheric background gradient
+  var bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, "#050b0a");
+  bgGrad.addColorStop(0.6, "#0a1715");
+  bgGrad.addColorStop(1, "#0d211c");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  var q = quality();
+  var energy = audioEnergy();
+
+  // Parallax City Layer
+  drawCitySkyline();
+
+  // Floating bioluminescent dust
+  for(var i = 0; i < 35; i++){
+    var px = W - ((world * (0.15 + (i % 4) * 0.03) + i * 73) % W);
+    var py = (i * 89) % H;
+    ctx.fillStyle = "rgba(110, 231, 183, " + (0.03 + good * 0.08) + ")";
+    ctx.fillRect(px, py, 1.5, 1.5);
+  }
+
+  // Living Wave Flow Ribbon Fill
+  ctx.beginPath();
+  for(var x = 0; x <= W; x += 8){
+    var z = terrain(x);
+    if(x === 0) ctx.moveTo(x, z.y - z.w); else ctx.lineTo(x, z.y - z.w);
+  }
+  for(x = W; x >= 0; x -= 8){
+    z = terrain(x);
+    ctx.lineTo(x, z.y + z.w);
+  }
+  ctx.closePath();
+  
+  var ribbonGrad = ctx.createLinearGradient(0, 0, W, H);
+  ribbonGrad.addColorStop(0, "rgba(20, 83, 65, " + (0.08 + good * 0.15) + ")");
+  ribbonGrad.addColorStop(1, "rgba(52, 211, 153, " + (0.05 + good * 0.22) + ")");
+  ctx.fillStyle = ribbonGrad;
+  ctx.fill();
+
+  // Outer Wave Boundary Lines
+  edgePath(-1, 0, energy * good);
+  ctx.strokeStyle = "rgba(52, 211, 153, " + (0.22 + good * 0.35) + ")";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  edgePath(1, 2.2, energy * good);
+  ctx.strokeStyle = "rgba(52, 211, 153, " + (0.22 + good * 0.35) + ")";
+  ctx.stroke();
+
+  // Living Secondary Resonant Threads
+  if(good > 0.15){
+    edgePath(-0.70, 1.1, energy * good);
+    ctx.strokeStyle = "rgba(167, 243, 208, " + (good * 0.25) + ")";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    edgePath(0.70, 3.4, energy * good);
+    ctx.strokeStyle = "rgba(167, 243, 208, " + (good * 0.25) + ")";
+    ctx.stroke();
+  }
+
+  // Central Core Living Thread
+  ctx.beginPath();
+  for(x = 0; x <= W; x += 8){
+    z = terrain(x);
+    var yy = z.y + Math.sin((world + x) * (0.09 + energy * 0.025)) * energy * 3.5 * good;
+    if(x === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+  }
+  ctx.strokeStyle = "rgba(236, 253, 245, " + (0.10 + good * 0.45) + ")";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  // Echo Shockwaves
+  for(i = 0; i < echoes.length; i++){
+    var e = echoes[i];
+    ctx.strokeStyle = "rgba(110, 231, 183, " + e.a + ")";
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.stroke();
+  }
+
+  // Bird Flight Feather Trace
+  for(i = 1; i < feathers.length; i++){
+    var f = feathers[i];
+    ctx.strokeStyle = "rgba(52, 211, 153, " + (f.a * (1 - i / feathers.length)) + ")";
+    ctx.lineWidth = 2 * (1 - i / feathers.length);
+    ctx.beginPath();
+    ctx.moveTo(feathers[i-1].x, feathers[i-1].y);
+    ctx.lineTo(f.x, f.y);
+    ctx.stroke();
+  }
+
+  // Pollen Seeds
+  for(i = 0; i < seeds.length; i++){
+    var s = seeds[i];
+    ctx.fillStyle = s.color;
+    ctx.globalAlpha = s.life * 0.8;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1.0;
+  }
+
+  // Flora Blooms on Buildings
+  for(i = 0; i < floraBlooms.length; i++){
+    var fb = floraBlooms[i];
+    ctx.fillStyle = "#34d399";
+    ctx.beginPath(); ctx.arc(fb.x, fb.y, fb.size, 0, Math.PI * 2); ctx.fill();
+  }
+
+  drawBird(q, energy);
+}
+
+function frame(now){
+  requestAnimationFrame(frame);
+  if(!last) last = now;
+  var dt = Math.min(0.04, (now - last) / 1000);
+  last = now;
+  if(running) update(dt);
+  draw();
+}
+
+play.addEventListener("click", function(e){
+  e.preventDefault();
+  reset();
+  running = true;
+  cover.classList.add("opacity-0", "pointer-events-none");
+  startAudio();
+  setTimeout(function(){
+    if(running && city.paused && birds.paused) state.textContent = "ACTIVER L'AUDIO";
+  }, 700);
+});
+
+document.addEventListener("visibilitychange", function(){
+  holding = false;
+  last = 0;
+  if(document.hidden){
+    city.pause();
+    birds.pause();
+    audioStarted = false;
+  }
+});
+
+window.addEventListener("resize", resize);
+resize();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
