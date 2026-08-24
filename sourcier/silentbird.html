@@ -54,9 +54,7 @@
     0% { opacity: 0.4; transform: scale(0.98); }
     100% { opacity: 0.8; transform: scale(1.02); }
   }
-  .difficulty-card { transition: .25s ease; border: 1px solid rgba(110,231,183,.12); }
-  .difficulty-card[aria-pressed="true"] { background: rgba(16,185,129,.16); border-color: rgba(110,231,183,.65); box-shadow: 0 0 24px rgba(52,211,153,.12); transform: translateY(-2px); }
-  .difficulty-card:focus-visible, button:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 3px; }
+  button:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 3px; }
   .hud-value { font-family: 'Space Grotesk', monospace; font-variant-numeric: tabular-nums; }
   .badge-pop { animation: badgePop 3s cubic-bezier(.16,1,.3,1) both; }
   @keyframes badgePop { 0%{opacity:0;transform:translate(-50%,18px) scale(.8)} 12%,78%{opacity:1;transform:translate(-50%,0) scale(1)} 100%{opacity:0;transform:translate(-50%,-12px) scale(.96)} }
@@ -120,19 +118,18 @@
     </h1>
     
     <div class="text-[10px] tracking-[0.35em] text-emerald-400/80 font-medium my-4 uppercase">
-      Suis la Veine Vivante
+      L'oiseau des Sourciers du vivant
     </div>
     
     <p class="text-sm text-slate-300/80 leading-relaxed font-light my-3">
-      La ville étouffe le monde.<br>
-      Une veine pure de chants d'oiseaux serpente dans le ciel.<br><br>
-      Plus ton vol épousera cette veine, plus la nature réinvestira le paysage.
+      Dans la ville saturée de bruit, Silent Bird cherche les veines de silence.<br><br>
+      Guide-le au cœur de ces passages secrets : là, le silence fait résonner les sons de la nature et le vivant reprend racine.
     </p>
 
-    <div class="w-full grid grid-cols-3 gap-2 my-3" id="difficultyPicker" aria-label="Choisir la difficulté">
-      <button class="difficulty-card rounded-xl py-3 px-1 text-left bg-black/10" data-level="0" aria-pressed="true"><strong class="block text-xs text-emerald-100">Clairière</strong><span class="text-[9px] text-emerald-200/50">Doux · 60 s</span></button>
-      <button class="difficulty-card rounded-xl py-3 px-1 text-left bg-black/10" data-level="1" aria-pressed="false"><strong class="block text-xs text-emerald-100">Canopée</strong><span class="text-[9px] text-emerald-200/50">Vif · 75 s</span></button>
-      <button class="difficulty-card rounded-xl py-3 px-1 text-left bg-black/10" data-level="2" aria-pressed="false"><strong class="block text-xs text-emerald-100">Migration</strong><span class="text-[9px] text-emerald-200/50">Expert · 90 s</span></button>
+    <div class="w-full my-4 px-5 py-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/15 text-left">
+      <div id="missionLabel" class="text-[9px] tracking-[.3em] text-amber-200/70 uppercase">Mission 1 sur 3</div>
+      <strong id="missionName" class="block mt-1 text-lg font-light text-emerald-100">La veine des jardins</strong>
+      <span id="missionGoal" class="block mt-1 text-xs leading-relaxed text-emerald-100/55">Reste dans la veine jusqu'à faire renaître le premier chant.</span>
     </div>
 
     <div id="bestContainer" class="hidden my-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300 font-mono tracking-wider">
@@ -140,20 +137,20 @@
     </div>
 
     <button id="play" class="glow-btn mt-6 px-10 py-4 rounded-full bg-gradient-to-r from-emerald-800/80 to-teal-900/80 text-emerald-100 font-medium text-xs tracking-[0.25em] border border-emerald-400/30 uppercase cursor-pointer">
-      S'envoler
+      Commencer la mission
     </button>
   </div>
 </div>
 
 <div id="results" class="fixed inset-0 z-30 hidden items-center justify-center p-6 bg-[#050b0a]/90 backdrop-blur-xl">
   <div class="max-w-md w-full glass-panel p-8 rounded-3xl text-center border border-emerald-500/20">
-    <div class="text-[10px] tracking-[.35em] text-emerald-400 uppercase">Traversée accomplie</div>
+    <div id="resultKicker" class="text-[10px] tracking-[.35em] text-emerald-400 uppercase">Mission accomplie</div>
     <h2 id="resultTitle" class="text-4xl font-light mt-3 text-emerald-50">Belle écoute</h2>
     <div id="resultScore" class="hud-value text-6xl text-emerald-300 mt-5">0</div>
     <div class="text-[10px] tracking-[.25em] text-emerald-200/50 uppercase">points de résonance</div>
     <div id="badges" class="flex flex-wrap justify-center gap-2 my-6"></div>
     <p id="resultDetail" class="text-sm text-slate-300/70 mb-5"></p>
-    <button id="replay" class="glow-btn px-9 py-4 rounded-full bg-emerald-900/80 border border-emerald-400/30 text-xs tracking-[.22em] uppercase">Reprendre le ciel</button>
+    <button id="replay" class="glow-btn px-9 py-4 rounded-full bg-emerald-900/80 border border-emerald-400/30 text-xs tracking-[.22em] uppercase">Mission suivante</button>
   </div>
 </div>
 
@@ -181,14 +178,14 @@ var running = false, holding = false;
 var time = 0, world = 0, good = 0, currentFlowTime = 0;
 var bestFlowTime = parseFloat(localStorage.getItem("sb_best_flow") || "0");
 var levels = [
-  {name:"Clairière", duration:60, speed:58, gravity:85, lift:-150, width:1, veilEvery:18, veilDuration:2.4},
-  {name:"Canopée", duration:75, speed:76, gravity:100, lift:-175, width:.78, veilEvery:14, veilDuration:3.2},
-  {name:"Migration", duration:90, speed:94, gravity:115, lift:-195, width:.62, veilEvery:11, veilDuration:4}
+  {name:"La veine des jardins", goal:"Reste dans la veine jusqu'à faire renaître le premier chant.", duration:45, speed:62, gravity:85, lift:-150, width:1, veilEvery:18, veilDuration:2.2, required:34},
+  {name:"Les toits en sommeil", goal:"Traverse les hauteurs : le courant accélère et le passage se resserre.", duration:55, speed:92, gravity:103, lift:-178, width:.76, veilEvery:14, veilDuration:3, required:40},
+  {name:"Le cœur de la cité", goal:"Réveille la dernière veine du vivant malgré le tumulte de la ville.", duration:65, speed:128, gravity:122, lift:-205, width:.60, veilEvery:11, veilDuration:3.8, required:46}
 ];
-var selectedLevel = 0, score = 0, vitality = 100, combo = 1, maxCombo = 1, veil = 0, nextVeil = 18, badgesEarned = [], lastBadgeAt = 0;
+var selectedLevel = Math.min(2, Math.max(0, parseInt(localStorage.getItem("sb_mission") || "0", 10))), score = 0, vitality = 100, combo = 1, maxCombo = 1, veil = 0, nextVeil = 18, badgesEarned = [], lastBadgeAt = 0, missionWon = false;
 
 var bird = { x: 90, y: 320, vy: 0 };
-var feathers = [], seeds = [], echoes = [], cityBuildings = [], floraBlooms = [];
+var feathers = [], seeds = [], echoes = [], cityBuildings = [], floraBlooms = [], resonanceBursts = [];
 var audioStarted = false;
 var audioCtx, citySource, birdSource, cityAnalyser, birdAnalyser;
 var citySpectrum, birdSpectrum, birdWaveform, previousBirdSpectrum;
@@ -359,10 +356,19 @@ function reset(){
   seeds = [];
   echoes = [];
   floraBlooms = [];
+  resonanceBursts = [];
   score = 0; vitality = 100; combo = 1; maxCombo = 1; veil = 0; nextVeil = levels[selectedLevel].veilEvery; badgesEarned = []; lastBadgeAt = 0;
   scoreText.textContent = "0000"; lifeBar.style.width = "100%";
   levelText.textContent = "Niveau " + (selectedLevel + 1) + " · " + levels[selectedLevel].name;
   veilNotice.style.opacity = 0;
+}
+
+function syncMissionCard(){
+  var level = levels[selectedLevel];
+  document.getElementById("missionLabel").textContent = "Mission " + (selectedLevel + 1) + " sur " + levels.length;
+  document.getElementById("missionName").textContent = level.name;
+  document.getElementById("missionGoal").textContent = level.goal;
+  levelText.textContent = "Niveau " + (selectedLevel + 1) + " · " + level.name;
 }
 
 function awardBadge(icon, label){
@@ -376,15 +382,18 @@ function awardBadge(icon, label){
 function finishGame(){
   if(!running) return;
   running = false; holding = false; city.volume = .15; birds.volume = .15;
-  var harmony = Math.round(good * 100);
+  missionWon = vitality > 0 && currentFlowTime >= levels[selectedLevel].required;
   if(vitality > 70) awardBadge("🪶", "Plume sereine");
   if(maxCombo >= 5) awardBadge("〰", "Surfeur d'ondes");
   if(score >= levels[selectedLevel].duration * 85) awardBadge("✦", "Cœur résonant");
   if(selectedLevel === 2 && vitality > 0) awardBadge("🧭", "Grand migrateur");
   if(!badgesEarned.length) awardBadge("🌱", "Premier envol");
   document.getElementById("resultScore").textContent = Math.round(score).toLocaleString("fr-FR");
-  document.getElementById("resultTitle").textContent = vitality <= 0 ? "Le ciel t'attend" : harmony > 70 ? "Résonance profonde" : "Belle traversée";
-  document.getElementById("resultDetail").textContent = "Meilleur élan ×" + maxCombo + " · " + Math.round(currentFlowTime) + " s en harmonie · " + levels[selectedLevel].name;
+  document.getElementById("resultKicker").textContent = missionWon ? "Mission accomplie" : "La veine s'est refermée";
+  document.getElementById("resultTitle").textContent = missionWon ? (selectedLevel === 2 ? "La ville résonne" : "Le vivant s'éveille") : "Écoute encore";
+  document.getElementById("resultDetail").textContent = Math.round(currentFlowTime) + " s de résonance sur " + levels[selectedLevel].required + " nécessaires · Meilleur élan ×" + maxCombo;
+  replay.textContent = missionWon ? (selectedLevel === levels.length - 1 ? "Revivre la traversée" : "Mission suivante") : "Reprendre la mission";
+  if(missionWon && selectedLevel < levels.length - 1) localStorage.setItem("sb_mission", String(selectedLevel + 1));
   document.getElementById("badges").innerHTML = badgesEarned.map(function(b){ return '<span class="px-3 py-2 rounded-full bg-emerald-950/60 border border-emerald-500/20 text-xs">'+b.icon+' '+b.label+'</span>'; }).join("");
   results.classList.remove("hidden"); results.classList.add("flex");
 }
@@ -441,6 +450,7 @@ function emitLiving(q, energy, dt){
         r: 1.2 + Math.random() * 2.2,
         color: Math.random() > 0.4 ? "#34d399" : "#6ee7b7"
       });
+      if(Math.random() < .32) resonanceBursts.push({x:bird.x, y:bird.y, life:1, hue:155 + Math.random()*45, petals:7 + Math.floor(Math.random()*7)});
     }
     var freshTransient = audioFeatures.transient > 0.34 && time - lastTransient > 0.13;
     if(freshTransient || Math.random() < (0.012 + energy * 0.025) * dt * 60){
@@ -519,6 +529,11 @@ function update(dt){
     var fb = floraBlooms[i];
     fb.x -= level.speed * dt;
     if(fb.x < -20) floraBlooms.splice(i, 1);
+  }
+  for(i = resonanceBursts.length - 1; i >= 0; i--){
+    resonanceBursts[i].life -= dt * 1.15;
+    resonanceBursts[i].x -= level.speed * dt * .22;
+    if(resonanceBursts[i].life <= 0) resonanceBursts.splice(i, 1);
   }
 }
 
@@ -667,13 +682,17 @@ function draw(){
   drawCitySkyline(0.19, 0.78, 0.52, "#0e1c19");
   drawCitySkyline(0.34, 1, 0.88 - good * 0.18, "#0f1c19");
 
-  // Floating bioluminescent dust
-  for(var i = 0; i < 35; i++){
+  // A deep field of drifting, bioluminescent particles makes the city feel enchanted.
+  ctx.save(); ctx.globalCompositeOperation = "lighter";
+  for(var i = 0; i < 80; i++){
     var px = W - ((world * (0.15 + (i % 4) * 0.03) + i * 73) % W);
-    var py = (i * 89) % H;
-    ctx.fillStyle = "rgba(110, 231, 183, " + (0.03 + good * 0.08) + ")";
-    ctx.fillRect(px, py, 1.5, 1.5);
+    var py = ((i * 89) + Math.sin(time * (0.5 + i%5*.08) + i) * 18) % H;
+    var pr = .5 + (i%7)/7 * (1.2 + good*1.8);
+    var pg = ctx.createRadialGradient(px,py,0,px,py,pr*4);
+    pg.addColorStop(0,"rgba(190,255,226,"+(0.16+good*.5)+")"); pg.addColorStop(1,"rgba(52,211,153,0)");
+    ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(px,py,pr*4,0,Math.PI*2); ctx.fill();
   }
+  ctx.restore();
 
   // Living Wave Flow Ribbon Fill
   var levelFade = Math.abs(veil - levels[selectedLevel].veilDuration / 2) - levels[selectedLevel].veilDuration * .34;
@@ -754,6 +773,19 @@ function draw(){
     ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.stroke();
   }
 
+  // Prismatic resonance blossoms reward every moment of true silence.
+  ctx.save(); ctx.globalCompositeOperation = "lighter";
+  for(i = 0; i < resonanceBursts.length; i++){
+    var rb = resonanceBursts[i], age = 1-rb.life;
+    for(var p=0;p<rb.petals;p++){
+      var pa=p/rb.petals*Math.PI*2 + age*1.8, dist=8+age*48;
+      var sx=rb.x+Math.cos(pa)*dist, sy=rb.y+Math.sin(pa)*dist;
+      ctx.fillStyle="hsla("+(rb.hue+p*4)+",95%,75%,"+(rb.life*.7)+")";
+      ctx.beginPath(); ctx.arc(sx,sy,.7+rb.life*1.8,0,Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.restore();
+
   // Bird Flight Feather Trace
   for(i = 1; i < feathers.length; i++){
     var f = feathers[i];
@@ -811,15 +843,10 @@ play.addEventListener("click", function(e){
   }, 700);
 });
 
-document.querySelectorAll("[data-level]").forEach(function(button){
-  button.addEventListener("click", function(){
-    selectedLevel = Number(button.dataset.level);
-    document.querySelectorAll("[data-level]").forEach(function(b){ b.setAttribute("aria-pressed", b === button ? "true" : "false"); });
-  });
-});
-
 replay.addEventListener("click", function(){
   results.classList.add("hidden"); results.classList.remove("flex");
+  if(missionWon && selectedLevel < levels.length - 1) selectedLevel++;
+  syncMissionCard();
   reset(); running = true; startAudio();
 });
 
@@ -835,6 +862,7 @@ document.addEventListener("visibilitychange", function(){
 
 window.addEventListener("resize", resize);
 resize();
+syncMissionCard();
 requestAnimationFrame(frame);
 })();
 </script>
