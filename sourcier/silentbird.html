@@ -95,8 +95,15 @@
 </div>
 
 <div class="fixed top-20 left-4 sm:left-6 z-20 pointer-events-none">
-  <div id="levelText" class="text-[9px] tracking-[.24em] text-emerald-200/60 uppercase">Niveau 1 · Clairière</div>
-  <div class="mt-2 w-28 h-1 rounded-full bg-emerald-950/70 overflow-hidden"><div id="lifeBar" class="h-full w-full bg-gradient-to-r from-amber-300 to-emerald-300 transition-all"></div></div>
+  <div id="levelText" class="text-[9px] tracking-[.24em] text-emerald-200/60 uppercase">Étape 1 · Clairière</div>
+  <div class="mt-2 flex items-center gap-2">
+    <span class="text-[9px] tracking-wider text-white/50 uppercase">Énergie</span>
+    <div class="w-24 sm:w-28 h-2 rounded-full bg-emerald-950/70 overflow-hidden border border-white/10"><div id="lifeBar" class="h-full w-full bg-gradient-to-r from-amber-300 to-emerald-300 transition-all"></div></div>
+  </div>
+</div>
+<div class="fixed top-32 sm:top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-center">
+  <div class="text-[9px] tracking-[.24em] text-white/50 uppercase">Arrivée dans</div>
+  <div id="timerText" class="hud-value text-3xl text-white leading-none mt-1">35</div>
 </div>
 <div class="fixed top-20 right-4 sm:right-6 z-20 pointer-events-none text-right">
   <div class="text-[9px] tracking-[.24em] text-sky-200/65 uppercase">Bulles de silence</div>
@@ -115,7 +122,7 @@
 
 <!-- Bottom Control Hint -->
 <div id="hint" class="fixed bottom-6 left-0 right-0 z-20 text-center pointer-events-none text-[10px] tracking-[0.25em] text-emerald-200/50 uppercase transition-opacity duration-500">
-  APPUIE POUR MONTER &bull; RELÂCHE POUR DESCENDRE &bull; ATTRAPE LES BULLES BLEUES
+  GARDE L’OISEAU DANS LA BANDE VERTE · APPUIE = MONTER · RELÂCHE = DESCENDRE
 </div>
 
 <!-- Cover / Start Screen Overlay -->
@@ -133,18 +140,24 @@
       L'oiseau des Sourciers du vivant
     </div>
     
-    <p class="text-sm text-slate-300/80 leading-relaxed font-light my-3">Une seule chose à faire : reste dans le couloir lumineux.</p>
-
-    <div class="w-full grid grid-cols-3 gap-2 my-3 text-center">
-      <div class="rounded-xl bg-white/[.035] p-3"><b class="block text-lg text-emerald-200">①</b><span class="text-[10px] text-slate-300/70">Appuie pour monter</span></div>
-      <div class="rounded-xl bg-white/[.035] p-3"><b class="block text-lg text-sky-300">②</b><span class="text-[10px] text-slate-300/70">Prends 3 bulles</span></div>
-      <div class="rounded-xl bg-white/[.035] p-3"><b class="block text-lg text-white">③</b><span class="text-[10px] text-slate-300/70">Savoure 5 s de silence</span></div>
+    <div class="w-full my-5 rounded-2xl bg-emerald-950/35 border border-emerald-400/20 p-5 text-left">
+      <div class="text-[10px] tracking-[.25em] text-emerald-300 uppercase">Ton but</div>
+      <p class="mt-2 text-lg text-white leading-snug">Atteins l’arrivée sans vider ta barre d’énergie.</p>
+      <div class="mt-4 space-y-3 text-sm text-slate-200/80">
+        <div class="flex gap-3"><b class="text-emerald-300">1</b><span>Reste dans la <strong class="text-emerald-200">bande verte</strong>.</span></div>
+        <div class="flex gap-3"><b class="text-emerald-300">2</b><span><strong>Appuie</strong> pour monter, <strong>relâche</strong> pour descendre.</span></div>
+      </div>
     </div>
 
-    <div class="w-full my-4 px-5 py-4 rounded-2xl bg-emerald-950/30 border border-emerald-400/15 text-left">
-      <div id="missionLabel" class="text-[9px] tracking-[.3em] text-amber-200/70 uppercase">Mission 1 sur 3</div>
-      <strong id="missionName" class="block mt-1 text-lg font-light text-emerald-100">La veine des jardins</strong>
-      <span id="missionGoal" class="block mt-1 text-xs leading-relaxed text-emerald-100/55">Reste dans la veine jusqu'à faire renaître le premier chant.</span>
+    <div class="w-full grid grid-cols-2 gap-2 text-left">
+      <div class="rounded-xl bg-white/[.035] p-3"><b class="block text-sky-300 text-xs uppercase tracking-wider">Bonus bleu</b><span class="text-[11px] text-slate-300/70">3 bulles = 5 s de vol automatique.</span></div>
+      <div class="rounded-xl bg-white/[.035] p-3"><b class="block text-amber-200 text-xs uppercase tracking-wider">Attention</b><span class="text-[11px] text-slate-300/70">Hors de la bande, l’énergie baisse.</span></div>
+    </div>
+
+    <div class="w-full my-4 px-5 py-4 rounded-2xl bg-white/[.025] border border-white/10 text-left">
+      <div id="missionLabel" class="text-[9px] tracking-[.3em] text-white/45 uppercase">Étape 1 sur 3</div>
+      <strong id="missionName" class="block mt-1 text-base font-light text-emerald-100">La veine des jardins</strong>
+      <span id="missionGoal" class="block mt-1 text-xs leading-relaxed text-emerald-100/55">Tiens 35 secondes dans la bande verte.</span>
     </div>
 
     <div id="bestContainer" class="hidden my-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300 font-mono tracking-wider">
@@ -152,20 +165,20 @@
     </div>
 
     <button id="play" class="glow-btn mt-6 px-10 py-4 rounded-full bg-gradient-to-r from-emerald-800/80 to-teal-900/80 text-emerald-100 font-medium text-xs tracking-[0.25em] border border-emerald-400/30 uppercase cursor-pointer">
-      Commencer la mission
+      J’ai compris · Jouer
     </button>
   </div>
 </div>
 
 <div id="results" class="fixed inset-0 z-30 hidden items-center justify-center p-6 bg-[#050b0a]/90 backdrop-blur-xl">
   <div class="max-w-md w-full glass-panel p-8 rounded-3xl text-center border border-emerald-500/20">
-    <div id="resultKicker" class="text-[10px] tracking-[.35em] text-emerald-400 uppercase">Mission accomplie</div>
+    <div id="resultKicker" class="text-[10px] tracking-[.35em] text-emerald-400 uppercase">Arrivée atteinte</div>
     <h2 id="resultTitle" class="text-4xl font-light mt-3 text-emerald-50">Belle écoute</h2>
     <div id="resultScore" class="hud-value text-6xl text-emerald-300 mt-5">0</div>
-    <div class="text-[10px] tracking-[.25em] text-emerald-200/50 uppercase">points de résonance</div>
+    <div class="text-[10px] tracking-[.25em] text-emerald-200/50 uppercase">points · score bonus</div>
     <div id="badges" class="flex flex-wrap justify-center gap-2 my-6"></div>
     <p id="resultDetail" class="text-sm text-slate-300/70 mb-5"></p>
-    <button id="replay" class="glow-btn px-9 py-4 rounded-full bg-emerald-900/80 border border-emerald-400/30 text-xs tracking-[.22em] uppercase">Mission suivante</button>
+    <button id="replay" class="glow-btn px-9 py-4 rounded-full bg-emerald-900/80 border border-emerald-400/30 text-xs tracking-[.22em] uppercase">Étape suivante</button>
   </div>
 </div>
 
@@ -182,7 +195,7 @@ var flowBar = document.getElementById("flowBar");
 var bestScoreEl = document.getElementById("bestScore");
 var bestScoreText = document.getElementById("bestScoreText");
 var bestContainer = document.getElementById("bestContainer");
-var scoreText = document.getElementById("scoreText"), lifeBar = document.getElementById("lifeBar");
+var scoreText = document.getElementById("scoreText"), lifeBar = document.getElementById("lifeBar"), timerText = document.getElementById("timerText");
 var levelText = document.getElementById("levelText"), veilNotice = document.getElementById("veilNotice"), veilTimer = document.getElementById("veilTimer");
 var results = document.getElementById("results"), replay = document.getElementById("replay"), badgeToast = document.getElementById("badgeToast");
 var bubbleMeter = document.getElementById("bubbleMeter"), silenceNotice = document.getElementById("silenceNotice"), silenceTimer = document.getElementById("silenceTimer");
@@ -194,9 +207,9 @@ var running = false, holding = false;
 var time = 0, world = 0, good = 0, currentFlowTime = 0;
 var bestFlowTime = parseFloat(localStorage.getItem("sb_best_flow") || "0");
 var levels = [
-  {name:"La veine des jardins", goal:"Suis la lumière, collecte 3 bulles bleues et écoute le silence.", duration:45, speed:60, gravity:78, lift:-135, width:1.18, required:30},
-  {name:"Les toits en sommeil", goal:"Trouve encore 3 bulles dans ce courant un peu plus rapide.", duration:52, speed:78, gravity:88, lift:-150, width:1.02, required:35},
-  {name:"Le cœur de la cité", goal:"Fais danser l'oiseau et offre un dernier silence à la ville.", duration:58, speed:96, gravity:98, lift:-165, width:.90, required:39}
+  {name:"La veine des jardins", goal:"Tiens 35 secondes dans la bande verte.", duration:35, speed:58, gravity:78, lift:-135, width:1.22},
+  {name:"Les toits en sommeil", goal:"Tiens 40 secondes : le trajet accélère.", duration:40, speed:72, gravity:86, lift:-148, width:1.08},
+  {name:"Le cœur de la cité", goal:"Tiens 45 secondes dans la bande plus étroite.", duration:45, speed:86, gravity:94, lift:-158, width:.96}
 ];
 var selectedLevel = Math.min(2, Math.max(0, parseInt(localStorage.getItem("sb_mission") || "0", 10))), score = 0, vitality = 100, combo = 1, maxCombo = 1, veil = 0, nextVeil = 18, badgesEarned = [], lastBadgeAt = 0, missionWon = false;
 
@@ -376,9 +389,9 @@ function reset(){
   floraBlooms = [];
   resonanceBursts = [];
   bubbles = []; bubblesCaught = 0; nextBubbleAt = 4; silenceTime = 0; totalBubbles = 0;
-  score = 0; vitality = 100; combo = 1; maxCombo = 1; veil = 0; nextVeil = levels[selectedLevel].veilEvery; badgesEarned = []; lastBadgeAt = 0;
-  scoreText.textContent = "0000"; lifeBar.style.width = "100%";
-  levelText.textContent = "Niveau " + (selectedLevel + 1) + " · " + levels[selectedLevel].name;
+  score = 0; vitality = 100; combo = 1; maxCombo = 1; veil = 0; badgesEarned = []; lastBadgeAt = 0;
+  scoreText.textContent = "0000"; lifeBar.style.width = "100%"; timerText.textContent = String(levels[selectedLevel].duration);
+  levelText.textContent = "Étape " + (selectedLevel + 1) + " · " + levels[selectedLevel].name;
   veilNotice.style.opacity = 0;
   silenceNotice.classList.add("hidden");
   updateBubbleMeter();
@@ -404,10 +417,10 @@ function beginSilence(){
 
 function syncMissionCard(){
   var level = levels[selectedLevel];
-  document.getElementById("missionLabel").textContent = "Mission " + (selectedLevel + 1) + " sur " + levels.length;
+  document.getElementById("missionLabel").textContent = "Étape " + (selectedLevel + 1) + " sur " + levels.length;
   document.getElementById("missionName").textContent = level.name;
   document.getElementById("missionGoal").textContent = level.goal;
-  levelText.textContent = "Niveau " + (selectedLevel + 1) + " · " + level.name;
+  levelText.textContent = "Étape " + (selectedLevel + 1) + " · " + level.name;
 }
 
 function awardBadge(icon, label){
@@ -421,7 +434,7 @@ function awardBadge(icon, label){
 function finishGame(){
   if(!running) return;
   running = false; holding = false; city.volume = .15; birds.volume = .15;
-  missionWon = vitality > 0 && currentFlowTime >= levels[selectedLevel].required;
+  missionWon = vitality > 0 && time >= levels[selectedLevel].duration;
   if(vitality > 70) awardBadge("🪶", "Plume sereine");
   if(maxCombo >= 5) awardBadge("〰", "Surfeur d'ondes");
   if(totalBubbles >= 3) awardBadge("●", "Chercheur de silence");
@@ -429,10 +442,10 @@ function finishGame(){
   if(selectedLevel === 2 && vitality > 0) awardBadge("🧭", "Grand migrateur");
   if(!badgesEarned.length) awardBadge("🌱", "Premier envol");
   document.getElementById("resultScore").textContent = Math.round(score).toLocaleString("fr-FR");
-  document.getElementById("resultKicker").textContent = missionWon ? "Mission accomplie" : "La veine s'est refermée";
-  document.getElementById("resultTitle").textContent = missionWon ? (selectedLevel === 2 ? "La ville résonne" : "Le vivant s'éveille") : "Écoute encore";
-  document.getElementById("resultDetail").textContent = totalBubbles + " bulles trouvées · " + Math.round(currentFlowTime) + " s de résonance sur " + levels[selectedLevel].required + " nécessaires · Meilleur élan ×" + maxCombo;
-  replay.textContent = missionWon ? (selectedLevel === levels.length - 1 ? "Revivre la traversée" : "Mission suivante") : "Reprendre la mission";
+  document.getElementById("resultKicker").textContent = missionWon ? "Arrivée atteinte" : "Énergie épuisée";
+  document.getElementById("resultTitle").textContent = missionWon ? (selectedLevel === 2 ? "Traversée réussie !" : "Étape réussie !") : "Presque !";
+  document.getElementById("resultDetail").textContent = Math.min(levels[selectedLevel].duration, Math.floor(time)) + " s parcourues sur " + levels[selectedLevel].duration + " · " + totalBubbles + " bulles attrapées · Énergie " + Math.max(0, Math.round(vitality)) + "%";
+  replay.textContent = missionWon ? (selectedLevel === levels.length - 1 ? "Rejouer" : "Étape suivante") : "Réessayer";
   if(missionWon && selectedLevel < levels.length - 1) localStorage.setItem("sb_mission", String(selectedLevel + 1));
   document.getElementById("badges").innerHTML = badgesEarned.map(function(b){ return '<span class="px-3 py-2 rounded-full bg-emerald-950/60 border border-emerald-500/20 text-xs">'+b.icon+' '+b.label+'</span>'; }).join("");
   results.classList.remove("hidden"); results.classList.add("flex");
@@ -537,7 +550,8 @@ function update(dt){
   var energy = audioEnergy();
 
   flowBar.style.width = Math.round(q * 100) + "%";
-  state.textContent = q > 0.78 ? "HARMONIE" : q > 0.42 ? "ÉCOUTE" : "BRUIT URBAIN";
+  timerText.textContent = String(Math.max(0, Math.ceil(level.duration - time)));
+  state.textContent = q > 0.72 ? "PARFAIT" : q > 0.35 ? "RECENTRE-TOI" : "DANGER";
   state.style.borderColor = q > 0.78 ? "rgba(52, 211, 153, 0.6)" : "rgba(154, 205, 185, 0.2)";
 
   emitLiving(q, energy, dt);
@@ -753,10 +767,8 @@ function draw(){
   ctx.restore();
 
   // Living Wave Flow Ribbon Fill
-  var levelFade = Math.abs(veil - levels[selectedLevel].veilDuration / 2) - levels[selectedLevel].veilDuration * .34;
-  var corridorAlpha = veil > 0 ? Math.max(0, Math.min(1, levelFade * 5)) : 1;
   ctx.save();
-  ctx.globalAlpha = corridorAlpha;
+  ctx.globalAlpha = 1;
   ctx.beginPath();
   for(var x = 0; x <= W; x += 8){
     var z = terrain(x);
