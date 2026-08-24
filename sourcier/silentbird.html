@@ -54,6 +54,13 @@
     0% { opacity: 0.4; transform: scale(0.98); }
     100% { opacity: 0.8; transform: scale(1.02); }
   }
+  .difficulty-card { transition: .25s ease; border: 1px solid rgba(110,231,183,.12); }
+  .difficulty-card[aria-pressed="true"] { background: rgba(16,185,129,.16); border-color: rgba(110,231,183,.65); box-shadow: 0 0 24px rgba(52,211,153,.12); transform: translateY(-2px); }
+  .difficulty-card:focus-visible, button:focus-visible { outline: 2px solid #6ee7b7; outline-offset: 3px; }
+  .hud-value { font-family: 'Space Grotesk', monospace; font-variant-numeric: tabular-nums; }
+  .badge-pop { animation: badgePop 3s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes badgePop { 0%{opacity:0;transform:translate(-50%,18px) scale(.8)} 12%,78%{opacity:1;transform:translate(-50%,0) scale(1)} 100%{opacity:0;transform:translate(-50%,-12px) scale(.96)} }
+  @media (prefers-reduced-motion: reduce) { .flow-pulse,.badge-pop { animation: none; } .glow-btn { transition: none; } }
 </style>
 </head>
 <body class="bg-[#050b0a] text-slate-100 flex flex-col justify-between select-none overflow-hidden">
@@ -73,6 +80,10 @@
 
   <!-- Flow Quality Meter -->
   <div class="flex items-center gap-4">
+    <div class="text-right">
+      <div class="text-[9px] tracking-[.22em] text-emerald-300/50 uppercase">Résonance</div>
+      <div id="scoreText" class="hud-value text-xl text-emerald-100 leading-none">0000</div>
+    </div>
     <div class="hidden sm:flex flex-col items-end gap-1">
       <span id="bestScoreText" class="text-[10px] tracking-widest text-emerald-300/60 font-mono">RECORD: 0.0s</span>
       <div class="w-32 h-1.5 bg-emerald-950/60 rounded-full overflow-hidden border border-emerald-500/20 p-[1px]">
@@ -82,6 +93,15 @@
     <span id="state" class="glass-panel px-3 py-1.5 rounded-full text-[10px] tracking-[0.2em] font-medium text-emerald-200 border border-emerald-500/20 shadow-lg uppercase">ÉCOUTE</span>
   </div>
 </div>
+
+<div class="fixed top-20 left-4 sm:left-6 z-20 pointer-events-none">
+  <div id="levelText" class="text-[9px] tracking-[.24em] text-emerald-200/60 uppercase">Niveau 1 · Clairière</div>
+  <div class="mt-2 w-28 h-1 rounded-full bg-emerald-950/70 overflow-hidden"><div id="lifeBar" class="h-full w-full bg-gradient-to-r from-amber-300 to-emerald-300 transition-all"></div></div>
+</div>
+<div id="veilNotice" class="fixed top-1/3 left-1/2 -translate-x-1/2 z-20 pointer-events-none opacity-0 transition-opacity text-center">
+  <div class="text-[10px] tracking-[.35em] text-amber-200 uppercase">Vol à l'instinct</div><div id="veilTimer" class="hud-value text-3xl text-white/90 mt-1">3</div>
+</div>
+<div id="badgeToast" class="fixed bottom-20 left-1/2 z-40 hidden glass-panel rounded-full px-5 py-3 text-xs tracking-wider text-emerald-100 whitespace-nowrap"></div>
 
 <!-- Bottom Control Hint -->
 <div id="hint" class="fixed bottom-6 left-0 right-0 z-20 text-center pointer-events-none text-[10px] tracking-[0.25em] text-emerald-200/50 uppercase transition-opacity duration-500">
@@ -109,6 +129,12 @@
       Plus ton vol épousera cette veine, plus la nature réinvestira le paysage.
     </p>
 
+    <div class="w-full grid grid-cols-3 gap-2 my-3" id="difficultyPicker" aria-label="Choisir la difficulté">
+      <button class="difficulty-card rounded-xl py-3 px-1 text-left bg-black/10" data-level="0" aria-pressed="true"><strong class="block text-xs text-emerald-100">Clairière</strong><span class="text-[9px] text-emerald-200/50">Doux · 60 s</span></button>
+      <button class="difficulty-card rounded-xl py-3 px-1 text-left bg-black/10" data-level="1" aria-pressed="false"><strong class="block text-xs text-emerald-100">Canopée</strong><span class="text-[9px] text-emerald-200/50">Vif · 75 s</span></button>
+      <button class="difficulty-card rounded-xl py-3 px-1 text-left bg-black/10" data-level="2" aria-pressed="false"><strong class="block text-xs text-emerald-100">Migration</strong><span class="text-[9px] text-emerald-200/50">Expert · 90 s</span></button>
+    </div>
+
     <div id="bestContainer" class="hidden my-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300 font-mono tracking-wider">
       Meilleure Harmonie: <span id="bestScore" class="font-bold text-emerald-200">0.0</span>s
     </div>
@@ -116,6 +142,18 @@
     <button id="play" class="glow-btn mt-6 px-10 py-4 rounded-full bg-gradient-to-r from-emerald-800/80 to-teal-900/80 text-emerald-100 font-medium text-xs tracking-[0.25em] border border-emerald-400/30 uppercase cursor-pointer">
       S'envoler
     </button>
+  </div>
+</div>
+
+<div id="results" class="fixed inset-0 z-30 hidden items-center justify-center p-6 bg-[#050b0a]/90 backdrop-blur-xl">
+  <div class="max-w-md w-full glass-panel p-8 rounded-3xl text-center border border-emerald-500/20">
+    <div class="text-[10px] tracking-[.35em] text-emerald-400 uppercase">Traversée accomplie</div>
+    <h2 id="resultTitle" class="text-4xl font-light mt-3 text-emerald-50">Belle écoute</h2>
+    <div id="resultScore" class="hud-value text-6xl text-emerald-300 mt-5">0</div>
+    <div class="text-[10px] tracking-[.25em] text-emerald-200/50 uppercase">points de résonance</div>
+    <div id="badges" class="flex flex-wrap justify-center gap-2 my-6"></div>
+    <p id="resultDetail" class="text-sm text-slate-300/70 mb-5"></p>
+    <button id="replay" class="glow-btn px-9 py-4 rounded-full bg-emerald-900/80 border border-emerald-400/30 text-xs tracking-[.22em] uppercase">Reprendre le ciel</button>
   </div>
 </div>
 
@@ -132,6 +170,9 @@ var flowBar = document.getElementById("flowBar");
 var bestScoreEl = document.getElementById("bestScore");
 var bestScoreText = document.getElementById("bestScoreText");
 var bestContainer = document.getElementById("bestContainer");
+var scoreText = document.getElementById("scoreText"), lifeBar = document.getElementById("lifeBar");
+var levelText = document.getElementById("levelText"), veilNotice = document.getElementById("veilNotice"), veilTimer = document.getElementById("veilTimer");
+var results = document.getElementById("results"), replay = document.getElementById("replay"), badgeToast = document.getElementById("badgeToast");
 var city = document.getElementById("city");
 var birds = document.getElementById("birds");
 
@@ -139,6 +180,12 @@ var W = 360, H = 640, D = 1, last = 0;
 var running = false, holding = false;
 var time = 0, world = 0, good = 0, currentFlowTime = 0;
 var bestFlowTime = parseFloat(localStorage.getItem("sb_best_flow") || "0");
+var levels = [
+  {name:"Clairière", duration:60, speed:58, gravity:85, lift:-150, width:1, veilEvery:18, veilDuration:2.4},
+  {name:"Canopée", duration:75, speed:76, gravity:100, lift:-175, width:.78, veilEvery:14, veilDuration:3.2},
+  {name:"Migration", duration:90, speed:94, gravity:115, lift:-195, width:.62, veilEvery:11, veilDuration:4}
+];
+var selectedLevel = 0, score = 0, vitality = 100, combo = 1, maxCombo = 1, veil = 0, nextVeil = 18, badgesEarned = [], lastBadgeAt = 0;
 
 var bird = { x: 90, y: 320, vy: 0 };
 var feathers = [], seeds = [], echoes = [], cityBuildings = [], floraBlooms = [];
@@ -192,7 +239,8 @@ function terrain(x){
   var breathing = 0.5 + 0.5 * Math.sin(u * 0.83 + 2.4);
   var pocket = Math.pow(0.5 + 0.5 * Math.sin(u * 0.37 + 0.5), 3);
   var width = H * (0.067 + breathing * 0.047 + pocket * 0.038);
-  width = Math.max(45, Math.min(H * 0.18, width));
+  width *= levels[selectedLevel].width;
+  width = Math.max(34, Math.min(H * 0.18, width));
   return { y: center, w: width };
 }
 
@@ -311,6 +359,34 @@ function reset(){
   seeds = [];
   echoes = [];
   floraBlooms = [];
+  score = 0; vitality = 100; combo = 1; maxCombo = 1; veil = 0; nextVeil = levels[selectedLevel].veilEvery; badgesEarned = []; lastBadgeAt = 0;
+  scoreText.textContent = "0000"; lifeBar.style.width = "100%";
+  levelText.textContent = "Niveau " + (selectedLevel + 1) + " · " + levels[selectedLevel].name;
+  veilNotice.style.opacity = 0;
+}
+
+function awardBadge(icon, label){
+  if(badgesEarned.some(function(b){ return b.label === label; })) return;
+  badgesEarned.push({icon:icon,label:label});
+  badgeToast.textContent = icon + "  " + label;
+  badgeToast.classList.remove("hidden", "badge-pop"); void badgeToast.offsetWidth; badgeToast.classList.add("badge-pop");
+  setTimeout(function(){ badgeToast.classList.add("hidden"); }, 3000);
+}
+
+function finishGame(){
+  if(!running) return;
+  running = false; holding = false; city.volume = .15; birds.volume = .15;
+  var harmony = Math.round(good * 100);
+  if(vitality > 70) awardBadge("🪶", "Plume sereine");
+  if(maxCombo >= 5) awardBadge("〰", "Surfeur d'ondes");
+  if(score >= levels[selectedLevel].duration * 85) awardBadge("✦", "Cœur résonant");
+  if(selectedLevel === 2 && vitality > 0) awardBadge("🧭", "Grand migrateur");
+  if(!badgesEarned.length) awardBadge("🌱", "Premier envol");
+  document.getElementById("resultScore").textContent = Math.round(score).toLocaleString("fr-FR");
+  document.getElementById("resultTitle").textContent = vitality <= 0 ? "Le ciel t'attend" : harmony > 70 ? "Résonance profonde" : "Belle traversée";
+  document.getElementById("resultDetail").textContent = "Meilleur élan ×" + maxCombo + " · " + Math.round(currentFlowTime) + " s en harmonie · " + levels[selectedLevel].name;
+  document.getElementById("badges").innerHTML = badgesEarned.map(function(b){ return '<span class="px-3 py-2 rounded-full bg-emerald-950/60 border border-emerald-500/20 text-xs">'+b.icon+' '+b.label+'</span>'; }).join("");
+  results.classList.remove("hidden"); results.classList.add("flex");
 }
 
 function down(e){
@@ -386,9 +462,10 @@ function emitLiving(q, energy, dt){
 
 function update(dt){
   time += dt;
-  world += 58 * dt;
+  var level = levels[selectedLevel];
+  world += level.speed * dt;
 
-  bird.vy += (holding ? -150 : 85) * dt;
+  bird.vy += (holding ? level.lift : level.gravity) * dt;
   bird.vy *= Math.pow(0.982, dt * 60);
   bird.vy = Math.max(-90, Math.min(80, bird.vy));
   bird.y += bird.vy * dt;
@@ -407,8 +484,23 @@ function update(dt){
 
   emitLiving(q, energy, dt);
 
+  if(time >= nextVeil && veil <= 0){ veil = level.veilDuration; nextVeil += level.veilEvery + Math.random() * 3; awardBadge("◌", "Vol à l'instinct"); }
+  if(veil > 0){ veil -= dt; veilNotice.style.opacity = 1; veilTimer.textContent = Math.max(1, Math.ceil(veil)); }
+  else veilNotice.style.opacity = 0;
+
+  if(q > .72){ combo = Math.min(8, combo + dt * .85); vitality = Math.min(100, vitality + dt * 3); }
+  else { combo = Math.max(1, combo - dt * 2.4); vitality -= dt * (q < .25 ? 15 : 6); }
+  maxCombo = Math.max(maxCombo, Math.floor(combo));
+  score += dt * (12 + q * 75) * combo * (1 + selectedLevel * .25);
+  scoreText.textContent = String(Math.round(score)).padStart(4,"0");
+  lifeBar.style.width = Math.max(0,vitality) + "%";
+  lifeBar.style.filter = vitality < 30 ? "hue-rotate(135deg)" : "none";
+  if(Math.floor(time) >= 20 && lastBadgeAt < 20 && currentFlowTime > 12){ lastBadgeAt = 20; awardBadge("♫", "Oreille fine"); }
+  if(time >= level.duration || vitality <= 0){ finishGame(); return; }
+
   feathers.unshift({ x: bird.x - 8, y: bird.y, a: 0.25 + q * 0.25 });
   if(feathers.length > 40) feathers.pop();
+  for(var fi = 0; fi < feathers.length; fi++) feathers[fi].x -= levels[selectedLevel].speed * dt;
 
   for(var i = seeds.length - 1; i >= 0; i--){
     var s = seeds[i];
@@ -425,7 +517,7 @@ function update(dt){
   }
   for(i = floraBlooms.length - 1; i >= 0; i--){
     var fb = floraBlooms[i];
-    fb.x -= 58 * dt;
+    fb.x -= level.speed * dt;
     if(fb.x < -20) floraBlooms.splice(i, 1);
   }
 }
@@ -443,13 +535,15 @@ function edgePath(side, phase, energy){
 }
 
 function drawBird(q, energy){
-  var flap = Math.sin(time * (holding ? 9 : 3.5));
+  var flapPhase = time * (holding ? 11 : 4.2);
+  var flap = Math.sin(flapPhase);
   var angle = Math.max(-0.35, Math.min(0.35, bird.vy / 170));
   var wing = q > 0.72 ? 1 + energy * 0.25 : 1;
 
   ctx.save();
   ctx.translate(bird.x, bird.y);
   ctx.rotate(angle);
+  ctx.scale(1 + Math.abs(flap) * .025, 1 - Math.abs(flap) * .018);
 
   // Bioluminescent bird aura when in flow
   if(q > 0.45) {
@@ -494,6 +588,18 @@ function drawBird(q, energy){
   ctx.quadraticCurveTo(-9, -5, 1, 5);
   ctx.fill();
 
+  // Individual primary feathers give the wing a soft, readable beat.
+  ctx.strokeStyle = "rgba(209, 250, 229, 0.68)";
+  ctx.lineCap = "round";
+  for(i = 0; i < 5; i++){
+    var spread = i * 3.2;
+    ctx.lineWidth = 1.4 - i * .14;
+    ctx.beginPath();
+    ctx.moveTo(-4 - i * 1.7, -4);
+    ctx.quadraticCurveTo(-10 - spread, -14 + flap * (9 + i), -20 - spread, -20 + flap * (7 + i));
+    ctx.stroke();
+  }
+
   // Beak
   ctx.fillStyle = "#fbbf24";
   ctx.beginPath();
@@ -501,7 +607,7 @@ function drawBird(q, energy){
 
   // Eye
   ctx.fillStyle = "#064e3b";
-  ctx.beginPath(); ctx.arc(11, -2, 1.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(11, -2, 1.4, Math.sin(time*.65) > .985 ? .15 : 1.4, 0, 0, Math.PI * 2); ctx.fill();
 
   ctx.restore();
 }
@@ -570,6 +676,10 @@ function draw(){
   }
 
   // Living Wave Flow Ribbon Fill
+  var levelFade = Math.abs(veil - levels[selectedLevel].veilDuration / 2) - levels[selectedLevel].veilDuration * .34;
+  var corridorAlpha = veil > 0 ? Math.max(0, Math.min(1, levelFade * 5)) : 1;
+  ctx.save();
+  ctx.globalAlpha = corridorAlpha;
   ctx.beginPath();
   for(var x = 0; x <= W; x += 8){
     var z = terrain(x);
@@ -634,6 +744,7 @@ function draw(){
   ctx.strokeStyle = "rgba(236, 253, 245, " + (0.10 + good * 0.45) + ")";
   ctx.lineWidth = 1.2;
   ctx.stroke();
+  ctx.restore();
 
   // Echo Shockwaves
   for(i = 0; i < echoes.length; i++){
@@ -698,6 +809,18 @@ play.addEventListener("click", function(e){
   setTimeout(function(){
     if(running && city.paused && birds.paused) state.textContent = "ACTIVER L'AUDIO";
   }, 700);
+});
+
+document.querySelectorAll("[data-level]").forEach(function(button){
+  button.addEventListener("click", function(){
+    selectedLevel = Number(button.dataset.level);
+    document.querySelectorAll("[data-level]").forEach(function(b){ b.setAttribute("aria-pressed", b === button ? "true" : "false"); });
+  });
+});
+
+replay.addEventListener("click", function(){
+  results.classList.add("hidden"); results.classList.remove("flex");
+  reset(); running = true; startAudio();
 });
 
 document.addEventListener("visibilitychange", function(){
