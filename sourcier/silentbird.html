@@ -80,12 +80,8 @@
 
   <!-- Flow Quality Meter -->
   <div class="flex items-center gap-4">
-    <div class="text-right">
-      <div class="text-[9px] tracking-[.22em] text-emerald-300/50 uppercase">Résonance</div>
-      <div id="scoreText" class="hud-value text-xl text-emerald-100 leading-none">0000</div>
-    </div>
     <div class="hidden sm:flex flex-col items-end gap-1">
-      <span id="bestScoreText" class="text-[10px] tracking-widest text-emerald-300/60 font-mono">RECORD: 0.0s</span>
+      <span class="text-[10px] tracking-widest text-emerald-300/60 uppercase">Résonance</span>
       <div class="w-32 h-1.5 bg-emerald-950/60 rounded-full overflow-hidden border border-emerald-500/20 p-[1px]">
         <div id="flowBar" class="h-full bg-gradient-to-r from-teal-500 to-emerald-300 rounded-full w-0 transition-all duration-150 shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
       </div>
@@ -160,10 +156,6 @@
       <span id="missionGoal" class="block mt-1 text-xs leading-relaxed text-emerald-100/55">Tiens 35 secondes dans la bande verte.</span>
     </div>
 
-    <div id="bestContainer" class="hidden my-2 px-4 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300 font-mono tracking-wider">
-      Meilleure Harmonie: <span id="bestScore" class="font-bold text-emerald-200">0.0</span>s
-    </div>
-
     <button id="play" class="glow-btn mt-6 px-10 py-4 rounded-full bg-gradient-to-r from-emerald-800/80 to-teal-900/80 text-emerald-100 font-medium text-xs tracking-[0.25em] border border-emerald-400/30 uppercase cursor-pointer">
       J’ai compris · Jouer
     </button>
@@ -174,8 +166,7 @@
   <div class="max-w-md w-full glass-panel p-8 rounded-3xl text-center border border-emerald-500/20">
     <div id="resultKicker" class="text-[10px] tracking-[.35em] text-emerald-400 uppercase">Arrivée atteinte</div>
     <h2 id="resultTitle" class="text-4xl font-light mt-3 text-emerald-50">Belle écoute</h2>
-    <div id="resultScore" class="hud-value text-6xl text-emerald-300 mt-5">0</div>
-    <div class="text-[10px] tracking-[.25em] text-emerald-200/50 uppercase">points · score bonus</div>
+    <p class="mt-5 text-lg font-light italic text-emerald-200/80">Chaque traversée laisse une trace différente.</p>
     <div id="badges" class="flex flex-wrap justify-center gap-2 my-6"></div>
     <p id="resultDetail" class="text-sm text-slate-300/70 mb-5"></p>
     <button id="replay" class="glow-btn px-9 py-4 rounded-full bg-emerald-900/80 border border-emerald-400/30 text-xs tracking-[.22em] uppercase">Étape suivante</button>
@@ -192,10 +183,7 @@ var cover = document.getElementById("cover");
 var play = document.getElementById("play");
 var state = document.getElementById("state");
 var flowBar = document.getElementById("flowBar");
-var bestScoreEl = document.getElementById("bestScore");
-var bestScoreText = document.getElementById("bestScoreText");
-var bestContainer = document.getElementById("bestContainer");
-var scoreText = document.getElementById("scoreText"), lifeBar = document.getElementById("lifeBar"), timerText = document.getElementById("timerText");
+var lifeBar = document.getElementById("lifeBar"), timerText = document.getElementById("timerText");
 var levelText = document.getElementById("levelText"), veilNotice = document.getElementById("veilNotice"), veilTimer = document.getElementById("veilTimer");
 var results = document.getElementById("results"), replay = document.getElementById("replay"), badgeToast = document.getElementById("badgeToast");
 var bubbleMeter = document.getElementById("bubbleMeter"), silenceNotice = document.getElementById("silenceNotice"), silenceTimer = document.getElementById("silenceTimer");
@@ -204,14 +192,13 @@ var birds = document.getElementById("birds");
 
 var W = 360, H = 640, D = 1, last = 0;
 var running = false, holding = false;
-var time = 0, world = 0, good = 0, currentFlowTime = 0;
-var bestFlowTime = parseFloat(localStorage.getItem("sb_best_flow") || "0");
+var time = 0, world = 0, good = 0;
 var levels = [
   {name:"La veine des jardins", goal:"Tiens 35 secondes dans la bande verte.", duration:35, speed:58, gravity:78, lift:-135, width:1.22},
   {name:"Les toits en sommeil", goal:"Tiens 40 secondes : le trajet accélère.", duration:40, speed:72, gravity:86, lift:-148, width:1.08},
   {name:"Le cœur de la cité", goal:"Tiens 45 secondes dans la bande plus étroite.", duration:45, speed:86, gravity:94, lift:-158, width:.96}
 ];
-var selectedLevel = Math.min(2, Math.max(0, parseInt(localStorage.getItem("sb_mission") || "0", 10))), score = 0, vitality = 100, combo = 1, maxCombo = 1, veil = 0, nextVeil = 18, badgesEarned = [], lastBadgeAt = 0, missionWon = false;
+var selectedLevel = Math.min(2, Math.max(0, parseInt(localStorage.getItem("sb_mission") || "0", 10))), vitality = 100, veil = 0, nextVeil = 18, badgesEarned = [], missionWon = false;
 
 var bird = { x: 90, y: 320, vy: 0 };
 var feathers = [], seeds = [], echoes = [], cityBuildings = [], floraBlooms = [], resonanceBursts = [], bubbles = [];
@@ -221,12 +208,6 @@ var audioCtx, citySource, birdSource, cityAnalyser, birdAnalyser;
 var citySpectrum, birdSpectrum, birdWaveform, previousBirdSpectrum;
 var audioFeatures = { cityLow: 0, cityMid: 0, birdPresence: 0, birdAir: 0, rms: 0, transient: 0, pulse: 0.15 };
 var lastTransient = 0;
-
-if(bestFlowTime > 0) {
-  bestScoreEl.textContent = bestFlowTime.toFixed(1);
-  bestScoreText.textContent = "RECORD: " + bestFlowTime.toFixed(1) + "s";
-  bestContainer.classList.remove("hidden");
-}
 
 function generateCitySkyline() {
   cityBuildings = [];
@@ -379,7 +360,6 @@ function reset(){
   time = 0;
   world = 0;
   good = 0;
-  currentFlowTime = 0;
   bird.x = W * 0.25;
   bird.y = H * 0.5;
   bird.vy = 0;
@@ -389,8 +369,8 @@ function reset(){
   floraBlooms = [];
   resonanceBursts = [];
   bubbles = []; bubblesCaught = 0; nextBubbleAt = 4; silenceTime = 0; totalBubbles = 0;
-  score = 0; vitality = 100; combo = 1; maxCombo = 1; veil = 0; badgesEarned = []; lastBadgeAt = 0;
-  scoreText.textContent = "0000"; lifeBar.style.width = "100%"; timerText.textContent = String(levels[selectedLevel].duration);
+  vitality = 100; veil = 0; badgesEarned = [];
+  lifeBar.style.width = "100%"; timerText.textContent = String(levels[selectedLevel].duration);
   levelText.textContent = "Étape " + (selectedLevel + 1) + " · " + levels[selectedLevel].name;
   veilNotice.style.opacity = 0;
   silenceNotice.classList.add("hidden");
@@ -436,12 +416,9 @@ function finishGame(){
   running = false; holding = false; city.volume = .15; birds.volume = .15;
   missionWon = vitality > 0 && time >= levels[selectedLevel].duration;
   if(vitality > 70) awardBadge("🪶", "Plume sereine");
-  if(maxCombo >= 5) awardBadge("〰", "Surfeur d'ondes");
   if(totalBubbles >= 3) awardBadge("●", "Chercheur de silence");
-  if(score >= levels[selectedLevel].duration * 85) awardBadge("✦", "Cœur résonant");
   if(selectedLevel === 2 && vitality > 0) awardBadge("🧭", "Grand migrateur");
   if(!badgesEarned.length) awardBadge("🌱", "Premier envol");
-  document.getElementById("resultScore").textContent = Math.round(score).toLocaleString("fr-FR");
   document.getElementById("resultKicker").textContent = missionWon ? "Arrivée atteinte" : "Énergie épuisée";
   document.getElementById("resultTitle").textContent = missionWon ? (selectedLevel === 2 ? "Traversée réussie !" : "Étape réussie !") : "Presque !";
   document.getElementById("resultDetail").textContent = Math.min(levels[selectedLevel].duration, Math.floor(time)) + " s parcourues sur " + levels[selectedLevel].duration + " · " + totalBubbles + " bulles attrapées · Énergie " + Math.max(0, Math.round(vitality)) + "%";
@@ -484,15 +461,6 @@ window.addEventListener("mouseup", up);
 function emitLiving(q, energy, dt){
   if(q > 0.72){
     good = Math.min(1, good + 0.55 * dt);
-    currentFlowTime += dt;
-
-    if(currentFlowTime > bestFlowTime) {
-      bestFlowTime = currentFlowTime;
-      localStorage.setItem("sb_best_flow", bestFlowTime.toString());
-      bestScoreEl.textContent = bestFlowTime.toFixed(1);
-      bestScoreText.textContent = "RECORD: " + bestFlowTime.toFixed(1) + "s";
-    }
-
     if(Math.random() < 0.15 + energy * 0.20){
       seeds.push({
         x: bird.x - 5,
@@ -563,21 +531,17 @@ function update(dt){
     var bubble=bubbles[bi]; bubble.x -= level.speed*dt; bubble.pulse += dt*3;
     var dx=bubble.x-bird.x, dy=bubble.y-bird.y;
     if(silenceTime <= 0 && dx*dx+dy*dy < 34*34){
-      bubbles.splice(bi,1); bubblesCaught++; totalBubbles++; score += 250; updateBubbleMeter();
+      bubbles.splice(bi,1); bubblesCaught++; totalBubbles++; updateBubbleMeter();
       resonanceBursts.push({x:bird.x,y:bird.y,life:1,hue:195,petals:16});
       if(bubblesCaught === 3) beginSilence();
     } else if(bubble.x < -30) bubbles.splice(bi,1);
   }
 
-  if(silenceTime > 0){ combo = Math.min(8, combo + dt); vitality = Math.min(100, vitality + dt * 4); currentFlowTime += dt; }
-  else if(q > .72){ combo = Math.min(8, combo + dt * .85); vitality = Math.min(100, vitality + dt * 3); }
-  else { combo = Math.max(1, combo - dt * 2.4); vitality -= dt * (q < .25 ? 15 : 6); }
-  maxCombo = Math.max(maxCombo, Math.floor(combo));
-  score += dt * (12 + q * 75) * combo * (1 + selectedLevel * .25);
-  scoreText.textContent = String(Math.round(score)).padStart(4,"0");
+  if(silenceTime > 0) vitality = Math.min(100, vitality + dt * 4);
+  else if(q > .72) vitality = Math.min(100, vitality + dt * 3);
+  else vitality -= dt * (q < .25 ? 15 : 6);
   lifeBar.style.width = Math.max(0,vitality) + "%";
   lifeBar.style.filter = vitality < 30 ? "hue-rotate(135deg)" : "none";
-  if(Math.floor(time) >= 20 && lastBadgeAt < 20 && currentFlowTime > 12){ lastBadgeAt = 20; awardBadge("♫", "Oreille fine"); }
   if(time >= level.duration || vitality <= 0){ finishGame(); return; }
 
   feathers.unshift({ x: bird.x - 8, y: bird.y, a: 0.25 + q * 0.25 });
