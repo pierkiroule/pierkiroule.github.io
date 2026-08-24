@@ -59,8 +59,8 @@
 <body class="bg-[#050b0a] text-slate-100 flex flex-col justify-between select-none overflow-hidden">
 
 <!-- Audio elements -->
-<audio id="city" preload="metadata" loop playsinline src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Ambient_sound_street_traffic_Berlin_2026-05-17.oga?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"></audio>
-<audio id="birds" preload="metadata" loop playsinline src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Sylvia_atricapilla_-_Eurasian_Blackcap_XC559969.mp3?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"></audio>
+<audio id="city" crossorigin="anonymous" preload="auto" loop playsinline src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Ambient_sound_street_traffic_Berlin_2026-05-17.oga?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"></audio>
+<audio id="birds" crossorigin="anonymous" preload="auto" loop playsinline src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Sylvia_atricapilla_-_Eurasian_Blackcap_XC559969.mp3?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"></audio>
 
 <canvas id="game" class="absolute inset-0 z-0"></canvas>
 
@@ -143,6 +143,10 @@ var bestFlowTime = parseFloat(localStorage.getItem("sb_best_flow") || "0");
 var bird = { x: 90, y: 320, vy: 0 };
 var feathers = [], seeds = [], echoes = [], cityBuildings = [], floraBlooms = [];
 var audioStarted = false;
+var audioCtx, citySource, birdSource, cityAnalyser, birdAnalyser;
+var citySpectrum, birdSpectrum, birdWaveform, previousBirdSpectrum;
+var audioFeatures = { cityLow: 0, cityMid: 0, birdPresence: 0, birdAir: 0, rms: 0, transient: 0, pulse: 0.15 };
+var lastTransient = 0;
 
 if(bestFlowTime > 0) {
   bestScoreEl.textContent = bestFlowTime.toFixed(1);
@@ -199,6 +203,8 @@ function quality(){
 }
 
 function startAudio(){
+  initAudioGraph();
+  if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
   city.volume = 0.72;
   birds.volume = 0.02;
   city.muted = false;
@@ -216,6 +222,68 @@ function startAudio(){
   audioStarted = true;
 }
 
+function initAudioGraph(){
+  if(audioCtx || !(window.AudioContext || window.webkitAudioContext)) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  cityAnalyser = audioCtx.createAnalyser();
+  birdAnalyser = audioCtx.createAnalyser();
+  cityAnalyser.fftSize = 1024;
+  birdAnalyser.fftSize = 2048;
+  cityAnalyser.smoothingTimeConstant = 0.84;
+  birdAnalyser.smoothingTimeConstant = 0.70;
+  citySpectrum = new Uint8Array(cityAnalyser.frequencyBinCount);
+  birdSpectrum = new Uint8Array(birdAnalyser.frequencyBinCount);
+  previousBirdSpectrum = new Uint8Array(birdAnalyser.frequencyBinCount);
+  birdWaveform = new Uint8Array(birdAnalyser.fftSize);
+  citySource = audioCtx.createMediaElementSource(city);
+  birdSource = audioCtx.createMediaElementSource(birds);
+  citySource.connect(cityAnalyser);
+  birdSource.connect(birdAnalyser);
+  cityAnalyser.connect(audioCtx.destination);
+  birdAnalyser.connect(audioCtx.destination);
+}
+
+function bandEnergy(data, analyser, lowHz, highHz){
+  if(!data || !audioCtx) return 0;
+  var hzPerBin = audioCtx.sampleRate / analyser.fftSize;
+  var first = Math.max(0, Math.floor(lowHz / hzPerBin));
+  var end = Math.min(data.length, Math.ceil(highHz / hzPerBin));
+  var sum = 0;
+  for(var i = first; i < end; i++) sum += data[i] / 255;
+  return end > first ? sum / (end - first) : 0;
+}
+
+function analyseAudio(dt, q){
+  if(!audioStarted || !cityAnalyser || !birdAnalyser){
+    var fallback = 0.35 + Math.sin(time * 4.7) * 0.08 + Math.sin(time * 9.1) * 0.04;
+    audioFeatures.pulse += (Math.max(0.08, fallback * q) - audioFeatures.pulse) * 0.08;
+    return;
+  }
+  cityAnalyser.getByteFrequencyData(citySpectrum);
+  birdAnalyser.getByteFrequencyData(birdSpectrum);
+  birdAnalyser.getByteTimeDomainData(birdWaveform);
+
+  var sum = 0, flux = 0;
+  for(var i = 0; i < birdWaveform.length; i++){
+    var sample = (birdWaveform[i] - 128) / 128;
+    sum += sample * sample;
+  }
+  for(i = 0; i < birdSpectrum.length; i++){
+    var delta = birdSpectrum[i] - previousBirdSpectrum[i];
+    if(delta > 0) flux += delta / 255;
+    previousBirdSpectrum[i] = birdSpectrum[i];
+  }
+  var targetRms = Math.min(1, Math.sqrt(sum / birdWaveform.length) * 3.8);
+  var targetTransient = Math.min(1, flux / birdSpectrum.length * 16);
+  audioFeatures.cityLow += (bandEnergy(citySpectrum, cityAnalyser, 40, 220) - audioFeatures.cityLow) * 0.12;
+  audioFeatures.cityMid += (bandEnergy(citySpectrum, cityAnalyser, 220, 1600) - audioFeatures.cityMid) * 0.12;
+  audioFeatures.birdPresence += (bandEnergy(birdSpectrum, birdAnalyser, 1400, 4200) - audioFeatures.birdPresence) * 0.18;
+  audioFeatures.birdAir += (bandEnergy(birdSpectrum, birdAnalyser, 4200, 11000) - audioFeatures.birdAir) * 0.20;
+  audioFeatures.rms += (targetRms - audioFeatures.rms) * 0.16;
+  audioFeatures.transient = Math.max(targetTransient, audioFeatures.transient - dt * 2.8);
+  audioFeatures.pulse += ((0.12 + audioFeatures.rms * 0.65 + audioFeatures.birdPresence * 0.45) * q - audioFeatures.pulse) * 0.18;
+}
+
 function mixAudio(q){
   if(!audioStarted) return;
   var m = Math.max(0, Math.min(1, (q - 0.10) / 0.72));
@@ -228,14 +296,7 @@ function mixAudio(q){
   birds.volume += (birdTarget - birds.volume) * 0.10;
 }
 
-function audioEnergy(){
-  var q = quality();
-  var pulse = 0.48
-    + Math.sin(time * 5.7) * 0.16
-    + Math.sin(time * 11.3 + 1.2) * 0.09
-    + Math.sin(time * 2.1 + 0.7) * 0.07;
-  return Math.max(0.08, Math.min(1, pulse * q));
-}
+function audioEnergy(){ return Math.max(0.08, Math.min(1, audioFeatures.pulse)); }
 
 function reset(){
   holding = false;
@@ -282,10 +343,10 @@ canvas.addEventListener("touchcancel", up, {passive: false});
 canvas.addEventListener("mousedown", down);
 window.addEventListener("mouseup", up);
 
-function emitLiving(q, energy){
+function emitLiving(q, energy, dt){
   if(q > 0.72){
-    good = Math.min(1, good + 0.018);
-    currentFlowTime += 0.016;
+    good = Math.min(1, good + 0.55 * dt);
+    currentFlowTime += dt;
 
     if(currentFlowTime > bestFlowTime) {
       bestFlowTime = currentFlowTime;
@@ -305,8 +366,10 @@ function emitLiving(q, energy){
         color: Math.random() > 0.4 ? "#34d399" : "#6ee7b7"
       });
     }
-    if(Math.random() < 0.03 + energy * 0.04){
+    var freshTransient = audioFeatures.transient > 0.34 && time - lastTransient > 0.13;
+    if(freshTransient || Math.random() < (0.012 + energy * 0.025) * dt * 60){
       echoes.push({ x: bird.x, y: bird.y, r: 8, a: 0.35 });
+      if(freshTransient) lastTransient = time;
     }
     if(Math.random() < 0.02) {
       floraBlooms.push({
@@ -317,7 +380,7 @@ function emitLiving(q, energy){
       });
     }
   } else {
-    good = Math.max(0, good - 0.022);
+    good = Math.max(0, good - 0.18 * dt);
   }
 }
 
@@ -335,13 +398,14 @@ function update(dt){
 
   var q = quality();
   mixAudio(q);
+  analyseAudio(dt, q);
   var energy = audioEnergy();
 
   flowBar.style.width = Math.round(q * 100) + "%";
   state.textContent = q > 0.78 ? "HARMONIE" : q > 0.42 ? "ÉCOUTE" : "BRUIT URBAIN";
   state.style.borderColor = q > 0.78 ? "rgba(52, 211, 153, 0.6)" : "rgba(154, 205, 185, 0.2)";
 
-  emitLiving(q, energy);
+  emitLiving(q, energy, dt);
 
   feathers.unshift({ x: bird.x - 8, y: bird.y, a: 0.25 + q * 0.25 });
   if(feathers.length > 40) feathers.pop();
@@ -442,27 +506,31 @@ function drawBird(q, energy){
   ctx.restore();
 }
 
-function drawCitySkyline() {
-  var offset = (world * 0.3) % 2500;
+function drawCitySkyline(speed, scale, alpha, color) {
+  var span = 2500 * scale;
+  var offset = (world * speed) % span;
   ctx.save();
-  ctx.fillStyle = "rgba(15, 28, 25, 0.85)";
+  ctx.fillStyle = color;
+  ctx.globalAlpha = alpha;
   
   for(var i = 0; i < cityBuildings.length; i++) {
     var b = cityBuildings[i];
-    var bx = b.x - offset;
-    if(bx < -b.w) bx += 2500;
+    var bw = b.w * scale;
+    var bh = b.h * scale;
+    var bx = b.x * scale - offset;
+    if(bx < -bw) bx += span;
     
-    ctx.fillRect(bx, H - b.h, b.w, b.h);
+    ctx.fillRect(bx, H - bh, bw, bh);
 
     // Render city window lights (fades as nature returns)
     if(b.windows && good < 0.85) {
       ctx.fillStyle = "rgba(251, 191, 36, " + ((1 - good) * 0.12) + ")";
-      for(var wy = H - b.h + 12; wy < H - 20; wy += 18) {
-        for(var wx = bx + 6; wx < bx + b.w - 10; wx += 12) {
+      for(var wy = H - bh + 12; wy < H - 20; wy += 18) {
+        for(var wx = bx + 6; wx < bx + bw - 10; wx += 12) {
           if((wx + wy) % 3 === 0) ctx.fillRect(wx, wy, 4, 6);
         }
       }
-      ctx.fillStyle = "rgba(15, 28, 25, 0.85)";
+      ctx.fillStyle = color;
     }
   }
   ctx.restore();
@@ -480,8 +548,18 @@ function draw(){
   var q = quality();
   var energy = audioEnergy();
 
-  // Parallax City Layer
-  drawCitySkyline();
+  // A soft dawn grows out of sustained harmony and real birdsong energy.
+  var skyGlow = ctx.createRadialGradient(W * 0.68, H * 0.38, 10, W * 0.68, H * 0.38, Math.max(W, H) * 0.72);
+  skyGlow.addColorStop(0, "rgba(45, 212, 191, " + (good * (0.05 + audioFeatures.birdPresence * 0.15)) + ")");
+  skyGlow.addColorStop(0.55, "rgba(16, 185, 129, " + (good * 0.035) + ")");
+  skyGlow.addColorStop(1, "rgba(5, 11, 10, 0)");
+  ctx.fillStyle = skyGlow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Three architectural planes create depth; the closest city slowly recedes into nature.
+  drawCitySkyline(0.08, 0.58, 0.34, "#11201e");
+  drawCitySkyline(0.19, 0.78, 0.52, "#0e1c19");
+  drawCitySkyline(0.34, 1, 0.88 - good * 0.18, "#0f1c19");
 
   // Floating bioluminescent dust
   for(var i = 0; i < 35; i++){
@@ -528,6 +606,21 @@ function draw(){
 
     edgePath(0.70, 3.4, energy * good);
     ctx.strokeStyle = "rgba(167, 243, 208, " + (good * 0.25) + ")";
+    ctx.stroke();
+  }
+
+  // Spectral filaments: high birdsong frequencies shimmer inside the living vein.
+  var filamentStrength = good * (0.08 + audioFeatures.birdAir * 0.85);
+  for(var band = -2; band <= 2; band++){
+    ctx.beginPath();
+    for(x = 0; x <= W; x += 10){
+      z = terrain(x);
+      var drift = Math.sin((world + x) * (0.035 + band * 0.002) + band * 1.7);
+      var fy = z.y + band * z.w * 0.22 + drift * (2 + audioFeatures.birdPresence * 7);
+      if(x === 0) ctx.moveTo(x, fy); else ctx.lineTo(x, fy);
+    }
+    ctx.strokeStyle = "rgba(153, 246, 228, " + filamentStrength * (1 - Math.abs(band) * 0.12) + ")";
+    ctx.lineWidth = band === 0 ? 1.1 : 0.65;
     ctx.stroke();
   }
 
@@ -578,6 +671,13 @@ function draw(){
   }
 
   drawBird(q, energy);
+
+  // Restrained vignette keeps the eye on the flight corridor.
+  var vignette = ctx.createRadialGradient(W * 0.48, H * 0.48, Math.min(W, H) * 0.18, W * 0.48, H * 0.48, Math.max(W, H) * 0.72);
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(1, "rgba(0, 4, 3, 0.48)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, H);
 }
 
 function frame(now){
