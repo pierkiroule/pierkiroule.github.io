@@ -11,6 +11,6 @@ directement les fichiers versionnés. Dans les réglages du projet Vercel :
 - laisser **Build Command** et **Output Directory** vides ;
 - laisser **Root Directory** à la racine du dépôt.
 
-Le fichier `vercel.json` redirige explicitement la racine `/` vers
-`/index.html`, tout en laissant Vercel servir normalement les autres fichiers
-statiques.
+Le fichier `vercel.json` réécrit explicitement la racine `/` vers la page du
+jeu `/sourcier/silentbird.html`, tout en laissant Vercel servir normalement les
+autres fichiers statiques.
