@@ -40,17 +40,17 @@
   <canvas id="game" aria-label="La voie du silence"></canvas>
   <div id="hud" aria-live="polite">
     <div id="title">LA VOIE DU SILENCE</div>
-    <div id="timeHud"><span id="timeLabel">TEMPS SUR LE RAIL</span><span id="timeValue">00:00.0</span></div>
+    <div id="timeHud"><span id="timeLabel">BULLES ACCROCHÉES</span><span id="timeValue">0</span></div>
     <div id="controls"><button id="soundBtn" class="iconButton" type="button" aria-label="Couper le son" title="Son">♫</button><button id="pauseBtn" class="iconButton" type="button" aria-label="Mettre en pause" title="Pause">Ⅱ</button></div>
-    <div id="hint">TAPEZ POUR FREINER DEVANT LES MÉTÉORITES</div>
-    <div id="statusWrap"><div id="status">SUR LE RAIL</div><div id="attunement" aria-label="Vitesse"><span id="attunementFill"></span></div></div>
+    <div id="hint">TAPEZ PRÈS D'UNE BULLE POUR LA POUSSER</div>
+    <div id="statusWrap"><div id="status">CHERCHEZ LE BON ANGLE</div><div id="attunement" aria-label="Bulles bleues accordées"><span id="attunementFill"></span></div></div>
   </div>
   <div id="pauseVeil">LAISSER RESPIRER</div>
   <main id="startScreen" class="screen">
     <div class="eyebrow">SILENT</div>
     <h1>La voie du silence</h1>
     <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">La bulle suit seule le rail et accélère naturellement.<br><br>Des météorites de vacarme vous traquent. Anticipez et tapez pour freiner : elles passeront devant vous. Impossible d'accélérer.</div>
+    <div class="copy">Des bulles bleues et rouges dérivent autour du fil.<br><br>Tapez pour créer une onde et pousser les bleues vers le silence. Elles s'y accrochent au contact — mais un tap directement sur elles les libère.</div>
     <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
   </main>
   <script>
@@ -77,9 +77,8 @@
     const pauseVeil = document.getElementById("pauseVeil");
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     let W = innerWidth, H = innerHeight, running = false, paused = false, muted = false, urbanStarted = false;
-    let time = 0, cameraU = 0, runnerU = 0, speed = .2, brakeTime = 0, pulseFlash = 0, bloom = 0, streak = 0, bestStreak = 0, spawnClock = 2.6, derailX = 0, derailY = 0, previous = 0;
-    let trail = [], particles = [], waves = [], meteors = [];
-    const orb = { x: W * .5, y: H * .55, radius: 12 };
+    let time = 0, cameraU = 0, bloom = 0, attachedBest = 0, previous = 0;
+    let particles = [], waves = [], bubbles = [];
 
     function createParticles() {
       particles = Array.from({ length: Math.min(170, Math.floor(W * H / 4500)) }, () => ({
@@ -92,7 +91,6 @@
       W = innerWidth; H = innerHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (!running) { orb.x = W * .5; orb.y = H * .55; }
       createParticles();
     }
     function pathWorld(u) {
@@ -106,76 +104,105 @@
       const p = pathWorld(u), camera = pathWorld(cameraU);
       return { x: W * .5 + p.x - camera.x, y: H * .55 + p.y - camera.y, width: p.width, u };
     }
+    function closestRail(x, y) {
+      let closest;
+      for (let i = 0; i <= 180; i++) {
+        const p = circuitPoint(cameraU - 2.7 + i / 180 * 7.2), distance = Math.hypot(x - p.x, y - p.y);
+        if (!closest || distance < closest.distance) closest = { ...p, distance };
+      }
+      return closest;
+    }
+    function createBubbles() {
+      const count = clamp(Math.floor(W * H / 62000), 10, 18);
+      bubbles = Array.from({ length: count }, (_, i) => ({
+        x: 45 + Math.random() * (W - 90), y: 75 + Math.random() * (H - 150),
+        vx: (Math.random() - .5) * 20, vy: (Math.random() - .5) * 20,
+        radius: 12 + Math.random() * 8, blue: i < Math.ceil(count * .68), attached: false,
+        phase: Math.random() * Math.PI * 2, railU: 0
+      }));
+    }
     async function startUrbanAudio() {
       urban.volume = 0;
       try { await urban.play(); urbanStarted = true; }
       catch (error) { urbanStarted = false; console.warn("Le jeu démarre sans l'ambiance urbaine.", error); }
     }
-    function updateAudio(danger) {
+    function updateAudio(activity) {
       if (!urbanStarted || muted) return;
-      const target = clamp(.06 + speed * .38 + danger * .44, 0, .88);
-      urban.volume += (target - urban.volume) * .09;
+      const target = clamp(.08 + activity * .42, .08, .62);
+      urban.volume += (target - urban.volume) * .07;
     }
-
     function updateHUD() {
-      const offRail = Math.hypot(derailX, derailY) > 20;
-      status.textContent = offRail ? "HORS DU RAIL — RETOUR EN COURS" : brakeTime > 0 ? "FREINAGE" : "SUR LE RAIL";
-      attunementFill.style.width = `${Math.round(clamp((speed - .1) / .64, 0, 1) * 100)}%`;
-      const minutes = Math.floor(streak / 60), seconds = Math.floor(streak % 60), tenths = Math.floor(streak * 10) % 10;
-      timeValue.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${tenths}`;
-      timeLabel.textContent = bestStreak > 1 ? `RAIL · RECORD ${bestStreak.toFixed(1)} S` : "TEMPS SUR LE RAIL";
+      const blue = bubbles.filter(b => b.blue), attached = blue.filter(b => b.attached).length;
+      attachedBest = Math.max(attachedBest, attached);
+      timeValue.textContent = String(attached);
+      timeLabel.textContent = attachedBest ? `BULLES ACCROCHÉES · RECORD ${attachedBest}` : "BULLES ACCROCHÉES";
+      status.textContent = attached === blue.length ? "HARMONIE COMPLÈTE" : attached ? `${blue.length - attached} BLEUE${blue.length - attached > 1 ? "S" : ""} ENCORE LIBRE${blue.length - attached > 1 ? "S" : ""}` : "CHERCHEZ LE BON ANGLE";
+      attunementFill.style.width = `${blue.length ? attached / blue.length * 100 : 0}%`;
     }
-    function brake() {
-      if (!running || paused || brakeTime > .08) return;
-      speed = Math.max(.1, speed * .36); brakeTime = .65; pulseFlash = .7;
-      waves.push({ x: orb.x, y: orb.y, r: 12, life: .8, hue: 185 });
+    function resonate(x, y) {
+      if (!running || paused) return;
+      const hooked = bubbles.find(b => b.blue && b.attached && Math.hypot(b.x - x, b.y - y) < b.radius + 14);
+      if (hooked) {
+        hooked.attached = false;
+        const rail = closestRail(hooked.x, hooked.y), length = Math.hypot(hooked.x - rail.x, hooked.y - rail.y) || 1;
+        hooked.vx = (hooked.x - rail.x) / length * 75; hooked.vy = (hooked.y - rail.y) / length * 75;
+        hint.textContent = "BULLE LIBÉRÉE";
+      } else {
+        for (const bubble of bubbles) {
+          if (bubble.attached) continue;
+          const dx = bubble.x - x, dy = bubble.y - y, distance = Math.hypot(dx, dy);
+          if (distance < 190 && distance > 3) {
+            const force = (1 - distance / 190) * (bubble.blue ? 185 : 125);
+            bubble.vx += dx / distance * force; bubble.vy += dy / distance * force;
+          }
+        }
+        hint.textContent = "ONDE RÉSONANTE";
+      }
+      waves.push({ x, y, r: 8, life: 1, hue: hooked ? 205 : 185 });
+      hint.classList.add("show"); setTimeout(() => hint.classList.remove("show"), 700);
       if (navigator.vibrate) navigator.vibrate(10);
     }
-    function spawnMeteor() {
-      const side = Math.random() < .5 ? -1 : 1;
-      const x = side < 0 ? -70 : W + 70, y = clamp(orb.y + (Math.random() - .5) * H * .65, 60, H - 60);
-      const target = circuitPoint(runnerU - speed * 1.35);
-      const angle = Math.atan2(target.y - y, target.x - x), force = 235 + speed * 190;
-      meteors.push({ x, y, vx: Math.cos(angle) * force, vy: Math.sin(angle) * force, r: 12 + Math.random() * 7, life: 6, trail: [], spin: Math.random() * 6 });
-      hint.textContent = "MÉTÉORITE VIOLETTE — FREINEZ !"; hint.classList.add("show");
-    }
     function update(dt) {
-      time += dt; streak += dt; bestStreak = Math.max(bestStreak, streak);
-      brakeTime = Math.max(0, brakeTime - dt); speed = Math.min(.74, speed + dt * (.014 + time * .00014));
-      const cameraBefore = pathWorld(cameraU);
-      runnerU -= speed * dt; cameraU += (runnerU - cameraU) * (1 - Math.exp(-2.6 * dt));
-      const cameraAfter = pathWorld(cameraU);
-      const cameraDx = cameraAfter.x - cameraBefore.x, cameraDy = cameraAfter.y - cameraBefore.y;
-      for (const p of trail) { p.x -= cameraDx; p.y -= cameraDy; }
-      for (const wave of waves) { wave.x -= cameraDx; wave.y -= cameraDy; }
-      const rail = circuitPoint(runnerU), recovery = 1 - Math.exp(-1.35 * dt);
-      derailX += (0 - derailX) * recovery; derailY += (0 - derailY) * recovery;
-      orb.x = rail.x + derailX; orb.y = rail.y + derailY;
-      pulseFlash = Math.max(0, pulseFlash - dt * 1.4);
-      const targetBloom = clamp(.2 + Math.min(streak / 45, 1) * .55, 0, 1);
-      bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
-      trail.push({ x: orb.x, y: orb.y }); if (trail.length > 100) trail.shift();
-      spawnClock -= dt; if (spawnClock <= 0) { spawnMeteor(); spawnClock = Math.max(1.5, 4 - speed * 3) + Math.random(); }
-      let danger = 0;
-      for (const meteor of meteors) {
-        meteor.trail.push({ x: meteor.x, y: meteor.y }); if (meteor.trail.length > 18) meteor.trail.shift();
-        const aim = Math.atan2(orb.y - meteor.y, orb.x - meteor.x), force = 42 * dt;
-        meteor.vx += Math.cos(aim) * force; meteor.vy += Math.sin(aim) * force;
-        const cap = 370, v = Math.hypot(meteor.vx, meteor.vy); if (v > cap) { meteor.vx *= cap / v; meteor.vy *= cap / v; }
-        meteor.x += meteor.vx * dt; meteor.y += meteor.vy * dt; meteor.life -= dt; meteor.spin += dt * 4;
-        const gap = Math.hypot(meteor.x - orb.x, meteor.y - orb.y); danger = Math.max(danger, clamp(1 - gap / 280, 0, 1));
-        if (!meteor.hit && gap < meteor.r + orb.radius) {
-          meteor.hit = true; meteor.life = .15; const impact = 90 / Math.max(v, 1);
-          derailX += meteor.vx * impact; derailY += meteor.vy * impact; streak = 0; pulseFlash = 1;
-          waves.push({ x: orb.x, y: orb.y, r: 10, life: 1, hue: 285 }); hint.textContent = "PERCUTÉ — HORS DU RAIL";
-          if (navigator.vibrate) navigator.vibrate([45, 25, 60]);
+      time += dt; cameraU -= dt * .105;
+      let activity = 0;
+      for (const bubble of bubbles) {
+        bubble.phase += dt;
+        if (bubble.attached) {
+          const rail = circuitPoint(bubble.railU), wobble = Math.sin(time * 1.8 + bubble.phase) * 3;
+          bubble.x = rail.x + wobble; bubble.y = rail.y; bubble.vx = bubble.vy = 0;
+          if (bubble.y < -40 || bubble.y > H + 40 || bubble.x < -40 || bubble.x > W + 40) {
+            bubble.attached = false; bubble.x = clamp(bubble.x, 40, W - 40); bubble.y = clamp(bubble.y, 60, H - 60);
+          }
+          continue;
+        }
+        bubble.vx += Math.sin(time * .43 + bubble.phase) * 2.2 * dt;
+        bubble.vy += Math.cos(time * .37 + bubble.phase) * 2.2 * dt;
+        const damping = Math.exp(-.32 * dt); bubble.vx *= damping; bubble.vy *= damping;
+        bubble.x += bubble.vx * dt; bubble.y += bubble.vy * dt;
+        if (bubble.x < bubble.radius) { bubble.x = bubble.radius; bubble.vx = Math.abs(bubble.vx); }
+        if (bubble.x > W - bubble.radius) { bubble.x = W - bubble.radius; bubble.vx = -Math.abs(bubble.vx); }
+        if (bubble.y < 55 + bubble.radius) { bubble.y = 55 + bubble.radius; bubble.vy = Math.abs(bubble.vy); }
+        if (bubble.y > H - 35 - bubble.radius) { bubble.y = H - 35 - bubble.radius; bubble.vy = -Math.abs(bubble.vy); }
+        activity = Math.max(activity, Math.hypot(bubble.vx, bubble.vy) / 190);
+        if (bubble.blue) {
+          const rail = closestRail(bubble.x, bubble.y);
+          if (rail.distance < bubble.radius + 7) {
+            bubble.attached = true; bubble.railU = rail.u; bubble.x = rail.x; bubble.y = rail.y;
+            waves.push({ x: rail.x, y: rail.y, r: 10, life: 1, hue: 205 });
+            hint.textContent = "UNE BULLE REJOINT LE SILENCE"; hint.classList.add("show");
+            if (navigator.vibrate) navigator.vibrate(16);
+          }
         }
       }
-      meteors = meteors.filter(m => m.life > 0 && m.x > -130 && m.x < W + 130 && m.y > -130 && m.y < H + 130);
-      if (!meteors.length) hint.classList.remove("show");
-      for (const wave of waves) { wave.r += 105 * dt; wave.life -= .6 * dt; }
-      waves = waves.filter(wave => wave.life > 0);
-      updateAudio(danger); updateHUD();
+      for (let i = 0; i < bubbles.length; i++) for (let j = i + 1; j < bubbles.length; j++) {
+        const a = bubbles[i], b = bubbles[j]; if (a.attached || b.attached) continue;
+        const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy), min = a.radius + b.radius;
+        if (d > 0 && d < min) { const push = (min - d) * .5, nx = dx / d, ny = dy / d; a.x -= nx * push; a.y -= ny * push; b.x += nx * push; b.y += ny * push; }
+      }
+      bloom += ((.25 + bubbles.filter(b => b.attached).length / Math.max(1, bubbles.length) * .7) - bloom) * (1 - Math.exp(-2 * dt));
+      for (const wave of waves) { wave.r += 180 * dt; wave.life -= .9 * dt; }
+      waves = waves.filter(w => w.life > 0);
+      updateAudio(activity); updateHUD();
     }
 
     function drawBackground() {
@@ -185,7 +212,7 @@
       g.addColorStop(1, `hsl(${285 - bloom * 120},${42 + bloom * 38}%,${4 + bloom * 7}%)`);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
       if (bloom > .02) {
-        const rg = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, W * .72);
+        const rg = ctx.createRadialGradient(W * .5, H * .55, 0, W * .5, H * .55, W * .72);
         rg.addColorStop(0, `rgba(80,170,255,${bloom * .14})`); rg.addColorStop(.45, `rgba(155,90,255,${bloom * .055})`); rg.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
       }
@@ -230,57 +257,45 @@
       strokePath(points); ctx.setLineDash([]);
       ctx.restore();
     }
-    function drawTrail() {
-      if (trail.length < 2) return; ctx.save(); ctx.globalCompositeOperation = "screen";
-      ctx.strokeStyle = `rgba(130,255,220,${.025 + bloom * .13})`; ctx.lineWidth = .7 + bloom; strokePath(trail); ctx.restore();
-    }
     function drawWaves() {
       ctx.save(); ctx.globalCompositeOperation = "screen";
-      for (const wave of waves) { ctx.strokeStyle = `hsla(${wave.hue},100%,75%,${wave.life * .32})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.r, 0, Math.PI * 2); ctx.stroke(); }
-      ctx.restore();
-    }
-    function drawMeteors() {
-      ctx.save(); ctx.globalCompositeOperation = "screen";
-      for (const meteor of meteors) {
-        if (meteor.trail.length > 1) {
-          const tail = ctx.createLinearGradient(meteor.trail[0].x, meteor.trail[0].y, meteor.x, meteor.y);
-          tail.addColorStop(0, "rgba(95,0,255,0)"); tail.addColorStop(.55, "rgba(175,20,255,.28)"); tail.addColorStop(1, "rgba(245,80,255,.95)");
-          ctx.strokeStyle = tail; ctx.lineWidth = meteor.r * 1.25; ctx.shadowColor = "#bd25ff"; ctx.shadowBlur = 18;
-          strokePath([...meteor.trail, meteor]);
-        }
-        ctx.save(); ctx.translate(meteor.x, meteor.y); ctx.rotate(meteor.spin); ctx.shadowColor = "#e94cff"; ctx.shadowBlur = 28;
-        const core = ctx.createRadialGradient(-meteor.r * .25, -meteor.r * .3, 1, 0, 0, meteor.r * 1.7);
-        core.addColorStop(0, "#fff6ff"); core.addColorStop(.18, "#f174ff"); core.addColorStop(.52, "#8d19ef"); core.addColorStop(1, "rgba(45,0,110,0)");
-        ctx.fillStyle = core; ctx.beginPath();
-        for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, r = meteor.r * (.78 + Math.sin(i * 12.7) * .18); ctx[i ? "lineTo" : "moveTo"](Math.cos(a) * r, Math.sin(a) * r); }
-        ctx.closePath(); ctx.fill(); ctx.strokeStyle = "rgba(255,170,255,.8)"; ctx.lineWidth = 1.2; ctx.stroke(); ctx.restore();
+      for (const wave of waves) {
+        ctx.strokeStyle = `hsla(${wave.hue},100%,75%,${wave.life * .5})`; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.r, 0, Math.PI * 2); ctx.stroke();
       }
       ctx.restore();
     }
-    function drawOrb() {
-      ctx.save(); ctx.translate(orb.x, orb.y); ctx.globalCompositeOperation = "screen";
-      const auraR = 32 + bloom * 62 + pulseFlash * 85, aura = ctx.createRadialGradient(0, 0, 0, 0, 0, auraR);
-      aura.addColorStop(0, `rgba(230,255,250,${.16 + bloom * .18})`); aura.addColorStop(.25, `rgba(70,255,210,${.08 + bloom * .11})`); aura.addColorStop(.65, `rgba(110,80,255,${bloom * .09})`); aura.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = aura; ctx.beginPath(); ctx.arc(0, 0, auraR, 0, Math.PI * 2); ctx.fill();
-      for (let i = 4; i >= 1; i--) { ctx.strokeStyle = `hsla(${(155 + i * 28 + time * 5) % 360},100%,82%,${.07 + bloom * .1})`; ctx.lineWidth = .7; ctx.beginPath(); ctx.arc(0, 0, orb.radius + i * 3 + Math.sin(time * (.8 + i * .12)) * (1 + bloom * 2), 0, Math.PI * 2); ctx.stroke(); }
-      const core = ctx.createRadialGradient(-3, -4, 0, 0, 0, orb.radius); core.addColorStop(0, "#fff"); core.addColorStop(.28, "rgba(215,255,245,.98)"); core.addColorStop(.72, "rgba(60,245,205,.55)"); core.addColorStop(1, "rgba(70,100,255,.12)");
-      ctx.fillStyle = core; ctx.beginPath(); ctx.arc(0, 0, orb.radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    function drawBubbles() {
+      ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (const bubble of bubbles) {
+        const pulse = 1 + Math.sin(time * 1.7 + bubble.phase) * .045, radius = bubble.radius * pulse;
+        const hue = bubble.blue ? 205 : 350, aura = ctx.createRadialGradient(bubble.x, bubble.y, 0, bubble.x, bubble.y, radius * 2.8);
+        aura.addColorStop(0, bubble.blue ? "rgba(145,225,255,.42)" : "rgba(255,110,130,.38)");
+        aura.addColorStop(.38, bubble.blue ? "rgba(25,130,255,.2)" : "rgba(255,30,65,.18)"); aura.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = aura; ctx.beginPath(); ctx.arc(bubble.x, bubble.y, radius * 2.8, 0, Math.PI * 2); ctx.fill();
+        const core = ctx.createRadialGradient(bubble.x - radius * .3, bubble.y - radius * .35, 1, bubble.x, bubble.y, radius);
+        core.addColorStop(0, "rgba(255,255,255,.92)"); core.addColorStop(.22, `hsla(${hue},100%,78%,.82)`); core.addColorStop(.72, `hsla(${hue},95%,50%,.36)`); core.addColorStop(1, `hsla(${hue},100%,55%,.08)`);
+        ctx.fillStyle = core; ctx.strokeStyle = `hsla(${hue},100%,82%,${bubble.attached ? .95 : .55})`; ctx.lineWidth = bubble.attached ? 2 : 1;
+        ctx.beginPath(); ctx.arc(bubble.x, bubble.y, radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        if (bubble.attached) { ctx.setLineDash([2, 5]); ctx.beginPath(); ctx.arc(bubble.x, bubble.y, radius + 6 + Math.sin(time * 3 + bubble.phase) * 2, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
+      }
+      ctx.restore();
     }
     function drawVignette() {
       const g = ctx.createRadialGradient(W * .5, H * .55, W * .12, W * .5, H * .55, Math.max(W, H) * .72);
       g.addColorStop(.35, "rgba(0,0,0,0)"); g.addColorStop(1, `rgba(0,0,8,${.48 - bloom * .18})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     }
-    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawMeteors(); drawWaves(); drawOrb(); drawVignette(); }
+    function render() { drawBackground(); drawParticles(); drawFlow(); drawBubbles(); drawWaves(); drawVignette(); }
     function frame(timestamp) {
       if (!previous) previous = timestamp; const dt = Math.min((timestamp - previous) / 1000, .033); previous = timestamp;
       if (running) { if (!paused) update(dt); render(); } requestAnimationFrame(frame);
     }
 
-    canvas.addEventListener("pointerdown", event => { event.preventDefault(); brake(); }, { passive: false });
+    canvas.addEventListener("pointerdown", event => { event.preventDefault(); resonate(event.clientX, event.clientY); }, { passive: false });
     addEventListener("resize", resize);
     addEventListener("pagehide", () => urban.pause());
     addEventListener("keydown", event => {
-      if ([" ", "Enter"].includes(event.key)) { event.preventDefault(); brake(); }
+      if ([" ", "Enter"].includes(event.key)) { event.preventDefault(); resonate(W * .5, H * .55); }
       if (event.key.toLowerCase() === "p" && running) togglePause();
     });
 
@@ -300,11 +315,10 @@
 
     document.getElementById("startBtn").addEventListener("click", () => {
       void startUrbanAudio();
-      cameraU = runnerU = 0; const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y });
-      time = pulseFlash = bloom = streak = derailX = derailY = 0; speed = .2; brakeTime = 0; spawnClock = 2.6; trail = []; waves = []; meteors = []; paused = false;
-      running = true; previous = performance.now(); timeValue.textContent = "00:00.0";
+      cameraU = 0; time = bloom = attachedBest = 0; waves = []; createBubbles(); paused = false;
+      running = true; previous = performance.now(); timeValue.textContent = "0";
       startScreen.classList.add("hide"); hud.classList.add("show");
-      hint.textContent = "TAPEZ POUR FREINER — JAMAIS POUR ACCÉLÉRER"; hint.classList.add("show");
+      hint.textContent = "TAPEZ DERRIÈRE UNE BLEUE POUR LA GUIDER"; hint.classList.add("show");
       setTimeout(() => hint.classList.remove("show"), 4200);
     });
     resize(); render(); requestAnimationFrame(frame);
