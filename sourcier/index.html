@@ -40,17 +40,17 @@
   <canvas id="game" aria-label="La voie du silence"></canvas>
   <div id="hud" aria-live="polite">
     <div id="title">LA VOIE DU SILENCE</div>
-    <div id="timeHud"><span id="timeLabel">SILLAGE DU SILENCE</span><span id="timeValue">00:00.0</span></div>
+    <div id="timeHud"><span id="timeLabel">TEMPS SUR LE RAIL</span><span id="timeValue">00:00.0</span></div>
     <div id="controls"><button id="soundBtn" class="iconButton" type="button" aria-label="Couper le son" title="Son">♫</button><button id="pauseBtn" class="iconButton" type="button" aria-label="Mettre en pause" title="Pause">Ⅱ</button></div>
-    <div id="hint">GLISSEZ LIBREMENT POUR REJOINDRE LA VOIE</div>
-    <div id="statusWrap"><div id="status">ÉCOUTE</div><div id="attunement" aria-label="Résonance"><span id="attunementFill"></span></div></div>
+    <div id="hint">TAPEZ POUR FREINER DEVANT LES MÉTÉORITES</div>
+    <div id="statusWrap"><div id="status">SUR LE RAIL</div><div id="attunement" aria-label="Vitesse"><span id="attunementFill"></span></div></div>
   </div>
   <div id="pauseVeil">LAISSER RESPIRER</div>
   <main id="startScreen" class="screen">
     <div class="eyebrow">SILENT</div>
     <h1>La voie du silence</h1>
     <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">La voie défile et se renouvelle sans fin.<br><br>Restez dans son sillage aussi longtemps que possible. Chaque seconde de silence transforme le monde.</div>
+    <div class="copy">La bulle suit seule le rail et accélère naturellement.<br><br>Des météorites de vacarme vous traquent. Anticipez et tapez pour freiner : elles passeront devant vous. Impossible d'accélérer.</div>
     <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
   </main>
   <script>
@@ -76,15 +76,10 @@
     const soundBtn = document.getElementById("soundBtn");
     const pauseVeil = document.getElementById("pauseVeil");
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-    const lerp = (a, b, amount) => a + (b - a) * amount;
-    const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
-
     let W = innerWidth, H = innerHeight, running = false, paused = false, muted = false, urbanStarted = false;
-    let time = 0, cameraU = 0, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, streak = 0, bestStreak = 0, grace = 0, previous = 0;
-    let trail = [], particles = [], waves = [];
-    const pointer = { down: false, x: 0, y: 0, targetX: 0, targetY: 0, t: 0 };
-    const keys = { left: false, right: false, up: false, down: false };
-    const orb = { x: W * .5, y: H * .68, vx: 0, vy: 0, radius: 12 };
+    let time = 0, cameraU = 0, runnerU = 0, speed = .2, brakeTime = 0, pulseFlash = 0, bloom = 0, streak = 0, bestStreak = 0, spawnClock = 2.6, derailX = 0, derailY = 0, previous = 0;
+    let trail = [], particles = [], waves = [], meteors = [];
+    const orb = { x: W * .5, y: H * .55, radius: 12 };
 
     function createParticles() {
       particles = Array.from({ length: Math.min(170, Math.floor(W * H / 4500)) }, () => ({
@@ -111,83 +106,76 @@
       const p = pathWorld(u), camera = pathWorld(cameraU);
       return { x: W * .5 + p.x - camera.x, y: H * .55 + p.y - camera.y, width: p.width, u };
     }
-    function closestCircuitPoint(x, y) {
-      let closest = null;
-      for (let i = 0; i <= 300; i++) {
-        const p = circuitPoint(cameraU - 2.6 + i / 300 * 6.8), distance = Math.hypot(p.x - x, p.y - y);
-        if (!closest || distance < closest.distance) closest = { ...p, distance };
-      }
-      return closest;
-    }
     async function startUrbanAudio() {
       urban.volume = 0;
       try { await urban.play(); urbanStarted = true; }
       catch (error) { urbanStarted = false; console.warn("Le jeu démarre sans l'ambiance urbaine.", error); }
     }
-    function updateAudio(distance) {
+    function updateAudio(danger) {
       if (!urbanStarted || muted) return;
-      const x = distance > .08 ? clamp((distance - .08) / .92, 0, 1) : 0;
-      const target = clamp(x * x * .88, 0, .88);
+      const target = clamp(.06 + speed * .38 + danger * .44, 0, .88);
       urban.volume += (target - urban.volume) * .09;
-      if (distance <= .08 && urban.volume < .012) urban.volume = 0;
     }
 
     function updateHUD() {
-      if (deepSilence > .75) { status.textContent = "SILENCE"; status.style.opacity = ".18"; }
-      else if (silence > .72) { status.textContent = "SUR LA VOIE"; status.style.opacity = ".3"; }
-      else if (silence > .35) { status.textContent = "ÉCOUTE"; status.style.opacity = ".35"; }
-      else { status.textContent = "RETROUVE LA VOIE"; status.style.opacity = ".45"; }
-      attunementFill.style.width = `${Math.round(resonance * 100)}%`;
+      const offRail = Math.hypot(derailX, derailY) > 20;
+      status.textContent = offRail ? "HORS DU RAIL — RETOUR EN COURS" : brakeTime > 0 ? "FREINAGE" : "SUR LE RAIL";
+      attunementFill.style.width = `${Math.round(clamp((speed - .1) / .64, 0, 1) * 100)}%`;
       const minutes = Math.floor(streak / 60), seconds = Math.floor(streak % 60), tenths = Math.floor(streak * 10) % 10;
       timeValue.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${tenths}`;
-      timeLabel.textContent = bestStreak > 1 ? `SILLAGE · RECORD ${bestStreak.toFixed(1)} S` : "SILLAGE DU SILENCE";
+      timeLabel.textContent = bestStreak > 1 ? `RAIL · RECORD ${bestStreak.toFixed(1)} S` : "TEMPS SUR LE RAIL";
+    }
+    function brake() {
+      if (!running || paused || brakeTime > .08) return;
+      speed = Math.max(.1, speed * .36); brakeTime = .65; pulseFlash = .7;
+      waves.push({ x: orb.x, y: orb.y, r: 12, life: .8, hue: 185 });
+      if (navigator.vibrate) navigator.vibrate(10);
+    }
+    function spawnMeteor() {
+      const side = Math.random() < .5 ? -1 : 1;
+      const x = side < 0 ? -70 : W + 70, y = clamp(orb.y + (Math.random() - .5) * H * .65, 60, H - 60);
+      const target = circuitPoint(runnerU - speed * 1.35);
+      const angle = Math.atan2(target.y - y, target.x - x), force = 235 + speed * 190;
+      meteors.push({ x, y, vx: Math.cos(angle) * force, vy: Math.sin(angle) * force, r: 12 + Math.random() * 7, life: 6, trail: [], spin: Math.random() * 6 });
+      hint.textContent = "MÉTÉORITE VIOLETTE — FREINEZ !"; hint.classList.add("show");
     }
     function update(dt) {
-      time += dt;
-      const cameraBefore = pathWorld(cameraU); cameraU -= dt * .29; const cameraAfter = pathWorld(cameraU);
+      time += dt; streak += dt; bestStreak = Math.max(bestStreak, streak);
+      brakeTime = Math.max(0, brakeTime - dt); speed = Math.min(.74, speed + dt * (.014 + time * .00014));
+      const cameraBefore = pathWorld(cameraU);
+      runnerU -= speed * dt; cameraU += (runnerU - cameraU) * (1 - Math.exp(-2.6 * dt));
+      const cameraAfter = pathWorld(cameraU);
       const cameraDx = cameraAfter.x - cameraBefore.x, cameraDy = cameraAfter.y - cameraBefore.y;
       for (const p of trail) { p.x -= cameraDx; p.y -= cameraDy; }
       for (const wave of waves) { wave.x -= cameraDx; wave.y -= cameraDy; }
-      const flow = closestCircuitPoint(orb.x, orb.y), dx = flow.x - orb.x, dy = flow.y - orb.y;
-      const distance = clamp(flow.distance / (flow.width * 1.75), 0, 1);
-      const targetSilence = 1 - smoothstep(0, flow.width * .82, flow.distance);
-      silence += (targetSilence - silence) * (1 - Math.exp(-7 * dt));
-      deepSilence = clamp(deepSilence + (flow.distance < flow.width * .2 ? dt * .25 : -dt * .12), 0, 1);
-      if (silence > .62) { streak += dt; grace = .9; bestStreak = Math.max(bestStreak, streak); }
-      else if (grace > 0) grace -= dt;
-      else streak = 0;
-      resonance += silence > .72 ? dt * (.28 + deepSilence * .25) : -dt * .18;
-      resonance = clamp(resonance, 0, 1);
-      if (resonance === 1) {
-        resonance = 0; pulseFlash = 1;
-        for (let i = 0; i < 5; i++) waves.push({ x: orb.x, y: orb.y, r: 14 + i * 15, life: 1 - i * .1, hue: 145 + i * 18 });
-        hint.textContent = "RÉSONANCE — LE MONDE S'ÉCLAIRE"; hint.classList.add("show");
-        setTimeout(() => hint.classList.remove("show"), 1400);
-        if (navigator.vibrate) navigator.vibrate(18);
-      }
+      const rail = circuitPoint(runnerU), recovery = 1 - Math.exp(-1.35 * dt);
+      derailX += (0 - derailX) * recovery; derailY += (0 - derailY) * recovery;
+      orb.x = rail.x + derailX; orb.y = rail.y + derailY;
       pulseFlash = Math.max(0, pulseFlash - dt * 1.4);
-      const targetBloom = clamp(deepSilence * .62 + Math.min(streak / 45, 1) * .38, 0, 1);
+      const targetBloom = clamp(.2 + Math.min(streak / 45, 1) * .55, 0, 1);
       bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
-      if (pointer.down) {
-        orb.vx += (pointer.targetX - orb.x) * 8.5 * dt;
-        orb.vy += (pointer.targetY - orb.y) * 8.5 * dt;
-      }
-      if (keys.left) orb.vx -= 330 * dt;
-      if (keys.right) orb.vx += 330 * dt;
-      if (keys.up) orb.vy -= 330 * dt;
-      if (keys.down) orb.vy += 330 * dt;
-      orb.vx += dx * silence * .38 * dt;
-      orb.vy += dy * silence * .38 * dt;
-      const friction = Math.exp(-(pointer.down ? 1.35 : 2.1) * dt);
-      orb.vx *= friction; orb.vy *= friction; orb.x += orb.vx * dt; orb.y += orb.vy * dt;
-      if (orb.x < 25) { orb.x = 25; orb.vx = Math.abs(orb.vx) * .25; }
-      if (orb.x > W - 25) { orb.x = W - 25; orb.vx = -Math.abs(orb.vx) * .25; }
-      if (orb.y < 25) { orb.y = 25; orb.vy = Math.abs(orb.vy) * .25; }
-      if (orb.y > H - 25) { orb.y = H - 25; orb.vy = -Math.abs(orb.vy) * .25; }
       trail.push({ x: orb.x, y: orb.y }); if (trail.length > 100) trail.shift();
+      spawnClock -= dt; if (spawnClock <= 0) { spawnMeteor(); spawnClock = Math.max(1.5, 4 - speed * 3) + Math.random(); }
+      let danger = 0;
+      for (const meteor of meteors) {
+        meteor.trail.push({ x: meteor.x, y: meteor.y }); if (meteor.trail.length > 18) meteor.trail.shift();
+        const aim = Math.atan2(orb.y - meteor.y, orb.x - meteor.x), force = 42 * dt;
+        meteor.vx += Math.cos(aim) * force; meteor.vy += Math.sin(aim) * force;
+        const cap = 370, v = Math.hypot(meteor.vx, meteor.vy); if (v > cap) { meteor.vx *= cap / v; meteor.vy *= cap / v; }
+        meteor.x += meteor.vx * dt; meteor.y += meteor.vy * dt; meteor.life -= dt; meteor.spin += dt * 4;
+        const gap = Math.hypot(meteor.x - orb.x, meteor.y - orb.y); danger = Math.max(danger, clamp(1 - gap / 280, 0, 1));
+        if (!meteor.hit && gap < meteor.r + orb.radius) {
+          meteor.hit = true; meteor.life = .15; const impact = 90 / Math.max(v, 1);
+          derailX += meteor.vx * impact; derailY += meteor.vy * impact; streak = 0; pulseFlash = 1;
+          waves.push({ x: orb.x, y: orb.y, r: 10, life: 1, hue: 285 }); hint.textContent = "PERCUTÉ — HORS DU RAIL";
+          if (navigator.vibrate) navigator.vibrate([45, 25, 60]);
+        }
+      }
+      meteors = meteors.filter(m => m.life > 0 && m.x > -130 && m.x < W + 130 && m.y > -130 && m.y < H + 130);
+      if (!meteors.length) hint.classList.remove("show");
       for (const wave of waves) { wave.r += 105 * dt; wave.life -= .6 * dt; }
       waves = waves.filter(wave => wave.life > 0);
-      updateAudio(distance); updateHUD();
+      updateAudio(danger); updateHUD();
     }
 
     function drawBackground() {
@@ -251,6 +239,24 @@
       for (const wave of waves) { ctx.strokeStyle = `hsla(${wave.hue},100%,75%,${wave.life * .32})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.r, 0, Math.PI * 2); ctx.stroke(); }
       ctx.restore();
     }
+    function drawMeteors() {
+      ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (const meteor of meteors) {
+        if (meteor.trail.length > 1) {
+          const tail = ctx.createLinearGradient(meteor.trail[0].x, meteor.trail[0].y, meteor.x, meteor.y);
+          tail.addColorStop(0, "rgba(95,0,255,0)"); tail.addColorStop(.55, "rgba(175,20,255,.28)"); tail.addColorStop(1, "rgba(245,80,255,.95)");
+          ctx.strokeStyle = tail; ctx.lineWidth = meteor.r * 1.25; ctx.shadowColor = "#bd25ff"; ctx.shadowBlur = 18;
+          strokePath([...meteor.trail, meteor]);
+        }
+        ctx.save(); ctx.translate(meteor.x, meteor.y); ctx.rotate(meteor.spin); ctx.shadowColor = "#e94cff"; ctx.shadowBlur = 28;
+        const core = ctx.createRadialGradient(-meteor.r * .25, -meteor.r * .3, 1, 0, 0, meteor.r * 1.7);
+        core.addColorStop(0, "#fff6ff"); core.addColorStop(.18, "#f174ff"); core.addColorStop(.52, "#8d19ef"); core.addColorStop(1, "rgba(45,0,110,0)");
+        ctx.fillStyle = core; ctx.beginPath();
+        for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, r = meteor.r * (.78 + Math.sin(i * 12.7) * .18); ctx[i ? "lineTo" : "moveTo"](Math.cos(a) * r, Math.sin(a) * r); }
+        ctx.closePath(); ctx.fill(); ctx.strokeStyle = "rgba(255,170,255,.8)"; ctx.lineWidth = 1.2; ctx.stroke(); ctx.restore();
+      }
+      ctx.restore();
+    }
     function drawOrb() {
       ctx.save(); ctx.translate(orb.x, orb.y); ctx.globalCompositeOperation = "screen";
       const auraR = 32 + bloom * 62 + pulseFlash * 85, aura = ctx.createRadialGradient(0, 0, 0, 0, 0, auraR);
@@ -264,41 +270,22 @@
       const g = ctx.createRadialGradient(W * .5, H * .55, W * .12, W * .5, H * .55, Math.max(W, H) * .72);
       g.addColorStop(.35, "rgba(0,0,0,0)"); g.addColorStop(1, `rgba(0,0,8,${.48 - bloom * .18})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     }
-    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawWaves(); drawOrb(); drawVignette(); }
+    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawMeteors(); drawWaves(); drawOrb(); drawVignette(); }
     function frame(timestamp) {
       if (!previous) previous = timestamp; const dt = Math.min((timestamp - previous) / 1000, .033); previous = timestamp;
       if (running) { if (!paused) update(dt); render(); } requestAnimationFrame(frame);
     }
 
-    canvas.addEventListener("pointerdown", event => { if (!running || paused) return; event.preventDefault(); pointer.down = true; pointer.x = pointer.targetX = event.clientX; pointer.y = pointer.targetY = event.clientY; pointer.t = performance.now(); }, { passive: false });
-    canvas.addEventListener("pointermove", event => {
-      if (!pointer.down || !running || paused) return; event.preventDefault();
-      const now = performance.now(), elapsed = Math.max(8, now - pointer.t);
-      const velocityX = (event.clientX - pointer.x) / elapsed * 1000, velocityY = (event.clientY - pointer.y) / elapsed * 1000;
-      orb.vx = clamp(orb.vx + velocityX * .018, -390, 390); orb.vy = clamp(orb.vy + velocityY * .018, -390, 390);
-      pointer.x = pointer.targetX = event.clientX; pointer.y = pointer.targetY = event.clientY; pointer.t = now;
-    }, { passive: false });
-    const release = () => { pointer.down = false; };
-    canvas.addEventListener("pointerup", release); canvas.addEventListener("pointercancel", release);
+    canvas.addEventListener("pointerdown", event => { event.preventDefault(); brake(); }, { passive: false });
     addEventListener("resize", resize);
     addEventListener("pagehide", () => urban.pause());
     addEventListener("keydown", event => {
-      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
-      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = true;
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = true;
-      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") keys.up = true;
-      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") keys.down = true;
-      if (event.key === " " && running) togglePause();
-    });
-    addEventListener("keyup", event => {
-      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = false;
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = false;
-      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") keys.up = false;
-      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") keys.down = false;
+      if ([" ", "Enter"].includes(event.key)) { event.preventDefault(); brake(); }
+      if (event.key.toLowerCase() === "p" && running) togglePause();
     });
 
     function togglePause() {
-      paused = !paused; pointer.down = false; pauseVeil.classList.toggle("show", paused);
+      paused = !paused; pauseVeil.classList.toggle("show", paused);
       pauseBtn.textContent = paused ? "▶" : "Ⅱ";
       pauseBtn.setAttribute("aria-label", paused ? "Reprendre" : "Mettre en pause");
       if (paused) urban.pause(); else if (urbanStarted && !muted) void urban.play();
@@ -313,11 +300,11 @@
 
     document.getElementById("startBtn").addEventListener("click", () => {
       void startUrbanAudio();
-      cameraU = 0; const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y, vx: 0, vy: 0 });
-      time = silence = deepSilence = resonance = pulseFlash = bloom = streak = grace = 0; trail = []; waves = []; paused = false;
+      cameraU = runnerU = 0; const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y });
+      time = pulseFlash = bloom = streak = derailX = derailY = 0; speed = .2; brakeTime = 0; spawnClock = 2.6; trail = []; waves = []; meteors = []; paused = false;
       running = true; previous = performance.now(); timeValue.textContent = "00:00.0";
       startScreen.classList.add("hide"); hud.classList.add("show");
-      hint.textContent = "GLISSEZ DANS TOUTES LES DIRECTIONS"; hint.classList.add("show");
+      hint.textContent = "TAPEZ POUR FREINER — JAMAIS POUR ACCÉLÉRER"; hint.classList.add("show");
       setTimeout(() => hint.classList.remove("show"), 4200);
     });
     resize(); render(); requestAnimationFrame(frame);
