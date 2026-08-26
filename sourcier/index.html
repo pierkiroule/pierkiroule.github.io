@@ -35,18 +35,18 @@
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="SILENT, jeu d'arcade tactile"></canvas>
+  <canvas id="game" aria-label="SILENT, guidez le papillon sur les courants de silence"></canvas>
   <div id="hud" aria-live="polite">
     <div id="score">SILENCE <strong>0</strong></div>
     <div id="combo">x2</div>
     <div id="timer">60</div>
     <div id="energy" aria-label="Énergie"><i></i><i></i><i></i></div>
-    <div id="gesture">GLISSEZ · ATTRAPEZ LE BLEU · ÉVITEZ LE ROUGE</div>
+    <div id="gesture">GLISSEZ · SUIVEZ LE BLEU · ÉVITEZ LE ROUGE</div>
   </div>
   <main id="startScreen" class="screen">
     <h1 class="brand">SILENT</h1>
     <div class="subtitle">LA VOIE DU SILENCE</div>
-    <div class="copy">Cueillez le silence.<br>Évitez le vacarme.</div>
+    <div class="copy">Glissez sur les courants de silence.<br>Évitez les rubans du vacarme.</div>
     <button id="startBtn" type="button">JOUER</button>
   </main>
   <section id="finalScreen" class="screen hide">
@@ -100,9 +100,9 @@
     }
     function spawn(type, x, y, scale = 1, delay = 0) {
       const bad = type === "noise";
-      objects.push({ type, x, y: y - delay, baseX: x, radius: (bad ? 15 : 12) * scale * (.85 + Math.random() * .35),
+      objects.push({ type, x, y: y - delay, baseX: x, radius: (bad ? 18 : 16) * scale * (.85 + Math.random() * .3), length: (bad ? 105 : 125) * scale * (.85 + Math.random() * .3),
         vy: 0, phase: Math.random() * 10, behavior: bad ? Math.floor(Math.random() * (elapsed > 35 ? 4 : elapsed > 15 ? 3 : 2)) : Math.floor(Math.random() * 3),
-        variant: Math.floor(Math.random() * 4), dead: false, absorb: 0 });
+        variant: Math.floor(Math.random() * 4), dead: false, collected: false, absorb: 0 });
     }
     function spawnPattern() {
       const progress = elapsed / 60, margin = 35, lane = margin + Math.random() * (W - margin * 2);
@@ -128,14 +128,15 @@
       }
     }
     function collect(object) {
-      object.dead = true; comboRun++; combo = Math.min(4, 1 + Math.floor(comboRun / 4)); bestCombo = Math.max(bestCombo, combo);
+      if (object.collected) return;
+      object.collected = true; comboRun++; combo = Math.min(4, 1 + Math.floor(comboRun / 4)); bestCombo = Math.max(bestCombo, combo);
       score += combo; cyanBloom = Math.min(1, cyanBloom + .34); hitStop = .025;
       waves.push({ x: ship.x, y: ship.y, radius: 8, life: 1, color: "90,225,255" });
       burst(ship.x, ship.y - 5, "105,225,255", 9); ship.squash = -.22; audio.collect();
       scoreNode.textContent = String(score); comboNode.textContent = `x${combo}`; comboNode.classList.toggle("show", combo > 1);
     }
     function collideNoise(object) {
-      if (hitCooldown > 0) return;
+      if (hitCooldown > 0) { object.dead = true; return; }
       object.dead = true; combo = 1; comboRun = 0; energy = Math.max(0, energy - 1); shake = 1; redFlash = .7; ship.squash = .34;
       hitCooldown = .7;
       waves.push({ x: ship.x, y: ship.y, radius: 7, life: .75, color: "255,80,105" });
@@ -174,10 +175,11 @@
         if (object.behavior === 2) object.x = object.baseX + Math.sin(object.phase * 2.15) * (12 + progress * 16) * drift;
         if (object.behavior === 3) object.x += Math.sin(object.phase * 3.4) * 34 * dt;
         const dx = ship.x - object.x, dy = ship.y - object.y, distance = Math.hypot(dx, dy);
-        if (object.type === "silence" && distance < 72 && distance > 1) {
+        if (object.type === "silence" && !object.collected && distance < 72 && distance > 1) {
           const pull = (1 - distance / 72) * 460; object.x += dx / distance * pull * dt; object.y += dy / distance * pull * dt; object.absorb = 1 - distance / 72;
         }
-        if (distance < object.radius + 13) object.type === "silence" ? collect(object) : collideNoise(object);
+        const ribbonDistance = Math.abs(dy) < object.length * .5 + 10 ? Math.abs(dx) : distance;
+        if (!object.collected && ribbonDistance < object.radius + 11 && Math.abs(dy) < object.length * .5 + 10) object.type === "silence" ? collect(object) : collideNoise(object);
       }
       objects = objects.filter(object => !object.dead && object.y < H + 70);
       for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= Math.exp(-2 * dt); p.vy *= Math.exp(-2 * dt); p.life -= dt; }
@@ -196,29 +198,41 @@
       ctx.globalCompositeOperation = "source-over";
     }
     function drawObject(object) {
-      const bad = object.type === "noise", hue = bad ? 352 : 193, wobble = bad ? Math.sin(object.phase * 9) * 1.3 : Math.sin(object.phase * 2) * .6;
-      ctx.save(); ctx.translate(object.x + wobble, object.y); ctx.globalCompositeOperation = "screen";
-      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, object.radius * 3.1);
-      glow.addColorStop(0, bad ? "rgba(255,70,95,.34)" : "rgba(75,220,255,.4)"); glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(0, 0, object.radius * 3.1, 0, Math.PI * 2); ctx.fill();
-      const core = ctx.createRadialGradient(-object.radius * .3, -object.radius * .35, 1, 0, 0, object.radius);
-      core.addColorStop(0, "rgba(255,255,255,.9)"); core.addColorStop(.2, `hsla(${hue},100%,78%,.78)`); core.addColorStop(.75, `hsla(${hue},95%,50%,.25)`); core.addColorStop(1, `hsla(${hue},100%,50%,.04)`);
-      ctx.fillStyle = core; ctx.strokeStyle = `hsla(${hue},100%,78%,${bad ? .72 : .62})`; ctx.lineWidth = bad ? 1.4 : 1;
-      ctx.beginPath();
-      const points = bad ? 16 : 28;
-      for (let i = 0; i <= points; i++) { const angle = i / points * Math.PI * 2, instability = bad ? Math.sin(angle * (5 + object.variant) + object.phase * 7) * 1.5 : 0; const r = object.radius + instability - object.absorb * 3; ctx[i ? "lineTo" : "moveTo"](Math.cos(angle) * r, Math.sin(angle) * r); }
-      ctx.closePath(); ctx.fill(); ctx.stroke();
-      if (!bad && (object.variant === 1 || object.variant === 3)) { ctx.globalAlpha = .55; ctx.beginPath(); ctx.arc(0, 0, object.radius * .7, 0, Math.PI * 2); ctx.stroke(); }
-      if (!bad && object.variant === 2) { ctx.globalAlpha = .45 + Math.sin(object.phase * 4) * .2; ctx.beginPath(); ctx.arc(0, 0, object.radius + 4, 0, Math.PI * 2); ctx.stroke(); }
+      const bad = object.type === "noise", hue = bad ? 352 : 193, segments = 18;
+      const amplitude = (bad ? 7 : 4) + object.variant * 1.2;
+      const ribbonX = t => Math.sin(t * Math.PI * (bad ? 3 : 2) + object.phase * (bad ? 6 : 1.8)) * amplitude;
+      ctx.save(); ctx.translate(object.x, object.y); ctx.globalCompositeOperation = "screen"; ctx.globalAlpha = object.collected ? .35 : 1;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      for (const layer of [{ width: object.radius * 3.2, alpha: .055 }, { width: object.radius * 1.6, alpha: .12 }, { width: bad ? 2.2 : 1.6, alpha: .82 }]) {
+        ctx.strokeStyle = `hsla(${hue},100%,${bad ? 67 : 72}%,${layer.alpha})`; ctx.lineWidth = layer.width;
+        ctx.beginPath();
+        for (let i = 0; i <= segments; i++) { const t = i / segments, y = (t - .5) * object.length; ctx[i ? "lineTo" : "moveTo"](ribbonX(t), y); }
+        ctx.stroke();
+      }
+      // Fine spectral filaments make each current read as a flowing sound ribbon.
+      for (let filament = -1; filament <= 1; filament += 2) {
+        ctx.strokeStyle = `hsla(${hue},100%,82%,${bad ? .28 : .2})`; ctx.lineWidth = .7; ctx.beginPath();
+        for (let i = 0; i <= segments; i++) { const t = i / segments, y = (t - .5) * object.length, edge = filament * object.radius * (.55 + Math.sin(t * 8 + object.phase) * .12); ctx[i ? "lineTo" : "moveTo"](ribbonX(t) + edge, y); }
+        ctx.stroke();
+      }
       ctx.restore();
     }
     function drawShip() {
-      ctx.save(); ctx.translate(ship.x, ship.y); ctx.rotate(ship.tilt); ctx.scale(1 - ship.squash * .25, 1 + ship.squash * .35); ctx.globalCompositeOperation = "screen";
+      const flutter = Math.sin(elapsed * 12) * .16;
+      ctx.save(); ctx.translate(ship.x, ship.y); ctx.rotate(ship.tilt * .55); ctx.scale(1 - ship.squash * .25, 1 + ship.squash * .35); ctx.globalCompositeOperation = "screen";
       const trail = ctx.createLinearGradient(0, 5, 0, 52); trail.addColorStop(0, "rgba(80,220,255,.45)"); trail.addColorStop(1, "rgba(45,100,255,0)");
-      ctx.fillStyle = trail; ctx.beginPath(); ctx.moveTo(-5, 5); ctx.quadraticCurveTo(0, 48 + Math.abs(ship.vx) * .025, 5, 5); ctx.closePath(); ctx.fill();
-      ctx.shadowColor = "#76e8ff"; ctx.shadowBlur = 22; ctx.fillStyle = "rgba(205,250,255,.94)";
-      ctx.beginPath(); ctx.moveTo(0, -15); ctx.quadraticCurveTo(11, 3, 6, 10); ctx.quadraticCurveTo(0, 15, -6, 10); ctx.quadraticCurveTo(-11, 3, 0, -15); ctx.fill();
-      ctx.shadowBlur = 0; ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.ellipse(0, -4, 2.4, 5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      ctx.fillStyle = trail; ctx.beginPath(); ctx.moveTo(-3, 5); ctx.quadraticCurveTo(0, 48 + Math.abs(ship.vx) * .02, 3, 5); ctx.closePath(); ctx.fill();
+      ctx.shadowColor = "#76e8ff"; ctx.shadowBlur = 20;
+      for (const side of [-1, 1]) {
+        ctx.save(); ctx.scale(side, 1); ctx.rotate(flutter);
+        const wing = ctx.createRadialGradient(7, -5, 1, 9, -3, 15); wing.addColorStop(0, "rgba(245,255,255,.95)"); wing.addColorStop(.35, "rgba(105,228,255,.68)"); wing.addColorStop(1, "rgba(30,115,210,.08)");
+        ctx.fillStyle = wing; ctx.strokeStyle = "rgba(150,240,255,.65)"; ctx.lineWidth = .8;
+        ctx.beginPath(); ctx.moveTo(1, -7); ctx.bezierCurveTo(8, -20, 20, -16, 17, -5); ctx.bezierCurveTo(15, 5, 7, 10, 1, 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // The inner arc suggests an ear listening to the current.
+        ctx.shadowBlur = 0; ctx.strokeStyle = "rgba(205,250,255,.42)"; ctx.beginPath(); ctx.arc(8, -4, 5, -.9, 1.45); ctx.stroke(); ctx.restore();
+      }
+      ctx.shadowBlur = 14; ctx.fillStyle = "rgba(230,253,255,.95)"; ctx.beginPath(); ctx.ellipse(0, 1, 2.4, 11, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0; ctx.strokeStyle = "rgba(190,245,255,.75)"; ctx.beginPath(); ctx.moveTo(-1, -8); ctx.quadraticCurveTo(-5, -15, -8, -16); ctx.moveTo(1, -8); ctx.quadraticCurveTo(5, -15, 8, -16); ctx.stroke(); ctx.restore();
     }
     function render() {
       drawBackground(); const sx = (Math.random() - .5) * shake * 6, sy = (Math.random() - .5) * shake * 4;
