@@ -14,7 +14,8 @@
     h1 { margin: 0; font-size: min(12vw, 58px); font-weight: 100; letter-spacing: -.045em; }
     .subtitle { margin-top: 12px; font-size: 9px; letter-spacing: .34em; opacity: .42; }
     .copy { max-width: 310px; margin: 38px 0; font-size: 13px; line-height: 1.8; font-weight: 300; opacity: .58; }
-    button { appearance: none; border: 1px solid rgba(180,255,225,.3); border-radius: 999px; padding: 16px 30px; background: rgba(100,255,210,.055); color: white; font-size: 9px; letter-spacing: .28em; cursor: pointer; }
+    button { appearance: none; border: 1px solid rgba(180,255,225,.3); border-radius: 999px; padding: 16px 30px; background: rgba(100,255,210,.055); color: white; font-size: 9px; letter-spacing: .28em; cursor: pointer; transition: background .3s, border-color .3s, transform .3s; }
+    button:hover { background: rgba(130,255,215,.12); border-color: rgba(200,255,230,.55); transform: translateY(-2px); }
     button:focus-visible { outline: 2px solid #caff91; outline-offset: 4px; }
     #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0; transition: opacity .5s; }
     #hud.show { opacity: 1; }
@@ -22,7 +23,16 @@
     #fireHud { position: absolute; top: max(43px, calc(env(safe-area-inset-top) + 27px)); left: 50%; transform: translateX(-50%); display: flex; gap: 13px; }
     .dot { width: 6px; height: 6px; border: 1px solid rgba(150,255,170,.3); border-radius: 50%; }
     .dot.on { background: #caff91; box-shadow: 0 0 8px #aaff7a, 0 0 22px rgba(80,255,130,.8); }
-    #status { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: .3em; color: white; opacity: .35; white-space: nowrap; }
+    #statusWrap { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: min(250px, 62vw); text-align: center; }
+    #status { font-size: 8px; letter-spacing: .3em; color: white; opacity: .35; white-space: nowrap; }
+    #attunement { height: 1px; margin-top: 10px; overflow: hidden; background: rgba(255,255,255,.1); }
+    #attunementFill { display: block; width: 0; height: 100%; background: #caffb4; box-shadow: 0 0 9px #78ffd0; transition: width .15s linear; }
+    #hint { position: absolute; left: 50%; bottom: max(76px, calc(env(safe-area-inset-bottom) + 52px)); transform: translate(-50%, 8px); padding: 9px 14px; border: 1px solid rgba(200,255,235,.12); border-radius: 99px; background: rgba(2,8,14,.42); backdrop-filter: blur(10px); color: rgba(255,255,255,.62); font-size: 8px; letter-spacing: .18em; white-space: nowrap; opacity: 0; transition: opacity .5s, transform .5s; }
+    #hint.show { opacity: 1; transform: translate(-50%, 0); }
+    #controls { position: absolute; top: max(17px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); display: flex; gap: 8px; pointer-events: auto; }
+    .iconButton { width: 36px; height: 36px; padding: 0; display: grid; place-items: center; border-color: rgba(200,255,235,.14); background: rgba(2,8,14,.28); font-size: 13px; letter-spacing: 0; }
+    #pauseVeil { position: fixed; inset: 0; z-index: 15; display: grid; place-items: center; color: rgba(255,255,255,.72); background: rgba(1,5,10,.55); backdrop-filter: blur(12px); font-size: 10px; letter-spacing: .35em; opacity: 0; visibility: hidden; transition: .35s; pointer-events: none; }
+    #pauseVeil.show { opacity: 1; visibility: visible; }
     #endScreen { opacity: 0; visibility: hidden; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(80,255,160,.2), transparent 28%), radial-gradient(circle at 50% 65%, rgba(30,180,255,.13), transparent 40%), #010806; }
     #endScreen.show { opacity: 1; visibility: visible; pointer-events: auto; }
     #natureOrb { width: 160px; height: 160px; position: relative; margin-bottom: 34px; }
@@ -41,13 +51,16 @@
   <div id="hud" aria-live="polite">
     <div id="title">LA VOIE DU SILENCE</div>
     <div id="fireHud" aria-label="Lucioles recueillies"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <div id="status">ÉCOUTE</div>
+    <div id="controls"><button id="soundBtn" class="iconButton" type="button" aria-label="Couper le son" title="Son">♫</button><button id="pauseBtn" class="iconButton" type="button" aria-label="Mettre en pause" title="Pause">Ⅱ</button></div>
+    <div id="hint">GLISSEZ DOUCEMENT POUR REJOINDRE LE FIL</div>
+    <div id="statusWrap"><div id="status">ÉCOUTE</div><div id="attunement" aria-hidden="true"><span id="attunementFill"></span></div></div>
   </div>
+  <div id="pauseVeil">LAISSER RESPIRER</div>
   <main id="startScreen" class="screen">
     <div class="eyebrow">SILENT</div>
     <h1>La voie du silence</h1>
     <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">Glissez pour guider le cercle.<br><br>Éloignez-vous du vacarme.<br>Trouvez la ligne du silence.<br><br>Recueillez les trois lucioles du vivant.</div>
+    <div class="copy">Guidez doucement le cercle vers le fil lumineux.<br><br>Le vacarme s'efface lorsque vous vous accordez à lui. Recueillez, sans urgence, les trois lucioles du vivant.</div>
     <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
   </main>
   <section id="endScreen" class="screen" aria-labelledby="endTitle">
@@ -75,15 +88,21 @@
     const startScreen = document.getElementById("startScreen");
     const endScreen = document.getElementById("endScreen");
     const listenBtn = document.getElementById("listenBtn");
+    const hint = document.getElementById("hint");
+    const attunementFill = document.getElementById("attunementFill");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const soundBtn = document.getElementById("soundBtn");
+    const pauseVeil = document.getElementById("pauseVeil");
     const dots = [...document.querySelectorAll(".dot")];
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const lerp = (a, b, amount) => a + (b - a) * amount;
     const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
-    let W = innerWidth, H = innerHeight, running = false, ending = false, urbanStarted = false;
+    let W = innerWidth, H = innerHeight, running = false, ending = false, paused = false, muted = false, urbanStarted = false;
     let time = 0, scroll = 0, speed = 105, silence = 0, deepSilence = 0, bloom = 0, collected = 0, previous = 0;
     let trail = [], fireflies = [], particles = [], waves = [];
-    const pointer = { down: false, x: 0, t: 0 };
+    const pointer = { down: false, x: 0, targetX: 0, t: 0 };
+    const keys = { left: false, right: false };
     const orb = { x: W * .5, y: H * .68, vx: 0, radius: 12 };
 
     function createParticles() {
@@ -121,7 +140,7 @@
       catch (error) { urbanStarted = false; console.warn("Le jeu démarre sans l'ambiance urbaine.", error); }
     }
     function updateAudio(distance) {
-      if (!urbanStarted || ending) return;
+      if (!urbanStarted || ending || muted) return;
       const x = distance > .08 ? clamp((distance - .08) / .92, 0, 1) : 0;
       const target = clamp(x * x * .88, 0, .88);
       urban.volume += (target - urban.volume) * .09;
@@ -141,8 +160,13 @@
       for (const firefly of fireflies) {
         if (firefly.collected) continue;
         const p = fireflyPosition(firefly);
+        // Une luciole manquée revient plus loin : cette promenade ne punit jamais.
+        if (p.y < -80) { firefly.worldY = scroll + H + 700; firefly.phase += 2.1; continue; }
         if (p.y < -60 || p.y > H + 60 || Math.hypot(p.x - orb.x, p.y - orb.y) >= 34) continue;
         firefly.collected = true; dots[collected]?.classList.add("on"); collected += 1;
+        hint.textContent = collected < 3 ? `LUCIOLE ${collected} SUR 3 — CONTINUEZ D'ÉCOUTER` : "LE VIVANT VOUS A RETROUVÉ";
+        hint.classList.add("show"); setTimeout(() => hint.classList.remove("show"), 2600);
+        if (navigator.vibrate) navigator.vibrate([20, 35, 45]);
         for (let i = 0; i < 4; i++) waves.push({ x: orb.x, y: orb.y, r: 10 + i * 7, life: 1 - i * .12, hue: 100 + i * 20 });
         if (collected === 3) beginEnding();
       }
@@ -152,6 +176,7 @@
       else if (silence > .72) { status.textContent = "SUR LA VOIE"; status.style.opacity = ".3"; }
       else if (silence > .35) { status.textContent = "ÉCOUTE"; status.style.opacity = ".35"; }
       else { status.textContent = "RETROUVE LA VOIE"; status.style.opacity = ".45"; }
+      attunementFill.style.width = `${Math.round(silence * 100)}%`;
     }
     function update(dt) {
       time += dt;
@@ -161,6 +186,9 @@
       deepSilence = clamp(deepSilence + (Math.abs(dx) < flow.width * .16 ? dt * .25 : -dt * .12), 0, 1);
       const targetBloom = clamp(deepSilence * .72 + collected * .12, 0, 1);
       bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
+      if (pointer.down) orb.vx += (pointer.targetX - orb.x) * 8.5 * dt;
+      if (keys.left) orb.vx -= 330 * dt;
+      if (keys.right) orb.vx += 330 * dt;
       orb.vx += dx * silence * .38 * dt;
       orb.vx *= Math.exp(-(pointer.down ? 1.2 : 1.9) * dt); orb.x += orb.vx * dt;
       if (orb.x < 25) { orb.x = 25; orb.vx = Math.abs(orb.vx) * .25; }
@@ -266,26 +294,52 @@
     function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawFireflies(); drawFireflyTrain(); drawWaves(); drawOrb(); drawVignette(); }
     function frame(timestamp) {
       if (!previous) previous = timestamp; const dt = Math.min((timestamp - previous) / 1000, .033); previous = timestamp;
-      if (running) { if (!ending) update(dt); render(); } requestAnimationFrame(frame);
+      if (running) { if (!ending && !paused) update(dt); render(); } requestAnimationFrame(frame);
     }
 
-    canvas.addEventListener("pointerdown", event => { if (!running || ending) return; event.preventDefault(); pointer.down = true; pointer.x = event.clientX; pointer.t = performance.now(); }, { passive: false });
+    canvas.addEventListener("pointerdown", event => { if (!running || ending || paused) return; event.preventDefault(); pointer.down = true; pointer.x = pointer.targetX = event.clientX; pointer.t = performance.now(); }, { passive: false });
     canvas.addEventListener("pointermove", event => {
-      if (!pointer.down || !running || ending) return; event.preventDefault();
+      if (!pointer.down || !running || ending || paused) return; event.preventDefault();
       const now = performance.now(), velocity = (event.clientX - pointer.x) / Math.max(8, now - pointer.t) * 1000;
-      orb.vx = clamp(orb.vx + velocity * .038, -390, 390); pointer.x = event.clientX; pointer.t = now;
+      orb.vx = clamp(orb.vx + velocity * .018, -390, 390); pointer.x = pointer.targetX = event.clientX; pointer.t = now;
     }, { passive: false });
     const release = () => { pointer.down = false; };
     canvas.addEventListener("pointerup", release); canvas.addEventListener("pointercancel", release);
     addEventListener("resize", resize);
     addEventListener("pagehide", () => { urban.pause(); nature.pause(); });
+    addEventListener("keydown", event => {
+      if (["ArrowLeft", "ArrowRight", " "].includes(event.key)) event.preventDefault();
+      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = true;
+      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = true;
+      if (event.key === " " && running && !ending) togglePause();
+    });
+    addEventListener("keyup", event => {
+      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = false;
+      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = false;
+    });
+
+    function togglePause() {
+      paused = !paused; pointer.down = false; pauseVeil.classList.toggle("show", paused);
+      pauseBtn.textContent = paused ? "▶" : "Ⅱ";
+      pauseBtn.setAttribute("aria-label", paused ? "Reprendre" : "Mettre en pause");
+      if (paused) urban.pause(); else if (urbanStarted && !muted) void urban.play();
+      previous = performance.now();
+    }
+    pauseBtn.addEventListener("click", togglePause);
+    soundBtn.addEventListener("click", () => {
+      muted = !muted; urban.muted = muted; nature.muted = muted;
+      soundBtn.textContent = muted ? "×" : "♫";
+      soundBtn.setAttribute("aria-label", muted ? "Activer le son" : "Couper le son");
+    });
 
     document.getElementById("startBtn").addEventListener("click", () => {
       void startUrbanAudio();
       Object.assign(orb, { x: W * .5, y: H * .68, vx: 0 });
-      time = scroll = silence = deepSilence = bloom = collected = 0; speed = 105; trail = []; waves = [];
+      time = scroll = silence = deepSilence = bloom = collected = 0; speed = 105; trail = []; waves = []; paused = false;
       createFireflies(); dots.forEach(dot => dot.classList.remove("on")); ending = false; running = true; previous = performance.now();
       startScreen.classList.add("hide"); hud.classList.add("show");
+      hint.textContent = "GLISSEZ DOUCEMENT POUR REJOINDRE LE FIL"; hint.classList.add("show");
+      setTimeout(() => hint.classList.remove("show"), 4200);
     });
     listenBtn.addEventListener("click", async () => {
       urban.volume = 0; urban.pause(); nature.pause(); nature.currentTime = 0; nature.volume = 1;
