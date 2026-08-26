@@ -52,7 +52,7 @@
     <div id="title">LA VOIE DU SILENCE</div>
     <div id="fireHud" aria-label="Lucioles recueillies"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <div id="controls"><button id="soundBtn" class="iconButton" type="button" aria-label="Couper le son" title="Son">♫</button><button id="pauseBtn" class="iconButton" type="button" aria-label="Mettre en pause" title="Pause">Ⅱ</button></div>
-    <div id="hint">GLISSEZ LIBREMENT POUR REJOINDRE LE CIRCUIT</div>
+    <div id="hint">GLISSEZ LIBREMENT POUR REJOINDRE LA VOIE</div>
     <div id="statusWrap"><div id="status">ÉCOUTE</div><div id="attunement" aria-label="Résonance"><span id="attunementFill"></span></div></div>
   </div>
   <div id="pauseVeil">LAISSER RESPIRER</div>
@@ -60,7 +60,7 @@
     <div class="eyebrow">SILENT</div>
     <h1>La voie du silence</h1>
     <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">Explorez librement le circuit lumineux dans toutes les directions.<br><br>Suivez ses virages et ses boucles pour apaiser le vacarme. Recueillez, sans urgence, les trois lucioles du vivant.</div>
+    <div class="copy">La voie défile et se renouvelle sans fin.<br><br>Explorez ses virages et ses boucles dans toutes les directions pour apaiser le vacarme. Recueillez les trois lucioles du vivant.</div>
     <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
   </main>
   <section id="endScreen" class="screen" aria-labelledby="endTitle">
@@ -101,7 +101,7 @@
     const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
     let W = innerWidth, H = innerHeight, running = false, ending = false, paused = false, muted = false, urbanStarted = false;
-    let time = 0, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, collected = 0, previous = 0;
+    let time = 0, cameraU = 0, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, collected = 0, previous = 0;
     let trail = [], fireflies = [], particles = [], waves = [];
     const pointer = { down: false, x: 0, y: 0, targetX: 0, targetY: 0, t: 0 };
     const keys = { left: false, right: false, up: false, down: false };
@@ -118,30 +118,32 @@
       W = innerWidth; H = innerHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (!running) { const start = circuitPoint(0); orb.x = start.x; orb.y = start.y; }
+      if (!running) { orb.x = W * .5; orb.y = H * .55; }
       createParticles();
     }
-    function circuitPoint(t) {
-      const angle = t * Math.PI * 2, portrait = H > W;
-      const rx = W * (portrait ? .34 : .37), ry = H * (portrait ? .31 : .36);
+    function pathWorld(u) {
       return {
-        x: W * .5 + Math.cos(angle) * rx + Math.sin(angle * 3) * W * .055,
-        y: H * .51 + Math.sin(angle) * ry + Math.cos(angle * 2) * H * .075,
-        width: Math.min(W, H) * (.075 + .014 * Math.sin(angle * 4))
+        x: Math.sin(u * .82) * W * .29 + Math.sin(u * 2.15) * W * .075,
+        y: u * Math.min(W, H) * .54 + Math.cos(u * 1.62) * Math.min(W, H) * .27,
+        width: Math.min(W, H) * (.075 + .014 * Math.sin(u * 2.7))
       };
+    }
+    function circuitPoint(u) {
+      const p = pathWorld(u), camera = pathWorld(cameraU);
+      return { x: W * .5 + p.x - camera.x, y: H * .55 + p.y - camera.y, width: p.width, u };
     }
     function closestCircuitPoint(x, y) {
       let closest = null;
-      for (let i = 0; i < 240; i++) {
-        const p = circuitPoint(i / 240), distance = Math.hypot(p.x - x, p.y - y);
+      for (let i = 0; i <= 300; i++) {
+        const p = circuitPoint(cameraU - 2.6 + i / 300 * 6.8), distance = Math.hypot(p.x - x, p.y - y);
         if (!closest || distance < closest.distance) closest = { ...p, distance };
       }
       return closest;
     }
     function createFireflies() {
-      fireflies = [{ t: .17, phase: 1.2 }, { t: .48, phase: 4.3 }, { t: .78, phase: 7.7 }].map(f => ({ ...f, collected: false }));
+      fireflies = [{ u: 1.25, phase: 1.2 }, { u: 3.05, phase: 4.3 }, { u: 5.05, phase: 7.7 }].map(f => ({ ...f, collected: false }));
     }
-    function fireflyPosition(f) { const p = circuitPoint(f.t); return { x: p.x, y: p.y }; }
+    function fireflyPosition(f) { return circuitPoint(f.u); }
 
     async function startUrbanAudio() {
       urban.volume = 0;
@@ -169,6 +171,7 @@
       for (const firefly of fireflies) {
         if (firefly.collected) continue;
         const p = fireflyPosition(firefly);
+        if (firefly.u < cameraU - 1.35) { firefly.u = cameraU + 3.4; firefly.phase += 1.7; continue; }
         if (Math.hypot(p.x - orb.x, p.y - orb.y) >= 38) continue;
         firefly.collected = true; dots[collected]?.classList.add("on"); collected += 1;
         hint.textContent = collected < 3 ? `LUCIOLE ${collected} SUR 3 — CONTINUEZ D'ÉCOUTER` : "LE VIVANT VOUS A RETROUVÉ";
@@ -187,6 +190,10 @@
     }
     function update(dt) {
       time += dt;
+      const cameraBefore = pathWorld(cameraU); cameraU += dt * (.27 + collected * .025); const cameraAfter = pathWorld(cameraU);
+      const cameraDx = cameraAfter.x - cameraBefore.x, cameraDy = cameraAfter.y - cameraBefore.y;
+      for (const p of trail) { p.x -= cameraDx; p.y -= cameraDy; }
+      for (const wave of waves) { wave.x -= cameraDx; wave.y -= cameraDy; }
       const flow = closestCircuitPoint(orb.x, orb.y), dx = flow.x - orb.x, dy = flow.y - orb.y;
       const distance = clamp(flow.distance / (flow.width * 1.75), 0, 1);
       const targetSilence = 1 - smoothstep(0, flow.width * .82, flow.distance);
@@ -248,30 +255,30 @@
       ctx.restore();
     }
     function getPath() {
-      const points = Array.from({ length: 181 }, (_, i) => circuitPoint(i / 180));
+      const points = Array.from({ length: 241 }, (_, i) => circuitPoint(cameraU - 2.7 + i / 240 * 7.2));
       return points.map((p, i) => {
-        const before = points[(i - 1 + points.length) % points.length], after = points[(i + 1) % points.length];
+        const before = points[Math.max(0, i - 1)], after = points[Math.min(points.length - 1, i + 1)];
         const length = Math.hypot(after.x - before.x, after.y - before.y) || 1;
         return { ...p, nx: -(after.y - before.y) / length, ny: (after.x - before.x) / length };
       });
     }
-    function strokePath(points, pointForPoint = p => p, closed = false) {
+    function strokePath(points, pointForPoint = p => p) {
       ctx.beginPath(); points.forEach((p, i) => { const q = pointForPoint(p); ctx[i ? "lineTo" : "moveTo"](q.x, q.y); });
-      if (closed) ctx.closePath(); ctx.stroke();
+      ctx.stroke();
     }
     function drawFlow() {
       const points = getPath(); ctx.save(); ctx.globalCompositeOperation = "screen";
       for (let layer = 6; layer >= 1; layer--) {
         ctx.strokeStyle = `hsla(${(155 + layer * 23 + time * 3) % 360},100%,70%,${.012 + bloom * .028})`;
         ctx.lineWidth = 10 + layer * 15 + bloom * 10;
-        strokePath(points, p => { const offset = Math.sin(p.x * .014 + time * .28 + layer) * layer * bloom * 1.8; return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; }, true);
+        strokePath(points, p => { const offset = Math.sin(p.x * .014 + time * .28 + layer) * layer * bloom * 1.8; return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; });
       }
-      ctx.strokeStyle = `rgba(235,255,250,${.22 + bloom * .42})`; ctx.lineWidth = .8 + bloom * .7; strokePath(points, undefined, true);
+      ctx.strokeStyle = `rgba(235,255,250,${.22 + bloom * .42})`; ctx.lineWidth = .8 + bloom * .7; strokePath(points);
       const strands = 2 + Math.floor(bloom * 10);
       for (let s = 0; s < strands; s++) {
         const fraction = s / Math.max(1, strands - 1) - .5;
         ctx.strokeStyle = `hsla(${(140 + s * 21 + time * 4) % 360},100%,72%,${bloom * .065})`; ctx.lineWidth = .7;
-        strokePath(points, p => { const offset = fraction * p.width * 1.6 + Math.sin((p.x + p.y) * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8); return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; }, true);
+        strokePath(points, p => { const offset = fraction * p.width * 1.6 + Math.sin((p.x + p.y) * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8); return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; });
       }
       ctx.restore();
     }
@@ -376,7 +383,7 @@
 
     document.getElementById("startBtn").addEventListener("click", () => {
       void startUrbanAudio();
-      const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y, vx: 0, vy: 0 });
+      cameraU = 0; const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y, vx: 0, vy: 0 });
       time = silence = deepSilence = resonance = pulseFlash = bloom = collected = 0; trail = []; waves = []; paused = false;
       createFireflies(); dots.forEach(dot => dot.classList.remove("on")); ending = false; running = true; previous = performance.now();
       startScreen.classList.add("hide"); hud.classList.add("show");
