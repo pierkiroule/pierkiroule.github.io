@@ -33,7 +33,6 @@
     @keyframes breathe { 0%, 100% { transform: scale(.8); opacity: .2; } 50% { transform: scale(1.18); opacity: .85; } }
     #endScreen h2 { margin: 0 0 12px; font-weight: 200; font-size: 29px; }
     #endScreen p { max-width: 290px; margin: 0 0 30px; line-height: 1.7; font-size: 12px; opacity: .5; }
-    .credit { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); font-size: 9px; line-height: 1.6; opacity: .25; }
     @media (prefers-reduced-motion: reduce) { .screen { transition-duration: .01ms; } .ring { animation: none; } }
   </style>
 </head>
@@ -57,14 +56,13 @@
     <h2 id="endTitle">Le vivant est là.</h2>
     <p>Le vacarme peut maintenant disparaître.<br>Il ne reste plus qu'à écouter.</p>
     <button id="listenBtn" type="button">ÉCOUTER LE VIVANT</button>
-    <div class="credit">Fauvette à tête noire · France<br>Marie-Lan Taÿ Pamart · Xeno-canto / Wikimedia Commons</div>
   </section>
   <script>
   (() => {
     "use strict";
 
-    const URBAN_AUDIO = "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/60/Ambient_sound_street_traffic_Berlin_2026-05-17.oga/Ambient_sound_street_traffic_Berlin_2026-05-17.oga.mp3";
-    const NATURE_AUDIO = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Sylvia_atricapilla_-_Eurasian_Blackcap_XC559969.mp3";
+    const URBAN_AUDIO = "./audio/urbain.mp3";
+    const NATURE_AUDIO = "./audio/nature.mp3";
     const urban = new Audio(URBAN_AUDIO);
     const nature = new Audio(NATURE_AUDIO);
     Object.assign(urban, { loop: true, preload: "auto", playsInline: true, volume: 0 });
