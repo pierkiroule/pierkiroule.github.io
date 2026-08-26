@@ -1,83 +1,302 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#071012">
-<title>Silent Bird — La rivière de silence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root{color-scheme:dark;--ink:#071012;--mist:#dcebea;--blue:#8ad8ed;--green:#80c8aa}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--ink);color:var(--mist);font-family:Manrope,sans-serif;touch-action:none}
-button{font:inherit;color:inherit} canvas{display:block;width:100%;height:100%}
-.ui{position:fixed;inset:0;pointer-events:none;transition:opacity 1.2s ease}.top{display:flex;justify-content:space-between;align-items:flex-start;padding:max(22px,env(safe-area-inset-top)) 24px 0}.brand{font-size:11px;letter-spacing:.28em;text-transform:uppercase}.brand i{display:inline-block;width:5px;height:5px;margin:0 10px 2px 0;border-radius:50%;background:#9bddc0;box-shadow:0 0 14px #74d7aa}.chapter{text-align:right}.eyebrow{font:300 9px DM Mono,monospace;letter-spacing:.22em;text-transform:uppercase;color:#93aaa8}.chapter strong{display:block;margin-top:6px;font-weight:300;font-size:14px}.progress{position:absolute;left:24px;right:24px;bottom:max(25px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:15px}.line{height:1px;flex:1;background:#ffffff1f}.line span{display:block;width:0;height:100%;background:#a9e3ce;box-shadow:0 0 8px #91dabd;transition:width .25s}.counter{font:300 10px DM Mono,monospace;color:#adc1bf}.sound-label{position:absolute;left:50%;top:22%;transform:translate(-50%,-8px);font:300 10px DM Mono,monospace;letter-spacing:.24em;text-transform:uppercase;color:#bdefff;opacity:0;transition:.4s;text-shadow:0 0 18px #55c8ed}.sound-label.show{opacity:1;transform:translate(-50%,0)}
-.intro,.result{position:fixed;inset:0;z-index:4;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 65% 25%,#15302d 0,#081311 36%,#050b0c 75%);overflow:auto;touch-action:pan-y}.result{display:none;background:#06100fe8;backdrop-filter:blur(14px)}.card{width:min(520px,100%);padding:42px;border:1px solid #b6e3d51c;background:#071210a8;box-shadow:0 30px 90px #0008;position:relative}.card:before{content:"";position:absolute;inset:12px;border:1px solid #ffffff09;pointer-events:none}.kicker{font:300 9px DM Mono,monospace;letter-spacing:.34em;color:#84caae;text-transform:uppercase}.card h1{margin:20px 0 16px;font-size:clamp(48px,11vw,76px);font-weight:300;line-height:.88;letter-spacing:-.06em}.card h1 em{font-style:normal;color:#9ed8c1}.lead{max-width:390px;margin:0;color:#b8c8c5;font-size:15px;line-height:1.65}.rule{margin:30px 0 22px;padding:18px 0;border-top:1px solid #ffffff17;border-bottom:1px solid #ffffff17;display:grid;grid-template-columns:22px 1fr;gap:12px;color:#d9e7e4;font-size:13px;line-height:1.55}.rule .wave{color:#8bd9ee}.levels{display:flex;gap:7px;margin-bottom:30px}.levels span{height:3px;flex:1;background:#ffffff17}.levels span:first-child{background:#92d7bc}.start,.next{pointer-events:auto;border:1px solid #a6dfc747;background:#173c32;padding:14px 22px;border-radius:99px;font:400 10px DM Mono,monospace;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:.25s}.start:hover,.next:hover{background:#235344;transform:translateY(-2px)}.instruction{position:fixed;z-index:3;left:50%;bottom:72px;transform:translateX(-50%);width:max-content;max-width:90%;font:300 9px DM Mono,monospace;letter-spacing:.18em;text-align:center;color:#aec3bf;text-transform:uppercase;transition:opacity .8s;pointer-events:none}.result .card{text-align:center}.result h2{font-weight:300;font-size:42px;margin:17px 0 12px}.result p{color:#a9bdb9;font-size:14px;line-height:1.6}.found{margin:25px 0;color:#a8e9d0;font:300 11px DM Mono,monospace}.final-copy{display:none}.final .standard-copy{display:none}.final .final-copy{display:block}.final .next{display:none}
-@media(max-width:600px){.card{padding:32px 25px}.top{padding-left:18px;padding-right:18px}.progress{left:18px;right:18px}.instruction{bottom:62px}.chapter strong{font-size:12px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <title>La voie du silence</title>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #02040b; touch-action: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+    .screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: white; text-align: center; background: radial-gradient(circle at 50% 40%, rgba(30,255,190,.12), transparent 28%), radial-gradient(circle at 70% 65%, rgba(100,80,255,.12), transparent 35%), #02040b; transition: opacity .9s ease, visibility .9s ease; }
+    .screen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+    .eyebrow { margin-bottom: 20px; font-size: 9px; letter-spacing: .5em; opacity: .38; }
+    h1 { margin: 0; font-size: min(12vw, 58px); font-weight: 100; letter-spacing: -.045em; }
+    .subtitle { margin-top: 12px; font-size: 9px; letter-spacing: .34em; opacity: .42; }
+    .copy { max-width: 310px; margin: 38px 0; font-size: 13px; line-height: 1.8; font-weight: 300; opacity: .58; }
+    button { appearance: none; border: 1px solid rgba(180,255,225,.3); border-radius: 999px; padding: 16px 30px; background: rgba(100,255,210,.055); color: white; font-size: 9px; letter-spacing: .28em; cursor: pointer; }
+    button:focus-visible { outline: 2px solid #caff91; outline-offset: 4px; }
+    #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0; transition: opacity .5s; }
+    #hud.show { opacity: 1; }
+    #title { position: absolute; top: max(18px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: .42em; color: white; opacity: .28; white-space: nowrap; }
+    #fireHud { position: absolute; top: max(43px, calc(env(safe-area-inset-top) + 27px)); left: 50%; transform: translateX(-50%); display: flex; gap: 13px; }
+    .dot { width: 6px; height: 6px; border: 1px solid rgba(150,255,170,.3); border-radius: 50%; }
+    .dot.on { background: #caff91; box-shadow: 0 0 8px #aaff7a, 0 0 22px rgba(80,255,130,.8); }
+    #status { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: .3em; color: white; opacity: .35; white-space: nowrap; }
+    #endScreen { opacity: 0; visibility: hidden; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(80,255,160,.2), transparent 28%), radial-gradient(circle at 50% 65%, rgba(30,180,255,.13), transparent 40%), #010806; }
+    #endScreen.show { opacity: 1; visibility: visible; pointer-events: auto; }
+    #natureOrb { width: 160px; height: 160px; position: relative; margin-bottom: 34px; }
+    .ring { position: absolute; inset: 0; border: 1px solid rgba(150,255,190,.22); border-radius: 50%; animation: breathe 5s ease-in-out infinite; }
+    .ring:nth-child(2) { inset: 22px; animation-delay: -1.7s; }
+    .ring:nth-child(3) { inset: 43px; animation-delay: -3.4s; }
+    .natureCore { position: absolute; inset: 59px; border-radius: 50%; background: #efffdc; box-shadow: 0 0 22px rgba(160,255,120,.9), 0 0 65px rgba(40,255,150,.55); }
+    @keyframes breathe { 0%, 100% { transform: scale(.8); opacity: .2; } 50% { transform: scale(1.18); opacity: .85; } }
+    #endScreen h2 { margin: 0 0 12px; font-weight: 200; font-size: 29px; }
+    #endScreen p { max-width: 290px; margin: 0 0 30px; line-height: 1.7; font-size: 12px; opacity: .5; }
+    .credit { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); font-size: 9px; line-height: 1.6; opacity: .25; }
+    @media (prefers-reduced-motion: reduce) { .screen { transition-duration: .01ms; } .ring { animation: none; } }
+  </style>
 </head>
 <body>
-<canvas id="game" aria-label="Silent Bird, jeu de navigation sonore"></canvas>
-<div class="ui" id="ui">
-  <div class="top"><div class="brand"><i></i>Silent Bird</div><div class="chapter"><div class="eyebrow" id="step">Niveau 1 · chercher le silence</div><strong id="destination">Le square</strong></div></div>
-  <div class="sound-label" id="soundLabel">Le vivant résonne</div>
-  <div class="progress"><div class="counter" id="mix">VILLE 80 · 20 VIVANT</div><div class="line"><span id="progressFill"></span></div><div class="counter" id="waveCount">0 ONDE</div></div>
-</div>
-<div class="instruction" id="instruction">Guide l’oiseau avec le doigt · écoute quand le chemin s’efface</div>
-<section class="intro" id="intro">
- <div class="card">
-  <div class="kicker">Un paysage sonore à retrouver</div>
-  <h1>Silent<br><em>Bird</em></h1>
-  <p class="lead">Perdu dans le vacarme urbain, l’oiseau du silence cherche les passages calmes cachés dans la ville.</p>
-  <div class="rule"><span class="wave">◌</span><span>Dans la rivière, le vacarme s’atténue. Traverse les <b>Ondes du Vivant</b> pour faire résonner oiseaux, feuilles, eau et vent.</span></div>
-  <div class="levels" aria-label="Trois niveaux"><span></span><span></span><span></span></div>
-  <button class="start" id="start">Toucher pour écouter</button>
- </div>
-</section>
-<section class="result" id="result">
- <div class="card">
-  <div class="standard-copy"><div class="kicker">Passage retrouvé</div><h2 id="resultTitle">Le square</h2><p>Le vivant demeure un instant dans le silence que tu as traversé.</p></div>
-  <div class="final-copy"><div class="kicker">La forêt retrouvée</div><h2>Écoute.</h2><p>Plus de chemin. Plus de collectables.<br>Seulement l’oiseau et le paysage vivant.</p></div>
-  <div class="found" id="found">3 ondes du vivant éveillées</div>
-  <button class="next" id="next">Continuer vers le parc</button>
- </div>
-</section>
-<script>
-(()=>{"use strict";
-const $=id=>document.getElementById(id), canvas=$("game"),ctx=canvas.getContext("2d"),ui=$("ui"),intro=$("intro"),result=$("result");
-let W=innerWidth,H=innerHeight,D=1,last=0,running=false,level=0,t=0,world=0,progress=0,pointer=false,ambient=0,collected=0,finalFlight=0;
-const chapters=[
- {name:"Le square",mode:"chercher le silence",duration:34,speed:76,width:.16,hide:1.1,city:.82},
- {name:"Le parc",mode:"écouter le vivant",duration:40,speed:88,width:.12,hide:2.1,city:.9},
- {name:"La forêt",mode:"retrouver la forêt",duration:46,speed:98,width:.095,hide:4.2,city:.78}
-];
-const bird={x:100,y:300,vy:0,target:300}, waves=[],trails=[],rings=[],dust=[]; let nextWave=4,audio=null,noiseGain=null,natureGain=null;
-function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);canvas.width=W*D;canvas.height=H*D;ctx.setTransform(D,0,0,D,0,0);bird.x=W*.24;if(!running)bird.y=bird.target=H*.5} addEventListener("resize",resize);resize();
-function pathAt(x){let u=(world+x)/Math.max(W,500), split=level>0&&Math.sin(u*.58+1.7)>.78;let y=H*(.5+Math.sin(u*1.7)*.16+Math.sin(u*4.9+1)*.055);let breathe=.72+.3*Math.sin(u*.76+2)+.18*Math.sin(u*2.3);let w=Math.max(34,H*chapters[level].width*breathe);return{y,w,split};}
-function silence(){let p=pathAt(bird.x),d=Math.abs(bird.y-p.y),q=Math.max(0,1-d/p.w);if(p.split)q=Math.max(q,Math.max(0,1-Math.abs(bird.y-(p.y-p.w*.82))/(p.w*.55)));return q}
-function initAudio(){if(audio)return;audio=new(window.AudioContext||window.webkitAudioContext)();natureGain=audio.createGain();natureGain.gain.value=.22;natureGain.connect(audio.destination);let buffer=audio.createBuffer(1,audio.sampleRate*2,audio.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1);let src=audio.createBufferSource();src.buffer=buffer;src.loop=true;let filter=audio.createBiquadFilter();filter.type="bandpass";filter.frequency.value=620;filter.Q.value=.45;noiseGain=audio.createGain();noiseGain.gain.value=.1;src.connect(filter).connect(noiseGain).connect(audio.destination);src.start()}
-function ping(type){if(!audio)return;let now=audio.currentTime,g=natureGain;function tone(freq,at,dur,vol,shape="sine"){let o=audio.createOscillator(),v=audio.createGain();o.type=shape;o.frequency.setValueAtTime(freq,now+at);o.frequency.exponentialRampToValueAtTime(freq*1.35,now+at+dur);v.gain.setValueAtTime(.001,now+at);v.gain.exponentialRampToValueAtTime(vol,now+at+.025);v.gain.exponentialRampToValueAtTime(.001,now+at+dur);o.connect(v).connect(g);o.start(now+at);o.stop(now+at+dur+.05)}
- if(type===0){tone(1250,0,.24,.12);tone(1760,.18,.28,.1);tone(1480,.43,.2,.07)}else if(type===1){for(let i=0;i<7;i++)tone(280+Math.random()*240,i*.09,.18,.025,"triangle")}else if(type===2){tone(420,0,.8,.07);tone(620,.12,.65,.04)}else if(type===3){tone(190,.0,1.5,.045,"sine");tone(255,.3,1.1,.025)}else{tone(115,.0,.25,.08);tone(98,.32,.3,.07)} }
-function visibility(){if(finalFlight)return 0;let c=chapters[level],cycle=7.8-level*.5,phase=t%cycle,start=cycle-c.hide;return phase<start?1:Math.max(0,1-(phase-start)*3)}
-function startLevel(){initAudio();audio.resume();t=world=progress=ambient=collected=finalFlight=0;waves.length=trails.length=rings.length=dust.length=0;nextWave=3.6;bird.y=bird.target=H*.5;bird.vy=0;running=true;result.style.display="none";ui.style.opacity=1;$("instruction").style.opacity=1;$("step").textContent=`Niveau ${level+1} · ${chapters[level].mode}`;$("destination").textContent=chapters[level].name;$("waveCount").textContent="0 ONDE";requestAnimationFrame(()=>intro.style.display="none")}
-function spawnWave(){let p=pathAt(W+80),types=["CHANT D’OISEAU","FEUILLES","EAU","VENT","GRENOUILLE","INSECTES"];waves.push({x:W+60,y:p.y+(Math.random()-.5)*p.w*.8,r:10,life:1,type:Math.floor(Math.random()*types.length),label:types});nextWave+=5.3+Math.random()*2.5}
-function update(dt){t+=dt;let c=chapters[level];world+=c.speed*dt;progress=Math.min(1,t/c.duration);if(pointer){bird.vy+=(bird.target-bird.y)*12*dt;bird.vy*=Math.pow(.84,dt*60)}else{bird.vy+=Math.sin(t*1.8)*2}bird.vy=Math.max(-310,Math.min(310,bird.vy));bird.y+=bird.vy*dt;bird.y=Math.max(35,Math.min(H-35,bird.y));let q=silence();ambient+=(q-ambient)*dt*2.5;if(noiseGain)noiseGain.gain.setTargetAtTime(.025+(1-q)*(.22+level*.05),audio.currentTime,.12);
- if(t>nextWave)spawnWave();for(let i=waves.length-1;i>=0;i--){let w=waves[i];w.x-=c.speed*dt;w.life+=dt;if((w.x-bird.x)**2+(w.y-bird.y)**2<32**2){collected++;ping(w.type%5);$("soundLabel").textContent=w.label[w.type];$("soundLabel").classList.add("show");setTimeout(()=>$("soundLabel").classList.remove("show"),1400);rings.push({x:w.x,y:w.y,r:8,a:1});for(let j=0;j<18;j++)dust.push({x:w.x,y:w.y,vx:-20-Math.random()*65,vy:(Math.random()-.5)*55,a:1});waves.splice(i,1);$("waveCount").textContent=collected+" ONDE"+(collected>1?"S":"")}else if(w.x< -30)waves.splice(i,1)}
- trails.unshift({x:bird.x-10,y:bird.y,a:.38+q*.3});if(trails.length>38)trails.pop();for(let p of trails)p.x-=c.speed*dt;for(let r of rings){r.r+=dt*60;r.a-=dt*.7}for(let d of dust){d.x+=d.vx*dt;d.y+=d.vy*dt;d.a-=dt*.45}rings.splice(0,rings.length,...rings.filter(r=>r.a>0));dust.splice(0,dust.length,...dust.filter(d=>d.a>0));
- let living=level===2?20+progress*60:20+Math.min(35,collected*7);$("mix").textContent=`VILLE ${Math.round(100-living)} · ${Math.round(living)} VIVANT`;$("progressFill").style.width=progress*100+"%";if(t>5)$("instruction").style.opacity=0;
- if(progress>=1){if(level===2){finalFlight+=dt;ui.style.opacity=0;waves.length=0;if(noiseGain)noiseGain.gain.setTargetAtTime(0,audio.currentTime,.6);if(finalFlight>6)finish()}else finish()}}
-function finish(){running=false;result.classList.toggle("final",level===2);$("resultTitle").textContent=chapters[level].name;$("found").textContent=collected+" onde"+(collected>1?"s":"")+" du vivant éveillée"+(collected>1?"s":"");$("next").textContent=level===0?"Continuer vers le parc":"Continuer vers la forêt";result.style.display="grid"}
-function drawPath(alpha){if(alpha<=.01)return;ctx.save();ctx.globalAlpha=alpha;ctx.beginPath();for(let x=0;x<=W+12;x+=9){let p=pathAt(x);x?ctx.lineTo(x,p.y-p.w):ctx.moveTo(x,p.y-p.w)}for(let x=W;x>=0;x-=9){let p=pathAt(x);ctx.lineTo(x,p.y+p.w)}ctx.closePath();let g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,"#4c9c8120");g.addColorStop(.55,"#6fc7a92b");g.addColorStop(1,"#93ddc020");ctx.fillStyle=g;ctx.fill();ctx.beginPath();for(let x=0;x<=W;x+=7){let p=pathAt(x),y=p.y+Math.sin((world+x)*.06)*2;x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.strokeStyle="#b5e8d3a8";ctx.lineWidth=1;ctx.shadowBlur=10;ctx.shadowColor="#72d6ae";ctx.stroke();ctx.restore()}
-function drawBird(q){ctx.save();let shake=(1-q)*Math.sin(t*46)*2;ctx.translate(bird.x,bird.y+shake);ctx.rotate(Math.max(-.35,Math.min(.35,bird.vy/500)));let flap=Math.sin(t*(q>.5?7:12));ctx.strokeStyle=`rgba(171,235,212,${.45+q*.45})`;ctx.lineWidth=2;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(-5,1);ctx.quadraticCurveTo(-18,-14-flap*11,-31,-17-flap*9);ctx.stroke();ctx.beginPath();ctx.moveTo(-4,2);ctx.quadraticCurveTo(-18,15+flap*9,-28,18+flap*7);ctx.stroke();ctx.fillStyle="#eaf6f2";ctx.beginPath();ctx.ellipse(4,1,15,6,0,0,Math.PI*2);ctx.fill();ctx.fillStyle="#8fd3b8";ctx.beginPath();ctx.moveTo(17,-1);ctx.lineTo(25,2);ctx.lineTo(17,4);ctx.fill();ctx.restore()}
-function draw(){let c=chapters[level],nature=level===2?progress:ambient*.5;let bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,`rgb(${7+nature*4},${15+nature*15},${17+nature*10})`);bg.addColorStop(1,`rgb(${5+ nature*4},${13+nature*22},${14+nature*14})`);ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);for(let layer=0;layer<3;layer++){ctx.fillStyle=`rgba(6,11,13,${.35+layer*.17-nature*.25})`;let base=H*(.68+layer*.09);for(let i=-1;i<W/55+2;i++){let x=i*65-(world*(.08+layer*.08)%65),h=60+((i*37+layer*53)%100);ctx.fillRect(x,base-h,58,h)}}
- if(level===2){ctx.fillStyle=`rgba(38,91,65,${progress*.34})`;for(let i=0;i<16;i++){let x=(i*97-world*.22)% (W+100);ctx.beginPath();ctx.arc(x,H-(i%4)*28,45+(i%3)*22,0,Math.PI*2);ctx.fill()}}
- drawPath(visibility());ctx.save();ctx.globalCompositeOperation="lighter";for(let w of waves){let pulse=w.r+Math.sin(w.life*3)*3;ctx.strokeStyle="#91e3f0cc";ctx.lineWidth=1.3;for(let a=0;a<3;a++){ctx.beginPath();ctx.arc(w.x,w.y,pulse+a*7,-2.45,2.45);ctx.stroke()}}for(let r of rings){ctx.strokeStyle=`rgba(122,221,240,${r.a})`;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke()}for(let d of dust){ctx.fillStyle=`rgba(143,226,239,${d.a})`;ctx.fillRect(d.x,d.y,2,2)}ctx.restore();for(let i=1;i<trails.length;i++){ctx.strokeStyle=`rgba(127,215,181,${trails[i].a*(1-i/trails.length)})`;ctx.beginPath();ctx.moveTo(trails[i-1].x,trails[i-1].y);ctx.lineTo(trails[i].x,trails[i].y);ctx.stroke()}drawBird(silence());let vig=ctx.createRadialGradient(W*.45,H*.5,50,W*.45,H*.5,Math.max(W,H)*.75);vig.addColorStop(0,"transparent");vig.addColorStop(1,"rgba(0,0,0,.48)");ctx.fillStyle=vig;ctx.fillRect(0,0,W,H)}
-function frame(now){requestAnimationFrame(frame);let dt=Math.min(.035,(now-(last||now))/1000);last=now;if(running)update(dt);draw()}requestAnimationFrame(frame);
-function point(e){let p=e.touches?e.touches[0]:e;bird.target=p.clientY;pointer=true;if(e.cancelable)e.preventDefault()}canvas.addEventListener("pointerdown",point);canvas.addEventListener("pointermove",e=>{if(pointer)point(e)});addEventListener("pointerup",()=>pointer=false);canvas.addEventListener("touchstart",point,{passive:false});canvas.addEventListener("touchmove",point,{passive:false});
-$("start").onclick=startLevel;$("next").onclick=()=>{level++;startLevel()};
-})();
-</script>
-</body></html>
+  <canvas id="game" aria-label="La voie du silence"></canvas>
+  <div id="hud" aria-live="polite">
+    <div id="title">LA VOIE DU SILENCE</div>
+    <div id="fireHud" aria-label="Lucioles recueillies"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div id="status">ÉCOUTE</div>
+  </div>
+  <main id="startScreen" class="screen">
+    <div class="eyebrow">SILENT</div>
+    <h1>La voie du silence</h1>
+    <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
+    <div class="copy">Glissez pour guider le cercle.<br><br>Éloignez-vous du vacarme.<br>Trouvez la ligne du silence.<br><br>Recueillez les trois lucioles du vivant.</div>
+    <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
+  </main>
+  <section id="endScreen" class="screen" aria-labelledby="endTitle">
+    <div id="natureOrb" aria-hidden="true"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="natureCore"></div></div>
+    <div class="eyebrow">3 LUCIOLES RETROUVÉES</div>
+    <h2 id="endTitle">Le vivant est là.</h2>
+    <p>Le vacarme peut maintenant disparaître.<br>Il ne reste plus qu'à écouter.</p>
+    <button id="listenBtn" type="button">ÉCOUTER LE VIVANT</button>
+    <div class="credit">Fauvette à tête noire · France<br>Marie-Lan Taÿ Pamart · Xeno-canto / Wikimedia Commons</div>
+  </section>
+  <script>
+  (() => {
+    "use strict";
+
+    const URBAN_AUDIO = "https://upload.wikimedia.org/wikipedia/commons/transcoded/6/60/Ambient_sound_street_traffic_Berlin_2026-05-17.oga/Ambient_sound_street_traffic_Berlin_2026-05-17.oga.mp3";
+    const NATURE_AUDIO = "https://upload.wikimedia.org/wikipedia/commons/2/2f/Sylvia_atricapilla_-_Eurasian_Blackcap_XC559969.mp3";
+    const urban = new Audio(URBAN_AUDIO);
+    const nature = new Audio(NATURE_AUDIO);
+    Object.assign(urban, { loop: true, preload: "auto", playsInline: true, volume: 0 });
+    Object.assign(nature, { loop: false, preload: "auto", playsInline: true, volume: 1 });
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const hud = document.getElementById("hud");
+    const status = document.getElementById("status");
+    const startScreen = document.getElementById("startScreen");
+    const endScreen = document.getElementById("endScreen");
+    const listenBtn = document.getElementById("listenBtn");
+    const dots = [...document.querySelectorAll(".dot")];
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const lerp = (a, b, amount) => a + (b - a) * amount;
+    const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+
+    let W = innerWidth, H = innerHeight, running = false, ending = false, urbanStarted = false;
+    let time = 0, scroll = 0, speed = 105, silence = 0, deepSilence = 0, bloom = 0, collected = 0, previous = 0;
+    let trail = [], fireflies = [], particles = [], waves = [];
+    const pointer = { down: false, x: 0, t: 0 };
+    const orb = { x: W * .5, y: H * .68, vx: 0, radius: 12 };
+
+    function createParticles() {
+      particles = Array.from({ length: Math.min(170, Math.floor(W * H / 4500)) }, () => ({
+        x: Math.random() * W, y: Math.random() * H, depth: .15 + Math.random() * .85,
+        size: .3 + Math.random() * 1.3, phase: Math.random() * 20, hue: Math.random()
+      }));
+    }
+    function resize() {
+      const dpr = Math.min(devicePixelRatio || 1, 2);
+      W = innerWidth; H = innerHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      orb.y = H * .68; if (!running) orb.x = W * .5;
+      createParticles();
+    }
+    function difficulty() { return clamp(clamp(time / 75, 0, 1) * .55 + collected / 3 * .45, 0, 1); }
+    function flowAt(worldY) {
+      const d = difficulty();
+      const w1 = Math.sin(worldY * .00105), w2 = Math.sin(worldY * lerp(.0019, .0032, d) + 1.8);
+      const w3 = Math.sin(worldY * .0058 + 4), drift = Math.sin(worldY * .00037 + 1);
+      const organic = Math.sin(worldY * .009 + Math.sin(worldY * .0014) * 2.2);
+      const x = W * .5 + w1 * W * lerp(.07, .12, d) + w2 * W * lerp(.07, .16, d) + w3 * W * (.012 + d * .04) + drift * W * .05 + organic * W * d * d * .022;
+      const breath = Math.sin(worldY * .0025 + 2) * .5 + .5, slow = Math.sin(worldY * .0008) * .5 + .5;
+      return { x, width: lerp(105, 62, d) + breath * lerp(28, 17, d) + slow * 8 };
+    }
+    function createFireflies() {
+      fireflies = [{ worldY: 1350, phase: 1.2 }, { worldY: 3550, phase: 4.3 }, { worldY: 6200, phase: 7.7 }].map(f => ({ ...f, collected: false }));
+    }
+    function fireflyPosition(f) { const flow = flowAt(f.worldY); return { x: flow.x + Math.sin(f.phase) * flow.width * .18, y: f.worldY - scroll }; }
+
+    async function startUrbanAudio() {
+      urban.volume = 0;
+      try { await urban.play(); urbanStarted = true; }
+      catch (error) { urbanStarted = false; console.warn("Le jeu démarre sans l'ambiance urbaine.", error); }
+    }
+    function updateAudio(distance) {
+      if (!urbanStarted || ending) return;
+      const x = distance > .08 ? clamp((distance - .08) / .92, 0, 1) : 0;
+      const target = clamp(x * x * .88, 0, .88);
+      urban.volume += (target - urban.volume) * .09;
+      if (distance <= .08 && urban.volume < .012) urban.volume = 0;
+    }
+
+    function beginEnding() {
+      if (ending) return;
+      ending = true; pointer.down = false; status.textContent = "LE VIVANT EST RETROUVÉ";
+      const fade = setInterval(() => {
+        urban.volume = Math.max(0, urban.volume - .04);
+        if (urban.volume === 0) { clearInterval(fade); urban.pause(); }
+      }, 40);
+      setTimeout(() => { running = false; hud.classList.remove("show"); endScreen.classList.add("show"); }, 1600);
+    }
+    function checkFireflies() {
+      for (const firefly of fireflies) {
+        if (firefly.collected) continue;
+        const p = fireflyPosition(firefly);
+        if (p.y < -60 || p.y > H + 60 || Math.hypot(p.x - orb.x, p.y - orb.y) >= 34) continue;
+        firefly.collected = true; dots[collected]?.classList.add("on"); collected += 1;
+        for (let i = 0; i < 4; i++) waves.push({ x: orb.x, y: orb.y, r: 10 + i * 7, life: 1 - i * .12, hue: 100 + i * 20 });
+        if (collected === 3) beginEnding();
+      }
+    }
+    function updateHUD() {
+      if (deepSilence > .75) { status.textContent = "SILENCE"; status.style.opacity = ".18"; }
+      else if (silence > .72) { status.textContent = "SUR LA VOIE"; status.style.opacity = ".3"; }
+      else if (silence > .35) { status.textContent = "ÉCOUTE"; status.style.opacity = ".35"; }
+      else { status.textContent = "RETROUVE LA VOIE"; status.style.opacity = ".45"; }
+    }
+    function update(dt) {
+      time += dt;
+      const flow = flowAt(scroll + orb.y), dx = flow.x - orb.x, distance = clamp(Math.abs(dx) / (flow.width * 1.75), 0, 1);
+      const targetSilence = 1 - smoothstep(0, flow.width * .78, Math.abs(dx));
+      silence += (targetSilence - silence) * (1 - Math.exp(-7 * dt));
+      deepSilence = clamp(deepSilence + (Math.abs(dx) < flow.width * .16 ? dt * .25 : -dt * .12), 0, 1);
+      const targetBloom = clamp(deepSilence * .72 + collected * .12, 0, 1);
+      bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
+      orb.vx += dx * silence * .38 * dt;
+      orb.vx *= Math.exp(-(pointer.down ? 1.2 : 1.9) * dt); orb.x += orb.vx * dt;
+      if (orb.x < 25) { orb.x = 25; orb.vx = Math.abs(orb.vx) * .25; }
+      if (orb.x > W - 25) { orb.x = W - 25; orb.vx = -Math.abs(orb.vx) * .25; }
+      const targetSpeed = 100 + difficulty() * 34 + silence * 16;
+      speed += (targetSpeed - speed) * (1 - Math.exp(-1.5 * dt)); scroll += speed * dt;
+      trail.push({ x: orb.x, y: orb.y }); if (trail.length > 100) trail.shift();
+      for (const p of trail) p.y += speed * dt * .07;
+      for (const wave of waves) { wave.r += 105 * dt; wave.life -= .6 * dt; }
+      waves = waves.filter(wave => wave.life > 0);
+      checkFireflies(); updateAudio(distance); updateHUD();
+    }
+
+    function drawBackground() {
+      const g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, `hsl(${228 + bloom * 48},${45 + bloom * 35}%,${5 + bloom * 7}%)`);
+      g.addColorStop(.48, `hsl(${250 - bloom * 80},${45 + bloom * 38}%,${4 + bloom * 8}%)`);
+      g.addColorStop(1, `hsl(${285 - bloom * 120},${42 + bloom * 38}%,${4 + bloom * 7}%)`);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      if (collected || bloom > .05) {
+        const life = collected / 3, rg = ctx.createRadialGradient(W * .5, H * .55, 0, W * .5, H * .55, W * .7);
+        rg.addColorStop(0, `rgba(30,255,150,${bloom * .08 + life * .06})`); rg.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+      }
+    }
+    function drawParticles() {
+      ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (const p of particles) {
+        const y = ((p.y + scroll * p.depth * .08) % H + H) % H;
+        ctx.fillStyle = `hsla(${145 + p.hue * 150},100%,76%,${.01 + bloom * p.depth * .19})`;
+        ctx.beginPath(); ctx.arc(p.x + Math.sin(time * .25 + p.phase) * 4 * bloom, y, p.size * (.6 + bloom), 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function getPath() {
+      const points = []; for (let y = -40; y <= H + 40; y += 5) points.push({ ...flowAt(scroll + y), y }); return points;
+    }
+    function strokePath(points, xForPoint) {
+      ctx.beginPath(); points.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](xForPoint(p), p.y)); ctx.stroke();
+    }
+    function drawFlow() {
+      const points = getPath(); ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (let layer = 6; layer >= 1; layer--) {
+        ctx.strokeStyle = `hsla(${(155 + layer * 23 + time * 3) % 360},100%,70%,${.012 + bloom * .028})`;
+        ctx.lineWidth = 10 + layer * 15 + bloom * 10;
+        strokePath(points, p => p.x + Math.sin(p.y * .014 + time * .28 + layer) * layer * bloom * 1.8);
+      }
+      ctx.strokeStyle = `rgba(235,255,250,${.22 + bloom * .42})`; ctx.lineWidth = .8 + bloom * .7; strokePath(points, p => p.x);
+      const strands = 2 + Math.floor(bloom * 10);
+      for (let s = 0; s < strands; s++) {
+        const fraction = s / Math.max(1, strands - 1) - .5;
+        ctx.strokeStyle = `hsla(${(140 + s * 21 + time * 4) % 360},100%,72%,${bloom * .065})`; ctx.lineWidth = .7;
+        strokePath(points, p => p.x + fraction * p.width * 1.6 + Math.sin(p.y * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8));
+      }
+      ctx.restore();
+    }
+    function drawFireflies() {
+      ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (const firefly of fireflies) {
+        if (firefly.collected) continue; const p = fireflyPosition(firefly); if (p.y < -50 || p.y > H + 50) continue;
+        const radius = 18 + (.5 + .5 * Math.sin(time * 4 + firefly.phase)) * 8;
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
+        glow.addColorStop(0, "rgba(245,255,180,1)"); glow.addColorStop(.14, "rgba(160,255,90,.95)"); glow.addColorStop(.5, "rgba(40,255,120,.24)"); glow.addColorStop(1, "rgba(0,255,120,0)");
+        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(p.x, p.y, radius, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#f5ffd2"; ctx.beginPath(); ctx.arc(p.x, p.y, 2.4, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    function drawTrail() {
+      if (trail.length < 2) return; ctx.save(); ctx.globalCompositeOperation = "screen";
+      ctx.strokeStyle = `rgba(130,255,220,${.025 + bloom * .13})`; ctx.lineWidth = .7 + bloom; strokePath(trail, p => p.x); ctx.restore();
+    }
+    function drawFireflyTrain() {
+      if (!collected) return; ctx.save(); ctx.globalCompositeOperation = "screen"; let previousPoint = { x: orb.x, y: orb.y };
+      for (let i = 0; i < collected; i++) {
+        const p = trail[Math.max(0, trail.length - 1 - (18 + i * 19))]; if (!p) continue;
+        const x = p.x, y = p.y + 7 + Math.sin(time * 3 + i) * 2;
+        ctx.strokeStyle = `rgba(120,255,160,${.16 + bloom * .13})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(previousPoint.x, previousPoint.y); ctx.quadraticCurveTo((previousPoint.x + x) * .5, (previousPoint.y + y) * .5 + 4, x, y); ctx.stroke();
+        const radius = 12 + (.5 + .5 * Math.sin(time * 3.5 + i * 2)) * 5;
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, radius); glow.addColorStop(0, "#f5ffbe"); glow.addColorStop(.2, "rgba(150,255,100,.9)"); glow.addColorStop(1, "rgba(40,255,120,0)");
+        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); previousPoint = { x, y };
+      }
+      ctx.restore();
+    }
+    function drawWaves() {
+      ctx.save(); ctx.globalCompositeOperation = "screen";
+      for (const wave of waves) { ctx.strokeStyle = `hsla(${wave.hue},100%,75%,${wave.life * .32})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.r, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.restore();
+    }
+    function drawOrb() {
+      ctx.save(); ctx.translate(orb.x, orb.y); ctx.globalCompositeOperation = "screen";
+      const auraR = 32 + bloom * 62, aura = ctx.createRadialGradient(0, 0, 0, 0, 0, auraR);
+      aura.addColorStop(0, `rgba(230,255,250,${.16 + bloom * .18})`); aura.addColorStop(.25, `rgba(70,255,210,${.08 + bloom * .11})`); aura.addColorStop(.65, `rgba(110,80,255,${bloom * .09})`); aura.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = aura; ctx.beginPath(); ctx.arc(0, 0, auraR, 0, Math.PI * 2); ctx.fill();
+      for (let i = 4; i >= 1; i--) { ctx.strokeStyle = `hsla(${(155 + i * 28 + time * 5) % 360},100%,82%,${.07 + bloom * .1})`; ctx.lineWidth = .7; ctx.beginPath(); ctx.arc(0, 0, orb.radius + i * 3 + Math.sin(time * (.8 + i * .12)) * (1 + bloom * 2), 0, Math.PI * 2); ctx.stroke(); }
+      const core = ctx.createRadialGradient(-3, -4, 0, 0, 0, orb.radius); core.addColorStop(0, "#fff"); core.addColorStop(.28, "rgba(215,255,245,.98)"); core.addColorStop(.72, "rgba(60,245,205,.55)"); core.addColorStop(1, "rgba(70,100,255,.12)");
+      ctx.fillStyle = core; ctx.beginPath(); ctx.arc(0, 0, orb.radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    function drawVignette() {
+      const g = ctx.createRadialGradient(W * .5, H * .55, W * .12, W * .5, H * .55, Math.max(W, H) * .72);
+      g.addColorStop(.35, "rgba(0,0,0,0)"); g.addColorStop(1, `rgba(0,0,8,${.48 - bloom * .18})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawFireflies(); drawFireflyTrain(); drawWaves(); drawOrb(); drawVignette(); }
+    function frame(timestamp) {
+      if (!previous) previous = timestamp; const dt = Math.min((timestamp - previous) / 1000, .033); previous = timestamp;
+      if (running) { if (!ending) update(dt); render(); } requestAnimationFrame(frame);
+    }
+
+    canvas.addEventListener("pointerdown", event => { if (!running || ending) return; event.preventDefault(); pointer.down = true; pointer.x = event.clientX; pointer.t = performance.now(); }, { passive: false });
+    canvas.addEventListener("pointermove", event => {
+      if (!pointer.down || !running || ending) return; event.preventDefault();
+      const now = performance.now(), velocity = (event.clientX - pointer.x) / Math.max(8, now - pointer.t) * 1000;
+      orb.vx = clamp(orb.vx + velocity * .038, -390, 390); pointer.x = event.clientX; pointer.t = now;
+    }, { passive: false });
+    const release = () => { pointer.down = false; };
+    canvas.addEventListener("pointerup", release); canvas.addEventListener("pointercancel", release);
+    addEventListener("resize", resize);
+    addEventListener("pagehide", () => { urban.pause(); nature.pause(); });
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      void startUrbanAudio();
+      Object.assign(orb, { x: W * .5, y: H * .68, vx: 0 });
+      time = scroll = silence = deepSilence = bloom = collected = 0; speed = 105; trail = []; waves = [];
+      createFireflies(); dots.forEach(dot => dot.classList.remove("on")); ending = false; running = true; previous = performance.now();
+      startScreen.classList.add("hide"); hud.classList.add("show");
+    });
+    listenBtn.addEventListener("click", async () => {
+      urban.volume = 0; urban.pause(); nature.pause(); nature.currentTime = 0; nature.volume = 1;
+      try { await nature.play(); listenBtn.textContent = "LE VIVANT JOUE"; }
+      catch (error) { console.warn("Le chant de l'oiseau n'a pas pu démarrer.", error); listenBtn.textContent = "TOUCHER POUR RÉESSAYER"; }
+    });
+
+    resize(); createFireflies(); render(); requestAnimationFrame(frame);
+  })();
+  </script>
+</body>
+</html>
