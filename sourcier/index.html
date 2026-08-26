@@ -3,297 +3,251 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <title>La voie du silence</title>
+  <title>SILENT — La voie du silence</title>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #02040b; touch-action: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #02050e; touch-action: none; user-select: none; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
     canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-    .screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: white; text-align: center; background: radial-gradient(circle at 50% 40%, rgba(30,255,190,.12), transparent 28%), radial-gradient(circle at 70% 65%, rgba(100,80,255,.12), transparent 35%), #02040b; transition: opacity .9s ease, visibility .9s ease; }
+    .screen { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; color: #f5fbff; text-align: center; background: radial-gradient(circle at 50% 44%, rgba(36,154,255,.1), transparent 30%), rgba(2,5,14,.91); backdrop-filter: blur(14px); transition: opacity .65s ease, visibility .65s ease; }
     .screen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-    .eyebrow { margin-bottom: 20px; font-size: 9px; letter-spacing: .5em; opacity: .38; }
-    h1 { margin: 0; font-size: min(12vw, 58px); font-weight: 100; letter-spacing: -.045em; }
-    .subtitle { margin-top: 12px; font-size: 9px; letter-spacing: .34em; opacity: .42; }
-    .copy { max-width: 310px; margin: 38px 0; font-size: 13px; line-height: 1.8; font-weight: 300; opacity: .58; }
-    button { appearance: none; border: 1px solid rgba(180,255,225,.3); border-radius: 999px; padding: 16px 30px; background: rgba(100,255,210,.055); color: white; font-size: 9px; letter-spacing: .28em; cursor: pointer; }
-    button:focus-visible { outline: 2px solid #caff91; outline-offset: 4px; }
-    #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0; transition: opacity .5s; }
+    .brand { margin: 0; font-size: min(15vw, 72px); font-weight: 100; letter-spacing: .16em; text-indent: .16em; text-shadow: 0 0 42px rgba(75,200,255,.24); }
+    .subtitle { margin-top: 13px; font-size: 8px; letter-spacing: .52em; text-indent: .52em; opacity: .48; }
+    .copy { margin: 48px 0 38px; font-size: 13px; line-height: 1.9; font-weight: 300; letter-spacing: .04em; opacity: .68; }
+    button { appearance: none; border: 1px solid rgba(150,225,255,.3); border-radius: 999px; padding: 16px 34px; background: rgba(80,190,255,.06); color: #fff; font-size: 9px; letter-spacing: .32em; cursor: pointer; transition: .25s ease; }
+    button:hover { background: rgba(80,190,255,.13); border-color: rgba(180,235,255,.58); transform: translateY(-2px); }
+    button:focus-visible { outline: 2px solid #86eaff; outline-offset: 4px; }
+    #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; color: white; opacity: 0; transition: opacity .4s; }
     #hud.show { opacity: 1; }
-    #title { position: absolute; top: max(18px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: .42em; color: white; opacity: .28; white-space: nowrap; }
-    #fireHud { position: absolute; top: max(43px, calc(env(safe-area-inset-top) + 27px)); left: 50%; transform: translateX(-50%); display: flex; gap: 13px; }
-    .dot { width: 6px; height: 6px; border: 1px solid rgba(150,255,170,.3); border-radius: 50%; }
-    .dot.on { background: #caff91; box-shadow: 0 0 8px #aaff7a, 0 0 22px rgba(80,255,130,.8); }
-    #status { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: .3em; color: white; opacity: .35; white-space: nowrap; }
-    #endScreen { opacity: 0; visibility: hidden; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(80,255,160,.2), transparent 28%), radial-gradient(circle at 50% 65%, rgba(30,180,255,.13), transparent 40%), #010806; }
-    #endScreen.show { opacity: 1; visibility: visible; pointer-events: auto; }
-    #natureOrb { width: 160px; height: 160px; position: relative; margin-bottom: 34px; }
-    .ring { position: absolute; inset: 0; border: 1px solid rgba(150,255,190,.22); border-radius: 50%; animation: breathe 5s ease-in-out infinite; }
-    .ring:nth-child(2) { inset: 22px; animation-delay: -1.7s; }
-    .ring:nth-child(3) { inset: 43px; animation-delay: -3.4s; }
-    .natureCore { position: absolute; inset: 59px; border-radius: 50%; background: #efffdc; box-shadow: 0 0 22px rgba(160,255,120,.9), 0 0 65px rgba(40,255,150,.55); }
-    @keyframes breathe { 0%, 100% { transform: scale(.8); opacity: .2; } 50% { transform: scale(1.18); opacity: .85; } }
-    #endScreen h2 { margin: 0 0 12px; font-weight: 200; font-size: 29px; }
-    #endScreen p { max-width: 290px; margin: 0 0 30px; line-height: 1.7; font-size: 12px; opacity: .5; }
-    @media (prefers-reduced-motion: reduce) { .screen { transition-duration: .01ms; } .ring { animation: none; } }
+    #score { position: absolute; top: max(22px, env(safe-area-inset-top)); left: max(22px, env(safe-area-inset-left)); font-size: 9px; letter-spacing: .3em; opacity: .58; font-variant-numeric: tabular-nums; }
+    #score strong { margin-left: 8px; color: #b8f5ff; font-size: 14px; font-weight: 300; }
+    #combo { position: absolute; top: max(50px, calc(env(safe-area-inset-top) + 28px)); left: max(22px, env(safe-area-inset-left)); color: #70dcff; font-size: 10px; letter-spacing: .2em; opacity: 0; transform: translateY(5px); transition: .2s; }
+    #combo.show { opacity: .85; transform: none; }
+    #timer { position: absolute; top: max(22px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); font-size: 9px; letter-spacing: .24em; font-variant-numeric: tabular-nums; opacity: .38; }
+    #energy { position: absolute; top: max(23px, env(safe-area-inset-top)); right: max(22px, env(safe-area-inset-right)); display: flex; gap: 6px; }
+    #energy i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #ff7180; box-shadow: 0 0 8px #ff4058; transition: .3s; }
+    #energy i.off { background: rgba(255,255,255,.1); box-shadow: none; }
+    #gesture { position: absolute; left: 50%; bottom: max(30px, env(safe-area-inset-bottom)); transform: translateX(-50%); white-space: nowrap; font-size: 8px; letter-spacing: .3em; opacity: 0; transition: opacity .5s; }
+    #gesture.show { opacity: .46; }
+    #finalScreen .label { font-size: 8px; letter-spacing: .42em; opacity: .45; }
+    #finalScore { margin: 16px 0 38px; font-size: 72px; font-weight: 100; color: #c9f8ff; text-shadow: 0 0 35px rgba(60,210,255,.45); }
+    #bestCombo { margin: 12px 0 44px; font-size: 30px; font-weight: 200; color: #7fe5ff; }
+    @media (prefers-reduced-motion: reduce) { .screen, #combo { transition-duration: .01ms; } }
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="La voie du silence"></canvas>
+  <canvas id="game" aria-label="SILENT, jeu d'arcade tactile"></canvas>
   <div id="hud" aria-live="polite">
-    <div id="title">LA VOIE DU SILENCE</div>
-    <div id="fireHud" aria-label="Lucioles recueillies"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-    <div id="status">ÉCOUTE</div>
+    <div id="score">SILENCE <strong>0</strong></div>
+    <div id="combo">x2</div>
+    <div id="timer">60</div>
+    <div id="energy" aria-label="Énergie"><i></i><i></i><i></i></div>
+    <div id="gesture">GLISSEZ · ATTRAPEZ LE BLEU · ÉVITEZ LE ROUGE</div>
   </div>
   <main id="startScreen" class="screen">
-    <div class="eyebrow">SILENT</div>
-    <h1>La voie du silence</h1>
-    <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">Glissez pour guider le cercle.<br><br>Éloignez-vous du vacarme.<br>Trouvez la ligne du silence.<br><br>Recueillez les trois lucioles du vivant.</div>
-    <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
+    <h1 class="brand">SILENT</h1>
+    <div class="subtitle">LA VOIE DU SILENCE</div>
+    <div class="copy">Cueillez le silence.<br>Évitez le vacarme.</div>
+    <button id="startBtn" type="button">JOUER</button>
   </main>
-  <section id="endScreen" class="screen" aria-labelledby="endTitle">
-    <div id="natureOrb" aria-hidden="true"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="natureCore"></div></div>
-    <div class="eyebrow">3 LUCIOLES RETROUVÉES</div>
-    <h2 id="endTitle">Le vivant est là.</h2>
-    <p>Le vacarme peut maintenant disparaître.<br>Il ne reste plus qu'à écouter.</p>
-    <button id="listenBtn" type="button">ÉCOUTER LE VIVANT</button>
+  <section id="finalScreen" class="screen hide">
+    <div class="label">SILENCE RECUEILLI</div>
+    <div id="finalScore">0</div>
+    <div class="label">MEILLEURE SÉRIE</div>
+    <div id="bestCombo">x1</div>
+    <button id="replayBtn" type="button">REJOUER</button>
   </section>
   <script>
   (() => {
     "use strict";
 
-    const URBAN_AUDIO = "./audio/urbain.mp3";
-    const NATURE_AUDIO = "./audio/nature.mp3";
-    const urban = new Audio(URBAN_AUDIO);
-    const nature = new Audio(NATURE_AUDIO);
-    Object.assign(urban, { loop: true, preload: "auto", playsInline: true, volume: 0 });
-    Object.assign(nature, { loop: false, preload: "auto", playsInline: true, volume: 1 });
-
     const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const hud = document.getElementById("hud");
-    const status = document.getElementById("status");
+    const ctx = canvas.getContext("2d", { alpha: false });
     const startScreen = document.getElementById("startScreen");
-    const endScreen = document.getElementById("endScreen");
-    const listenBtn = document.getElementById("listenBtn");
-    const dots = [...document.querySelectorAll(".dot")];
+    const finalScreen = document.getElementById("finalScreen");
+    const hud = document.getElementById("hud");
+    const scoreNode = document.querySelector("#score strong");
+    const comboNode = document.getElementById("combo");
+    const timerNode = document.getElementById("timer");
+    const gesture = document.getElementById("gesture");
+    const energyDots = [...document.querySelectorAll("#energy i")];
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
-    const lerp = (a, b, amount) => a + (b - a) * amount;
-    const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
-    let W = innerWidth, H = innerHeight, running = false, ending = false, urbanStarted = false;
-    let time = 0, scroll = 0, speed = 105, silence = 0, deepSilence = 0, bloom = 0, collected = 0, previous = 0;
-    let trail = [], fireflies = [], particles = [], waves = [];
-    const pointer = { down: false, x: 0, t: 0 };
-    const orb = { x: W * .5, y: H * .68, vx: 0, radius: 12 };
+    let W = innerWidth, H = innerHeight, running = false, ending = false, previous = 0, elapsed = 0;
+    let score = 0, combo = 1, comboRun = 0, bestCombo = 1, energy = 3;
+    let spawnClock = 0, shake = 0, cyanBloom = 0, redFlash = 0, hitStop = 0;
+    let objects = [], particles = [], waves = [], stars = [];
+    const pointer = { down: false, x: W * .5 };
+    const ship = { x: W * .5, targetX: W * .5, vx: 0, y: H * .79, tilt: 0, squash: 0 };
 
-    function createParticles() {
-      particles = Array.from({ length: Math.min(170, Math.floor(W * H / 4500)) }, () => ({
-        x: Math.random() * W, y: Math.random() * H, depth: .15 + Math.random() * .85,
-        size: .3 + Math.random() * 1.3, phase: Math.random() * 20, hue: Math.random()
-      }));
-    }
+    // Reserved for a later optional sound layer. Gameplay never depends on it.
+    const audio = { enabled: false, update() {}, collect() {}, hit() {} };
+
     function resize() {
       const dpr = Math.min(devicePixelRatio || 1, 2);
       W = innerWidth; H = innerHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      orb.y = H * .68; if (!running) orb.x = W * .5;
-      createParticles();
+      ship.y = H * .79; ship.x = ship.targetX = clamp(ship.x, 24, W - 24);
+      stars = Array.from({ length: Math.min(120, Math.floor(W * H / 6500)) }, () => ({ x: Math.random() * W, y: Math.random() * H, z: .2 + Math.random() * .8, size: .3 + Math.random() }));
     }
-    function difficulty() { return clamp(clamp(time / 75, 0, 1) * .55 + collected / 3 * .45, 0, 1); }
-    function flowAt(worldY) {
-      const d = difficulty();
-      const w1 = Math.sin(worldY * .00105), w2 = Math.sin(worldY * lerp(.0019, .0032, d) + 1.8);
-      const w3 = Math.sin(worldY * .0058 + 4), drift = Math.sin(worldY * .00037 + 1);
-      const organic = Math.sin(worldY * .009 + Math.sin(worldY * .0014) * 2.2);
-      const x = W * .5 + w1 * W * lerp(.07, .12, d) + w2 * W * lerp(.07, .16, d) + w3 * W * (.012 + d * .04) + drift * W * .05 + organic * W * d * d * .022;
-      const breath = Math.sin(worldY * .0025 + 2) * .5 + .5, slow = Math.sin(worldY * .0008) * .5 + .5;
-      return { x, width: lerp(105, 62, d) + breath * lerp(28, 17, d) + slow * 8 };
+    function resetGame() {
+      elapsed = score = comboRun = 0; combo = bestCombo = 1; energy = 3;
+      spawnClock = .55; shake = cyanBloom = redFlash = hitStop = 0;
+      objects = []; particles = []; waves = [];
+      ship.x = ship.targetX = W * .5; ship.vx = ship.tilt = ship.squash = 0;
+      scoreNode.textContent = "0"; comboNode.classList.remove("show"); timerNode.textContent = "60";
+      energyDots.forEach(dot => dot.classList.remove("off"));
     }
-    function createFireflies() {
-      fireflies = [{ worldY: 1350, phase: 1.2 }, { worldY: 3550, phase: 4.3 }, { worldY: 6200, phase: 7.7 }].map(f => ({ ...f, collected: false }));
+    function spawn(type, x, y, scale = 1, delay = 0) {
+      const bad = type === "noise";
+      objects.push({ type, x, y: y - delay, baseX: x, radius: (bad ? 15 : 12) * scale * (.85 + Math.random() * .35),
+        vy: 0, phase: Math.random() * 10, behavior: bad ? Math.floor(Math.random() * (elapsed > 35 ? 4 : elapsed > 15 ? 3 : 2)) : Math.floor(Math.random() * 3),
+        variant: Math.floor(Math.random() * 4), dead: false, absorb: 0 });
     }
-    function fireflyPosition(f) { const flow = flowAt(f.worldY); return { x: flow.x + Math.sin(f.phase) * flow.width * .18, y: f.worldY - scroll }; }
-
-    async function startUrbanAudio() {
-      urban.volume = 0;
-      try { await urban.play(); urbanStarted = true; }
-      catch (error) { urbanStarted = false; console.warn("Le jeu démarre sans l'ambiance urbaine.", error); }
-    }
-    function updateAudio(distance) {
-      if (!urbanStarted || ending) return;
-      const x = distance > .08 ? clamp((distance - .08) / .92, 0, 1) : 0;
-      const target = clamp(x * x * .88, 0, .88);
-      urban.volume += (target - urban.volume) * .09;
-      if (distance <= .08 && urban.volume < .012) urban.volume = 0;
-    }
-
-    function beginEnding() {
-      if (ending) return;
-      ending = true; pointer.down = false; status.textContent = "LE VIVANT EST RETROUVÉ";
-      const fade = setInterval(() => {
-        urban.volume = Math.max(0, urban.volume - .04);
-        if (urban.volume === 0) { clearInterval(fade); urban.pause(); }
-      }, 40);
-      setTimeout(() => { running = false; hud.classList.remove("show"); endScreen.classList.add("show"); }, 1600);
-    }
-    function checkFireflies() {
-      for (const firefly of fireflies) {
-        if (firefly.collected) continue;
-        const p = fireflyPosition(firefly);
-        if (p.y < -60 || p.y > H + 60 || Math.hypot(p.x - orb.x, p.y - orb.y) >= 34) continue;
-        firefly.collected = true; dots[collected]?.classList.add("on"); collected += 1;
-        for (let i = 0; i < 4; i++) waves.push({ x: orb.x, y: orb.y, r: 10 + i * 7, life: 1 - i * .12, hue: 100 + i * 20 });
-        if (collected === 3) beginEnding();
+    function spawnPattern() {
+      const progress = elapsed / 60, margin = 35, lane = margin + Math.random() * (W - margin * 2);
+      const noiseChance = .15 + progress * .27;
+      if (elapsed > 9 && Math.random() < .28 + progress * .2) {
+        const count = 2 + (Math.random() < progress * .65 ? 1 : 0), gap = Math.min(62, W / 5);
+        const start = clamp(lane - (count - 1) * gap * .5, margin, W - margin - (count - 1) * gap);
+        for (let i = 0; i < count; i++) spawn(Math.random() < noiseChance ? "noise" : "silence", start + i * gap, -30, .8 + Math.random() * .25, i * 25);
+      } else {
+        spawn(Math.random() < noiseChance ? "noise" : "silence", lane, -30, 1, 0);
+      }
+      if (elapsed > 22 && Math.random() < .18) {
+        const safeLeft = Math.random() < .5;
+        for (let i = 0; i < 3; i++) spawn("noise", W * (safeLeft ? .62 : .18) + i * 35, -90, .82, i * 12);
+        spawn("silence", W * (safeLeft ? .22 : .82), -105, 1.15);
       }
     }
-    function updateHUD() {
-      if (deepSilence > .75) { status.textContent = "SILENCE"; status.style.opacity = ".18"; }
-      else if (silence > .72) { status.textContent = "SUR LA VOIE"; status.style.opacity = ".3"; }
-      else if (silence > .35) { status.textContent = "ÉCOUTE"; status.style.opacity = ".35"; }
-      else { status.textContent = "RETROUVE LA VOIE"; status.style.opacity = ".45"; }
+    function burst(x, y, color, count) {
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2, speed = 35 + Math.random() * 105;
+        particles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: .45 + Math.random() * .35, max: .8, color, size: .7 + Math.random() * 2 });
+      }
+    }
+    function collect(object) {
+      object.dead = true; comboRun++; combo = Math.min(4, 1 + Math.floor(comboRun / 4)); bestCombo = Math.max(bestCombo, combo);
+      score += combo; cyanBloom = Math.min(1, cyanBloom + .34); hitStop = .025;
+      waves.push({ x: ship.x, y: ship.y, radius: 8, life: 1, color: "90,225,255" });
+      burst(ship.x, ship.y - 5, "105,225,255", 9); ship.squash = -.22; audio.collect();
+      scoreNode.textContent = String(score); comboNode.textContent = `x${combo}`; comboNode.classList.toggle("show", combo > 1);
+    }
+    function collideNoise(object) {
+      object.dead = true; combo = 1; comboRun = 0; energy = Math.max(0, energy - 1); shake = 1; redFlash = .7; ship.squash = .34;
+      waves.push({ x: ship.x, y: ship.y, radius: 7, life: .75, color: "255,80,105" });
+      burst(ship.x, ship.y, "255,85,105", 8); energyDots.forEach((dot, i) => dot.classList.toggle("off", i >= energy));
+      comboNode.classList.remove("show"); audio.hit();
+      if (energy === 0) setTimeout(() => { energy = 3; energyDots.forEach(dot => dot.classList.remove("off")); }, 1400);
     }
     function update(dt) {
-      time += dt;
-      const flow = flowAt(scroll + orb.y), dx = flow.x - orb.x, distance = clamp(Math.abs(dx) / (flow.width * 1.75), 0, 1);
-      const targetSilence = 1 - smoothstep(0, flow.width * .78, Math.abs(dx));
-      silence += (targetSilence - silence) * (1 - Math.exp(-7 * dt));
-      deepSilence = clamp(deepSilence + (Math.abs(dx) < flow.width * .16 ? dt * .25 : -dt * .12), 0, 1);
-      const targetBloom = clamp(deepSilence * .72 + collected * .12, 0, 1);
-      bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
-      orb.vx += dx * silence * .38 * dt;
-      orb.vx *= Math.exp(-(pointer.down ? 1.2 : 1.9) * dt); orb.x += orb.vx * dt;
-      if (orb.x < 25) { orb.x = 25; orb.vx = Math.abs(orb.vx) * .25; }
-      if (orb.x > W - 25) { orb.x = W - 25; orb.vx = -Math.abs(orb.vx) * .25; }
-      const targetSpeed = 100 + difficulty() * 34 + silence * 16;
-      speed += (targetSpeed - speed) * (1 - Math.exp(-1.5 * dt)); scroll += speed * dt;
-      trail.push({ x: orb.x, y: orb.y }); if (trail.length > 100) trail.shift();
-      for (const p of trail) p.y += speed * dt * .07;
-      for (const wave of waves) { wave.r += 105 * dt; wave.life -= .6 * dt; }
-      waves = waves.filter(wave => wave.life > 0);
-      checkFireflies(); updateAudio(distance); updateHUD();
+      if (hitStop > 0) { hitStop -= dt; return; }
+      elapsed += dt; const progress = clamp(elapsed / 60, 0, 1), scroll = 105 + progress * 145;
+      if (elapsed >= 60) { finish(); return; }
+      timerNode.textContent = String(Math.ceil(60 - elapsed));
+      spawnClock -= dt;
+      if (spawnClock <= 0) { spawnPattern(); spawnClock = Math.max(.28, .82 - progress * .43) * (.82 + Math.random() * .38); }
+
+      const follow = pointer.down ? 30 : 16;
+      ship.vx += (ship.targetX - ship.x) * follow * dt;
+      ship.vx *= Math.exp(-(pointer.down ? 9 : 6) * dt);
+      ship.x = clamp(ship.x + ship.vx * dt, 20, W - 20);
+      ship.tilt += (clamp(ship.vx / 360, -.52, .52) - ship.tilt) * (1 - Math.exp(-12 * dt));
+      ship.squash *= Math.exp(-12 * dt); cyanBloom *= Math.exp(-2.8 * dt); redFlash *= Math.exp(-8 * dt); shake *= Math.exp(-15 * dt);
+
+      for (const object of objects) {
+        object.phase += dt; object.vy += (scroll - object.vy) * (1 - Math.exp(-4 * dt)); object.y += object.vy * dt;
+        const drift = object.type === "noise" ? 1 : .55;
+        if (object.behavior === 1) object.x = object.baseX + Math.sin(object.phase * 1.35) * (18 + progress * 20) * drift;
+        if (object.behavior === 2) object.x = object.baseX + Math.sin(object.phase * 2.15) * (12 + progress * 16) * drift;
+        if (object.behavior === 3) object.x += Math.sin(object.phase * 3.4) * 34 * dt;
+        const dx = ship.x - object.x, dy = ship.y - object.y, distance = Math.hypot(dx, dy);
+        if (object.type === "silence" && distance < 72 && distance > 1) {
+          const pull = (1 - distance / 72) * 460; object.x += dx / distance * pull * dt; object.y += dy / distance * pull * dt; object.absorb = 1 - distance / 72;
+        }
+        if (distance < object.radius + 13) object.type === "silence" ? collect(object) : collideNoise(object);
+      }
+      objects = objects.filter(object => !object.dead && object.y < H + 70);
+      for (const p of particles) { p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= Math.exp(-2 * dt); p.vy *= Math.exp(-2 * dt); p.life -= dt; }
+      particles = particles.filter(p => p.life > 0);
+      for (const wave of waves) { wave.radius += 150 * dt; wave.life -= 1.35 * dt; }
+      waves = waves.filter(w => w.life > 0); audio.update(dt);
+      for (const star of stars) { star.y += scroll * star.z * .12 * dt; if (star.y > H) { star.y = 0; star.x = Math.random() * W; } }
     }
 
     function drawBackground() {
-      const g = ctx.createLinearGradient(0, 0, W, H);
-      g.addColorStop(0, `hsl(${228 + bloom * 48},${45 + bloom * 35}%,${5 + bloom * 7}%)`);
-      g.addColorStop(.48, `hsl(${250 - bloom * 80},${45 + bloom * 38}%,${4 + bloom * 8}%)`);
-      g.addColorStop(1, `hsl(${285 - bloom * 120},${42 + bloom * 38}%,${4 + bloom * 7}%)`);
-      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      if (collected || bloom > .05) {
-        const life = collected / 3, rg = ctx.createRadialGradient(W * .5, H * .55, 0, W * .5, H * .55, W * .7);
-        rg.addColorStop(0, `rgba(30,255,150,${bloom * .08 + life * .06})`); rg.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
-      }
+      const gradient = ctx.createLinearGradient(0, 0, 0, H);
+      gradient.addColorStop(0, `rgb(${3 + cyanBloom * 3},${7 + cyanBloom * 8},${19 + cyanBloom * 13})`);
+      gradient.addColorStop(1, "#01030a"); ctx.fillStyle = gradient; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "screen";
+      for (const star of stars) { ctx.fillStyle = `rgba(100,175,220,${.035 + star.z * .07})`; ctx.fillRect(star.x, star.y, star.size, star.size * 3); }
+      ctx.globalCompositeOperation = "source-over";
     }
-    function drawParticles() {
-      ctx.save(); ctx.globalCompositeOperation = "screen";
+    function drawObject(object) {
+      const bad = object.type === "noise", hue = bad ? 352 : 193, wobble = bad ? Math.sin(object.phase * 9) * 1.3 : Math.sin(object.phase * 2) * .6;
+      ctx.save(); ctx.translate(object.x + wobble, object.y); ctx.globalCompositeOperation = "screen";
+      const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, object.radius * 3.1);
+      glow.addColorStop(0, bad ? "rgba(255,70,95,.34)" : "rgba(75,220,255,.4)"); glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(0, 0, object.radius * 3.1, 0, Math.PI * 2); ctx.fill();
+      const core = ctx.createRadialGradient(-object.radius * .3, -object.radius * .35, 1, 0, 0, object.radius);
+      core.addColorStop(0, "rgba(255,255,255,.9)"); core.addColorStop(.2, `hsla(${hue},100%,78%,.78)`); core.addColorStop(.75, `hsla(${hue},95%,50%,.25)`); core.addColorStop(1, `hsla(${hue},100%,50%,.04)`);
+      ctx.fillStyle = core; ctx.strokeStyle = `hsla(${hue},100%,78%,${bad ? .72 : .62})`; ctx.lineWidth = bad ? 1.4 : 1;
+      ctx.beginPath();
+      const points = bad ? 16 : 28;
+      for (let i = 0; i <= points; i++) { const angle = i / points * Math.PI * 2, instability = bad ? Math.sin(angle * (5 + object.variant) + object.phase * 7) * 1.5 : 0; const r = object.radius + instability - object.absorb * 3; ctx[i ? "lineTo" : "moveTo"](Math.cos(angle) * r, Math.sin(angle) * r); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      if (!bad && (object.variant === 1 || object.variant === 3)) { ctx.globalAlpha = .55; ctx.beginPath(); ctx.arc(0, 0, object.radius * .7, 0, Math.PI * 2); ctx.stroke(); }
+      if (!bad && object.variant === 2) { ctx.globalAlpha = .45 + Math.sin(object.phase * 4) * .2; ctx.beginPath(); ctx.arc(0, 0, object.radius + 4, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.restore();
+    }
+    function drawShip() {
+      ctx.save(); ctx.translate(ship.x, ship.y); ctx.rotate(ship.tilt); ctx.scale(1 - ship.squash * .25, 1 + ship.squash * .35); ctx.globalCompositeOperation = "screen";
+      const trail = ctx.createLinearGradient(0, 5, 0, 52); trail.addColorStop(0, "rgba(80,220,255,.45)"); trail.addColorStop(1, "rgba(45,100,255,0)");
+      ctx.fillStyle = trail; ctx.beginPath(); ctx.moveTo(-5, 5); ctx.quadraticCurveTo(0, 48 + Math.abs(ship.vx) * .025, 5, 5); ctx.closePath(); ctx.fill();
+      ctx.shadowColor = "#76e8ff"; ctx.shadowBlur = 22; ctx.fillStyle = "rgba(205,250,255,.94)";
+      ctx.beginPath(); ctx.moveTo(0, -15); ctx.quadraticCurveTo(11, 3, 6, 10); ctx.quadraticCurveTo(0, 15, -6, 10); ctx.quadraticCurveTo(-11, 3, 0, -15); ctx.fill();
+      ctx.shadowBlur = 0; ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.ellipse(0, -4, 2.4, 5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    }
+    function render() {
+      drawBackground(); const sx = (Math.random() - .5) * shake * 6, sy = (Math.random() - .5) * shake * 4;
+      ctx.save(); ctx.translate(sx, sy); for (const object of objects) drawObject(object);
+      ctx.globalCompositeOperation = "screen";
+      for (const wave of waves) { ctx.strokeStyle = `rgba(${wave.color},${wave.life * .55})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.radius, 0, Math.PI * 2); ctx.stroke(); }
+      for (const p of particles) { ctx.fillStyle = `rgba(${p.color},${clamp(p.life / p.max, 0, 1)})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill(); }
+      drawShip(); ctx.restore();
+      if (redFlash > .01) { ctx.fillStyle = `rgba(255,25,60,${redFlash * .08})`; ctx.fillRect(0, 0, W, H); }
+      const vignette = ctx.createRadialGradient(W * .5, H * .5, Math.min(W, H) * .2, W * .5, H * .5, Math.max(W, H) * .72);
+      vignette.addColorStop(.45, "rgba(0,0,0,0)"); vignette.addColorStop(1, "rgba(0,0,8,.52)"); ctx.fillStyle = vignette; ctx.fillRect(0, 0, W, H);
+    }
+    function updateEnding(dt) {
       for (const p of particles) {
-        const y = ((p.y + scroll * p.depth * .08) % H + H) % H;
-        ctx.fillStyle = `hsla(${145 + p.hue * 150},100%,76%,${.01 + bloom * p.depth * .19})`;
-        ctx.beginPath(); ctx.arc(p.x + Math.sin(time * .25 + p.phase) * 4 * bloom, y, p.size * (.6 + bloom), 0, Math.PI * 2); ctx.fill();
+        const dx = W * .5 - p.x, dy = H * .5 - p.y;
+        p.vx += dx * .42 * dt; p.vy += dy * .42 * dt;
+        p.vx *= Math.exp(-1.1 * dt); p.vy *= Math.exp(-1.1 * dt);
+        p.x += p.vx * dt; p.y += p.vy * dt; p.life = Math.max(.35, p.life - dt * .08);
       }
-      ctx.restore();
     }
-    function getPath() {
-      const points = []; for (let y = -40; y <= H + 40; y += 5) points.push({ ...flowAt(scroll + y), y }); return points;
-    }
-    function strokePath(points, xForPoint) {
-      ctx.beginPath(); points.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](xForPoint(p), p.y)); ctx.stroke();
-    }
-    function drawFlow() {
-      const points = getPath(); ctx.save(); ctx.globalCompositeOperation = "screen";
-      for (let layer = 6; layer >= 1; layer--) {
-        ctx.strokeStyle = `hsla(${(155 + layer * 23 + time * 3) % 360},100%,70%,${.012 + bloom * .028})`;
-        ctx.lineWidth = 10 + layer * 15 + bloom * 10;
-        strokePath(points, p => p.x + Math.sin(p.y * .014 + time * .28 + layer) * layer * bloom * 1.8);
-      }
-      ctx.strokeStyle = `rgba(235,255,250,${.22 + bloom * .42})`; ctx.lineWidth = .8 + bloom * .7; strokePath(points, p => p.x);
-      const strands = 2 + Math.floor(bloom * 10);
-      for (let s = 0; s < strands; s++) {
-        const fraction = s / Math.max(1, strands - 1) - .5;
-        ctx.strokeStyle = `hsla(${(140 + s * 21 + time * 4) % 360},100%,72%,${bloom * .065})`; ctx.lineWidth = .7;
-        strokePath(points, p => p.x + fraction * p.width * 1.6 + Math.sin(p.y * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8));
-      }
-      ctx.restore();
-    }
-    function drawFireflies() {
-      ctx.save(); ctx.globalCompositeOperation = "screen";
-      for (const firefly of fireflies) {
-        if (firefly.collected) continue; const p = fireflyPosition(firefly); if (p.y < -50 || p.y > H + 50) continue;
-        const radius = 18 + (.5 + .5 * Math.sin(time * 4 + firefly.phase)) * 8;
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
-        glow.addColorStop(0, "rgba(245,255,180,1)"); glow.addColorStop(.14, "rgba(160,255,90,.95)"); glow.addColorStop(.5, "rgba(40,255,120,.24)"); glow.addColorStop(1, "rgba(0,255,120,0)");
-        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(p.x, p.y, radius, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#f5ffd2"; ctx.beginPath(); ctx.arc(p.x, p.y, 2.4, 0, Math.PI * 2); ctx.fill();
-      }
-      ctx.restore();
-    }
-    function drawTrail() {
-      if (trail.length < 2) return; ctx.save(); ctx.globalCompositeOperation = "screen";
-      ctx.strokeStyle = `rgba(130,255,220,${.025 + bloom * .13})`; ctx.lineWidth = .7 + bloom; strokePath(trail, p => p.x); ctx.restore();
-    }
-    function drawFireflyTrain() {
-      if (!collected) return; ctx.save(); ctx.globalCompositeOperation = "screen"; let previousPoint = { x: orb.x, y: orb.y };
-      for (let i = 0; i < collected; i++) {
-        const p = trail[Math.max(0, trail.length - 1 - (18 + i * 19))]; if (!p) continue;
-        const x = p.x, y = p.y + 7 + Math.sin(time * 3 + i) * 2;
-        ctx.strokeStyle = `rgba(120,255,160,${.16 + bloom * .13})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(previousPoint.x, previousPoint.y); ctx.quadraticCurveTo((previousPoint.x + x) * .5, (previousPoint.y + y) * .5 + 4, x, y); ctx.stroke();
-        const radius = 12 + (.5 + .5 * Math.sin(time * 3.5 + i * 2)) * 5;
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, radius); glow.addColorStop(0, "#f5ffbe"); glow.addColorStop(.2, "rgba(150,255,100,.9)"); glow.addColorStop(1, "rgba(40,255,120,0)");
-        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); previousPoint = { x, y };
-      }
-      ctx.restore();
-    }
-    function drawWaves() {
-      ctx.save(); ctx.globalCompositeOperation = "screen";
-      for (const wave of waves) { ctx.strokeStyle = `hsla(${wave.hue},100%,75%,${wave.life * .32})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(wave.x, wave.y, wave.r, 0, Math.PI * 2); ctx.stroke(); }
-      ctx.restore();
-    }
-    function drawOrb() {
-      ctx.save(); ctx.translate(orb.x, orb.y); ctx.globalCompositeOperation = "screen";
-      const auraR = 32 + bloom * 62, aura = ctx.createRadialGradient(0, 0, 0, 0, 0, auraR);
-      aura.addColorStop(0, `rgba(230,255,250,${.16 + bloom * .18})`); aura.addColorStop(.25, `rgba(70,255,210,${.08 + bloom * .11})`); aura.addColorStop(.65, `rgba(110,80,255,${bloom * .09})`); aura.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = aura; ctx.beginPath(); ctx.arc(0, 0, auraR, 0, Math.PI * 2); ctx.fill();
-      for (let i = 4; i >= 1; i--) { ctx.strokeStyle = `hsla(${(155 + i * 28 + time * 5) % 360},100%,82%,${.07 + bloom * .1})`; ctx.lineWidth = .7; ctx.beginPath(); ctx.arc(0, 0, orb.radius + i * 3 + Math.sin(time * (.8 + i * .12)) * (1 + bloom * 2), 0, Math.PI * 2); ctx.stroke(); }
-      const core = ctx.createRadialGradient(-3, -4, 0, 0, 0, orb.radius); core.addColorStop(0, "#fff"); core.addColorStop(.28, "rgba(215,255,245,.98)"); core.addColorStop(.72, "rgba(60,245,205,.55)"); core.addColorStop(1, "rgba(70,100,255,.12)");
-      ctx.fillStyle = core; ctx.beginPath(); ctx.arc(0, 0, orb.radius, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-    }
-    function drawVignette() {
-      const g = ctx.createRadialGradient(W * .5, H * .55, W * .12, W * .5, H * .55, Math.max(W, H) * .72);
-      g.addColorStop(.35, "rgba(0,0,0,0)"); g.addColorStop(1, `rgba(0,0,8,${.48 - bloom * .18})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    }
-    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawFireflies(); drawFireflyTrain(); drawWaves(); drawOrb(); drawVignette(); }
     function frame(timestamp) {
       if (!previous) previous = timestamp; const dt = Math.min((timestamp - previous) / 1000, .033); previous = timestamp;
-      if (running) { if (!ending) update(dt); render(); } requestAnimationFrame(frame);
+      if (running) update(dt); else if (ending) updateEnding(dt); render(); requestAnimationFrame(frame);
     }
-
-    canvas.addEventListener("pointerdown", event => { if (!running || ending) return; event.preventDefault(); pointer.down = true; pointer.x = event.clientX; pointer.t = performance.now(); }, { passive: false });
-    canvas.addEventListener("pointermove", event => {
-      if (!pointer.down || !running || ending) return; event.preventDefault();
-      const now = performance.now(), velocity = (event.clientX - pointer.x) / Math.max(8, now - pointer.t) * 1000;
-      orb.vx = clamp(orb.vx + velocity * .038, -390, 390); pointer.x = event.clientX; pointer.t = now;
-    }, { passive: false });
+    function finish() {
+      running = false; ending = true; pointer.down = false; hud.classList.remove("show"); gesture.classList.remove("show");
+      document.getElementById("finalScore").textContent = String(score); document.getElementById("bestCombo").textContent = `x${bestCombo}`;
+      finalScreen.classList.remove("hide");
+      for (let i = 0; i < Math.min(score, 80); i++) { const angle = Math.random() * Math.PI * 2, radius = Math.random() * Math.max(W, H) * .45; particles.push({ x: W * .5 + Math.cos(angle) * radius, y: H * .5 + Math.sin(angle) * radius, vx: -Math.cos(angle) * radius * .18, vy: -Math.sin(angle) * radius * .18, life: 5, max: 5, color: "90,220,255", size: 1 + Math.random() * 2 }); }
+    }
+    function begin() {
+      resetGame(); running = true; ending = false; previous = performance.now(); startScreen.classList.add("hide"); finalScreen.classList.add("hide"); hud.classList.add("show"); gesture.classList.add("show");
+      setTimeout(() => gesture.classList.remove("show"), 3200);
+    }
+    canvas.addEventListener("pointerdown", event => { if (!running) return; event.preventDefault(); pointer.down = true; pointer.x = ship.targetX = event.clientX; canvas.setPointerCapture?.(event.pointerId); }, { passive: false });
+    canvas.addEventListener("pointermove", event => { if (!running || !pointer.down) return; event.preventDefault(); pointer.x = ship.targetX = event.clientX; }, { passive: false });
     const release = () => { pointer.down = false; };
     canvas.addEventListener("pointerup", release); canvas.addEventListener("pointercancel", release);
-    addEventListener("resize", resize);
-    addEventListener("pagehide", () => { urban.pause(); nature.pause(); });
-
-    document.getElementById("startBtn").addEventListener("click", () => {
-      void startUrbanAudio();
-      Object.assign(orb, { x: W * .5, y: H * .68, vx: 0 });
-      time = scroll = silence = deepSilence = bloom = collected = 0; speed = 105; trail = []; waves = [];
-      createFireflies(); dots.forEach(dot => dot.classList.remove("on")); ending = false; running = true; previous = performance.now();
-      startScreen.classList.add("hide"); hud.classList.add("show");
-    });
-    listenBtn.addEventListener("click", async () => {
-      urban.volume = 0; urban.pause(); nature.pause(); nature.currentTime = 0; nature.volume = 1;
-      try { await nature.play(); listenBtn.textContent = "LE VIVANT JOUE"; }
-      catch (error) { console.warn("Le chant de l'oiseau n'a pas pu démarrer.", error); listenBtn.textContent = "TOUCHER POUR RÉESSAYER"; }
-    });
-
-    resize(); createFireflies(); render(); requestAnimationFrame(frame);
+    addEventListener("resize", resize); addEventListener("pagehide", () => { running = false; });
+    document.getElementById("startBtn").addEventListener("click", begin); document.getElementById("replayBtn").addEventListener("click", begin);
+    resize(); resetGame(); render(); requestAnimationFrame(frame);
   })();
   </script>
 </body>
