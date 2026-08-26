@@ -74,7 +74,7 @@
 
     let W = innerWidth, H = innerHeight, running = false, ending = false, previous = 0, elapsed = 0;
     let score = 0, combo = 1, comboRun = 0, bestCombo = 1, energy = 3;
-    let spawnClock = 0, shake = 0, cyanBloom = 0, redFlash = 0, hitStop = 0;
+    let spawnClock = 0, shake = 0, cyanBloom = 0, redFlash = 0, hitStop = 0, hitCooldown = 0;
     let objects = [], particles = [], waves = [], stars = [];
     const pointer = { down: false, x: W * .5 };
     const ship = { x: W * .5, targetX: W * .5, vx: 0, y: H * .79, tilt: 0, squash: 0 };
@@ -92,7 +92,7 @@
     }
     function resetGame() {
       elapsed = score = comboRun = 0; combo = bestCombo = 1; energy = 3;
-      spawnClock = .55; shake = cyanBloom = redFlash = hitStop = 0;
+      spawnClock = .55; shake = cyanBloom = redFlash = hitStop = hitCooldown = 0;
       objects = []; particles = []; waves = [];
       ship.x = ship.targetX = W * .5; ship.vx = ship.tilt = ship.squash = 0;
       scoreNode.textContent = "0"; comboNode.classList.remove("show"); timerNode.textContent = "60";
@@ -114,10 +114,11 @@
       } else {
         spawn(Math.random() < noiseChance ? "noise" : "silence", lane, -30, 1, 0);
       }
-      if (elapsed > 22 && Math.random() < .18) {
+      if (elapsed > 22 && W > 250 && Math.random() < .18) {
         const safeLeft = Math.random() < .5;
-        for (let i = 0; i < 3; i++) spawn("noise", W * (safeLeft ? .62 : .18) + i * 35, -90, .82, i * 12);
-        spawn("silence", W * (safeLeft ? .22 : .82), -105, 1.15);
+        const dangerCenter = W * (safeLeft ? .72 : .28);
+        for (let i = -1; i <= 1; i++) spawn("noise", dangerCenter + i * Math.min(35, W * .1), -90, .82, (i + 1) * 12);
+        spawn("silence", W * (safeLeft ? .2 : .8), -105, 1.15);
       }
     }
     function burst(x, y, color, count) {
@@ -134,7 +135,9 @@
       scoreNode.textContent = String(score); comboNode.textContent = `x${combo}`; comboNode.classList.toggle("show", combo > 1);
     }
     function collideNoise(object) {
+      if (hitCooldown > 0) return;
       object.dead = true; combo = 1; comboRun = 0; energy = Math.max(0, energy - 1); shake = 1; redFlash = .7; ship.squash = .34;
+      hitCooldown = .7;
       waves.push({ x: ship.x, y: ship.y, radius: 7, life: .75, color: "255,80,105" });
       burst(ship.x, ship.y, "255,85,105", 8); energyDots.forEach((dot, i) => dot.classList.toggle("off", i >= energy));
       comboNode.classList.remove("show"); audio.hit();
@@ -148,12 +151,21 @@
       spawnClock -= dt;
       if (spawnClock <= 0) { spawnPattern(); spawnClock = Math.max(.28, .82 - progress * .43) * (.82 + Math.random() * .38); }
 
-      const follow = pointer.down ? 30 : 16;
-      ship.vx += (ship.targetX - ship.x) * follow * dt;
-      ship.vx *= Math.exp(-(pointer.down ? 9 : 6) * dt);
-      ship.x = clamp(ship.x + ship.vx * dt, 20, W - 20);
+      // Direct positional tracking gives touch input priority; retained velocity
+      // provides a short, controlled surf-like glide when the finger lifts.
+      if (pointer.down) {
+        const oldX = ship.x;
+        ship.x += (ship.targetX - ship.x) * (1 - Math.exp(-24 * dt));
+        const measuredVelocity = (ship.x - oldX) / Math.max(dt, .001);
+        ship.vx += (measuredVelocity - ship.vx) * (1 - Math.exp(-18 * dt));
+      } else {
+        ship.x += ship.vx * dt;
+        ship.vx *= Math.exp(-9 * dt);
+      }
+      ship.x = clamp(ship.x, 20, W - 20);
       ship.tilt += (clamp(ship.vx / 360, -.52, .52) - ship.tilt) * (1 - Math.exp(-12 * dt));
       ship.squash *= Math.exp(-12 * dt); cyanBloom *= Math.exp(-2.8 * dt); redFlash *= Math.exp(-8 * dt); shake *= Math.exp(-15 * dt);
+      hitCooldown = Math.max(0, hitCooldown - dt);
 
       for (const object of objects) {
         object.phase += dt; object.vy += (scroll - object.vy) * (1 - Math.exp(-4 * dt)); object.y += object.vy * dt;
