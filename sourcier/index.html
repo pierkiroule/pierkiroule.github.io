@@ -52,7 +52,7 @@
     <div id="title">LA VOIE DU SILENCE</div>
     <div id="fireHud" aria-label="Lucioles recueillies"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
     <div id="controls"><button id="soundBtn" class="iconButton" type="button" aria-label="Couper le son" title="Son">♫</button><button id="pauseBtn" class="iconButton" type="button" aria-label="Mettre en pause" title="Pause">Ⅱ</button></div>
-    <div id="hint">GLISSEZ DOUCEMENT POUR REJOINDRE LE FIL</div>
+    <div id="hint">GLISSEZ LIBREMENT POUR REJOINDRE LE CIRCUIT</div>
     <div id="statusWrap"><div id="status">ÉCOUTE</div><div id="attunement" aria-label="Résonance"><span id="attunementFill"></span></div></div>
   </div>
   <div id="pauseVeil">LAISSER RESPIRER</div>
@@ -60,7 +60,7 @@
     <div class="eyebrow">SILENT</div>
     <h1>La voie du silence</h1>
     <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">Guidez doucement le cercle vers le fil lumineux.<br><br>Le vacarme s'efface lorsque vous vous accordez à lui. Recueillez, sans urgence, les trois lucioles du vivant.</div>
+    <div class="copy">Explorez librement le circuit lumineux dans toutes les directions.<br><br>Suivez ses virages et ses boucles pour apaiser le vacarme. Recueillez, sans urgence, les trois lucioles du vivant.</div>
     <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
   </main>
   <section id="endScreen" class="screen" aria-labelledby="endTitle">
@@ -101,11 +101,11 @@
     const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
     let W = innerWidth, H = innerHeight, running = false, ending = false, paused = false, muted = false, urbanStarted = false;
-    let time = 0, scroll = 0, speed = 105, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, collected = 0, previous = 0;
+    let time = 0, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, collected = 0, previous = 0;
     let trail = [], fireflies = [], particles = [], waves = [];
-    const pointer = { down: false, x: 0, targetX: 0, t: 0 };
-    const keys = { left: false, right: false };
-    const orb = { x: W * .5, y: H * .68, vx: 0, radius: 12 };
+    const pointer = { down: false, x: 0, y: 0, targetX: 0, targetY: 0, t: 0 };
+    const keys = { left: false, right: false, up: false, down: false };
+    const orb = { x: W * .5, y: H * .68, vx: 0, vy: 0, radius: 12 };
 
     function createParticles() {
       particles = Array.from({ length: Math.min(170, Math.floor(W * H / 4500)) }, () => ({
@@ -118,25 +118,30 @@
       W = innerWidth; H = innerHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      orb.y = H * .68; if (!running) orb.x = W * .5;
+      if (!running) { const start = circuitPoint(0); orb.x = start.x; orb.y = start.y; }
       createParticles();
     }
-    function difficulty() { return clamp(clamp(time / 75, 0, 1) * .55 + collected / 3 * .45, 0, 1); }
-    function flowAt(worldY) {
-      const d = difficulty();
-      const w1 = Math.sin(worldY * .00105), w2 = Math.sin(worldY * lerp(.0019, .0032, d) + 1.8);
-      const w3 = Math.sin(worldY * .0058 + 4), drift = Math.sin(worldY * .00037 + 1);
-      const organic = Math.sin(worldY * .009 + Math.sin(worldY * .0014) * 2.2);
-      const x = W * .5 + w1 * W * lerp(.07, .12, d) + w2 * W * lerp(.07, .16, d) + w3 * W * (.012 + d * .04) + drift * W * .05 + organic * W * d * d * .022;
-      const breath = Math.sin(worldY * .0025 + 2) * .5 + .5, slow = Math.sin(worldY * .0008) * .5 + .5;
-      return { x, width: lerp(105, 62, d) + breath * lerp(28, 17, d) + slow * 8 };
+    function circuitPoint(t) {
+      const angle = t * Math.PI * 2, portrait = H > W;
+      const rx = W * (portrait ? .34 : .37), ry = H * (portrait ? .31 : .36);
+      return {
+        x: W * .5 + Math.cos(angle) * rx + Math.sin(angle * 3) * W * .055,
+        y: H * .51 + Math.sin(angle) * ry + Math.cos(angle * 2) * H * .075,
+        width: Math.min(W, H) * (.075 + .014 * Math.sin(angle * 4))
+      };
+    }
+    function closestCircuitPoint(x, y) {
+      let closest = null;
+      for (let i = 0; i < 240; i++) {
+        const p = circuitPoint(i / 240), distance = Math.hypot(p.x - x, p.y - y);
+        if (!closest || distance < closest.distance) closest = { ...p, distance };
+      }
+      return closest;
     }
     function createFireflies() {
-      // Une première rencontre rapide, puis un rythme qui laisse respirer sans
-      // imposer une minute entière avant la conclusion.
-      fireflies = [{ worldY: 760, phase: 1.2 }, { worldY: 2050, phase: 4.3 }, { worldY: 3550, phase: 7.7 }].map(f => ({ ...f, collected: false }));
+      fireflies = [{ t: .17, phase: 1.2 }, { t: .48, phase: 4.3 }, { t: .78, phase: 7.7 }].map(f => ({ ...f, collected: false }));
     }
-    function fireflyPosition(f) { const flow = flowAt(f.worldY); return { x: flow.x + Math.sin(f.phase) * flow.width * .18, y: f.worldY - scroll }; }
+    function fireflyPosition(f) { const p = circuitPoint(f.t); return { x: p.x, y: p.y }; }
 
     async function startUrbanAudio() {
       urban.volume = 0;
@@ -164,9 +169,7 @@
       for (const firefly of fireflies) {
         if (firefly.collected) continue;
         const p = fireflyPosition(firefly);
-        // Une luciole manquée revient plus loin : cette promenade ne punit jamais.
-        if (p.y < -80) { firefly.worldY = scroll + H + 700; firefly.phase += 2.1; continue; }
-        if (p.y < -60 || p.y > H + 60 || Math.hypot(p.x - orb.x, p.y - orb.y) >= 34) continue;
+        if (Math.hypot(p.x - orb.x, p.y - orb.y) >= 38) continue;
         firefly.collected = true; dots[collected]?.classList.add("on"); collected += 1;
         hint.textContent = collected < 3 ? `LUCIOLE ${collected} SUR 3 — CONTINUEZ D'ÉCOUTER` : "LE VIVANT VOUS A RETROUVÉ";
         hint.classList.add("show"); setTimeout(() => hint.classList.remove("show"), 2600);
@@ -184,10 +187,11 @@
     }
     function update(dt) {
       time += dt;
-      const flow = flowAt(scroll + orb.y), dx = flow.x - orb.x, distance = clamp(Math.abs(dx) / (flow.width * 1.75), 0, 1);
-      const targetSilence = 1 - smoothstep(0, flow.width * .78, Math.abs(dx));
+      const flow = closestCircuitPoint(orb.x, orb.y), dx = flow.x - orb.x, dy = flow.y - orb.y;
+      const distance = clamp(flow.distance / (flow.width * 1.75), 0, 1);
+      const targetSilence = 1 - smoothstep(0, flow.width * .82, flow.distance);
       silence += (targetSilence - silence) * (1 - Math.exp(-7 * dt));
-      deepSilence = clamp(deepSilence + (Math.abs(dx) < flow.width * .16 ? dt * .25 : -dt * .12), 0, 1);
+      deepSilence = clamp(deepSilence + (flow.distance < flow.width * .2 ? dt * .25 : -dt * .12), 0, 1);
       resonance += silence > .72 ? dt * (.28 + deepSilence * .25) : -dt * .18;
       resonance = clamp(resonance, 0, 1);
       if (resonance === 1) {
@@ -200,17 +204,23 @@
       pulseFlash = Math.max(0, pulseFlash - dt * 1.4);
       const targetBloom = clamp(deepSilence * .72 + collected * .12, 0, 1);
       bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
-      if (pointer.down) orb.vx += (pointer.targetX - orb.x) * 8.5 * dt;
+      if (pointer.down) {
+        orb.vx += (pointer.targetX - orb.x) * 8.5 * dt;
+        orb.vy += (pointer.targetY - orb.y) * 8.5 * dt;
+      }
       if (keys.left) orb.vx -= 330 * dt;
       if (keys.right) orb.vx += 330 * dt;
+      if (keys.up) orb.vy -= 330 * dt;
+      if (keys.down) orb.vy += 330 * dt;
       orb.vx += dx * silence * .38 * dt;
-      orb.vx *= Math.exp(-(pointer.down ? 1.2 : 1.9) * dt); orb.x += orb.vx * dt;
+      orb.vy += dy * silence * .38 * dt;
+      const friction = Math.exp(-(pointer.down ? 1.35 : 2.1) * dt);
+      orb.vx *= friction; orb.vy *= friction; orb.x += orb.vx * dt; orb.y += orb.vy * dt;
       if (orb.x < 25) { orb.x = 25; orb.vx = Math.abs(orb.vx) * .25; }
       if (orb.x > W - 25) { orb.x = W - 25; orb.vx = -Math.abs(orb.vx) * .25; }
-      const targetSpeed = 100 + difficulty() * 34 + silence * 16;
-      speed += (targetSpeed - speed) * (1 - Math.exp(-1.5 * dt)); scroll += speed * dt;
+      if (orb.y < 25) { orb.y = 25; orb.vy = Math.abs(orb.vy) * .25; }
+      if (orb.y > H - 25) { orb.y = H - 25; orb.vy = -Math.abs(orb.vy) * .25; }
       trail.push({ x: orb.x, y: orb.y }); if (trail.length > 100) trail.shift();
-      for (const p of trail) p.y += speed * dt * .07;
       for (const wave of waves) { wave.r += 105 * dt; wave.life -= .6 * dt; }
       waves = waves.filter(wave => wave.life > 0);
       checkFireflies(); updateAudio(distance); updateHUD();
@@ -231,31 +241,37 @@
     function drawParticles() {
       ctx.save(); ctx.globalCompositeOperation = "screen";
       for (const p of particles) {
-        const y = ((p.y + scroll * p.depth * .08) % H + H) % H;
+        const y = ((p.y + time * 4 * p.depth) % H + H) % H;
         ctx.fillStyle = `hsla(${145 + p.hue * 150},100%,76%,${.01 + bloom * p.depth * .19})`;
         ctx.beginPath(); ctx.arc(p.x + Math.sin(time * .25 + p.phase) * 4 * bloom, y, p.size * (.6 + bloom), 0, Math.PI * 2); ctx.fill();
       }
       ctx.restore();
     }
     function getPath() {
-      const points = []; for (let y = -40; y <= H + 40; y += 5) points.push({ ...flowAt(scroll + y), y }); return points;
+      const points = Array.from({ length: 181 }, (_, i) => circuitPoint(i / 180));
+      return points.map((p, i) => {
+        const before = points[(i - 1 + points.length) % points.length], after = points[(i + 1) % points.length];
+        const length = Math.hypot(after.x - before.x, after.y - before.y) || 1;
+        return { ...p, nx: -(after.y - before.y) / length, ny: (after.x - before.x) / length };
+      });
     }
-    function strokePath(points, xForPoint) {
-      ctx.beginPath(); points.forEach((p, i) => ctx[i ? "lineTo" : "moveTo"](xForPoint(p), p.y)); ctx.stroke();
+    function strokePath(points, pointForPoint = p => p, closed = false) {
+      ctx.beginPath(); points.forEach((p, i) => { const q = pointForPoint(p); ctx[i ? "lineTo" : "moveTo"](q.x, q.y); });
+      if (closed) ctx.closePath(); ctx.stroke();
     }
     function drawFlow() {
       const points = getPath(); ctx.save(); ctx.globalCompositeOperation = "screen";
       for (let layer = 6; layer >= 1; layer--) {
         ctx.strokeStyle = `hsla(${(155 + layer * 23 + time * 3) % 360},100%,70%,${.012 + bloom * .028})`;
         ctx.lineWidth = 10 + layer * 15 + bloom * 10;
-        strokePath(points, p => p.x + Math.sin(p.y * .014 + time * .28 + layer) * layer * bloom * 1.8);
+        strokePath(points, p => { const offset = Math.sin(p.x * .014 + time * .28 + layer) * layer * bloom * 1.8; return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; }, true);
       }
-      ctx.strokeStyle = `rgba(235,255,250,${.22 + bloom * .42})`; ctx.lineWidth = .8 + bloom * .7; strokePath(points, p => p.x);
+      ctx.strokeStyle = `rgba(235,255,250,${.22 + bloom * .42})`; ctx.lineWidth = .8 + bloom * .7; strokePath(points, undefined, true);
       const strands = 2 + Math.floor(bloom * 10);
       for (let s = 0; s < strands; s++) {
         const fraction = s / Math.max(1, strands - 1) - .5;
         ctx.strokeStyle = `hsla(${(140 + s * 21 + time * 4) % 360},100%,72%,${bloom * .065})`; ctx.lineWidth = .7;
-        strokePath(points, p => p.x + fraction * p.width * 1.6 + Math.sin(p.y * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8));
+        strokePath(points, p => { const offset = fraction * p.width * 1.6 + Math.sin((p.x + p.y) * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8); return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; }, true);
       }
       ctx.restore();
     }
@@ -279,7 +295,7 @@
     }
     function drawTrail() {
       if (trail.length < 2) return; ctx.save(); ctx.globalCompositeOperation = "screen";
-      ctx.strokeStyle = `rgba(130,255,220,${.025 + bloom * .13})`; ctx.lineWidth = .7 + bloom; strokePath(trail, p => p.x); ctx.restore();
+      ctx.strokeStyle = `rgba(130,255,220,${.025 + bloom * .13})`; ctx.lineWidth = .7 + bloom; strokePath(trail); ctx.restore();
     }
     function drawFireflyTrain() {
       if (!collected) return; ctx.save(); ctx.globalCompositeOperation = "screen"; let previousPoint = { x: orb.x, y: orb.y };
@@ -317,25 +333,31 @@
       if (running) { if (!ending && !paused) update(dt); render(); } requestAnimationFrame(frame);
     }
 
-    canvas.addEventListener("pointerdown", event => { if (!running || ending || paused) return; event.preventDefault(); pointer.down = true; pointer.x = pointer.targetX = event.clientX; pointer.t = performance.now(); }, { passive: false });
+    canvas.addEventListener("pointerdown", event => { if (!running || ending || paused) return; event.preventDefault(); pointer.down = true; pointer.x = pointer.targetX = event.clientX; pointer.y = pointer.targetY = event.clientY; pointer.t = performance.now(); }, { passive: false });
     canvas.addEventListener("pointermove", event => {
       if (!pointer.down || !running || ending || paused) return; event.preventDefault();
-      const now = performance.now(), velocity = (event.clientX - pointer.x) / Math.max(8, now - pointer.t) * 1000;
-      orb.vx = clamp(orb.vx + velocity * .018, -390, 390); pointer.x = pointer.targetX = event.clientX; pointer.t = now;
+      const now = performance.now(), elapsed = Math.max(8, now - pointer.t);
+      const velocityX = (event.clientX - pointer.x) / elapsed * 1000, velocityY = (event.clientY - pointer.y) / elapsed * 1000;
+      orb.vx = clamp(orb.vx + velocityX * .018, -390, 390); orb.vy = clamp(orb.vy + velocityY * .018, -390, 390);
+      pointer.x = pointer.targetX = event.clientX; pointer.y = pointer.targetY = event.clientY; pointer.t = now;
     }, { passive: false });
     const release = () => { pointer.down = false; };
     canvas.addEventListener("pointerup", release); canvas.addEventListener("pointercancel", release);
     addEventListener("resize", resize);
     addEventListener("pagehide", () => { urban.pause(); nature.pause(); });
     addEventListener("keydown", event => {
-      if (["ArrowLeft", "ArrowRight", " "].includes(event.key)) event.preventDefault();
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
       if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = true;
       if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = true;
+      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") keys.up = true;
+      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") keys.down = true;
       if (event.key === " " && running && !ending) togglePause();
     });
     addEventListener("keyup", event => {
       if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = false;
       if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = false;
+      if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") keys.up = false;
+      if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") keys.down = false;
     });
 
     function togglePause() {
@@ -354,11 +376,11 @@
 
     document.getElementById("startBtn").addEventListener("click", () => {
       void startUrbanAudio();
-      Object.assign(orb, { x: W * .5, y: H * .68, vx: 0 });
-      time = scroll = silence = deepSilence = resonance = pulseFlash = bloom = collected = 0; speed = 105; trail = []; waves = []; paused = false;
+      const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y, vx: 0, vy: 0 });
+      time = silence = deepSilence = resonance = pulseFlash = bloom = collected = 0; trail = []; waves = []; paused = false;
       createFireflies(); dots.forEach(dot => dot.classList.remove("on")); ending = false; running = true; previous = performance.now();
       startScreen.classList.add("hide"); hud.classList.add("show");
-      hint.textContent = "GLISSEZ DOUCEMENT POUR REJOINDRE LE FIL"; hint.classList.add("show");
+      hint.textContent = "GLISSEZ DANS TOUTES LES DIRECTIONS"; hint.classList.add("show");
       setTimeout(() => hint.classList.remove("show"), 4200);
     });
     listenBtn.addEventListener("click", async () => {
