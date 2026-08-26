@@ -20,9 +20,8 @@
     #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; opacity: 0; transition: opacity .5s; }
     #hud.show { opacity: 1; }
     #title { position: absolute; top: max(18px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); font-size: 8px; letter-spacing: .42em; color: white; opacity: .28; white-space: nowrap; }
-    #fireHud { position: absolute; top: max(43px, calc(env(safe-area-inset-top) + 27px)); left: 50%; transform: translateX(-50%); display: flex; gap: 13px; }
-    .dot { width: 6px; height: 6px; border: 1px solid rgba(150,255,170,.3); border-radius: 50%; }
-    .dot.on { background: #caff91; box-shadow: 0 0 8px #aaff7a, 0 0 22px rgba(80,255,130,.8); }
+    #timeHud { position: absolute; top: max(42px, calc(env(safe-area-inset-top) + 26px)); left: 50%; transform: translateX(-50%); font-variant-numeric: tabular-nums; color: rgba(225,240,255,.78); font-size: 22px; font-weight: 200; letter-spacing: .12em; text-shadow: 0 0 24px rgba(120,170,255,.45); }
+    #timeLabel { display: block; margin-bottom: 4px; font-size: 7px; letter-spacing: .34em; opacity: .45; }
     #statusWrap { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: min(250px, 62vw); text-align: center; }
     #status { font-size: 8px; letter-spacing: .3em; color: white; opacity: .35; white-space: nowrap; }
     #attunement { height: 1px; margin-top: 10px; overflow: hidden; background: rgba(255,255,255,.1); }
@@ -33,16 +32,7 @@
     .iconButton { width: 36px; height: 36px; padding: 0; display: grid; place-items: center; border-color: rgba(200,255,235,.14); background: rgba(2,8,14,.28); font-size: 13px; letter-spacing: 0; }
     #pauseVeil { position: fixed; inset: 0; z-index: 15; display: grid; place-items: center; color: rgba(255,255,255,.72); background: rgba(1,5,10,.55); backdrop-filter: blur(12px); font-size: 10px; letter-spacing: .35em; opacity: 0; visibility: hidden; transition: .35s; pointer-events: none; }
     #pauseVeil.show { opacity: 1; visibility: visible; }
-    #endScreen { opacity: 0; visibility: hidden; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(80,255,160,.2), transparent 28%), radial-gradient(circle at 50% 65%, rgba(30,180,255,.13), transparent 40%), #010806; }
-    #endScreen.show { opacity: 1; visibility: visible; pointer-events: auto; }
-    #natureOrb { width: 160px; height: 160px; position: relative; margin-bottom: 34px; }
-    .ring { position: absolute; inset: 0; border: 1px solid rgba(150,255,190,.22); border-radius: 50%; animation: breathe 5s ease-in-out infinite; }
-    .ring:nth-child(2) { inset: 22px; animation-delay: -1.7s; }
-    .ring:nth-child(3) { inset: 43px; animation-delay: -3.4s; }
-    .natureCore { position: absolute; inset: 59px; border-radius: 50%; background: #efffdc; box-shadow: 0 0 22px rgba(160,255,120,.9), 0 0 65px rgba(40,255,150,.55); }
     @keyframes breathe { 0%, 100% { transform: scale(.8); opacity: .2; } 50% { transform: scale(1.18); opacity: .85; } }
-    #endScreen h2 { margin: 0 0 12px; font-weight: 200; font-size: 29px; }
-    #endScreen p { max-width: 290px; margin: 0 0 30px; line-height: 1.7; font-size: 12px; opacity: .5; }
     @media (prefers-reduced-motion: reduce) { .screen { transition-duration: .01ms; } .ring { animation: none; } }
   </style>
 </head>
@@ -50,7 +40,7 @@
   <canvas id="game" aria-label="La voie du silence"></canvas>
   <div id="hud" aria-live="polite">
     <div id="title">LA VOIE DU SILENCE</div>
-    <div id="fireHud" aria-label="Lucioles recueillies"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div id="timeHud"><span id="timeLabel">SILLAGE DU SILENCE</span><span id="timeValue">00:00.0</span></div>
     <div id="controls"><button id="soundBtn" class="iconButton" type="button" aria-label="Couper le son" title="Son">♫</button><button id="pauseBtn" class="iconButton" type="button" aria-label="Mettre en pause" title="Pause">Ⅱ</button></div>
     <div id="hint">GLISSEZ LIBREMENT POUR REJOINDRE LA VOIE</div>
     <div id="statusWrap"><div id="status">ÉCOUTE</div><div id="attunement" aria-label="Résonance"><span id="attunementFill"></span></div></div>
@@ -60,16 +50,9 @@
     <div class="eyebrow">SILENT</div>
     <h1>La voie du silence</h1>
     <div class="subtitle">UNE EXPÉRIENCE D'ÉCOUTE</div>
-    <div class="copy">La voie défile et se renouvelle sans fin.<br><br>Explorez ses virages et ses boucles dans toutes les directions pour apaiser le vacarme. Recueillez les trois lucioles du vivant.</div>
+    <div class="copy">La voie défile et se renouvelle sans fin.<br><br>Restez dans son sillage aussi longtemps que possible. Chaque seconde de silence transforme le monde.</div>
     <button id="startBtn" type="button">ENTRER DANS LA VOIE</button>
   </main>
-  <section id="endScreen" class="screen" aria-labelledby="endTitle">
-    <div id="natureOrb" aria-hidden="true"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="natureCore"></div></div>
-    <div class="eyebrow">3 LUCIOLES RETROUVÉES</div>
-    <h2 id="endTitle">Le vivant est là.</h2>
-    <p>Le vacarme peut maintenant disparaître.<br>Il ne reste plus qu'à écouter.</p>
-    <button id="listenBtn" type="button">ÉCOUTER LE VIVANT</button>
-  </section>
   <script>
   (() => {
     "use strict";
@@ -77,32 +60,28 @@
     // Versionner l'URL force les navigateurs à charger le fichier fourni, et non
     // une ancienne ambiance urbaine restée dans leur cache.
     const URBAN_AUDIO = "./audio/urbain.mp3?v=20260826";
-    const NATURE_AUDIO = "./audio/nature.mp3";
     const urban = new Audio(URBAN_AUDIO);
-    const nature = new Audio(NATURE_AUDIO);
     Object.assign(urban, { loop: true, preload: "auto", playsInline: true, volume: 0 });
-    Object.assign(nature, { loop: false, preload: "auto", playsInline: true, volume: 1 });
 
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
     const hud = document.getElementById("hud");
     const status = document.getElementById("status");
     const startScreen = document.getElementById("startScreen");
-    const endScreen = document.getElementById("endScreen");
-    const listenBtn = document.getElementById("listenBtn");
+    const timeValue = document.getElementById("timeValue");
+    const timeLabel = document.getElementById("timeLabel");
     const hint = document.getElementById("hint");
     const attunementFill = document.getElementById("attunementFill");
     const pauseBtn = document.getElementById("pauseBtn");
     const soundBtn = document.getElementById("soundBtn");
     const pauseVeil = document.getElementById("pauseVeil");
-    const dots = [...document.querySelectorAll(".dot")];
     const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
     const lerp = (a, b, amount) => a + (b - a) * amount;
     const smoothstep = (a, b, value) => { const t = clamp((value - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
-    let W = innerWidth, H = innerHeight, running = false, ending = false, paused = false, muted = false, urbanStarted = false;
-    let time = 0, cameraU = 0, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, collected = 0, previous = 0;
-    let trail = [], fireflies = [], particles = [], waves = [];
+    let W = innerWidth, H = innerHeight, running = false, paused = false, muted = false, urbanStarted = false;
+    let time = 0, cameraU = 0, silence = 0, deepSilence = 0, resonance = 0, pulseFlash = 0, bloom = 0, streak = 0, bestStreak = 0, grace = 0, previous = 0;
+    let trail = [], particles = [], waves = [];
     const pointer = { down: false, x: 0, y: 0, targetX: 0, targetY: 0, t: 0 };
     const keys = { left: false, right: false, up: false, down: false };
     const orb = { x: W * .5, y: H * .68, vx: 0, vy: 0, radius: 12 };
@@ -140,57 +119,32 @@
       }
       return closest;
     }
-    function createFireflies() {
-      fireflies = [{ u: 1.25, phase: 1.2 }, { u: 3.05, phase: 4.3 }, { u: 5.05, phase: 7.7 }].map(f => ({ ...f, collected: false }));
-    }
-    function fireflyPosition(f) { return circuitPoint(f.u); }
-
     async function startUrbanAudio() {
       urban.volume = 0;
       try { await urban.play(); urbanStarted = true; }
       catch (error) { urbanStarted = false; console.warn("Le jeu démarre sans l'ambiance urbaine.", error); }
     }
     function updateAudio(distance) {
-      if (!urbanStarted || ending || muted) return;
+      if (!urbanStarted || muted) return;
       const x = distance > .08 ? clamp((distance - .08) / .92, 0, 1) : 0;
       const target = clamp(x * x * .88, 0, .88);
       urban.volume += (target - urban.volume) * .09;
       if (distance <= .08 && urban.volume < .012) urban.volume = 0;
     }
 
-    function beginEnding() {
-      if (ending) return;
-      ending = true; pointer.down = false; status.textContent = "LE VIVANT EST RETROUVÉ";
-      const fade = setInterval(() => {
-        urban.volume = Math.max(0, urban.volume - .04);
-        if (urban.volume === 0) { clearInterval(fade); urban.pause(); }
-      }, 40);
-      setTimeout(() => { running = false; hud.classList.remove("show"); endScreen.classList.add("show"); }, 1600);
-    }
-    function checkFireflies() {
-      for (const firefly of fireflies) {
-        if (firefly.collected) continue;
-        const p = fireflyPosition(firefly);
-        if (firefly.u < cameraU - 1.35) { firefly.u = cameraU + 3.4; firefly.phase += 1.7; continue; }
-        if (Math.hypot(p.x - orb.x, p.y - orb.y) >= 38) continue;
-        firefly.collected = true; dots[collected]?.classList.add("on"); collected += 1;
-        hint.textContent = collected < 3 ? `LUCIOLE ${collected} SUR 3 — CONTINUEZ D'ÉCOUTER` : "LE VIVANT VOUS A RETROUVÉ";
-        hint.classList.add("show"); setTimeout(() => hint.classList.remove("show"), 2600);
-        if (navigator.vibrate) navigator.vibrate([20, 35, 45]);
-        for (let i = 0; i < 4; i++) waves.push({ x: orb.x, y: orb.y, r: 10 + i * 7, life: 1 - i * .12, hue: 100 + i * 20 });
-        if (collected === 3) beginEnding();
-      }
-    }
     function updateHUD() {
       if (deepSilence > .75) { status.textContent = "SILENCE"; status.style.opacity = ".18"; }
       else if (silence > .72) { status.textContent = "SUR LA VOIE"; status.style.opacity = ".3"; }
       else if (silence > .35) { status.textContent = "ÉCOUTE"; status.style.opacity = ".35"; }
       else { status.textContent = "RETROUVE LA VOIE"; status.style.opacity = ".45"; }
       attunementFill.style.width = `${Math.round(resonance * 100)}%`;
+      const minutes = Math.floor(streak / 60), seconds = Math.floor(streak % 60), tenths = Math.floor(streak * 10) % 10;
+      timeValue.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${tenths}`;
+      timeLabel.textContent = bestStreak > 1 ? `SILLAGE · RECORD ${bestStreak.toFixed(1)} S` : "SILLAGE DU SILENCE";
     }
     function update(dt) {
       time += dt;
-      const cameraBefore = pathWorld(cameraU); cameraU += dt * (.27 + collected * .025); const cameraAfter = pathWorld(cameraU);
+      const cameraBefore = pathWorld(cameraU); cameraU -= dt * .29; const cameraAfter = pathWorld(cameraU);
       const cameraDx = cameraAfter.x - cameraBefore.x, cameraDy = cameraAfter.y - cameraBefore.y;
       for (const p of trail) { p.x -= cameraDx; p.y -= cameraDy; }
       for (const wave of waves) { wave.x -= cameraDx; wave.y -= cameraDy; }
@@ -199,6 +153,9 @@
       const targetSilence = 1 - smoothstep(0, flow.width * .82, flow.distance);
       silence += (targetSilence - silence) * (1 - Math.exp(-7 * dt));
       deepSilence = clamp(deepSilence + (flow.distance < flow.width * .2 ? dt * .25 : -dt * .12), 0, 1);
+      if (silence > .62) { streak += dt; grace = .9; bestStreak = Math.max(bestStreak, streak); }
+      else if (grace > 0) grace -= dt;
+      else streak = 0;
       resonance += silence > .72 ? dt * (.28 + deepSilence * .25) : -dt * .18;
       resonance = clamp(resonance, 0, 1);
       if (resonance === 1) {
@@ -209,7 +166,7 @@
         if (navigator.vibrate) navigator.vibrate(18);
       }
       pulseFlash = Math.max(0, pulseFlash - dt * 1.4);
-      const targetBloom = clamp(deepSilence * .72 + collected * .12, 0, 1);
+      const targetBloom = clamp(deepSilence * .62 + Math.min(streak / 45, 1) * .38, 0, 1);
       bloom += (targetBloom - bloom) * (1 - Math.exp(-1.5 * dt));
       if (pointer.down) {
         orb.vx += (pointer.targetX - orb.x) * 8.5 * dt;
@@ -230,7 +187,7 @@
       trail.push({ x: orb.x, y: orb.y }); if (trail.length > 100) trail.shift();
       for (const wave of waves) { wave.r += 105 * dt; wave.life -= .6 * dt; }
       waves = waves.filter(wave => wave.life > 0);
-      checkFireflies(); updateAudio(distance); updateHUD();
+      updateAudio(distance); updateHUD();
     }
 
     function drawBackground() {
@@ -239,9 +196,9 @@
       g.addColorStop(.48, `hsl(${250 - bloom * 80},${45 + bloom * 38}%,${4 + bloom * 8}%)`);
       g.addColorStop(1, `hsl(${285 - bloom * 120},${42 + bloom * 38}%,${4 + bloom * 7}%)`);
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-      if (collected || bloom > .05) {
-        const life = collected / 3, rg = ctx.createRadialGradient(W * .5, H * .55, 0, W * .5, H * .55, W * .7);
-        rg.addColorStop(0, `rgba(30,255,150,${bloom * .08 + life * .06})`); rg.addColorStop(1, "rgba(0,0,0,0)");
+      if (bloom > .02) {
+        const rg = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, W * .72);
+        rg.addColorStop(0, `rgba(80,170,255,${bloom * .14})`); rg.addColorStop(.45, `rgba(155,90,255,${bloom * .055})`); rg.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
       }
     }
@@ -249,7 +206,7 @@
       ctx.save(); ctx.globalCompositeOperation = "screen";
       for (const p of particles) {
         const y = ((p.y + time * 4 * p.depth) % H + H) % H;
-        ctx.fillStyle = `hsla(${145 + p.hue * 150},100%,76%,${.01 + bloom * p.depth * .19})`;
+        ctx.fillStyle = `hsla(${190 + p.hue * 100},100%,80%,${.018 + bloom * p.depth * .22})`;
         ctx.beginPath(); ctx.arc(p.x + Math.sin(time * .25 + p.phase) * 4 * bloom, y, p.size * (.6 + bloom), 0, Math.PI * 2); ctx.fill();
       }
       ctx.restore();
@@ -269,7 +226,7 @@
     function drawFlow() {
       const points = getPath(); ctx.save(); ctx.globalCompositeOperation = "screen";
       for (let layer = 6; layer >= 1; layer--) {
-        ctx.strokeStyle = `hsla(${(155 + layer * 23 + time * 3) % 360},100%,70%,${.012 + bloom * .028})`;
+        ctx.strokeStyle = `hsla(${(205 + layer * 19 + time * 3) % 360},100%,74%,${.015 + bloom * .035})`;
         ctx.lineWidth = 10 + layer * 15 + bloom * 10;
         strokePath(points, p => { const offset = Math.sin(p.x * .014 + time * .28 + layer) * layer * bloom * 1.8; return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; });
       }
@@ -277,44 +234,17 @@
       const strands = 2 + Math.floor(bloom * 10);
       for (let s = 0; s < strands; s++) {
         const fraction = s / Math.max(1, strands - 1) - .5;
-        ctx.strokeStyle = `hsla(${(140 + s * 21 + time * 4) % 360},100%,72%,${bloom * .065})`; ctx.lineWidth = .7;
+        ctx.strokeStyle = `hsla(${(195 + s * 17 + time * 4) % 360},100%,76%,${bloom * .075})`; ctx.lineWidth = .7;
         strokePath(points, p => { const offset = fraction * p.width * 1.6 + Math.sin((p.x + p.y) * .02 + time * (.14 + s * .015) + s * 1.4) * (3 + bloom * 8); return { x: p.x + p.nx * offset, y: p.y + p.ny * offset }; });
       }
-      ctx.restore();
-    }
-    function drawFireflies() {
-      ctx.save(); ctx.globalCompositeOperation = "screen";
-      for (const firefly of fireflies) {
-        if (firefly.collected) continue; const p = fireflyPosition(firefly);
-        if (p.y > H && p.y < H + 520) {
-          const approach = 1 - (p.y - H) / 520;
-          ctx.fillStyle = `rgba(195,255,150,${approach * .55})`;
-          ctx.beginPath(); ctx.moveTo(p.x, H - 18); ctx.lineTo(p.x - 5, H - 9); ctx.lineTo(p.x + 5, H - 9); ctx.closePath(); ctx.fill();
-        }
-        if (p.y < -50 || p.y > H + 50) continue;
-        const radius = 18 + (.5 + .5 * Math.sin(time * 4 + firefly.phase)) * 8;
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
-        glow.addColorStop(0, "rgba(245,255,180,1)"); glow.addColorStop(.14, "rgba(160,255,90,.95)"); glow.addColorStop(.5, "rgba(40,255,120,.24)"); glow.addColorStop(1, "rgba(0,255,120,0)");
-        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(p.x, p.y, radius, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#f5ffd2"; ctx.beginPath(); ctx.arc(p.x, p.y, 2.4, 0, Math.PI * 2); ctx.fill();
-      }
+      ctx.setLineDash([1, 17]); ctx.lineDashOffset = -time * 22;
+      ctx.strokeStyle = `rgba(205,225,255,${.16 + bloom * .36})`; ctx.lineWidth = 2;
+      strokePath(points); ctx.setLineDash([]);
       ctx.restore();
     }
     function drawTrail() {
       if (trail.length < 2) return; ctx.save(); ctx.globalCompositeOperation = "screen";
       ctx.strokeStyle = `rgba(130,255,220,${.025 + bloom * .13})`; ctx.lineWidth = .7 + bloom; strokePath(trail); ctx.restore();
-    }
-    function drawFireflyTrain() {
-      if (!collected) return; ctx.save(); ctx.globalCompositeOperation = "screen"; let previousPoint = { x: orb.x, y: orb.y };
-      for (let i = 0; i < collected; i++) {
-        const p = trail[Math.max(0, trail.length - 1 - (18 + i * 19))]; if (!p) continue;
-        const x = p.x, y = p.y + 7 + Math.sin(time * 3 + i) * 2;
-        ctx.strokeStyle = `rgba(120,255,160,${.16 + bloom * .13})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(previousPoint.x, previousPoint.y); ctx.quadraticCurveTo((previousPoint.x + x) * .5, (previousPoint.y + y) * .5 + 4, x, y); ctx.stroke();
-        const radius = 12 + (.5 + .5 * Math.sin(time * 3.5 + i * 2)) * 5;
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, radius); glow.addColorStop(0, "#f5ffbe"); glow.addColorStop(.2, "rgba(150,255,100,.9)"); glow.addColorStop(1, "rgba(40,255,120,0)");
-        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); previousPoint = { x, y };
-      }
-      ctx.restore();
     }
     function drawWaves() {
       ctx.save(); ctx.globalCompositeOperation = "screen";
@@ -334,15 +264,15 @@
       const g = ctx.createRadialGradient(W * .5, H * .55, W * .12, W * .5, H * .55, Math.max(W, H) * .72);
       g.addColorStop(.35, "rgba(0,0,0,0)"); g.addColorStop(1, `rgba(0,0,8,${.48 - bloom * .18})`); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     }
-    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawFireflies(); drawFireflyTrain(); drawWaves(); drawOrb(); drawVignette(); }
+    function render() { drawBackground(); drawParticles(); drawFlow(); drawTrail(); drawWaves(); drawOrb(); drawVignette(); }
     function frame(timestamp) {
       if (!previous) previous = timestamp; const dt = Math.min((timestamp - previous) / 1000, .033); previous = timestamp;
-      if (running) { if (!ending && !paused) update(dt); render(); } requestAnimationFrame(frame);
+      if (running) { if (!paused) update(dt); render(); } requestAnimationFrame(frame);
     }
 
-    canvas.addEventListener("pointerdown", event => { if (!running || ending || paused) return; event.preventDefault(); pointer.down = true; pointer.x = pointer.targetX = event.clientX; pointer.y = pointer.targetY = event.clientY; pointer.t = performance.now(); }, { passive: false });
+    canvas.addEventListener("pointerdown", event => { if (!running || paused) return; event.preventDefault(); pointer.down = true; pointer.x = pointer.targetX = event.clientX; pointer.y = pointer.targetY = event.clientY; pointer.t = performance.now(); }, { passive: false });
     canvas.addEventListener("pointermove", event => {
-      if (!pointer.down || !running || ending || paused) return; event.preventDefault();
+      if (!pointer.down || !running || paused) return; event.preventDefault();
       const now = performance.now(), elapsed = Math.max(8, now - pointer.t);
       const velocityX = (event.clientX - pointer.x) / elapsed * 1000, velocityY = (event.clientY - pointer.y) / elapsed * 1000;
       orb.vx = clamp(orb.vx + velocityX * .018, -390, 390); orb.vy = clamp(orb.vy + velocityY * .018, -390, 390);
@@ -351,14 +281,14 @@
     const release = () => { pointer.down = false; };
     canvas.addEventListener("pointerup", release); canvas.addEventListener("pointercancel", release);
     addEventListener("resize", resize);
-    addEventListener("pagehide", () => { urban.pause(); nature.pause(); });
+    addEventListener("pagehide", () => urban.pause());
     addEventListener("keydown", event => {
       if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(event.key)) event.preventDefault();
       if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = true;
       if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") keys.right = true;
       if (event.key === "ArrowUp" || event.key.toLowerCase() === "w") keys.up = true;
       if (event.key === "ArrowDown" || event.key.toLowerCase() === "s") keys.down = true;
-      if (event.key === " " && running && !ending) togglePause();
+      if (event.key === " " && running) togglePause();
     });
     addEventListener("keyup", event => {
       if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") keys.left = false;
@@ -376,7 +306,7 @@
     }
     pauseBtn.addEventListener("click", togglePause);
     soundBtn.addEventListener("click", () => {
-      muted = !muted; urban.muted = muted; nature.muted = muted;
+      muted = !muted; urban.muted = muted;
       soundBtn.textContent = muted ? "×" : "♫";
       soundBtn.setAttribute("aria-label", muted ? "Activer le son" : "Couper le son");
     });
@@ -384,19 +314,13 @@
     document.getElementById("startBtn").addEventListener("click", () => {
       void startUrbanAudio();
       cameraU = 0; const start = circuitPoint(0); Object.assign(orb, { x: start.x, y: start.y, vx: 0, vy: 0 });
-      time = silence = deepSilence = resonance = pulseFlash = bloom = collected = 0; trail = []; waves = []; paused = false;
-      createFireflies(); dots.forEach(dot => dot.classList.remove("on")); ending = false; running = true; previous = performance.now();
+      time = silence = deepSilence = resonance = pulseFlash = bloom = streak = grace = 0; trail = []; waves = []; paused = false;
+      running = true; previous = performance.now(); timeValue.textContent = "00:00.0";
       startScreen.classList.add("hide"); hud.classList.add("show");
       hint.textContent = "GLISSEZ DANS TOUTES LES DIRECTIONS"; hint.classList.add("show");
       setTimeout(() => hint.classList.remove("show"), 4200);
     });
-    listenBtn.addEventListener("click", async () => {
-      urban.volume = 0; urban.pause(); nature.pause(); nature.currentTime = 0; nature.volume = 1;
-      try { await nature.play(); listenBtn.textContent = "LE VIVANT JOUE"; }
-      catch (error) { console.warn("Le chant de l'oiseau n'a pas pu démarrer.", error); listenBtn.textContent = "TOUCHER POUR RÉESSAYER"; }
-    });
-
-    resize(); createFireflies(); render(); requestAnimationFrame(frame);
+    resize(); render(); requestAnimationFrame(frame);
   })();
   </script>
 </body>
