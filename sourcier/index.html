@@ -46,7 +46,7 @@
   <main id="startScreen" class="screen">
     <h1 class="brand">SILENT</h1>
     <div class="subtitle">LA VOIE DU SILENCE</div>
-    <div class="copy">Glissez sur les courants de silence.<br>Évitez les rubans du vacarme.</div>
+    <div class="copy">Glissez dans les nappes de silence.<br>Évitez les nappes du vacarme.</div>
     <button id="startBtn" type="button">JOUER</button>
   </main>
   <section id="finalScreen" class="screen hide">
@@ -100,7 +100,7 @@
     }
     function spawn(type, x, y, scale = 1, delay = 0) {
       const bad = type === "noise";
-      objects.push({ type, x, y: y - delay, baseX: x, radius: (bad ? 18 : 16) * scale * (.85 + Math.random() * .3), length: (bad ? 105 : 125) * scale * (.85 + Math.random() * .3),
+      objects.push({ type, x, y: y - delay, baseX: x, radius: (bad ? 29 : 34) * scale * (.85 + Math.random() * .3), length: (bad ? 125 : 155) * scale * (.85 + Math.random() * .3),
         vy: 0, phase: Math.random() * 10, behavior: bad ? Math.floor(Math.random() * (elapsed > 35 ? 4 : elapsed > 15 ? 3 : 2)) : Math.floor(Math.random() * 3),
         variant: Math.floor(Math.random() * 4), dead: false, collected: false, absorb: 0 });
     }
@@ -198,21 +198,32 @@
       ctx.globalCompositeOperation = "source-over";
     }
     function drawObject(object) {
-      const bad = object.type === "noise", hue = bad ? 352 : 193, segments = 18;
-      const amplitude = (bad ? 7 : 4) + object.variant * 1.2;
-      const ribbonX = t => Math.sin(t * Math.PI * (bad ? 3 : 2) + object.phase * (bad ? 6 : 1.8)) * amplitude;
+      const bad = object.type === "noise", hue = bad ? 352 : 193, segments = 24;
+      const pulse = 1 + Math.sin(object.phase * (bad ? 7 : 2.2)) * (bad ? .07 : .035);
+      const centerX = t => Math.sin(t * Math.PI * (bad ? 3.2 : 2.1) + object.phase * (bad ? 5.5 : 1.5)) * (bad ? 9 : 6);
+      const edgeX = (t, side, inset = 0) => {
+        const tapered = Math.sin(Math.PI * t) * object.radius * pulse;
+        const livingEdge = Math.sin(t * Math.PI * (5 + object.variant) + object.phase * (bad ? 7 : 2.6) + side) * (bad ? 4 : 2.5);
+        return centerX(t) + side * Math.max(2, tapered + livingEdge - inset);
+      };
       ctx.save(); ctx.translate(object.x, object.y); ctx.globalCompositeOperation = "screen"; ctx.globalAlpha = object.collected ? .35 : 1;
-      ctx.lineCap = "round"; ctx.lineJoin = "round";
-      for (const layer of [{ width: object.radius * 3.2, alpha: .055 }, { width: object.radius * 1.6, alpha: .12 }, { width: bad ? 2.2 : 1.6, alpha: .82 }]) {
-        ctx.strokeStyle = `hsla(${hue},100%,${bad ? 67 : 72}%,${layer.alpha})`; ctx.lineWidth = layer.width;
-        ctx.beginPath();
-        for (let i = 0; i <= segments; i++) { const t = i / segments, y = (t - .5) * object.length; ctx[i ? "lineTo" : "moveTo"](ribbonX(t), y); }
+      const wash = ctx.createLinearGradient(0, -object.length * .5, 0, object.length * .5);
+      wash.addColorStop(0, `hsla(${hue},100%,70%,0)`); wash.addColorStop(.2, `hsla(${hue},100%,65%,${bad ? .13 : .1})`);
+      wash.addColorStop(.55, `hsla(${hue},100%,72%,${bad ? .2 : .15})`); wash.addColorStop(1, `hsla(${hue},100%,60%,0)`);
+      ctx.fillStyle = wash; ctx.shadowColor = `hsla(${hue},100%,60%,.35)`; ctx.shadowBlur = bad ? 18 : 24; ctx.beginPath();
+      for (let i = 0; i <= segments; i++) { const t = i / segments, y = (t - .5) * object.length; ctx[i ? "lineTo" : "moveTo"](edgeX(t, -1), y); }
+      for (let i = segments; i >= 0; i--) { const t = i / segments, y = (t - .5) * object.length; ctx.lineTo(edgeX(t, 1), y); }
+      ctx.closePath(); ctx.fill();
+      ctx.shadowBlur = 0; ctx.lineWidth = bad ? 1.1 : .75;
+      for (const side of [-1, 1]) {
+        ctx.strokeStyle = `hsla(${hue},100%,82%,${bad ? .38 : .25})`; ctx.beginPath();
+        for (let i = 1; i < segments; i++) { const t = i / segments, y = (t - .5) * object.length; ctx[i > 1 ? "lineTo" : "moveTo"](edgeX(t, side), y); }
         ctx.stroke();
       }
-      // Fine spectral filaments make each current read as a flowing sound ribbon.
-      for (let filament = -1; filament <= 1; filament += 2) {
-        ctx.strokeStyle = `hsla(${hue},100%,82%,${bad ? .28 : .2})`; ctx.lineWidth = .7; ctx.beginPath();
-        for (let i = 0; i <= segments; i++) { const t = i / segments, y = (t - .5) * object.length, edge = filament * object.radius * (.55 + Math.sin(t * 8 + object.phase) * .12); ctx[i ? "lineTo" : "moveTo"](ribbonX(t) + edge, y); }
+      // Slow inner veins make the translucent mass feel alive without hard edges.
+      for (let vein = -1; vein <= 1; vein++) {
+        ctx.strokeStyle = `hsla(${hue},100%,85%,${bad ? .13 : .1})`; ctx.lineWidth = .6; ctx.beginPath();
+        for (let i = 2; i < segments - 1; i++) { const t = i / segments, y = (t - .5) * object.length; ctx[i > 2 ? "lineTo" : "moveTo"](centerX(t) + vein * Math.sin(Math.PI * t) * object.radius * .42, y); }
         ctx.stroke();
       }
       ctx.restore();
