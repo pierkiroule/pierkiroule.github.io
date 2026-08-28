@@ -3,57 +3,125 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-  <meta name="theme-color" content="#071813">
+  <meta name="theme-color" content="#edf0df">
   <title>Silent Bubble — Le tunnel du vivant</title>
   <style>
-    :root{--night:#071813;--cream:#f3eddf;--green:#65f2a2;--noise:#ff675d}
+    :root{--ink:#17352c;--paper:#edf0df;--life:#46bc76;--warm:#c75f48}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;background:var(--night);color:var(--cream);font-family:Inter,ui-sans-serif,system-ui,sans-serif;user-select:none}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif;user-select:none}
     canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
-    #hud{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .5s}
-    #hud.on{opacity:1}.top{position:absolute;top:max(20px,env(safe-area-inset-top));left:max(20px,env(safe-area-inset-left));right:max(20px,env(safe-area-inset-right));display:flex;justify-content:space-between;align-items:flex-start}
-    .brand{font-size:11px;font-weight:900;letter-spacing:.28em}.brand small{display:block;margin-top:6px;font-size:7px;opacity:.5;letter-spacing:.2em}
-    .count{text-align:right;font-size:8px;font-weight:800;letter-spacing:.18em;color:rgba(243,237,223,.62)}#count{display:block;margin-top:3px;font-size:25px;font-weight:350;color:var(--green)}
-    .progress{position:absolute;left:50%;bottom:max(24px,env(safe-area-inset-bottom));width:min(420px,70vw);transform:translateX(-50%)}.track{height:3px;background:rgba(255,255,255,.18)}#progress{display:block;width:0;height:100%;background:var(--green);box-shadow:0 0 12px var(--green)}
-    #status{position:absolute;top:15%;left:50%;transform:translateX(-50%);font-size:9px;font-weight:750;letter-spacing:.17em;white-space:nowrap;color:rgba(243,237,223,.65)}
-    .overlay{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:28px;text-align:center;background:radial-gradient(circle at 50% 42%,rgba(21,72,53,.94),rgba(7,24,19,.98) 67%);transition:opacity .55s,visibility .55s}.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.card{width:min(510px,92vw)}
-    h1{margin:0;font-size:clamp(37px,9vw,66px);line-height:.95;letter-spacing:.08em}h1 span{display:block;color:var(--green)}.tag{margin-top:16px;font-size:8px;font-weight:800;letter-spacing:.36em;opacity:.55}.intro{margin:30px auto 22px;max-width:440px;font-size:13px;line-height:1.7;color:rgba(243,237,223,.74)}
-    .rules{margin:0 auto 30px;padding:16px 19px;max-width:430px;border:1px solid rgba(101,242,162,.27);border-radius:15px 3px;text-align:left;font-size:10px;line-height:1.75}.rules b{color:var(--green);letter-spacing:.08em}
-    button{appearance:none;border:0;border-radius:2px 14px;padding:16px 29px;background:var(--green);color:#071813;font-size:9px;font-weight:950;letter-spacing:.2em;cursor:pointer;box-shadow:6px 7px 0 rgba(243,237,223,.16)}button:focus-visible{outline:3px solid white;outline-offset:4px}
-    #end h2{font-size:10px;letter-spacing:.3em;color:var(--green)}#result{margin:12px 0;font-size:clamp(38px,11vw,70px);font-weight:250}#resultText{max-width:420px;margin:0 auto 28px;font-size:12px;line-height:1.7;opacity:.72}#listen{margin-bottom:13px}#listen[hidden]{display:none}#rewardTimer{display:block;margin:8px 0 22px;font-size:10px;letter-spacing:.22em;color:var(--green)}
-    @media(max-width:520px){#status{top:19%;font-size:7px}.progress{width:65vw}.intro{font-size:12px}}
+    #hud{position:fixed;z-index:3;top:max(22px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);font-size:10px;font-weight:750;letter-spacing:.18em;white-space:nowrap;opacity:0;transition:opacity .6s;pointer-events:none}#hud.on{opacity:.72}
+    .overlay{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:30px;text-align:center;background:radial-gradient(circle at 50% 43%,rgba(255,255,244,.83),rgba(237,240,223,.97) 68%);transition:opacity 1s,visibility 1s}.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.card{width:min(460px,92vw)}
+    h1{margin:0;font-size:clamp(42px,11vw,68px);font-weight:350;line-height:.95;letter-spacing:.06em}h1 strong{display:block;color:#348e5c;font-weight:850}.tag{margin:16px 0 31px;font-size:8px;font-weight:800;letter-spacing:.34em;opacity:.48}
+    p{margin:0 auto 28px;max-width:400px;font-size:13px;line-height:1.75;opacity:.67}.hint{font-size:9px;letter-spacing:.1em;opacity:.48}
+    button{appearance:none;border:1px solid rgba(23,53,44,.32);border-radius:999px;padding:15px 25px;background:rgba(255,255,248,.62);color:var(--ink);font-size:9px;font-weight:850;letter-spacing:.2em;cursor:pointer;backdrop-filter:blur(8px);transition:transform .25s,background .25s}button:hover{transform:translateY(-2px);background:white}button:focus-visible{outline:3px solid #67ca8f;outline-offset:4px}
+    #victory{background:rgba(237,240,223,.35);backdrop-filter:blur(7px)}#victory h2{margin:0;font-size:clamp(31px,9vw,55px);font-weight:350;letter-spacing:.04em}#victory p{margin:14px auto 31px;font-size:10px;font-weight:750;letter-spacing:.2em;color:#348e5c;opacity:1}
+    #listenUi{background:transparent;pointer-events:none}#listenUi .card{position:absolute;bottom:max(35px,env(safe-area-inset-bottom))}#listenUi h2{margin:0 0 10px;font-size:10px;letter-spacing:.28em;font-weight:750}#listenUi p{margin:0 0 20px;font-size:9px;letter-spacing:.16em}#listenUi button{pointer-events:auto}#listenUi button[hidden]{display:none}
+    @media(max-width:520px){p{font-size:12px}.overlay{padding:24px}.hint{font-size:8px}}
+    @media(prefers-reduced-motion:reduce){.overlay{transition-duration:.01ms}}
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="Pilotez une bulle au centre d'un tunnel et collectez cinq bulles vertes sans toucher les parois"></canvas>
+  <canvas id="game" aria-label="Guidez Silent Bubble dans le tunnel et recueillez cinq Échos du vivant"></canvas>
   <audio id="nature" src="audio/nature2.mp3" preload="auto"></audio>
   <audio id="noise" src="audio/urbain.mp3" preload="auto" loop></audio>
-  <div id="hud"><div class="top"><div class="brand">SILENT BUBBLE<small>LE TUNNEL DU VIVANT</small></div><div class="count">ÉCHOS COLLECTÉS<span id="count">0 / 5</span></div></div><div id="status">AU CENTRE, LE SILENCE</div><div class="progress"><div class="track"><i id="progress"></i></div></div></div>
-  <main id="start" class="overlay"><div class="card"><h1>SILENT <span>BUBBLE</span></h1><div class="tag">PILOTER · ÉCOUTER · RECUEILLIR</div><p class="intro">Traverse le tunnel dans le silence. Les parois du haut et du bas portent le vacarme&nbsp;: ne les touche pas.</p><div class="rules"><b>UNE SEULE COMMANDE</b><br>Maintiens l'écran, la souris ou la barre espace pour monter. Relâche pour descendre. Collecte les <b>5 bulles vertes</b>&nbsp;: chacune libère 3 secondes de nature. Atteins la sortie avec les cinq pour écouter une minute entière.</div><button id="play">ENTRER DANS LE TUNNEL</button></div></main>
-  <section id="end" class="overlay hidden"><div class="card"><h2>FIN DU TUNNEL</h2><div id="result"></div><p id="resultText"></p><button id="listen" hidden>ÉCOUTER LA MINUTE DE NATURE</button><span id="rewardTimer"></span><br><button id="again">RECOMMENCER</button></div></section>
+  <div id="hud">ÉCHOS DU VIVANT&nbsp; <span id="count">0 / 5</span></div>
+  <main id="start" class="overlay"><div class="card"><h1>SILENT <strong>BUBBLE</strong></h1><div class="tag">LE TUNNEL DU VIVANT</div><p>Guide la bulle dans le silence. Évite les parois qui portent le vacarme et recueille les cinq lueurs vertes.</p><p class="hint">TOUCHE ET GLISSE POUR PILOTER</p><button id="play">ENTRER DANS LE SILENCE</button></div></main>
+  <section id="victory" class="overlay hidden"><div class="card"><h2>Le vivant est retrouvé</h2><p>5 ÉCHOS RECUEILLIS</p><button id="listen">ÉCOUTER LA MINUTE VIVANTE</button></div></section>
+  <section id="listenUi" class="overlay hidden"><div class="card"><h2 id="listenTitle">LA MINUTE VIVANTE</h2><p id="listenTime">01:00</p><button id="replay" hidden>REJOUER</button></div></section>
   <script>
   (()=>{"use strict";
-    const canvas=document.querySelector("#game"),ctx=canvas.getContext("2d"),nature=document.querySelector("#nature"),noise=document.querySelector("#noise"),hud=document.querySelector("#hud"),countEl=document.querySelector("#count"),statusEl=document.querySelector("#status"),progressEl=document.querySelector("#progress"),end=document.querySelector("#end"),listen=document.querySelector("#listen"),rewardTimer=document.querySelector("#rewardTimer");
-    const DURATION=48,GOAL=5,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));let W,H,dpr,last=0,time=0,running=false,holding=false,collected=0,contact=false,natureStop=0,rewardInterval=0,orbs=[],particles=[];
-    const hero={x:0,y:0,vy:0,r:18,trail:[]};
-    function tunnelAt(x){const travel=time*150+x;const center=H*.5+Math.sin(travel*.0042)*H*.085+Math.sin(travel*.0105+1.5)*H*.025;const half=Math.max(78,H*(.205+Math.sin(travel*.0027+.8)*.025));return{top:center-half,bottom:center+half,center};}
-    function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);hero.x=W*.25;if(!running)hero.y=H*.5}
-    function reset(){clearInterval(rewardInterval);nature.pause();noise.pause();time=0;collected=0;contact=false;natureStop=0;orbs=[];particles=[];hero.x=W*.25;hero.y=H*.5;hero.vy=0;hero.trail=[];for(let i=0;i<GOAL;i++)orbs.push({at:6+i*8.1,ySeed:i*1.71,dead:false});updateHud()}
-    function updateHud(){countEl.textContent=`${collected} / ${GOAL}`;progressEl.style.width=`${clamp(time/DURATION*100,0,100)}%`}
-    function playNatureSnippet(){noise.pause();contact=false;nature.currentTime=Math.min(Math.max(0,nature.currentTime),Math.max(0,(nature.duration||60)-3.1));nature.volume=.8;nature.play().catch(()=>{});natureStop=performance.now()+3000}
-    function setContact(on){if(on===contact)return;contact=on;if(on){nature.pause();natureStop=0;noise.volume=.72;noise.play().catch(()=>{});statusEl.textContent="PAROI — VACARME";statusEl.style.color="#ff8178"}else{noise.pause();statusEl.textContent=natureStop?"ÉCHO DU VIVANT — 3 SECONDES":"AU CENTRE, LE SILENCE";statusEl.style.color=""}}
-    function burst(x,y){for(let i=0;i<30;i++){const a=Math.random()*7,s=35+Math.random()*110;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.8+Math.random()*.5,r:1+Math.random()*3})}}
-    function update(dt){time+=dt;if(time>=DURATION){finish();return}hero.vy+=(holding?-255:170)*dt;hero.vy*=Math.exp(-1.75*dt);hero.y+=hero.vy*dt;const t=tunnelAt(hero.x),hit=hero.y-hero.r<t.top||hero.y+hero.r>t.bottom;if(hit){hero.y=clamp(hero.y,t.top+hero.r-5,t.bottom-hero.r+5);hero.vy*=-.24}setContact(hit);if(natureStop&&performance.now()>=natureStop){nature.pause();natureStop=0;if(!contact)statusEl.textContent="AU CENTRE, LE SILENCE"}hero.trail.push({x:hero.x,y:hero.y});if(hero.trail.length>32)hero.trail.shift();
-      for(const o of orbs){const x=hero.x+(o.at-time)*150;const tt=tunnelAt(x),y=tt.center+Math.sin(o.ySeed)*Math.min(55,(tt.bottom-tt.top)*.25);o.x=x;o.y=y;if(!o.dead&&Math.hypot(hero.x-x,hero.y-y)<hero.r+15){o.dead=true;collected++;burst(x,y);playNatureSnippet();statusEl.textContent="ÉCHO DU VIVANT — 3 SECONDES";updateHud()}}
-      for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.97;p.vy*=.97;p.life-=dt}particles=particles.filter(p=>p.life>0);updateHud()}
-    function draw(){const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#06120f");bg.addColorStop(.5,"#12382a");bg.addColorStop(1,"#06120f");ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);const top=[],bottom=[];for(let x=-10;x<=W+10;x+=10){const t=tunnelAt(x);top.push([x,t.top]);bottom.push([x,t.bottom])}ctx.fillStyle="#101716";ctx.beginPath();ctx.moveTo(0,0);top.forEach(p=>ctx.lineTo(...p));ctx.lineTo(W,0);ctx.fill();ctx.beginPath();ctx.moveTo(0,H);bottom.forEach(p=>ctx.lineTo(...p));ctx.lineTo(W,H);ctx.fill();for(const points of [top,bottom]){ctx.beginPath();points.forEach((p,i)=>ctx[i?"lineTo":"moveTo"](...p));ctx.strokeStyle=contact?"rgba(255,103,93,.85)":"rgba(255,103,93,.42)";ctx.shadowColor="#ff554b";ctx.shadowBlur=contact?25:10;ctx.lineWidth=4;ctx.stroke()}ctx.shadowBlur=0;
-      for(const o of orbs){if(o.dead||o.x<-40||o.x>W+40)continue;const g=ctx.createRadialGradient(o.x-5,o.y-6,1,o.x,o.y,32);g.addColorStop(0,"#fff");g.addColorStop(.18,"#9affc6");g.addColorStop(.55,"rgba(29,224,117,.85)");g.addColorStop(1,"rgba(29,224,117,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(o.x,o.y,32,0,7);ctx.fill();ctx.strokeStyle="#72ffad";ctx.lineWidth=2;ctx.beginPath();ctx.arc(o.x,o.y,15,0,7);ctx.stroke()}
-      for(const p of particles){ctx.fillStyle=`rgba(101,242,162,${p.life})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill()}hero.trail.forEach((p,i)=>{ctx.fillStyle=`rgba(101,242,162,${i/hero.trail.length*.06})`;ctx.beginPath();ctx.arc(p.x,p.y,hero.r*.7,0,7);ctx.fill()});const g=ctx.createRadialGradient(hero.x-7,hero.y-8,1,hero.x,hero.y,hero.r);g.addColorStop(0,"white");g.addColorStop(.3,"#b7ffda");g.addColorStop(1,"#23ad70");ctx.fillStyle=g;ctx.strokeStyle="#eafff3";ctx.lineWidth=2;ctx.shadowColor="#65f2a2";ctx.shadowBlur=18;ctx.beginPath();ctx.arc(hero.x,hero.y,hero.r,0,7);ctx.fill();ctx.stroke();ctx.shadowBlur=0}
-    function frame(now){const dt=Math.min((now-last)/1000||0,.033);last=now;if(running)update(dt);draw();requestAnimationFrame(frame)}
-    function begin(){reset();running=true;last=performance.now();document.querySelector("#start").classList.add("hidden");end.classList.add("hidden");hud.classList.add("on")}
-    function finish(){running=false;holding=false;noise.pause();nature.pause();natureStop=0;hud.classList.remove("on");const won=collected===GOAL;document.querySelector("#result").textContent=won?"5 / 5":`${collected} / 5`;document.querySelector("#resultText").textContent=won?"Tu as traversé le tunnel et recueilli tous les échos. La minute du vivant est à toi.":"La sortie est atteinte, mais des échos sont restés dans le tunnel. Repars les chercher pour libérer la minute de nature.";listen.hidden=!won;rewardTimer.textContent="";end.classList.remove("hidden")}
-    function reward(){listen.hidden=true;document.querySelector("#again").style.display="none";nature.currentTime=0;nature.volume=.85;nature.play().catch(()=>{});let left=60;rewardTimer.textContent="01:00 — ÉCOUTE LE VIVANT";clearInterval(rewardInterval);rewardInterval=setInterval(()=>{left--;rewardTimer.textContent=`00:${String(Math.max(0,left)).padStart(2,"0")} — ÉCOUTE LE VIVANT`;if(left<=0){clearInterval(rewardInterval);nature.pause();document.querySelector("#again").style.display="inline-block";rewardTimer.textContent="LA MINUTE EST ACCOMPLIE"}},1000)}
-    const press=e=>{if(running){e.preventDefault();holding=true;canvas.setPointerCapture?.(e.pointerId)}};canvas.addEventListener("pointerdown",press,{passive:false});addEventListener("pointerup",()=>holding=false);addEventListener("pointercancel",()=>holding=false);addEventListener("keydown",e=>{if((e.code==="Space"||e.code==="ArrowUp")&&running){e.preventDefault();holding=true}});addEventListener("keyup",e=>{if(e.code==="Space"||e.code==="ArrowUp")holding=false});addEventListener("resize",resize);document.querySelector("#play").onclick=begin;document.querySelector("#again").onclick=()=>{document.querySelector("#again").style.display="inline-block";begin()};listen.onclick=reward;resize();reset();requestAnimationFrame(frame)
+    const STATE={START:0,PLAYING:1,WIN_TRANSITION:2,READY:3,LISTENING:4,DONE:5};
+    const canvas=document.querySelector("#game"),ctx=canvas.getContext("2d",{alpha:false});
+    const hud=document.querySelector("#hud"),countEl=document.querySelector("#count"),start=document.querySelector("#start"),victory=document.querySelector("#victory"),listenUi=document.querySelector("#listenUi"),nature=document.querySelector("#nature"),noise=document.querySelector("#noise");
+    const GOAL=5,SPEED=112,FRAGMENT_MS=3000,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
+    let W=0,H=0,DPR=1,state=STATE.START,last=0,world=0,scrollSpeed=0,winTime=0,listenLeft=60,pointer=false,keyDir=0;
+    let audioCtx,natureSource,noiseSource,natureGain,noiseGain,analyser,fragmentTimer=0,minuteTimer=0;
+    let motes=[],particles=[],collectibles=[];
+    const hero={x:0,y:0,targetY:0,vy:0,r:18,sx:1,sy:1,life:0,contact:false,trail:[]};
+
+    function tunnelAt(screenX){
+      const x=world+screenX,center=H*.51+Math.sin(x*.0024+.5)*H*.095+Math.sin(x*.0063)*H*.032;
+      const half=Math.max(78,H*(.215+Math.sin(x*.0017+2)*.035+Math.sin(x*.0041)*.014));
+      return{top:center-half,bottom:center+half,center,half};
+    }
+    function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);hero.x=W*.24;if(state===STATE.START){hero.y=hero.targetY=H*.5}motes=Array.from({length:Math.min(55,Math.floor(W*H/13000))},(_,i)=>({x:(i*83.7)%W,y:(i*151.3)%H,z:.25+(i%9)/12}))}
+
+    function initAudio(){
+      if(audioCtx){audioCtx.resume();return}
+      audioCtx=new(window.AudioContext||window.webkitAudioContext)();natureSource=audioCtx.createMediaElementSource(nature);noiseSource=audioCtx.createMediaElementSource(noise);natureGain=audioCtx.createGain();noiseGain=audioCtx.createGain();analyser=audioCtx.createAnalyser();analyser.fftSize=128;analyser.smoothingTimeConstant=.86;natureGain.gain.value=0;noiseGain.gain.value=0;natureSource.connect(analyser).connect(natureGain).connect(audioCtx.destination);noiseSource.connect(noiseGain).connect(audioCtx.destination);
+    }
+    function fade(param,value,seconds=.045){if(!audioCtx)return;const now=audioCtx.currentTime;param.cancelScheduledValues(now);param.setValueAtTime(param.value,now);param.linearRampToValueAtTime(value,now+seconds)}
+    function silenceAll(){clearTimeout(fragmentTimer);clearTimeout(minuteTimer);fragmentTimer=minuteTimer=0;if(audioCtx){fade(natureGain.gain,0,.04);fade(noiseGain.gain,0,.04)}setTimeout(()=>{if(state!==STATE.LISTENING)nature.pause();if(!hero.contact)noise.pause()},70)}
+    function setNoise(active){
+      if(state!==STATE.PLAYING&&active)return;
+      hero.contact=active;if(active){clearTimeout(fragmentTimer);fragmentTimer=0;fade(natureGain.gain,0,.035);setTimeout(()=>nature.pause(),45);noise.play().catch(()=>{});fade(noiseGain.gain,.58,.055)}else{fade(noiseGain.gain,0,.04);setTimeout(()=>{if(!hero.contact)noise.pause()},60)}
+    }
+    function playFragment(index){
+      clearTimeout(fragmentTimer);setNoise(false);noise.pause();fade(noiseGain.gain,0,.02);
+      const duration=Number.isFinite(nature.duration)?nature.duration:60,usable=Math.max(3,duration-3.05),position=(index-1)/GOAL*usable;
+      nature.currentTime=Math.min(position,usable);nature.play().catch(()=>{});fade(natureGain.gain,.68,.06);
+      fragmentTimer=setTimeout(()=>{fade(natureGain.gain,0,.07);setTimeout(()=>nature.pause(),75);fragmentTimer=0},FRAGMENT_MS-80);
+    }
+
+    function reset(){
+      silenceAll();world=0;scrollSpeed=SPEED;winTime=0;hero.y=hero.targetY=H*.5;hero.vy=0;hero.life=0;hero.contact=false;hero.trail=[];particles=[];
+      const positions=[850,1740,2660,3600,4580],offsets=[0,-.48,.36,-.58,.48];collectibles=positions.map((x,i)=>({worldX:x,offset:offsets[i],taken:false,phase:i*1.7}));countEl.textContent=`0 / ${GOAL}`;
+    }
+    function begin(){initAudio();reset();state=STATE.PLAYING;start.classList.add("hidden");victory.classList.add("hidden");listenUi.classList.add("hidden");hud.classList.add("on");last=performance.now()}
+    function collect(o,x,y){
+      o.taken=true;hero.life++;hero.sx=.78;hero.sy=1.25;countEl.textContent=`${hero.life} / ${GOAL}`;playFragment(hero.life);
+      for(let i=0;i<28;i++){const a=i/28*Math.PI*2,s=28+Math.random()*75;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.8+Math.random()*.55,max:1.35,r:1+Math.random()*2.4})}
+      if(hero.life===GOAL){state=STATE.WIN_TRANSITION;winTime=0;setNoise(false)}
+    }
+    function updatePlaying(dt){
+      world+=scrollSpeed*dt;
+      if(keyDir)hero.targetY+=keyDir*250*dt;
+      const tunnel=tunnelAt(hero.x),safeTop=tunnel.top+hero.r,safeBottom=tunnel.bottom-hero.r;hero.targetY=clamp(hero.targetY,safeTop-18,safeBottom+18);
+      const pull=(hero.targetY-hero.y)*20;hero.vy+=(pull-hero.vy*8)*dt;hero.y+=hero.vy*dt;hero.sx=lerp(hero.sx,1,1-Math.exp(-10*dt));hero.sy=lerp(hero.sy,1,1-Math.exp(-10*dt));
+      const hit=hero.y-hero.r<tunnel.top||hero.y+hero.r>tunnel.bottom;if(hit){hero.y=clamp(hero.y,safeTop-3,safeBottom+3);hero.vy*=.35;hero.sx=1.12;hero.sy=.9}setNoise(hit);
+      hero.trail.push({x:hero.x,y:hero.y,life:1});if(hero.trail.length>34)hero.trail.shift();
+      for(const o of collectibles){if(o.taken)continue;const x=o.worldX-world,t=tunnelAt(x),margin=hero.r+18+12,y=t.center+o.offset*(t.half-margin);o.x=x;o.y=y;o.phase+=dt;if(Math.hypot(hero.x-x,hero.y-y)<hero.r+17)collect(o,x,y)}
+    }
+    function update(dt){
+      if(state===STATE.PLAYING)updatePlaying(dt);
+      else if(state===STATE.WIN_TRANSITION){winTime+=dt;scrollSpeed=lerp(scrollSpeed,0,1-Math.exp(-1.8*dt));world+=scrollSpeed*dt;hero.targetY=H*.5;hero.y=lerp(hero.y,H*.5,1-Math.exp(-1.5*dt));if(winTime>3.2){state=STATE.READY;silenceAll();hud.classList.remove("on");victory.classList.remove("hidden")}}
+      for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.exp(-2.2*dt);p.vy*=Math.exp(-2.2*dt);p.life-=dt}particles=particles.filter(p=>p.life>0);
+    }
+
+    function path(points){ctx.beginPath();points.forEach((p,i)=>ctx[i?"lineTo":"moveTo"](p[0],p[1]))}
+    function drawTunnel(alpha=1){
+      const top=[],bottom=[];for(let x=-12;x<W+15;x+=12){const t=tunnelAt(x);top.push([x,t.top]);bottom.push([x,t.bottom])}
+      ctx.save();ctx.globalAlpha=alpha;const wall=ctx.createLinearGradient(0,0,0,H);wall.addColorStop(0,"#b4a889");wall.addColorStop(.28,"#cec5a7");wall.addColorStop(.72,"#c9bea0");wall.addColorStop(1,"#9f9478");ctx.fillStyle=wall;
+      ctx.beginPath();ctx.moveTo(0,0);top.forEach(p=>ctx.lineTo(...p));ctx.lineTo(W,0);ctx.fill();ctx.beginPath();ctx.moveTo(0,H);bottom.forEach(p=>ctx.lineTo(...p));ctx.lineTo(W,H);ctx.fill();
+      for(const pts of [top,bottom]){path(pts);ctx.strokeStyle=hero.contact?"rgba(186,75,50,.75)":"rgba(99,83,62,.28)";ctx.lineWidth=hero.contact?5:2;ctx.shadowColor="#c65d45";ctx.shadowBlur=hero.contact?17:0;ctx.stroke()}ctx.restore();
+    }
+    function drawCollectibles(){for(const o of collectibles){if(o.taken||o.x<-50||o.x>W+50)continue;const pulse=1+Math.sin(o.phase*2.2)*.07,g=ctx.createRadialGradient(o.x-4,o.y-5,1,o.x,o.y,35);g.addColorStop(0,"rgba(255,255,238,.98)");g.addColorStop(.22,"rgba(145,237,170,.92)");g.addColorStop(.55,"rgba(50,177,100,.45)");g.addColorStop(1,"rgba(50,177,100,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(o.x,o.y,35*pulse,0,7);ctx.fill();ctx.strokeStyle="rgba(42,143,84,.72)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(o.x,o.y,14*pulse,0,7);ctx.stroke()}}
+    function drawHero(audioEnergy=0){
+      const life=hero.life/GOAL,glow=15+life*27+audioEnergy*35;for(let i=0;i<hero.trail.length;i++){const p=hero.trail[i],a=i/hero.trail.length*life*.12;ctx.fillStyle=`rgba(56,181,108,${a})`;ctx.beginPath();ctx.arc(p.x-(hero.trail.length-i)*life*.8,p.y,3+life*7,0,7);ctx.fill()}
+      if(life>.35)for(let i=0;i<Math.floor(life*8);i++){const a=i*2.4+performance.now()*.00035,r=hero.r+12+(i%3)*8;ctx.fillStyle=`rgba(67,181,105,${.12+life*.18})`;ctx.beginPath();ctx.arc(hero.x+Math.cos(a)*r,hero.y+Math.sin(a)*r,1.2+life,0,7);ctx.fill()}
+      ctx.save();ctx.translate(hero.x+(hero.contact?(Math.random()-.5)*2:0),hero.y);ctx.scale(hero.sx,hero.sy);ctx.shadowColor=`rgba(54,181,104,${.35+life*.45})`;ctx.shadowBlur=glow;const g=ctx.createRadialGradient(-7,-8,1,0,0,hero.r*(1+audioEnergy*.08));g.addColorStop(0,"rgba(255,255,250,.96)");g.addColorStop(.3,`rgba(${185-life*45},${229+life*18},${205-life*8},.78)`);g.addColorStop(1,"rgba(46,148,91,.42)");ctx.fillStyle=g;ctx.strokeStyle="rgba(37,101,69,.58)";ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(0,0,hero.r*(1+audioEnergy*.08),0,7);ctx.fill();ctx.stroke();ctx.restore();
+    }
+    function drawListening(){
+      const data=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(data);const energy=data.reduce((a,b)=>a+b,0)/(data.length*255),t=performance.now()*.001;ctx.fillStyle="#edf0df";ctx.fillRect(0,0,W,H);
+      for(let i=0;i<motes.length;i++){const m=motes[i],a=.08+energy*.25,x=(m.x+Math.sin(t*m.z+i)*24)%W,y=m.y+Math.cos(t*.5+i)*10;ctx.fillStyle=`rgba(48,151,88,${a})`;ctx.beginPath();ctx.arc(x,y,.7+m.z*1.5+energy*2,0,7);ctx.fill()}
+      hero.x=lerp(hero.x,W*.5,.03);hero.y=H*.47+Math.sin(t*.7)*7;hero.sx=hero.sy=1;drawHero(energy);ctx.strokeStyle=`rgba(62,167,99,${.08+energy*.3})`;for(let i=0;i<3;i++){ctx.lineWidth=1;ctx.beginPath();ctx.arc(hero.x,hero.y,hero.r+24+i*22+Math.sin(t+i)*4+energy*25,0,7);ctx.stroke()}
+    }
+    function render(){
+      if(state===STATE.LISTENING||state===STATE.DONE){drawListening();return}ctx.fillStyle="#edf0df";ctx.fillRect(0,0,W,H);const fade=state===STATE.WIN_TRANSITION?clamp(1-winTime/3.2,0,1):1;drawTunnel(fade);drawCollectibles();for(const p of particles){ctx.fillStyle=`rgba(50,174,99,${clamp(p.life/p.max,0,1)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill()}drawHero();
+    }
+    function frame(now){const dt=Math.min((now-last)/1000||0,.033);last=now;update(dt);render();requestAnimationFrame(frame)}
+
+    function startMinute(){
+      initAudio();state=STATE.LISTENING;victory.classList.add("hidden");listenUi.classList.remove("hidden");document.querySelector("#replay").hidden=true;document.querySelector("#listenTitle").textContent="LA MINUTE VIVANTE";listenLeft=60;nature.currentTime=0;nature.play().catch(()=>{});fade(natureGain.gain,.72,.35);clearTimeout(minuteTimer);minuteTimer=setTimeout(endMinute,60000);updateMinuteClock();
+    }
+    function updateMinuteClock(){if(state!==STATE.LISTENING)return;document.querySelector("#listenTime").textContent=`00:${String(Math.ceil(listenLeft)).padStart(2,"0")}`;setTimeout(updateMinuteClock,250)}
+    function endMinute(){if(state!==STATE.LISTENING)return;state=STATE.DONE;fade(natureGain.gain,0,.4);setTimeout(()=>nature.pause(),450);document.querySelector("#listenTitle").textContent="LE SILENCE REVIENT";document.querySelector("#listenTime").textContent="";document.querySelector("#replay").hidden=false}
+    setInterval(()=>{if(state===STATE.LISTENING){listenLeft=Math.max(0,listenLeft-.25);if(listenLeft<=0)endMinute()}},250);
+    function movePointer(e){if(state!==STATE.PLAYING)return;e.preventDefault();const rect=canvas.getBoundingClientRect();hero.targetY=e.clientY-rect.top}
+    canvas.addEventListener("pointerdown",e=>{pointer=true;canvas.setPointerCapture?.(e.pointerId);movePointer(e)},{passive:false});canvas.addEventListener("pointermove",e=>{if(pointer)movePointer(e)},{passive:false});addEventListener("pointerup",()=>pointer=false);addEventListener("pointercancel",()=>pointer=false);
+    addEventListener("keydown",e=>{if(e.code==="ArrowUp"||e.code==="ArrowDown"){e.preventDefault();keyDir=e.code==="ArrowUp"?-1:1}});addEventListener("keyup",e=>{if(e.code==="ArrowUp"||e.code==="ArrowDown")keyDir=0});addEventListener("resize",resize);
+    document.querySelector("#play").onclick=begin;document.querySelector("#listen").onclick=startMinute;document.querySelector("#replay").onclick=()=>{state=STATE.START;listenUi.classList.add("hidden");start.classList.remove("hidden");hero.life=0;silenceAll()};resize();reset();requestAnimationFrame(frame);
   })();
   </script>
 </body>
