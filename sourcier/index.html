@@ -10,7 +10,7 @@
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{margin:0;width:100%;height:100%;overflow:hidden;touch-action:none;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,sans-serif;user-select:none}
     canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
-    #hud{position:fixed;z-index:3;top:max(22px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);font-size:10px;font-weight:750;letter-spacing:.18em;white-space:nowrap;opacity:0;transition:opacity .6s;pointer-events:none}#hud.on{opacity:.72}
+    #hud{position:fixed;z-index:3;top:max(22px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);text-align:center;font-size:10px;font-weight:750;letter-spacing:.18em;white-space:nowrap;opacity:0;transition:opacity .6s;pointer-events:none}#hud.on{opacity:.72}#silenceHud{display:block;margin-top:9px;font-size:7px;letter-spacing:.15em;opacity:.65}#silenceMeter{display:inline-block;width:74px;height:3px;margin-left:7px;vertical-align:middle;background:rgba(23,53,44,.14);border-radius:3px;overflow:hidden}#silenceBar{display:block;width:0;height:100%;background:#7aaeba;transition:width .15s}
     .overlay{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:30px;text-align:center;background:radial-gradient(circle at 50% 43%,rgba(255,255,244,.83),rgba(237,240,223,.97) 68%);transition:opacity 1s,visibility 1s}.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.card{width:min(460px,92vw)}
     h1{margin:0;font-size:clamp(42px,11vw,68px);font-weight:350;line-height:.95;letter-spacing:.06em}h1 strong{display:block;color:#348e5c;font-weight:850}.tag{margin:16px 0 31px;font-size:8px;font-weight:800;letter-spacing:.34em;opacity:.48}
     p{margin:0 auto 28px;max-width:400px;font-size:13px;line-height:1.75;opacity:.67}.hint{font-size:9px;letter-spacing:.1em;opacity:.48}
@@ -25,24 +25,25 @@
   <canvas id="game" aria-label="Guidez Silent Bubble dans le tunnel et recueillez cinq Échos du vivant"></canvas>
   <audio id="nature" src="audio/nature2.mp3" preload="auto"></audio>
   <audio id="noise" src="audio/urbain.mp3" preload="auto" loop></audio>
-  <div id="hud">ÉCHOS DU VIVANT&nbsp; <span id="count">0 / 5</span></div>
-  <main id="start" class="overlay"><div class="card"><h1>SILENT <strong>BUBBLE</strong></h1><div class="tag">LE TUNNEL DU VIVANT</div><p>Guide la bulle dans le silence. Évite les parois qui portent le vacarme et recueille les cinq lueurs vertes.</p><p class="hint">TOUCHE ET GLISSE POUR PILOTER</p><button id="play">ENTRER DANS LE SILENCE</button></div></main>
+  <div id="hud">ÉCHOS DU VIVANT&nbsp; <span id="count">0 / 5</span><span id="silenceHud">SOUFFLE DE SILENCE <i id="silenceMeter"><b id="silenceBar"></b></i></span></div>
+  <main id="start" class="overlay"><div class="card"><h1>SILENT <strong>BUBBLE</strong></h1><div class="tag">LE TUNNEL DU VIVANT</div><p>Le tunnel se resserre à mesure que tu avances. Recueille les bulles pâles pour lui redonner du souffle, évite ses parois et retrouve les cinq lueurs vertes.</p><p class="hint">TOUCHE ET GLISSE POUR PILOTER</p><button id="play">ENTRER DANS LE SILENCE</button></div></main>
   <section id="victory" class="overlay hidden"><div class="card"><h2>Le vivant est retrouvé</h2><p>5 ÉCHOS RECUEILLIS</p><button id="listen">ÉCOUTER LA MINUTE VIVANTE</button></div></section>
   <section id="listenUi" class="overlay hidden"><div class="card"><h2 id="listenTitle">LA MINUTE VIVANTE</h2><p id="listenTime">01:00</p><button id="replay" hidden>REJOUER</button></div></section>
   <script>
   (()=>{"use strict";
     const STATE={START:0,PLAYING:1,WIN_TRANSITION:2,READY:3,LISTENING:4,DONE:5};
     const canvas=document.querySelector("#game"),ctx=canvas.getContext("2d",{alpha:false});
-    const hud=document.querySelector("#hud"),countEl=document.querySelector("#count"),start=document.querySelector("#start"),victory=document.querySelector("#victory"),listenUi=document.querySelector("#listenUi"),nature=document.querySelector("#nature"),noise=document.querySelector("#noise");
-    const GOAL=5,SPEED=112,FRAGMENT_MS=3000,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
-    let W=0,H=0,DPR=1,state=STATE.START,last=0,world=0,scrollSpeed=0,winTime=0,listenLeft=60,pointer=false,keyDir=0;
+    const hud=document.querySelector("#hud"),countEl=document.querySelector("#count"),silenceBar=document.querySelector("#silenceBar"),start=document.querySelector("#start"),victory=document.querySelector("#victory"),listenUi=document.querySelector("#listenUi"),nature=document.querySelector("#nature"),noise=document.querySelector("#noise");
+    const GOAL=5,SPEED=122,FRAGMENT_MS=3000,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
+    let W=0,H=0,DPR=1,state=STATE.START,last=0,world=0,scrollSpeed=0,winTime=0,listenLeft=60,pointer=false,keyDir=0,silencePower=0,breathLevel=0,wallPulse=0,nearWall=0;
     let audioCtx,natureSource,noiseSource,natureGain,noiseGain,analyser,fragmentTimer=0,minuteTimer=0;
-    let motes=[],particles=[],collectibles=[];
+    let motes=[],particles=[],collectibles=[],silenceOrbs=[];
     const hero={x:0,y:0,targetY:0,vy:0,r:18,sx:1,sy:1,life:0,contact:false,trail:[]};
 
     function tunnelAt(screenX){
-      const x=world+screenX,center=H*.51+Math.sin(x*.0024+.5)*H*.095+Math.sin(x*.0063)*H*.032;
-      const half=Math.max(78,H*(.215+Math.sin(x*.0017+2)*.035+Math.sin(x*.0041)*.014));
+      const x=world+screenX,progress=clamp(x/5200,0,1),center=H*.51+Math.sin(x*.0024+.5)*H*.095+Math.sin(x*.0063)*H*.032;
+      const wave=(1+Math.sin(x*.0034+1.2))*.5,squeeze=wave*wave*H*(.03+progress*.055),breath=H*.055*clamp(breathLevel/6,0,1);
+      const half=Math.max(55,H*(.225-progress*.075+Math.sin(x*.0017+2)*.026)-squeeze+breath);
       return{top:center-half,bottom:center+half,center,half};
     }
     function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);hero.x=W*.24;if(state===STATE.START){hero.y=hero.targetY=H*.5}motes=Array.from({length:Math.min(55,Math.floor(W*H/13000))},(_,i)=>({x:(i*83.7)%W,y:(i*151.3)%H,z:.25+(i%9)/12}))}
@@ -65,8 +66,9 @@
     }
 
     function reset(){
-      silenceAll();world=0;scrollSpeed=SPEED;winTime=0;hero.y=hero.targetY=H*.5;hero.vy=0;hero.life=0;hero.contact=false;hero.trail=[];particles=[];
+      silenceAll();world=0;scrollSpeed=SPEED;winTime=0;silencePower=breathLevel=2.5;wallPulse=nearWall=0;hero.y=hero.targetY=H*.5;hero.vy=0;hero.life=0;hero.contact=false;hero.trail=[];particles=[];
       const positions=[850,1740,2660,3600,4580],offsets=[0,-.48,.36,-.58,.48];collectibles=positions.map((x,i)=>({worldX:x,offset:offsets[i],taken:false,phase:i*1.7}));countEl.textContent=`0 / ${GOAL}`;
+      silenceOrbs=[430,1160,2070,3010,3940,4310].map((x,i)=>({worldX:x,offset:i%2?.18:-.15,taken:false,phase:i}));silenceBar.style.width=`${silencePower/10*100}%`;
     }
     function begin(){initAudio();reset();state=STATE.PLAYING;start.classList.add("hidden");victory.classList.add("hidden");listenUi.classList.add("hidden");hud.classList.add("on");last=performance.now()}
     function collect(o,x,y){
@@ -74,14 +76,16 @@
       for(let i=0;i<28;i++){const a=i/28*Math.PI*2,s=28+Math.random()*75;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.8+Math.random()*.55,max:1.35,r:1+Math.random()*2.4})}
       if(hero.life===GOAL){state=STATE.WIN_TRANSITION;winTime=0;setNoise(false)}
     }
+    function collectSilence(o,x,y){o.taken=true;silencePower=Math.min(10,silencePower+5);hero.sx=.84;hero.sy=1.18;wallPulse=1;for(let i=0;i<18;i++){const a=i/18*Math.PI*2,s=18+Math.random()*48;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.65+Math.random()*.4,max:1.05,r:1+Math.random()*2,color:"112,166,181"})}}
     function updatePlaying(dt){
-      world+=scrollSpeed*dt;
+      world+=scrollSpeed*dt;silencePower=Math.max(0,silencePower-dt);breathLevel=lerp(breathLevel,silencePower,1-Math.exp(-2.8*dt));silenceBar.style.width=`${silencePower/10*100}%`;wallPulse*=Math.exp(-2.4*dt);
       if(keyDir)hero.targetY+=keyDir*250*dt;
       const tunnel=tunnelAt(hero.x),safeTop=tunnel.top+hero.r,safeBottom=tunnel.bottom-hero.r;hero.targetY=clamp(hero.targetY,safeTop-18,safeBottom+18);
       const pull=(hero.targetY-hero.y)*20;hero.vy+=(pull-hero.vy*8)*dt;hero.y+=hero.vy*dt;hero.sx=lerp(hero.sx,1,1-Math.exp(-10*dt));hero.sy=lerp(hero.sy,1,1-Math.exp(-10*dt));
-      const hit=hero.y-hero.r<tunnel.top||hero.y+hero.r>tunnel.bottom;if(hit){hero.y=clamp(hero.y,safeTop-3,safeBottom+3);hero.vy*=.35;hero.sx=1.12;hero.sy=.9}setNoise(hit);
+      const clearance=Math.min(hero.y-hero.r-tunnel.top,tunnel.bottom-hero.r-hero.y);nearWall=clamp(1-clearance/38,0,1);const hit=clearance<0;if(hit){hero.y=clamp(hero.y,safeTop-3,safeBottom+3);hero.vy*=.28;hero.sx=1.14;hero.sy=.87;wallPulse=Math.max(wallPulse,.65);for(let i=0;i<2;i++)particles.push({x:hero.x+(Math.random()-.5)*18,y:hero.y+(Math.random()-.5)*18,vx:-20-Math.random()*35,vy:(Math.random()-.5)*35,life:.3,max:.3,r:1.2,color:"184,84,61"})}setNoise(hit);
       hero.trail.push({x:hero.x,y:hero.y,life:1});if(hero.trail.length>34)hero.trail.shift();
       for(const o of collectibles){if(o.taken)continue;const x=o.worldX-world,t=tunnelAt(x),margin=hero.r+18+12,y=t.center+o.offset*(t.half-margin);o.x=x;o.y=y;o.phase+=dt;if(Math.hypot(hero.x-x,hero.y-y)<hero.r+17)collect(o,x,y)}
+      for(const o of silenceOrbs){if(o.taken)continue;const x=o.worldX-world,t=tunnelAt(x),y=t.center+o.offset*(t.half-52);o.x=x;o.y=y;o.phase+=dt;if(Math.hypot(hero.x-x,hero.y-y)<hero.r+13)collectSilence(o,x,y)}
     }
     function update(dt){
       if(state===STATE.PLAYING)updatePlaying(dt);
@@ -94,13 +98,14 @@
       const top=[],bottom=[];for(let x=-12;x<W+15;x+=12){const t=tunnelAt(x);top.push([x,t.top]);bottom.push([x,t.bottom])}
       ctx.save();ctx.globalAlpha=alpha;const wall=ctx.createLinearGradient(0,0,0,H);wall.addColorStop(0,"#b4a889");wall.addColorStop(.28,"#cec5a7");wall.addColorStop(.72,"#c9bea0");wall.addColorStop(1,"#9f9478");ctx.fillStyle=wall;
       ctx.beginPath();ctx.moveTo(0,0);top.forEach(p=>ctx.lineTo(...p));ctx.lineTo(W,0);ctx.fill();ctx.beginPath();ctx.moveTo(0,H);bottom.forEach(p=>ctx.lineTo(...p));ctx.lineTo(W,H);ctx.fill();
-      for(const pts of [top,bottom]){path(pts);ctx.strokeStyle=hero.contact?"rgba(186,75,50,.75)":"rgba(99,83,62,.28)";ctx.lineWidth=hero.contact?5:2;ctx.shadowColor="#c65d45";ctx.shadowBlur=hero.contact?17:0;ctx.stroke()}ctx.restore();
+      for(const pts of [top,bottom]){path(pts);ctx.strokeStyle=`rgba(186,75,50,${.16+nearWall*.2+wallPulse*.42})`;ctx.lineWidth=2+nearWall*2+wallPulse*2;ctx.shadowColor="#c65d45";ctx.shadowBlur=nearWall*9+wallPulse*13;ctx.stroke()}ctx.restore();
     }
     function drawCollectibles(){for(const o of collectibles){if(o.taken)continue;const x=o.worldX-world,t=tunnelAt(x),margin=hero.r+30,y=t.center+o.offset*(t.half-margin);o.x=x;o.y=y;if(x<-50||x>W+50)continue;const pulse=1+Math.sin(o.phase*2.2)*.07,g=ctx.createRadialGradient(x-4,y-5,1,x,y,35);g.addColorStop(0,"rgba(255,255,238,.98)");g.addColorStop(.22,"rgba(145,237,170,.92)");g.addColorStop(.55,"rgba(50,177,100,.45)");g.addColorStop(1,"rgba(50,177,100,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,35*pulse,0,7);ctx.fill();ctx.strokeStyle="rgba(42,143,84,.72)";ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y,14*pulse,0,7);ctx.stroke()}}
+    function drawSilenceOrbs(){for(const o of silenceOrbs){if(o.taken)continue;const x=o.worldX-world;if(x<-40||x>W+40)continue;const t=tunnelAt(x),y=t.center+o.offset*(t.half-52),pulse=1+Math.sin(o.phase*2.8)*.08,g=ctx.createRadialGradient(x-3,y-4,1,x,y,27);o.x=x;o.y=y;g.addColorStop(0,"rgba(255,255,255,.95)");g.addColorStop(.28,"rgba(194,224,226,.82)");g.addColorStop(1,"rgba(112,166,181,0)");ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,27*pulse,0,7);ctx.fill();ctx.strokeStyle="rgba(91,145,160,.55)";ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,11*pulse,0,7);ctx.stroke()}}
     function drawHero(audioEnergy=0){
       const life=hero.life/GOAL,glow=15+life*27+audioEnergy*35;for(let i=0;i<hero.trail.length;i++){const p=hero.trail[i],a=i/hero.trail.length*life*.12;ctx.fillStyle=`rgba(56,181,108,${a})`;ctx.beginPath();ctx.arc(p.x-(hero.trail.length-i)*life*.8,p.y,3+life*7,0,7);ctx.fill()}
       if(life>.35)for(let i=0;i<Math.floor(life*8);i++){const a=i*2.4+performance.now()*.00035,r=hero.r+12+(i%3)*8;ctx.fillStyle=`rgba(67,181,105,${.12+life*.18})`;ctx.beginPath();ctx.arc(hero.x+Math.cos(a)*r,hero.y+Math.sin(a)*r,1.2+life,0,7);ctx.fill()}
-      ctx.save();ctx.translate(hero.x+(hero.contact?(Math.random()-.5)*2:0),hero.y);ctx.scale(hero.sx,hero.sy);ctx.shadowColor=`rgba(54,181,104,${.35+life*.45})`;ctx.shadowBlur=glow;const g=ctx.createRadialGradient(-7,-8,1,0,0,hero.r*(1+audioEnergy*.08));g.addColorStop(0,"rgba(255,255,250,.96)");g.addColorStop(.3,`rgba(${185-life*45},${229+life*18},${205-life*8},.78)`);g.addColorStop(1,"rgba(46,148,91,.42)");ctx.fillStyle=g;ctx.strokeStyle="rgba(37,101,69,.58)";ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(0,0,hero.r*(1+audioEnergy*.08),0,7);ctx.fill();ctx.stroke();ctx.restore();
+      ctx.save();ctx.translate(hero.x+(hero.contact?(Math.random()-.5)*2:0),hero.y);ctx.rotate(clamp(hero.vy/900,-.13,.13));ctx.scale(hero.sx,hero.sy);ctx.shadowColor=`rgba(54,181,104,${.35+life*.45})`;ctx.shadowBlur=glow;const g=ctx.createRadialGradient(-7,-8,1,0,0,hero.r*(1+audioEnergy*.08));g.addColorStop(0,"rgba(255,255,250,.96)");g.addColorStop(.3,`rgba(${185-life*45},${229+life*18},${205-life*8},.78)`);g.addColorStop(1,"rgba(46,148,91,.42)");ctx.fillStyle=g;ctx.strokeStyle=nearWall>.55?`rgba(170,83,61,${.35+nearWall*.35})`:"rgba(37,101,69,.58)";ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(0,0,hero.r*(1+audioEnergy*.08),0,7);ctx.fill();ctx.stroke();ctx.restore();
     }
     function drawListening(){
       const data=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(data);const energy=data.reduce((a,b)=>a+b,0)/(data.length*255),t=performance.now()*.001;ctx.fillStyle="#edf0df";ctx.fillRect(0,0,W,H);
@@ -108,7 +113,7 @@
       hero.x=lerp(hero.x,W*.5,.03);hero.y=H*.47+Math.sin(t*.7)*7;hero.sx=hero.sy=1;drawHero(energy);ctx.strokeStyle=`rgba(62,167,99,${.08+energy*.3})`;for(let i=0;i<3;i++){ctx.lineWidth=1;ctx.beginPath();ctx.arc(hero.x,hero.y,hero.r+24+i*22+Math.sin(t+i)*4+energy*25,0,7);ctx.stroke()}
     }
     function render(){
-      if(state===STATE.LISTENING||state===STATE.DONE){drawListening();return}ctx.fillStyle="#edf0df";ctx.fillRect(0,0,W,H);const fade=state===STATE.WIN_TRANSITION?clamp(1-winTime/3.2,0,1):1;drawTunnel(fade);drawCollectibles();for(const p of particles){ctx.fillStyle=`rgba(50,174,99,${clamp(p.life/p.max,0,1)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill()}drawHero();
+      if(state===STATE.LISTENING||state===STATE.DONE){drawListening();return}ctx.fillStyle="#edf0df";ctx.fillRect(0,0,W,H);const fade=state===STATE.WIN_TRANSITION?clamp(1-winTime/3.2,0,1):1;drawTunnel(fade);drawSilenceOrbs();drawCollectibles();for(const p of particles){ctx.fillStyle=`rgba(${p.color||"50,174,99"},${clamp(p.life/p.max,0,1)})`;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill()}drawHero();
     }
     function frame(now){const dt=Math.min((now-last)/1000||0,.033);last=now;update(dt);render();requestAnimationFrame(frame)}
 
