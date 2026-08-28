@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <meta name="theme-color" content="#f3eddf">
-  <title>SILENT BUBBLE — L'onde vivante</title>
+  <title>Silent Bubble : la Bulle de Silence</title>
   <style>
     :root { --ink:#11100e; --green:#00a85a; --blue:#008fcb; --red:#e72d36; --paper:#f3eddf; }
     * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -28,6 +28,7 @@
     .overlay.hidden { opacity:0; visibility:hidden; pointer-events:none; }
     .card { width:min(430px,90vw); }
     h1 { margin:0; font-size:clamp(31px,9vw,58px); font-weight:900; letter-spacing:.12em; text-indent:.12em; transform:rotate(-1deg); }
+    h1 small { display:block; margin-top:8px; font-size:.25em; letter-spacing:.2em; }
     .tag { margin-top:11px; font-size:8px; font-weight:800; letter-spacing:.36em; opacity:.42; }
     .intro { margin:28px auto 20px; max-width:370px; font-size:13px; font-weight:400; line-height:1.65; opacity:.72; }
     .rules { margin:0 auto 25px; padding:15px 18px; max-width:390px; border:1px solid rgba(17,16,14,.18); border-radius:12px 3px 13px 4px; text-align:left; font-size:10px; line-height:1.65; }
@@ -51,23 +52,23 @@
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="Jeu Silent Bubble : suivre l'onde verte, recueillir le silence bleu et dissoudre le vacarme rouge"></canvas>
+  <canvas id="game" aria-label="Jeu Silent Bubble : chercher la Veine Verte, éviter les Zones de Vacarme et collecter les Échos du Vivant"></canvas>
   <audio id="natureAudio" src="audio/nature.mp3" loop preload="auto"></audio>
   <audio id="urbanAudio" src="audio/urbain.mp3" loop preload="auto"></audio>
   <div id="hud">
-    <div class="top"><div class="wordmark">SILENT BUBBLE<small>L'ONDE VIVANTE</small></div><div class="score"><span id="timer">01:00</span> · HARMONIE <strong id="score">0</strong></div></div>
-    <div id="message">Silence bleu tu cueilleras et ta ligne verte tu nettoieras</div>
+    <div class="top"><div class="wordmark">SILENT BUBBLE<small>LA BULLE DE SILENCE</small></div><div class="score"><span id="timer">01:00</span> · HARMONIE <strong id="score">0</strong></div></div>
+    <div id="message">Les Échos du Vivant tu cueilleras et la Veine Verte tu purifieras</div>
     <div class="reserve"><div class="meter-label"><span>ÉNERGIE DU SILENCE</span><span id="energyValue">0%</span></div><div class="meter"><i id="energyBar"></i></div></div>
     <div id="guide">APPUI LONG : GONFLER ET MONTER · RELÂCHER : SE VIDER ET TOMBER</div>
   </div>
   <main id="start" class="overlay"><div class="card">
-    <h1>SILENT BUBBLE</h1><div class="tag">RESPIRER · ABSORBER · APAISER</div>
-    <p class="intro">Tu as une minute pour nettoyer le maximum de ta ligne verte. À la fin, survole et écoute le paysage que tu as créé.</p>
-    <div class="rules"><strong>UNE SEULE COMMANDE</strong><br>Maintiens pour gonfler et décoller. En hauteur, le monde devient silencieux et ton bouclier se recharge — attrape les bulles bleues pour l'accélérer. Relâche pour te vider et retomber sur la ligne verte : ton énergie y repousse les vacarmes urbains, mais elle s'épuise.</div>
-    <div class="legend"><span style="color:#2fb978"><i class="dot"></i>NATURE</span><span style="color:#49bfe8"><i class="dot"></i>SILENCE EN HAUTEUR</span><span style="color:#ec5d55"><i class="dot"></i>TRAFIC SUR LA LIGNE</span></div>
+    <h1>SILENT BUBBLE<small>: LA BULLE DE SILENCE</small></h1><div class="tag">RESPIRER · RECUEILLIR · PURIFIER</div>
+    <p class="intro">Cherche la <b>Veine Verte</b>, évite les <b>Zones de Vacarme</b> et collecte les <b>Échos du Vivant</b>. Tu as une minute pour purifier le plus long sillage possible.</p>
+    <div class="rules"><strong>UNE SEULE COMMANDE</strong><br>Maintiens pour gonfler et décoller. En hauteur, le monde devient silencieux et ton bouclier se recharge — recueille les Échos du Vivant bleus pour l'amplifier. Relâche pour te vider et rejoindre la Veine Verte : ton énergie y dissipe les Zones de Vacarme, mais elle s'épuise.</div>
+    <div class="legend"><span style="color:#2fb978"><i class="dot"></i>VEINE VERTE</span><span style="color:#49bfe8"><i class="dot"></i>ÉCHOS DU VIVANT</span><span style="color:#ec5d55"><i class="dot"></i>ZONES DE VACARME</span></div>
     <button id="play">ÉCOUTER LE MONDE</button>
   </div></main>
-  <section id="end" class="overlay reward hidden"><div class="card"><h2>TA LIGNE NETTOYÉE · VOL FPV</h2><div id="finalScore">0%</div><p id="finalText"></p><button id="again">RECOMMENCER UNE MINUTE</button></div></section>
+  <section id="end" class="overlay reward hidden"><div class="card"><h2>TA VEINE VERTE PURIFIÉE · VOL FPV</h2><div id="finalScore">0%</div><p id="finalText"></p><button id="again">RECOMMENCER UNE MINUTE</button></div></section>
   <script>
   (()=>{"use strict";
     const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false}),hud=document.getElementById("hud"),scoreEl=document.getElementById("score"),timerEl=document.getElementById("timer"),energyBar=document.getElementById("energyBar"),energyValue=document.getElementById("energyValue"),message=document.getElementById("message"),guide=document.getElementById("guide");
@@ -100,7 +101,7 @@
     function render(){background();const sx=(Math.random()-.5)*shake*9,sy=(Math.random()-.5)*shake*6;ctx.save();ctx.translate(sx,sy);drawPath();for(const o of orbs)drawOrb(o);ctx.globalCompositeOperation="screen";for(const r of rings){ctx.strokeStyle=`rgba(${r.color},${r.life*.55})`;ctx.lineWidth=2;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,7);ctx.stroke();}for(const p of particles){const alpha=clamp(p.life/p.max,0,1);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot||0);ctx.fillStyle=`rgba(${p.color},${alpha})`;ctx.strokeStyle=`rgba(${p.color},${alpha})`;ctx.shadowColor=`rgba(${p.color},${alpha})`;ctx.shadowBlur=p.kind?9:0;ctx.beginPath();if(p.kind==="leaf")ctx.ellipse(0,0,p.r*1.9,p.r*.65,0,0,7);else if(p.kind==="star"){for(let i=0;i<8;i++){const a=i*Math.PI/4,r=i%2?p.r*.45:p.r*1.8;ctx[i?"lineTo":"moveTo"](Math.cos(a)*r,Math.sin(a)*r);}ctx.closePath();}else if(p.kind==="ray"){ctx.lineWidth=p.r;ctx.moveTo(-18*alpha,0);ctx.lineTo(18*alpha,0);ctx.stroke();}else ctx.arc(0,0,p.r,0,7);if(p.kind!=="ray")ctx.fill();ctx.restore();}drawHero();ctx.restore();if(blueFlash>.01){const b=ctx.createRadialGradient(hero.x,hero.y,0,hero.x,hero.y,Math.max(W,H)*.7);b.addColorStop(0,`rgba(193,249,255,${blueFlash*.24})`);b.addColorStop(.2,`rgba(54,193,255,${blueFlash*.1})`);b.addColorStop(1,"rgba(54,193,255,0)");ctx.fillStyle=b;ctx.fillRect(0,0,W,H);}if(flash>.01){ctx.fillStyle=`rgba(236,67,65,${flash*.1})`;ctx.fillRect(0,0,W,H);}const v=ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.24,W*.5,H*.5,Math.max(W,H)*.82);v.addColorStop(.35,"rgba(255,255,255,0)");v.addColorStop(1,"rgba(24,67,50,.16)");ctx.fillStyle=v;ctx.fillRect(0,0,W,H);}
     function frame(t){const dt=Math.min((t-last)/1000||0,.033);last=t;if(running)update(dt);if(mode==="fpv"){fpvTime+=dt;drawFpv();}else render();requestAnimationFrame(frame);}
     function begin(){if(!audio){audio=new(window.AudioContext||window.webkitAudioContext)();initAmbience();}audio.resume?.();document.getElementById("natureAudio").play().catch(()=>{});document.getElementById("urbanAudio").play().catch(()=>{});reset();mode="play";running=true;last=performance.now();document.getElementById("start").classList.add("hidden");document.getElementById("end").classList.add("hidden");hud.classList.add("on");guide.style.opacity=.45;setTimeout(()=>guide.style.opacity=.12,5000);}
-    function finish(){running=false;holding=false;mode="fpv";orbs=[];particles=[];rings=[];energy=0;const cleanedRatio=totalNoise?cleaned/totalNoise:0,residual=1-cleanedRatio,now=audio?.currentTime||0;missedNoise=Math.max(missedNoise,totalNoise-cleaned);natureGain?.gain.setTargetAtTime(.76,now,.8);urbanGain?.gain.setTargetAtTime(residual*.62,now,1.2);hud.classList.remove("on");document.getElementById("finalScore").textContent=`${Math.round(cleanedRatio*100)}%`;document.getElementById("finalText").textContent=residual<.15?"Écoute ta ligne presque pure : le vivant a repris toute sa place.":`Écoute ton paysage final : ${Math.round(residual*100)} % du vacarme non nettoyé demeure dans le mix.`;document.getElementById("end").classList.remove("hidden");}
+    function finish(){running=false;holding=false;mode="fpv";orbs=[];particles=[];rings=[];energy=0;const cleanedRatio=totalNoise?cleaned/totalNoise:0,residual=1-cleanedRatio,now=audio?.currentTime||0;missedNoise=Math.max(missedNoise,totalNoise-cleaned);natureGain?.gain.setTargetAtTime(.76,now,.8);urbanGain?.gain.setTargetAtTime(residual*.62,now,1.2);hud.classList.remove("on");document.getElementById("finalScore").textContent=`${Math.round(cleanedRatio*100)}%`;document.getElementById("finalText").textContent=residual<.15?"Écoute ta Veine Verte presque pure : le vivant a repris toute sa place.":`Écoute ton paysage final : ${Math.round(residual*100)} % des Zones de Vacarme demeure dans le mix.`;document.getElementById("end").classList.remove("hidden");}
     const press=e=>{if(!running)return;e.preventDefault();holding=true;guide.style.opacity=.08;canvas.setPointerCapture?.(e.pointerId);};canvas.addEventListener("pointerdown",press,{passive:false});canvas.addEventListener("pointerup",()=>holding=false);canvas.addEventListener("pointercancel",()=>holding=false);canvas.addEventListener("pointerleave",()=>holding=false);addEventListener("keydown",e=>{if((e.code==="Space"||e.code==="ArrowUp")&&running){e.preventDefault();holding=true;}});addEventListener("keyup",e=>{if(e.code==="Space"||e.code==="ArrowUp")holding=false;});addEventListener("resize",resize);document.getElementById("play").onclick=begin;document.getElementById("again").onclick=begin;resize();reset();render();requestAnimationFrame(frame);
   })();
   </script>
