@@ -13,19 +13,14 @@ test("calcule le centre de la paume et refuse des repères incomplets", () => {
   assert.equal(hand.palmCenter(marks.slice(0, 9)), null);
 });
 
-test("ré-ancre la main sans faire sauter la corde après une perte de tracking", () => {
+test("mesure le déplacement de la main sans impulsion après une perte de tracking", () => {
   let state = hand.createState(.62);
   state = hand.updateState(state, { x: .4, y: .2 }, 1);
-  assert.equal(hand.target(state), .62);
+  assert.deepEqual([state.dx, state.dy], [0, 0]);
   state = hand.updateState(state, { x: .4, y: .3 }, 1);
-  assert.equal(hand.target(state), .745);
+  assert.ok(Math.abs(state.dx) < 1e-9);
+  assert.ok(Math.abs(state.dy - .1) < 1e-9);
   state = hand.updateState(state, null);
-  state = { ...state, guideY: .7 };
   state = hand.updateState(state, { x: .6, y: .8 }, 1);
-  assert.equal(hand.target(state), .7);
-});
-
-test("borne la traction aux limites jouables", () => {
-  assert.equal(hand.target({ originY: .5, rawY: 1, anchorY: 0 }, 2), .96);
-  assert.equal(hand.target({ originY: .5, rawY: 0, anchorY: 1 }, 2), .04);
+  assert.deepEqual([state.dx, state.dy], [0, 0]);
 });

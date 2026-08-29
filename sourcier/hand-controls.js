@@ -18,7 +18,7 @@
   }
 
   function createState(guideY) {
-    return { seen: false, rawX: .5, rawY: .5, anchorY: .5, originY: guideY, guideY };
+    return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, guideY };
   }
 
   function updateState(previous, center, smoothing) {
@@ -32,14 +32,10 @@
       seen: true,
       rawX,
       rawY,
-      anchorY: reacquired ? rawY : previous.anchorY,
-      originY: reacquired ? previous.guideY : previous.originY
+      dx: reacquired ? 0 : rawX - previous.rawX,
+      dy: reacquired ? 0 : rawY - previous.rawY
     };
   }
 
-  function target(state, sensitivity) {
-    return clamp(state.originY + (state.rawY - state.anchorY) * (sensitivity || 1.25), .04, .96);
-  }
-
-  return { palmCenter, createState, updateState, target };
+  return { palmCenter, createState, updateState };
 });
