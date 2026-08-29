@@ -26,13 +26,13 @@
   </style>
 </head>
 <body>
-  <canvas id="game" aria-label="Guidez Silent Bubble dans le tunnel et recueillez cinq Échos du vivant"></canvas>
+  <canvas id="game" aria-label="Tapez pour gonfler la bulle et la faire monter dans le tunnel"></canvas>
   <audio id="nature" src="audio/nature2.mp3" preload="auto"></audio>
   <audio id="noise" src="audio/urbain.mp3" preload="auto" loop></audio>
   <div id="hud">ÉCHOS DU VIVANT&nbsp; <span id="count">0 / 5</span><span id="silenceHud">SOUFFLE DE SILENCE <i id="silenceMeter"><b id="silenceBar"></b></i></span></div>
   <div id="handStatus"><span>🖐</span><span id="handLost">MONTRE TA MAIN</span></div><button id="settings" aria-label="Réglages du contrôle">RECALIBRER</button>
   <video id="cameraPreview" autoplay muted playsinline aria-hidden="true"></video><canvas id="debug" width="440" height="330"></canvas>
-  <main id="start" class="overlay"><div class="card"><h1 class="choice-title">SILENT <strong>BUBBLE</strong></h1><div class="tag">LE TUNNEL DU VIVANT</div><p class="choice-copy">Choisis comment faire respirer ta bulle.</p><div class="modes"><button id="playTouch" class="mode"><span class="mode-icon">☝</span><strong>TACTILE</strong><small>Joue avec ton doigt</small></button><button id="playHand" class="mode"><span class="mode-icon">🖐</span><strong>MAIN</strong><small>Ouvre et ferme la main</small></button></div><p class="privacy">En mode Main, la reconnaissance est réalisée directement sur ton appareil. Aucune image n’est enregistrée.</p></div></main>
+  <main id="start" class="overlay"><div class="card"><h1 class="choice-title">SILENT <strong>BUBBLE</strong></h1><div class="tag">LE TUNNEL DU VIVANT</div><p class="choice-copy">Choisis comment faire respirer ta bulle.</p><div class="modes"><button id="playTouch" class="mode"><span class="mode-icon">☝</span><strong>TACTILE</strong><small>Tape pour gonfler et monter</small></button><button id="playHand" class="mode"><span class="mode-icon">🖐</span><strong>MAIN</strong><small>Ouvre et ferme la main</small></button></div><p class="privacy">En mode Main, la reconnaissance est réalisée directement sur ton appareil. Aucune image n’est enregistrée.</p></div></main>
   <section id="calibration" class="overlay hidden"><div class="card"><h2 id="calibrationTitle">OUVRE TA MAIN</h2><p id="calibrationCopy">Place une main face à la caméra.</p><div class="hand-gauge"><span>FERMÉ</span><span class="gauge-track"><i id="gaugeValue" class="gauge-value"></i><b id="gaugeDot" class="gauge-dot"></b></span><span>OUVERT</span></div><button id="cancelHand" class="secondary">JOUER EN TACTILE</button></div></section>
   <section id="cameraError" class="overlay hidden"><div class="card"><h2>CAMÉRA INDISPONIBLE</h2><p id="cameraErrorCopy">La caméra est nécessaire pour jouer avec la main.</p><button id="retryCamera">RÉESSAYER</button><br><button id="fallbackTouch" class="secondary">JOUER EN TACTILE</button></div></section>
   <section id="victory" class="overlay hidden"><div class="card"><h2>Le vivant est retrouvé</h2><p>5 ÉCHOS RECUEILLIS</p><button id="listen">ÉCOUTER LA MINUTE VIVANTE</button></div></section>
@@ -43,13 +43,17 @@
     const canvas=document.querySelector("#game"),ctx=canvas.getContext("2d",{alpha:false});
     const hud=document.querySelector("#hud"),countEl=document.querySelector("#count"),silenceBar=document.querySelector("#silenceBar"),start=document.querySelector("#start"),victory=document.querySelector("#victory"),listenUi=document.querySelector("#listenUi"),nature=document.querySelector("#nature"),noise=document.querySelector("#noise"),calibration=document.querySelector("#calibration"),cameraError=document.querySelector("#cameraError"),camera=document.querySelector("#cameraPreview"),handStatus=document.querySelector("#handStatus"),settings=document.querySelector("#settings"),debugCanvas=document.querySelector("#debug");
     const GOAL=5,SPEED=122,FRAGMENT_MS=3000,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t;
-    let W=0,H=0,DPR=1,state=STATE.START,last=0,world=0,scrollSpeed=0,winTime=0,listenLeft=60,pointer=false,keyDir=0,silencePower=0,breathLevel=0,wallPulse=0,nearWall=0,controlProvider=null;
+    let W=0,H=0,DPR=1,state=STATE.START,last=0,world=0,scrollSpeed=0,winTime=0,listenLeft=60,keyDir=0,silencePower=0,breathLevel=0,wallPulse=0,nearWall=0,controlProvider=null;
     let audioCtx,natureSource,noiseSource,natureGain,noiseGain,analyser,fragmentTimer=0,minuteTimer=0;
     let motes=[],particles=[],collectibles=[],silenceOrbs=[];
     const hero={x:0,y:0,targetY:0,vy:0,r:18,sx:1,sy:1,life:0,contact:false,trail:[]};
 
     class ControlProvider{update(){} destroy(){}}
-    class TouchControl extends ControlProvider{constructor(){super();this.type="touch"}setTarget(y){hero.targetY=y}update(){}}
+    class TouchControl extends ControlProvider{
+      constructor(){super();this.type="touch";this.control=0}
+      tap(){this.control=Math.min(1,this.control+.72);hero.vy=Math.min(hero.vy,-115)}
+      update(dt){this.control=Math.max(0,this.control-dt*.82)}
+    }
     class HandControl extends ControlProvider{
       constructor(){super();this.type="hand";this.raw=.5;this.value=.5;this.control=.5;this.detected=false;this.lastSeen=0;this.lastInference=0;this.lastVideoTime=-1;this.trackFps=0;this.frames=0;this.fpsAt=performance.now();this.min=.18;this.max=.82;this.stream=null;this.landmarker=null;this.running=false;this.landmarks=null}
       async start(){
@@ -108,7 +112,7 @@
       world+=scrollSpeed*dt;silencePower=Math.max(0,silencePower-dt);breathLevel=lerp(breathLevel,silencePower,1-Math.exp(-2.8*dt));silenceBar.style.width=`${silencePower/10*100}%`;wallPulse*=Math.exp(-2.4*dt);
       controlProvider?.update(dt);const tunnel=tunnelAt(hero.x),safeTop=tunnel.top+hero.r,safeBottom=tunnel.bottom-hero.r;
       if(controlProvider?.type==="hand"){const buoyancy=(.5-controlProvider.control)*540,drift=Math.sin(world*.004)*12;hero.vy+=(buoyancy+drift-hero.vy*2.7)*dt;hero.y+=hero.vy*dt;const expansion=.92+controlProvider.control*.18;hero.sx=lerp(hero.sx,expansion,1-Math.exp(-7*dt));hero.sy=lerp(hero.sy,expansion,1-Math.exp(-7*dt))}
-      else{if(keyDir)hero.targetY+=keyDir*250*dt;hero.targetY=clamp(hero.targetY,safeTop-18,safeBottom+18);const pull=(hero.targetY-hero.y)*20;hero.vy+=(pull-hero.vy*8)*dt;hero.y+=hero.vy*dt;hero.sx=lerp(hero.sx,1,1-Math.exp(-10*dt));hero.sy=lerp(hero.sy,1,1-Math.exp(-10*dt))}
+      else{const lift=controlProvider?.control||0,buoyancy=310-lift*720+keyDir*360;hero.vy+=(buoyancy-hero.vy*2.35)*dt;hero.y+=hero.vy*dt;const expansion=.78+lift*.42;hero.sx=lerp(hero.sx,expansion,1-Math.exp(-8*dt));hero.sy=lerp(hero.sy,expansion,1-Math.exp(-8*dt))}
       const clearance=Math.min(hero.y-hero.r-tunnel.top,tunnel.bottom-hero.r-hero.y);nearWall=clamp(1-clearance/38,0,1);const hit=clearance<0;if(hit){hero.y=clamp(hero.y,safeTop-3,safeBottom+3);hero.vy*=.28;hero.sx=1.14;hero.sy=.87;wallPulse=Math.max(wallPulse,.65);for(let i=0;i<2;i++)particles.push({x:hero.x+(Math.random()-.5)*18,y:hero.y+(Math.random()-.5)*18,vx:-20-Math.random()*35,vy:(Math.random()-.5)*35,life:.3,max:.3,r:1.2,color:"184,84,61"})}setNoise(hit);
       hero.trail.push({x:hero.x,y:hero.y,life:1});if(hero.trail.length>34)hero.trail.shift();
       for(const o of collectibles){if(o.taken)continue;const x=o.worldX-world,t=tunnelAt(x),margin=hero.r+18+12,y=t.center+o.offset*(t.half-margin);o.x=x;o.y=y;o.phase+=dt;if(Math.hypot(hero.x-x,hero.y-y)<hero.r+17)collect(o,x,y)}
@@ -132,7 +136,8 @@
     function drawHero(audioEnergy=0){
       const life=hero.life/GOAL,glow=15+life*27+audioEnergy*35;for(let i=0;i<hero.trail.length;i++){const p=hero.trail[i],a=i/hero.trail.length*life*.12;ctx.fillStyle=`rgba(56,181,108,${a})`;ctx.beginPath();ctx.arc(p.x-(hero.trail.length-i)*life*.8,p.y,3+life*7,0,7);ctx.fill()}
       if(life>.35)for(let i=0;i<Math.floor(life*8);i++){const a=i*2.4+performance.now()*.00035,r=hero.r+12+(i%3)*8;ctx.fillStyle=`rgba(67,181,105,${.12+life*.18})`;ctx.beginPath();ctx.arc(hero.x+Math.cos(a)*r,hero.y+Math.sin(a)*r,1.2+life,0,7);ctx.fill()}
-      ctx.save();ctx.translate(hero.x+(hero.contact?(Math.random()-.5)*2:0),hero.y);ctx.rotate(clamp(hero.vy/900,-.13,.13));ctx.scale(hero.sx,hero.sy);ctx.shadowColor=`rgba(54,181,104,${.35+life*.45})`;ctx.shadowBlur=glow;const g=ctx.createRadialGradient(-7,-8,1,0,0,hero.r*(1+audioEnergy*.08));g.addColorStop(0,"rgba(255,255,250,.96)");g.addColorStop(.3,`rgba(${185-life*45},${229+life*18},${205-life*8},.78)`);g.addColorStop(1,"rgba(46,148,91,.42)");ctx.fillStyle=g;ctx.strokeStyle=nearWall>.55?`rgba(170,83,61,${.35+nearWall*.35})`:"rgba(37,101,69,.58)";ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(0,0,hero.r*(1+audioEnergy*.08),0,7);ctx.fill();ctx.stroke();ctx.restore();
+      const touchLift=controlProvider?.type==="touch"?controlProvider.control:1;
+      ctx.save();ctx.translate(hero.x+(hero.contact?(Math.random()-.5)*2:0),hero.y);ctx.rotate(clamp(hero.vy/900,-.13,.13));ctx.scale(hero.sx,hero.sy);ctx.shadowColor=`rgba(54,181,104,${.18+touchLift*.3+life*.32})`;ctx.shadowBlur=glow*(.55+touchLift*.45);const g=ctx.createRadialGradient(-7,-8,1,0,0,hero.r*(1+audioEnergy*.08));g.addColorStop(0,`rgba(${185+touchLift*70},${211+touchLift*44},${190+touchLift*60},${.72+touchLift*.24})`);g.addColorStop(.3,`rgba(${104+touchLift*81-life*35},${164+touchLift*65+life*12},${126+touchLift*79},${.72+touchLift*.08})`);g.addColorStop(1,`rgba(${24+touchLift*22},${91+touchLift*57},${53+touchLift*38},${.62-touchLift*.2})`);ctx.fillStyle=g;ctx.strokeStyle=nearWall>.55?`rgba(170,83,61,${.35+nearWall*.35})`:`rgba(28,82,53,${.72-touchLift*.2})`;ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(0,0,hero.r*(1+audioEnergy*.08),0,7);ctx.fill();ctx.stroke();ctx.restore();
     }
     function drawListening(){
       const data=new Uint8Array(analyser.frequencyBinCount);analyser.getByteFrequencyData(data);const energy=data.reduce((a,b)=>a+b,0)/(data.length*255),t=performance.now()*.001;ctx.fillStyle="#edf0df";ctx.fillRect(0,0,W,H);
@@ -156,8 +161,7 @@
     function updateMinuteClock(){if(state!==STATE.LISTENING)return;document.querySelector("#listenTime").textContent=`00:${String(Math.ceil(listenLeft)).padStart(2,"0")}`;setTimeout(updateMinuteClock,250)}
     function endMinute(){if(state!==STATE.LISTENING)return;state=STATE.DONE;fade(natureGain.gain,0,.4);setTimeout(()=>nature.pause(),450);document.querySelector("#listenTitle").textContent="LE SILENCE REVIENT";document.querySelector("#listenTime").textContent="";document.querySelector("#replay").hidden=false}
     setInterval(()=>{if(state===STATE.LISTENING){listenLeft=Math.max(0,listenLeft-.25);if(listenLeft<=0)endMinute()}},250);
-    function movePointer(e){if(state!==STATE.PLAYING||controlProvider?.type!=="touch")return;e.preventDefault();const rect=canvas.getBoundingClientRect();controlProvider.setTarget(e.clientY-rect.top)}
-    canvas.addEventListener("pointerdown",e=>{pointer=true;canvas.setPointerCapture?.(e.pointerId);movePointer(e)},{passive:false});canvas.addEventListener("pointermove",e=>{if(pointer)movePointer(e)},{passive:false});addEventListener("pointerup",()=>pointer=false);addEventListener("pointercancel",()=>pointer=false);
+    canvas.addEventListener("pointerdown",e=>{if(state!==STATE.PLAYING||controlProvider?.type!=="touch")return;e.preventDefault();controlProvider.tap()},{passive:false});
     addEventListener("keydown",e=>{if(e.code==="ArrowUp"||e.code==="ArrowDown"){e.preventDefault();keyDir=e.code==="ArrowUp"?-1:1}});addEventListener("keyup",e=>{if(e.code==="ArrowUp"||e.code==="ArrowDown")keyDir=0});addEventListener("resize",resize);
     document.querySelector("#playTouch").onclick=chooseTouch;document.querySelector("#playHand").onclick=chooseHand;document.querySelector("#retryCamera").onclick=chooseHand;document.querySelector("#fallbackTouch").onclick=chooseTouch;document.querySelector("#cancelHand").onclick=chooseTouch;settings.onclick=()=>{if(controlProvider?.type==="hand"){calibrationWasPlaying=true;showCalibration(true)}};document.querySelector("#listen").onclick=startMinute;document.querySelector("#replay").onclick=()=>{state=STATE.START;controlProvider?.destroy();controlProvider=null;handStatus.classList.remove("on","lost");settings.classList.remove("on");listenUi.classList.add("hidden");start.classList.remove("hidden");hero.life=0;silenceAll()};resize();reset();requestAnimationFrame(frame);
   })();
