@@ -17,23 +17,29 @@
     return { x: center.x / PALM_POINTS.length, y: center.y / PALM_POINTS.length };
   }
 
-  function createState(guideY) {
-    return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, guideY };
+  function createState() {
+    return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, speed: 0, updatedAt: 0 };
   }
 
-  function updateState(previous, center, smoothing) {
-    if (!center) return { ...previous, seen: false };
+  function updateState(previous, center, smoothing, now) {
+    if (!center) return { ...previous, seen: false, dx: 0, dy: 0, speed: 0 };
     const amount = clamp(smoothing == null ? .35 : smoothing, 0, 1);
     const rawX = previous.rawX + (center.x - previous.rawX) * amount;
     const rawY = previous.rawY + (center.y - previous.rawY) * amount;
     const reacquired = !previous.seen;
+    const dx = reacquired ? 0 : rawX - previous.rawX;
+    const dy = reacquired ? 0 : rawY - previous.rawY;
+    const elapsed = Math.max(.001, ((now == null ? previous.updatedAt + 16 : now) - previous.updatedAt) / 1000);
+    const measuredSpeed = Math.hypot(dx, dy) / elapsed;
     return {
       ...previous,
       seen: true,
       rawX,
       rawY,
-      dx: reacquired ? 0 : rawX - previous.rawX,
-      dy: reacquired ? 0 : rawY - previous.rawY
+      dx,
+      dy,
+      speed: reacquired ? 0 : previous.speed + (measuredSpeed - previous.speed) * .22,
+      updatedAt: now == null ? previous.updatedAt + 16 : now
     };
   }
 
