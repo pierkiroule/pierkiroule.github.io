@@ -17,28 +17,32 @@
     return { x: center.x / PALM_POINTS.length, y: center.y / PALM_POINTS.length };
   }
 
-  function jointAngle(a, b, c) {
-    if (!a || !b || !c) return 0;
-    const ab={x:a.x-b.x,y:a.y-b.y},cb={x:c.x-b.x,y:c.y-b.y};
-    const denominator=Math.hypot(ab.x,ab.y)*Math.hypot(cb.x,cb.y);
-    if (!denominator) return 0;
-    return Math.acos(clamp((ab.x*cb.x+ab.y*cb.y)/denominator,-1,1));
+  function pinchAmount(landmarks) {
+    if (!Array.isArray(landmarks) || landmarks.length<21) return 0;
+    const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+    const handSize=distance(landmarks[0],landmarks[9]);
+    if (handSize<.001) return 0;
+    const normalized=distance(landmarks[4],landmarks[8])/handSize;
+    return 1-clamp((normalized-.18)/.62,0,1);
   }
 
-  function isIndexPointing(landmarks) {
-    if (!Array.isArray(landmarks) || landmarks.length<21) return false;
-    const wrist=landmarks[0],distance=index=>Math.hypot(landmarks[index].x-wrist.x,landmarks[index].y-wrist.y);
-    const indexStraight=jointAngle(landmarks[5],landmarks[6],landmarks[8])>2.55&&distance(8)>distance(6)*1.12;
-    const folded=[[10,12],[14,16],[18,20]].filter(([pip,tip])=>distance(tip)<distance(pip)*1.08).length;
-    return indexStraight&&folded>=2;
+  function updatePinch(previous, landmarks, options={}) {
+    const smoothing=options.smoothing == null ? .42 : clamp(options.smoothing,0,1);
+    const amount=previous.pinch+(pinchAmount(landmarks)-previous.pinch)*smoothing;
+    const on=options.onThreshold == null ? .8 : options.onThreshold;
+    const off=options.offThreshold == null ? .5 : options.offThreshold;
+    let armed=previous.pinchArmed,pinched=previous.pinched,triggered=false;
+    if(armed&&amount>=on){armed=false;pinched=true;triggered=true;}
+    else if(!armed&&amount<=off){armed=true;pinched=false;}
+    return {...previous,pinch:amount,pinchArmed:armed,pinched,triggered};
   }
 
   function createState() {
-    return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, speed: 0, updatedAt: 0 };
+    return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, speed: 0, updatedAt: 0, pinch: 0, pinchArmed: true, pinched: false, triggered: false };
   }
 
   function updateState(previous, center, smoothing, now) {
-    if (!center) return { ...previous, seen: false, dx: 0, dy: 0, speed: 0 };
+    if (!center) return { ...previous, seen: false, dx: 0, dy: 0, speed: 0, triggered: false };
     const amount = clamp(smoothing == null ? .35 : smoothing, 0, 1);
     const rawX = previous.rawX + (center.x - previous.rawX) * amount;
     const rawY = previous.rawY + (center.y - previous.rawY) * amount;
@@ -59,5 +63,5 @@
     };
   }
 
-  return { palmCenter, isIndexPointing, createState, updateState };
+  return { palmCenter, pinchAmount, updatePinch, createState, updateState };
 });

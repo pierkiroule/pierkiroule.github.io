@@ -25,17 +25,30 @@ test("mesure le déplacement de la main sans impulsion après une perte de track
   assert.deepEqual([state.dx, state.dy], [0, 0]);
 });
 
-test("reconnaît un index tendu avec les autres doigts repliés", () => {
+test("normalise le pinch relativement à la taille de la main", () => {
   const marks = landmarks(0, 0);
-  marks[5] = { x: .1, y: .1 };
-  marks[6] = { x: .2, y: .2 };
-  marks[8] = { x: .4, y: .4 };
-  [[10, 12], [14, 16], [18, 20]].forEach(([pip, tip]) => {
-    marks[pip] = { x: .4, y: .4 };
-    marks[tip] = { x: .25, y: .25 };
-  });
-  assert.equal(hand.isIndexPointing(marks), true);
-  marks[8] = { x: .15, y: .15 };
-  assert.equal(hand.isIndexPointing(marks), false);
-  assert.equal(hand.isIndexPointing(marks.slice(0, 8)), false);
+  marks[9] = { x: .5, y: 0 };
+  marks[4] = { x: .1, y: .1 };
+  marks[8] = { x: .11, y: .1 };
+  assert.ok(hand.pinchAmount(marks) > .95);
+  marks[8] = { x: .6, y: .1 };
+  assert.equal(hand.pinchAmount(marks), 0);
+  assert.equal(hand.pinchAmount(marks.slice(0, 8)), 0);
+});
+
+test("ne déclenche qu'une onde par pinch grâce à l’hystérésis", () => {
+  const pinched = landmarks(0, 0), open = landmarks(0, 0);
+  pinched[9] = open[9] = { x: .5, y: 0 };
+  pinched[4] = pinched[8] = { x: .1, y: .1 };
+  open[4] = { x: .1, y: .1 };
+  open[8] = { x: .6, y: .1 };
+  let state = hand.createState();
+  state = hand.updatePinch(state, pinched, { smoothing: 1 });
+  assert.equal(state.triggered, true);
+  state = hand.updatePinch(state, pinched, { smoothing: 1 });
+  assert.equal(state.triggered, false);
+  state = hand.updatePinch(state, open, { smoothing: 1 });
+  assert.equal(state.pinchArmed, true);
+  state = hand.updatePinch(state, pinched, { smoothing: 1 });
+  assert.equal(state.triggered, true);
 });
