@@ -17,29 +17,51 @@
     return { x: center.x / PALM_POINTS.length, y: center.y / PALM_POINTS.length };
   }
 
-  function createState(guideY) {
-    return { seen: false, rawX: .5, rawY: .5, anchorY: .5, originY: guideY, guideY };
+  function pinchAmount(landmarks) {
+    if (!Array.isArray(landmarks) || landmarks.length<21) return 0;
+    const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+    const handSize=distance(landmarks[0],landmarks[9]);
+    if (handSize<.001) return 0;
+    const normalized=distance(landmarks[4],landmarks[8])/handSize;
+    return 1-clamp((normalized-.18)/.62,0,1);
   }
 
-  function updateState(previous, center, smoothing) {
-    if (!center) return { ...previous, seen: false };
+  function updatePinch(previous, landmarks, options={}) {
+    const smoothing=options.smoothing == null ? .42 : clamp(options.smoothing,0,1);
+    const amount=previous.pinch+(pinchAmount(landmarks)-previous.pinch)*smoothing;
+    const on=options.onThreshold == null ? .8 : options.onThreshold;
+    const off=options.offThreshold == null ? .5 : options.offThreshold;
+    let armed=previous.pinchArmed,pinched=previous.pinched,triggered=false;
+    if(armed&&amount>=on){armed=false;pinched=true;triggered=true;}
+    else if(!armed&&amount<=off){armed=true;pinched=false;}
+    return {...previous,pinch:amount,pinchArmed:armed,pinched,triggered};
+  }
+
+  function createState() {
+    return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, speed: 0, updatedAt: 0, pinch: 0, pinchArmed: true, pinched: false, triggered: false };
+  }
+
+  function updateState(previous, center, smoothing, now) {
+    if (!center) return { ...previous, seen: false, dx: 0, dy: 0, speed: 0, triggered: false };
     const amount = clamp(smoothing == null ? .35 : smoothing, 0, 1);
     const rawX = previous.rawX + (center.x - previous.rawX) * amount;
     const rawY = previous.rawY + (center.y - previous.rawY) * amount;
     const reacquired = !previous.seen;
+    const dx = reacquired ? 0 : rawX - previous.rawX;
+    const dy = reacquired ? 0 : rawY - previous.rawY;
+    const elapsed = Math.max(.001, ((now == null ? previous.updatedAt + 16 : now) - previous.updatedAt) / 1000);
+    const measuredSpeed = Math.hypot(dx, dy) / elapsed;
     return {
       ...previous,
       seen: true,
       rawX,
       rawY,
-      anchorY: reacquired ? rawY : previous.anchorY,
-      originY: reacquired ? previous.guideY : previous.originY
+      dx,
+      dy,
+      speed: reacquired ? 0 : previous.speed + (measuredSpeed - previous.speed) * .22,
+      updatedAt: now == null ? previous.updatedAt + 16 : now
     };
   }
 
-  function target(state, sensitivity) {
-    return clamp(state.originY + (state.rawY - state.anchorY) * (sensitivity || 1.25), .04, .96);
-  }
-
-  return { palmCenter, createState, updateState, target };
+  return { palmCenter, pinchAmount, updatePinch, createState, updateState };
 });

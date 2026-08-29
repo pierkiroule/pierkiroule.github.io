@@ -13,19 +13,42 @@ test("calcule le centre de la paume et refuse des repères incomplets", () => {
   assert.equal(hand.palmCenter(marks.slice(0, 9)), null);
 });
 
-test("ré-ancre la main sans faire sauter la corde après une perte de tracking", () => {
+test("mesure le déplacement de la main sans impulsion après une perte de tracking", () => {
   let state = hand.createState(.62);
   state = hand.updateState(state, { x: .4, y: .2 }, 1);
-  assert.equal(hand.target(state), .62);
+  assert.deepEqual([state.dx, state.dy], [0, 0]);
   state = hand.updateState(state, { x: .4, y: .3 }, 1);
-  assert.equal(hand.target(state), .745);
+  assert.ok(Math.abs(state.dx) < 1e-9);
+  assert.ok(Math.abs(state.dy - .1) < 1e-9);
   state = hand.updateState(state, null);
-  state = { ...state, guideY: .7 };
   state = hand.updateState(state, { x: .6, y: .8 }, 1);
-  assert.equal(hand.target(state), .7);
+  assert.deepEqual([state.dx, state.dy], [0, 0]);
 });
 
-test("borne la traction aux limites jouables", () => {
-  assert.equal(hand.target({ originY: .5, rawY: 1, anchorY: 0 }, 2), .96);
-  assert.equal(hand.target({ originY: .5, rawY: 0, anchorY: 1 }, 2), .04);
+test("normalise le pinch relativement à la taille de la main", () => {
+  const marks = landmarks(0, 0);
+  marks[9] = { x: .5, y: 0 };
+  marks[4] = { x: .1, y: .1 };
+  marks[8] = { x: .11, y: .1 };
+  assert.ok(hand.pinchAmount(marks) > .95);
+  marks[8] = { x: .6, y: .1 };
+  assert.equal(hand.pinchAmount(marks), 0);
+  assert.equal(hand.pinchAmount(marks.slice(0, 8)), 0);
+});
+
+test("ne déclenche qu'une onde par pinch grâce à l’hystérésis", () => {
+  const pinched = landmarks(0, 0), open = landmarks(0, 0);
+  pinched[9] = open[9] = { x: .5, y: 0 };
+  pinched[4] = pinched[8] = { x: .1, y: .1 };
+  open[4] = { x: .1, y: .1 };
+  open[8] = { x: .6, y: .1 };
+  let state = hand.createState();
+  state = hand.updatePinch(state, pinched, { smoothing: 1 });
+  assert.equal(state.triggered, true);
+  state = hand.updatePinch(state, pinched, { smoothing: 1 });
+  assert.equal(state.triggered, false);
+  state = hand.updatePinch(state, open, { smoothing: 1 });
+  assert.equal(state.pinchArmed, true);
+  state = hand.updatePinch(state, pinched, { smoothing: 1 });
+  assert.equal(state.triggered, true);
 });
