@@ -15,6 +15,7 @@
     bubbleDrag: 1.75,
     bubbleMaxSpeed: 390,
     gestureWaveInterval: .125,
+    handWaveInterval: .3,
     handDeadZone: .035,
     handSmoothing: .3,
     velocitySmoothing: .22,

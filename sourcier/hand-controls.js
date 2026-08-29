@@ -17,6 +17,22 @@
     return { x: center.x / PALM_POINTS.length, y: center.y / PALM_POINTS.length };
   }
 
+  function jointAngle(a, b, c) {
+    if (!a || !b || !c) return 0;
+    const ab={x:a.x-b.x,y:a.y-b.y},cb={x:c.x-b.x,y:c.y-b.y};
+    const denominator=Math.hypot(ab.x,ab.y)*Math.hypot(cb.x,cb.y);
+    if (!denominator) return 0;
+    return Math.acos(clamp((ab.x*cb.x+ab.y*cb.y)/denominator,-1,1));
+  }
+
+  function isIndexPointing(landmarks) {
+    if (!Array.isArray(landmarks) || landmarks.length<21) return false;
+    const wrist=landmarks[0],distance=index=>Math.hypot(landmarks[index].x-wrist.x,landmarks[index].y-wrist.y);
+    const indexStraight=jointAngle(landmarks[5],landmarks[6],landmarks[8])>2.55&&distance(8)>distance(6)*1.12;
+    const folded=[[10,12],[14,16],[18,20]].filter(([pip,tip])=>distance(tip)<distance(pip)*1.08).length;
+    return indexStraight&&folded>=2;
+  }
+
   function createState() {
     return { seen: false, rawX: .5, rawY: .5, dx: 0, dy: 0, speed: 0, updatedAt: 0 };
   }
@@ -43,5 +59,5 @@
     };
   }
 
-  return { palmCenter, createState, updateState };
+  return { palmCenter, isIndexPointing, createState, updateState };
 });

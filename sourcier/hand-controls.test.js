@@ -24,3 +24,18 @@ test("mesure le déplacement de la main sans impulsion après une perte de track
   state = hand.updateState(state, { x: .6, y: .8 }, 1);
   assert.deepEqual([state.dx, state.dy], [0, 0]);
 });
+
+test("reconnaît un index tendu avec les autres doigts repliés", () => {
+  const marks = landmarks(0, 0);
+  marks[5] = { x: .1, y: .1 };
+  marks[6] = { x: .2, y: .2 };
+  marks[8] = { x: .4, y: .4 };
+  [[10, 12], [14, 16], [18, 20]].forEach(([pip, tip]) => {
+    marks[pip] = { x: .4, y: .4 };
+    marks[tip] = { x: .25, y: .25 };
+  });
+  assert.equal(hand.isIndexPointing(marks), true);
+  marks[8] = { x: .15, y: .15 };
+  assert.equal(hand.isIndexPointing(marks), false);
+  assert.equal(hand.isIndexPointing(marks.slice(0, 8)), false);
+});
