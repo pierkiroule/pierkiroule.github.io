@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="wave" x1="0" x2="1"><stop stop-color="#ffd77a"/><stop offset=".5" stop-color="#ff8d87"/><stop offset="1" stop-color="#bd74ff"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
+  <path d="M7 32c8-22 13 22 20 0s13 22 20 0 8 0 10 0" fill="none" stroke="#ff7e91" stroke-width="9" stroke-linecap="round" opacity=".3" filter="url(#glow)"><animate attributeName="stroke-width" values="6;12;6" dur=".65s" repeatCount="indefinite"/></path>
+  <path d="M7 32c8-22 13 22 20 0s13 22 20 0 8 0 10 0" fill="none" stroke="url(#wave)" stroke-width="5" stroke-linecap="round"><animate attributeName="d" values="M7 32c8-22 13 22 20 0s13 22 20 0 8 0 10 0;M7 32c8 22 13-22 20 0s13-22 20 0 8 0 10 0;M7 32c8-22 13 22 20 0s13 22 20 0 8 0 10 0" dur=".72s" repeatCount="indefinite"/></path>
+  <circle cx="55" cy="32" r="4" fill="#fff1b4"><animate attributeName="r" values="3;6;3" dur=".72s" repeatCount="indefinite"/></circle>
+</svg>
