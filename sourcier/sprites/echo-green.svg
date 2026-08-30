@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs><radialGradient id="e"><stop stop-color="#efffc7"/><stop offset=".45" stop-color="#7fffb0"/><stop offset="1" stop-color="#159b72"/></radialGradient><filter id="g"><feGaussianBlur stdDeviation="3"/></filter></defs>
-  <circle cx="32" cy="32" r="20" fill="#62ffae" opacity=".3" filter="url(#g)"><animate attributeName="r" values="17;26;17" dur="1.25s" repeatCount="indefinite"/></circle>
-  <circle cx="32" cy="32" r="15" fill="none" stroke="#adffd0" opacity=".8"><animate attributeName="r" values="13;27" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="1.5s" repeatCount="indefinite"/></circle>
-  <path fill="url(#e)" d="M48 32c0 10-6 17-16 17s-16-7-16-17 6-17 16-17 16 7 16 17Z"><animateTransform attributeName="transform" type="rotate" values="-5 32 32;5 32 32;-5 32 32" dur="1s" repeatCount="indefinite"/></path>
-  <circle cx="27" cy="25" r="4" fill="#fff" opacity=".72"/>
-</svg>
