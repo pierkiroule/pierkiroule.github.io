@@ -39,7 +39,7 @@
   <div id="tutorial" class="hidden"></div><pre id="debug" class="hidden"></pre>
   <div id="toast" role="status"></div>
   <script src="game-feel.js"></script>
-  <script src="motion-controller.js"></script>
+  <script src="elastic-controller.js"></script>
   <script src="touch-controller.js"></script>
   <script src="bubble-physics.js"></script>
   <script src="gameplay-flow.js"></script>
@@ -51,13 +51,11 @@
     const screens={HOME:home,READY:ready,RESULTS:results};
     const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
     const echoKinds=[{icon:"🐦",name:"Rouge-gorge"},{icon:"💧",name:"Ruisseau"},{icon:"🍃",name:"Feuilles"},{icon:"🦗",name:"Grillon"},{icon:"🌿",name:"Sous-bois"},{icon:"🦉",name:"Chouette"},{icon:"🌧️",name:"Pluie"},{icon:"🐸",name:"Grenouille"},{icon:"🌬️",name:"Souffle"},{icon:"🐝",name:"Abeille"}];
-    let state=STATES.HOME,selectedPath=null,control="touch",touchActive=false,touchState=SilentBubbleTouch.createState(),touchSample=null,tutorialActive=false,motionState=createMotion("touch"),motionOutput=motionState.output;
+    let state=STATES.HOME,selectedPath=null,control="touch",touchActive=false,touchState=SilentBubbleTouch.createState(),touchSample=null,tutorialActive=false,cordState=SilentBubbleElastic.createState({range:GAME_FEEL.touchRange}),motionOutput=cordState.output;
     let W=innerWidth,H=innerHeight,DPR=1,last=performance.now(),elapsed=0,silentTime=0,progress=0,cameraY=0,rewardSeconds=0,rewardEnds=0,endingAt=0,flowState=SilentBubbleFlow.createState();
     let audioCtx,natureGain,noiseGain,natureSource,noiseSource,audioAnalyser,waveform,wallContact=0,collisionNoise=0,collisionCooldown=0,impactSide=0,calmGlow=0,echoAbsorb=0,echoTimer=0;
     const hero={x:0,y:0,r:19,noise:0,impact:0,impactX:0,impactY:0,...SilentBubblePhysics.createState()},puffFx={wave:0,phase:0},particles=[],hazards=[.08,.17,.27,.36,.46,.55,.65,.74,.84,.93].map((q,i)=>({q,phase:i*.73}));
     const debugEnabled=DEBUG_GAME_FEEL&&new URLSearchParams(location.search).has("debug");let fps=60;
-    function createMotion(){return SilentBubbleMotion.createState({smoothing:GAME_FEEL.inputSmoothing,range:GAME_FEEL.touchRange,neutralFollowMin:GAME_FEEL.neutralFollowMin,neutralFollowMax:GAME_FEEL.neutralFollowMax,deadZone:GAME_FEEL.deadZone,curve:GAME_FEEL.forceCurve,velocityContribution:GAME_FEEL.gestureVelocityContribution})}
-
     function createJourney(){
       const points=[];
       for(let i=0;i<=320;i++){
@@ -111,7 +109,7 @@
     }
     function updateGame(dt){
       elapsed+=dt;collisionCooldown=Math.max(0,collisionCooldown-dt);
-      if(control==="touch"&&touchActive&&touchSample)acceptMotion(SilentBubbleMotion.update(motionState,touchSample,performance.now(),dt));
+      if(touchActive)acceptMotion(SilentBubbleElastic.update(cordState,dt));
       const travel=SilentBubblePhysics.step(hero,motionOutput,dt,GAME_FEEL);
       puffFx.wave=lerp(puffFx.wave,0,1-Math.exp(-4.2*dt));puffFx.phase+=dt*1.5;
       hero.x=clamp(hero.x+travel.dx,W*.32,W*.72);const camera=SilentBubbleCorridor.cameraStep(Math.max(0,travel.dx),hero.x,W,PATH_DISTANCE);hero.x-=camera.scroll;progress=clamp(progress+camera.progress,0,1);cameraY-=travel.dy;hero.y=H*.5;
@@ -153,7 +151,7 @@
       if(puffFx.wave>.015){c.save();c.globalCompositeOperation="screen";for(let ring=0;ring<3;ring++){const cycle=(puffFx.phase+ring*.28)%1,radius=hero.r+10+cycle*68,alpha=puffFx.wave*(1-cycle)*(.24-ring*.035);c.strokeStyle=`rgba(139,235,218,${alpha})`;c.lineWidth=1.1+puffFx.wave*(1-cycle);c.shadowColor="#7ae6cf";c.shadowBlur=7*puffFx.wave;c.beginPath();for(let i=0;i<=48;i++){const a=i/48*Math.PI*2,r=radius+Math.sin(a*5+puffFx.phase*8+ring)*2.2*puffFx.wave,x=hero.x+Math.cos(a)*r,y=hero.y+Math.sin(a)*r;c[i?"lineTo":"moveTo"](x,y)}c.closePath();c.stroke()}c.restore()}
       selectedPath.echoes.forEach((q,i)=>{if(selectedPath._taken[i])return;const p=echoPosition(q,i);if(p.x<-20||p.x>W+20)return;const scale=p.turn?.72:1;c.fillStyle=p.turn?"#efffc7":"#baffcb";c.shadowColor="#65df9c";c.shadowBlur=p.turn?22:10+calmGlow*7;c.save();c.translate(p.x,p.y);c.scale(1,scale);c.beginPath();c.arc(0,0,p.radius,0,7);c.fill();c.restore();c.shadowBlur=0});
       hazards.forEach(h=>{const x=(h.q-progress)/.115*W+hero.x+h.ox;if(x<-50||x>W+50)return;const y=tunnelAtX(x).center+h.oy,pulse=1+Math.sin(now*.003+h.phase)*.1;c.save();c.translate(x,y);c.rotate(now*.00045+h.phase);c.scale(pulse,pulse);c.shadowColor="#ff8c78";c.shadowBlur=9;c.fillStyle="#e85f62";c.fillRect(-6,-6,12,12);c.strokeStyle="rgba(255,225,205,.65)";c.lineWidth=1;c.strokeRect(-6,-6,12,12);c.restore()});
-      if(touchActive&&touchSample){const pull=Math.min(1,Math.hypot(touchSample.x-touchState.startX,touchSample.y-touchState.startY)/GAME_FEEL.touchRange),g=c.createLinearGradient(hero.x,hero.y,touchSample.x,touchSample.y);g.addColorStop(0,`rgba(160,245,225,${.12+pull*.3})`);g.addColorStop(1,"rgba(110,205,220,.05)");c.save();c.strokeStyle=g;c.lineWidth=1+pull*2;c.setLineDash([2,5]);c.lineDashOffset=-now*.015;c.beginPath();c.moveTo(hero.x,hero.y);c.quadraticCurveTo((hero.x+touchSample.x)/2,hero.y+(touchSample.y-hero.y)*.32,touchSample.x,touchSample.y);c.stroke();c.restore()}
+      if(touchActive&&touchSample){const pull=motionOutput.tension||0,g=c.createLinearGradient(hero.x,hero.y,touchSample.x,touchSample.y);g.addColorStop(0,`rgba(185,255,235,${.18+pull*.38})`);g.addColorStop(1,"rgba(110,205,220,.08)");c.save();c.strokeStyle=g;c.lineWidth=1+pull*2.4;c.setLineDash([2,5]);c.lineDashOffset=-now*.015;c.beginPath();c.moveTo(hero.x,hero.y);c.quadraticCurveTo((hero.x+touchSample.x)/2-cordState.velocityY*.018,(hero.y+touchSample.y)/2+cordState.velocityX*.018,touchSample.x,touchSample.y);c.stroke();c.restore()}
       c.save();c.translate(hero.x+(Math.random()-.5)*hero.noise*2,hero.y);c.rotate(clamp(hero.vy/800,-.1,.1));const squash=hero.impact*.05;c.scale(hero.scaleX+squash,hero.scaleY-squash);c.shadowColor=hero.noise>.6?"#8a78ff":"#42c8ff";c.shadowBlur=30+calmGlow*12;const bg=c.createRadialGradient(-7,-9,1,0,0,hero.r);bg.addColorStop(0,"#f2ffff");bg.addColorStop(.22,echoAbsorb>.05?"#baffd0":"#72d9ff");bg.addColorStop(.58,"#2879ed");bg.addColorStop(1,hero.noise>.6?"#5636b7":"#102d86");c.fillStyle=bg;c.beginPath();
       c.arc(0,0,hero.r,0,7);c.fill();c.restore();
       particles.forEach(p=>{c.fillStyle=p.cloud?`rgba(94,244,157,${Math.min(.65,p.life*.35)})`:`rgba(127,235,177,${p.life})`;c.shadowColor=p.cloud?"#55ef9b":"transparent";c.shadowBlur=p.cloud?8:0;c.beginPath();c.arc(p.x,p.y,p.r*(p.cloud?1.2:1),0,7);c.fill();c.shadowBlur=0})
@@ -163,13 +161,13 @@
     bubbleStart.onclick=homePlay.onclick=()=>{selectedPath=journey;setState(STATES.READY)};startGame.onclick=beginGame;
     function finishTutorial(){if(!tutorialActive)return;tutorialActive=false;tutorial.classList.add("hidden");try{localStorage.setItem(`silentBubbleTutorial-drag-${control}`,"1")}catch{}}
     function showTutorial(){let seen=false;try{seen=localStorage.getItem(`silentBubbleTutorial-drag-${control}`)==="1"}catch{}tutorialActive=!seen;tutorial.textContent="●  GLISSE POUR GUIDER · TOUCHE POUR POUF";tutorial.classList.toggle("hidden",seen)}
-    world.onpointerdown=e=>{if(state!==STATES.PLAYING||control!=="touch"||touchState.pointerId!==null)return;touchActive=true;touchSample=SilentBubbleTouch.begin(touchState,e.pointerId,e.clientX,e.clientY,performance.now());motionState=createMotion("touch");acceptMotion(SilentBubbleMotion.update(motionState,touchSample,performance.now(),.016));world.setPointerCapture(e.pointerId);finishTutorial()};
-    world.onpointermove=e=>{if(state!==STATES.PLAYING||control!=="touch"||e.pointerId!==touchState.pointerId)return;touchSample=SilentBubbleTouch.move(touchState,e.clientX,e.clientY)};
-    world.onpointerup=world.onpointercancel=e=>{if(e.pointerId!==touchState.pointerId)return;if(world.hasPointerCapture(e.pointerId))world.releasePointerCapture(e.pointerId);if(e.type==="pointerup"&&SilentBubbleTouch.end(touchState,performance.now()))triggerPuff();else touchState.pointerId=null;motionOutput=SilentBubbleMotion.release(motionState);touchActive=false;touchSample=null};
+    world.onpointerdown=e=>{if(state!==STATES.PLAYING||control!=="touch"||touchState.pointerId!==null)return;touchActive=true;touchSample=SilentBubbleTouch.begin(touchState,e.pointerId,e.clientX,e.clientY,performance.now());SilentBubbleElastic.begin(cordState,e.clientX,e.clientY);world.setPointerCapture(e.pointerId);finishTutorial()};
+    world.onpointermove=e=>{if(state!==STATES.PLAYING||control!=="touch"||e.pointerId!==touchState.pointerId)return;touchSample=SilentBubbleTouch.move(touchState,e.clientX,e.clientY);SilentBubbleElastic.move(cordState,e.clientX,e.clientY)};
+    world.onpointerup=world.onpointercancel=e=>{if(e.pointerId!==touchState.pointerId)return;if(world.hasPointerCapture(e.pointerId))world.releasePointerCapture(e.pointerId);if(e.type==="pointerup"&&SilentBubbleTouch.end(touchState,performance.now()))triggerPuff();else touchState.pointerId=null;motionOutput=SilentBubbleElastic.release(cordState);touchActive=false;touchSample=null};
     function renderDebug(){debug.classList.toggle("hidden",!debugEnabled);if(!debugEnabled)return;debug.textContent=`FORCE            ${motionOutput.forceX.toFixed(2)}, ${motionOutput.forceY.toFixed(2)}
 GESTURE VELOCITY ${motionOutput.velocityX.toFixed(2)}, ${motionOutput.velocityY.toFixed(2)}
 BUBBLE VELOCITY  ${hero.vx.toFixed(1)}, ${hero.vy.toFixed(1)}
-NEUTRAL OFFSET   ${motionState.offsetX.toFixed(2)}, ${motionState.offsetY.toFixed(2)}
+CORD TENSION     ${(motionOutput.tension||0).toFixed(2)}
 FPS              ${fps.toFixed(0)}`}
 
 
