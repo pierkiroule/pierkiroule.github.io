@@ -56,7 +56,7 @@
     let audioCtx,natureGain,noiseGain,natureSource,noiseSource,audioAnalyser,waveform,wallContact=0,collisionNoise=0,collisionCooldown=0,impactSide=0,calmGlow=0,echoAbsorb=0,echoTimer=0;
     const hero={x:0,y:0,r:19,noise:0,impact:0,impactX:0,impactY:0,...SilentBubblePhysics.createState()},puffFx={wave:0,phase:0},particles=[],hazards=[.08,.17,.27,.36,.46,.55,.65,.74,.84,.93].map((q,i)=>({q,phase:i*.73}));
     const debugEnabled=DEBUG_GAME_FEEL&&new URLSearchParams(location.search).has("debug");let fps=60;
-    function createMotion(kind){return SilentBubbleMotion.createState({smoothing:kind==="face"?GAME_FEEL.headSmoothing:GAME_FEEL.inputSmoothing,range:kind==="face"?GAME_FEEL.headRange:GAME_FEEL.touchRange,neutralFollowMin:GAME_FEEL.neutralFollowMin,neutralFollowMax:GAME_FEEL.neutralFollowMax,deadZone:GAME_FEEL.deadZone,curve:GAME_FEEL.forceCurve,velocityContribution:GAME_FEEL.gestureVelocityContribution})}
+    function createMotion(){return SilentBubbleMotion.createState({smoothing:GAME_FEEL.inputSmoothing,range:GAME_FEEL.touchRange,neutralFollowMin:GAME_FEEL.neutralFollowMin,neutralFollowMax:GAME_FEEL.neutralFollowMax,deadZone:GAME_FEEL.deadZone,curve:GAME_FEEL.forceCurve,velocityContribution:GAME_FEEL.gestureVelocityContribution})}
 
     function createJourney(){
       const points=[];
@@ -91,7 +91,7 @@
     async function beginGame(){
       await initAudio();elapsed=silentTime=progress=wallContact=collisionNoise=collisionCooldown=calmGlow=echoAbsorb=0;impactSide=0;flowState=SilentBubbleFlow.createState();
       const startPoint=pointAt(selectedPath.points,0);hero.x=W*.5;hero.y=H*.5;cameraY=hero.y-H*(1-startPoint.y)-H*startPoint.asym;Object.assign(hero,SilentBubblePhysics.createState(),{impact:0});
-      hazards.forEach(h=>Object.assign(h,{state:"REST",stateTime:0,attackX:0,attackY:0,chargeX:0,chargeY:0}));Object.assign(puffFx,{wave:0,phase:0});touchState=SilentBubbleTouch.createState();touchActive=false;
+      hazards.forEach((h,i)=>Object.assign(h,{ox:0,oy:0,vx:22+(i%3)*8,vy:(i%2?1:-1)*(34+(i%4)*7)}));selectedPath._echoBodies=selectedPath.echoes.map((_,i)=>({ox:0,oy:0,vx:(i%2?1:-1)*(12+i%3*4),vy:(i%2?1:-1)*(28+i%4*5)}));Object.assign(puffFx,{wave:0,phase:0});touchState=SilentBubbleTouch.createState();touchActive=false;
       selectedPath._taken=selectedPath.echoes.map(()=>false);selectedPath._missed=selectedPath.echoes.map(()=>false);gameEchoCount.textContent=`0/${ECHO_COUNT}`;journeyFill.style.width=flowFill.style.width="0%";setState(STATES.PLAYING);showTutorial();last=performance.now();nature.pause();noise.currentTime=0;noise.play().catch(()=>toastMessage("Touchez l’écran pour activer le son"));audioFade(noiseGain,0,.1)
     }
     function tunnelAtX(x){
@@ -101,21 +101,13 @@
     function wallsAtX(x){const here=tunnelAtX(x),left=tunnelAtX(x-3),right=tunnelAtX(x+3);return{...here,topSlope:(right.top-left.top)/6,bottomSlope:(right.bottom-left.bottom)/6}}
     function triggerNoise(side=0){collisionNoise=3;collisionCooldown=.22;wallContact=1;impactSide=side;hero.impact=1;SilentBubblePhysics.collide(hero,side,GAME_FEEL.membraneCollision);navigator.vibrate?.(12);noise.play().catch(()=>{});audioFade(noiseGain,.5,.04)}
     function echoPosition(q,i){
-      const x=(q-progress)/.115*W+hero.x,t=tunnelAtX(x),speed=.72+(i%3)*.24,phase=elapsed*speed+i*1.61+.16*Math.sin(elapsed*.43+i),radius=4.5;
-      return{x,y:SilentBubbleCorridor.echoY(t.center,t.half*(.72+(i%2)*.16),radius,phase),radius,turn:Math.abs(Math.cos(phase))<.13}
+      const body=selectedPath._echoBodies?.[i]||{ox:0,oy:0},x=(q-progress)/.115*W+hero.x+body.ox,t=tunnelAtX(x),radius=5;
+      return{x,y:t.center+body.oy,radius,turn:Math.abs(body.vy||0)<9}
     }
-    function updateHazards(dt,clearance){
-      hazards.forEach(h=>{
-        const baseX=(h.q-progress)/.115*W+hero.x,baseY=tunnelAtX(baseX).center,visible=baseX>-80&&baseX<W+80;
-        h.stateTime+=dt;if(!visible){h.state="REST";h.stateTime=0;h.attackX=h.attackY=0;return}
-        if(h.state==="REST"&&Math.abs(baseX-hero.x)<W*.42){h.state="WAKE";h.stateTime=0}
-        else if(h.state==="WAKE"&&h.stateTime>.8){h.state=clearance<.58?"AIM":"REST";h.stateTime=0}
-        else if(h.state==="AIM"&&clearance>=.68){h.state="REST";h.stateTime=0}
-        else if(h.state==="AIM"&&h.stateTime>1.35){h.state="CHARGE";h.stateTime=0;const tx=hero.x+hero.vx*.32,ty=hero.y+hero.vy*.32,a=Math.atan2(ty-baseY,tx-baseX);h.chargeX=Math.cos(a)*210;h.chargeY=Math.sin(a)*210}
-        else if(h.state==="CHARGE"){h.attackX+=h.chargeX*dt;h.attackY+=h.chargeY*dt;if(h.stateTime>.62){h.state="DISPERSE";h.stateTime=0}}
-        else if(h.state==="DISPERSE"){h.attackX=lerp(h.attackX,0,1-Math.exp(-2.5*dt));h.attackY=lerp(h.attackY,0,1-Math.exp(-2.5*dt));if(h.stateTime>1.25){h.state="REST";h.stateTime=0}}
-        const hx=baseX+h.attackX,hy=baseY+h.attackY;if(h.state==="CHARGE"&&Math.hypot(hx-hero.x,hy-hero.y)<hero.r+14){hero.vx-=h.chargeX*.18;hero.vy-=h.chargeY*.18;triggerNoise();spawnImpact(hx,hy);h.state="DISPERSE";h.stateTime=0}
-      })
+    function updateFloaters(dt){
+      const bounce=(body,q,r)=>{body.ox+=body.vx*dt;body.oy+=body.vy*dt;const baseX=(q-progress)/.115*W+hero.x,x=baseX+body.ox,t=tunnelAtX(x),limit=Math.max(12,t.half-r-8);if(Math.abs(body.oy)>limit){body.oy=clamp(body.oy,-limit,limit);body.vy*=-.92}if(Math.abs(body.ox)>24){body.ox=clamp(body.ox,-24,24);body.vx*=-1}};
+      hazards.forEach(h=>bounce(h,h.q,9));selectedPath._echoBodies.forEach((body,i)=>bounce(body,selectedPath.echoes[i],5));
+      hazards.forEach(h=>{const hx=(h.q-progress)/.115*W+hero.x+h.ox,hy=tunnelAtX(hx).center+h.oy;selectedPath.echoes.forEach((q,i)=>{if(selectedPath._taken[i])return;const e=echoPosition(q,i),dx=e.x-hx,dy=e.y-hy,d=Math.hypot(dx,dy);if(d<16&&d>0){const nx=dx/d,ny=dy/d,body=selectedPath._echoBodies[i],push=(16-d)*8;body.vx+=nx*push;body.vy+=ny*push;h.vx-=nx*push*.45;h.vy-=ny*push*.45}})})
     }
     function updateGame(dt){
       elapsed+=dt;collisionCooldown=Math.max(0,collisionCooldown-dt);
@@ -130,7 +122,7 @@
       const clearance=Math.abs(hero.y-walls.center)/Math.max(1,walls.half-hero.r),clean=collisionNoise<=0;flowState=SilentBubbleFlow.update(flowState,clean?clearance:1.3,dt);if(clean)silentTime+=dt;calmGlow=lerp(calmGlow,clean?clamp(flowState.streak/12,0,1):0,1-Math.exp(-1.2*dt));hero.noise=lerp(hero.noise,clean?0:1,1-Math.exp(-4*dt));
       noiseCue.classList.toggle("on",!clean);flowLabel.textContent=clean?SilentBubbleFlow.label(flowState):`VACARME ${collisionNoise.toFixed(1)} s`;flowFill.style.width=`${flowState.energy*100}%`;journeyFill.style.width=`${progress*100}%`;journeyNext.style.left=`${clamp(SilentBubbleFlow.nextEcho(selectedPath.echoes,selectedPath._taken,progress),0,1)*100}%`;audioFade(noiseGain,clean?0:.5,.12);
       selectedPath.echoes.forEach((q,i)=>{if(selectedPath._taken[i]||selectedPath._missed[i])return;const ep=echoPosition(q,i);if(q<progress-.018){selectedPath._missed[i]=true;spawnMiss(ep.x,ep.y);return}if(Math.hypot(hero.x-ep.x,hero.y-ep.y)>hero.r+ep.radius)return;selectedPath._taken[i]=true;echoAbsorb=1;spawnEcho(ep.x,ep.y);playEcho(i);gameEchoCount.textContent=`${selectedPath._taken.filter(Boolean).length}/${ECHO_COUNT}`;echoPop.textContent=`${echoKinds[i].icon}  ÉCHO ${i+1} RETROUVÉ`;echoPop.classList.remove("on");void echoPop.offsetWidth;echoPop.classList.add("on");if(navigator.vibrate)navigator.vibrate([20,25,35])});
-      updateHazards(dt,clearance);timer.textContent=`${Math.floor(elapsed/60)}:${String(Math.floor(elapsed)%60).padStart(2,"0")}`;if(progress>=1)endGame()
+      updateFloaters(dt);timer.textContent=`${Math.floor(elapsed/60)}:${String(Math.floor(elapsed)%60).padStart(2,"0")}`;if(progress>=1)endGame()
     }
     function spawnPuff(x,y){for(let i=0;i<18;i++){const a=Math.PI*2*i/18,s=18+Math.random()*16;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.48,r:1,halo:true})}}
     function spawnImpact(x,y){for(let i=0;i<7;i++){const a=Math.PI*2*i/7,s=18+Math.random()*35;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.42,r:1+Math.random()})}}
@@ -155,12 +147,13 @@
       const zone=Math.floor(progress*5),palettes=[["#3c315f","#162f4d","#55344e"],["#244f58","#123b49","#315842"],["#5a3b57","#1a3651","#68483b"],["#254c65","#18394f","#374a70"],["#3b5860","#173b49","#4c6549"]],palette=palettes[Math.min(zone,palettes.length-1)];
       const wall=c.createLinearGradient(0,0,0,H);wall.addColorStop(0,palette[0]);wall.addColorStop(.5,palette[1]);wall.addColorStop(1,palette[2]);c.fillStyle=wall;
       c.beginPath();c.moveTo(0,0);top.forEach(p=>c.lineTo(p.x,p.y));c.lineTo(W,0);c.fill();c.beginPath();c.moveTo(0,H);bottom.forEach(p=>c.lineTo(p.x,p.y));c.lineTo(W,H);c.fill();
-      c.save();c.globalAlpha=.18;for(let i=0;i<18;i++){const x=(i*137-progress*PATH_DISTANCE*.22)% (W+180)-70,r=16+(i%5)*8;c.fillStyle=i%2?"#8af0c0":"#77cfe2";c.beginPath();c.arc(x,top[Math.max(0,Math.min(top.length-1,Math.floor((x+20)/14)))]?.y-8,r,0,Math.PI);c.fill();c.beginPath();c.arc(x,bottom[Math.max(0,Math.min(bottom.length-1,Math.floor((x+20)/14)))]?.y+8,r,Math.PI,0);c.fill()}c.restore();
-      c.strokeStyle="rgba(126,225,190,.3)";c.lineWidth=2;[top,bottom].forEach(a=>{c.beginPath();a.forEach((p,i)=>c[i?"lineTo":"moveTo"](p.x,p.y));c.stroke()});
+      if(audioAnalyser&&waveform)audioAnalyser.getByteTimeDomainData(waveform);const soundPulse=.18+collisionNoise*.22+echoAbsorb*.35;
+      c.save();c.globalCompositeOperation="screen";[top,bottom].forEach((line,side)=>{for(let strand=0;strand<5;strand++){c.beginPath();line.forEach((p,i)=>{const sample=waveform?(waveform[Math.floor(i/Math.max(1,line.length-1)*(waveform.length-1))]-128)/128:Math.sin(i*.7+now*.003),direction=side?-1:1,wobble=sample*(3+soundPulse*13)+Math.sin(i*.52+now*.0018+strand)*1.8,offset=direction*(strand*3+wobble);c[i?"lineTo":"moveTo"](p.x,p.y+offset)});c.strokeStyle=`rgba(${105+strand*14},${205+strand*8},${190+strand*12},${.1+strand*.045+soundPulse*.08})`;c.lineWidth=.7+strand*.28;c.shadowColor="#69e6c4";c.shadowBlur=3+soundPulse*12;c.stroke()}});c.restore();
       if(wallContact>.02&&audioAnalyser&&waveform){audioAnalyser.getByteTimeDomainData(waveform);const touched=hero.y<tunnelAtX(hero.x).center?top:bottom,direction=touched===top?-1:1;c.save();c.strokeStyle=`rgba(145,242,205,${.28+.68*wallContact})`;c.lineWidth=1.5+wallContact*2;c.shadowColor="#73e5bc";c.shadowBlur=8+wallContact*18;c.beginPath();touched.forEach((p,i)=>{const sample=waveform[Math.floor(i/(touched.length-1)*(waveform.length-1))]/128-1,amplitude=(7+wallContact*28)*sample*direction;c[i?"lineTo":"moveTo"](p.x,p.y+amplitude)});c.stroke();c.restore()}
       if(puffFx.wave>.015){c.save();c.globalCompositeOperation="screen";for(let ring=0;ring<3;ring++){const cycle=(puffFx.phase+ring*.28)%1,radius=hero.r+10+cycle*68,alpha=puffFx.wave*(1-cycle)*(.24-ring*.035);c.strokeStyle=`rgba(139,235,218,${alpha})`;c.lineWidth=1.1+puffFx.wave*(1-cycle);c.shadowColor="#7ae6cf";c.shadowBlur=7*puffFx.wave;c.beginPath();for(let i=0;i<=48;i++){const a=i/48*Math.PI*2,r=radius+Math.sin(a*5+puffFx.phase*8+ring)*2.2*puffFx.wave,x=hero.x+Math.cos(a)*r,y=hero.y+Math.sin(a)*r;c[i?"lineTo":"moveTo"](x,y)}c.closePath();c.stroke()}c.restore()}
       selectedPath.echoes.forEach((q,i)=>{if(selectedPath._taken[i])return;const p=echoPosition(q,i);if(p.x<-20||p.x>W+20)return;const scale=p.turn?.72:1;c.fillStyle=p.turn?"#efffc7":"#baffcb";c.shadowColor="#65df9c";c.shadowBlur=p.turn?22:10+calmGlow*7;c.save();c.translate(p.x,p.y);c.scale(1,scale);c.beginPath();c.arc(0,0,p.radius,0,7);c.fill();c.restore();c.shadowBlur=0});
-      hazards.forEach(h=>{const x=(h.q-progress)/.115*W+hero.x+h.attackX;if(x<-50||x>W+50)return;const y=tunnelAtX(x-h.attackX).center+h.attackY,pulse=1+Math.sin(now*.003+h.phase)*.12;c.save();c.translate(x,y);c.rotate(now*.00075+h.phase);c.scale(pulse,pulse);c.shadowColor="#ff3535";c.shadowBlur=h.state==="AIM"?20:10;c.fillStyle=h.state==="CHARGE"?"#ff776e":"#ef3d48";c.fillRect(-5,-5,10,10);c.strokeStyle="rgba(255,220,210,.7)";c.lineWidth=1;c.strokeRect(-5,-5,10,10);if(h.state==="AIM"){c.strokeStyle=`rgba(255,91,84,${clamp(h.stateTime/1.35,0,1)*.4})`;c.setLineDash([2,7]);c.beginPath();c.moveTo(0,0);c.lineTo(hero.x-x,hero.y-y);c.stroke();c.setLineDash([])}c.restore()});
+      hazards.forEach(h=>{const x=(h.q-progress)/.115*W+hero.x+h.ox;if(x<-50||x>W+50)return;const y=tunnelAtX(x).center+h.oy,pulse=1+Math.sin(now*.003+h.phase)*.1;c.save();c.translate(x,y);c.rotate(now*.00045+h.phase);c.scale(pulse,pulse);c.shadowColor="#ff8c78";c.shadowBlur=9;c.fillStyle="#e85f62";c.fillRect(-6,-6,12,12);c.strokeStyle="rgba(255,225,205,.65)";c.lineWidth=1;c.strokeRect(-6,-6,12,12);c.restore()});
+      if(touchActive&&touchSample){const pull=Math.min(1,Math.hypot(touchSample.x-touchState.startX,touchSample.y-touchState.startY)/GAME_FEEL.touchRange),g=c.createLinearGradient(hero.x,hero.y,touchSample.x,touchSample.y);g.addColorStop(0,`rgba(160,245,225,${.12+pull*.3})`);g.addColorStop(1,"rgba(110,205,220,.05)");c.save();c.strokeStyle=g;c.lineWidth=1+pull*2;c.setLineDash([2,5]);c.lineDashOffset=-now*.015;c.beginPath();c.moveTo(hero.x,hero.y);c.quadraticCurveTo((hero.x+touchSample.x)/2,hero.y+(touchSample.y-hero.y)*.32,touchSample.x,touchSample.y);c.stroke();c.restore()}
       c.save();c.translate(hero.x+(Math.random()-.5)*hero.noise*2,hero.y);c.rotate(clamp(hero.vy/800,-.1,.1));const squash=hero.impact*.05;c.scale(hero.scaleX+squash,hero.scaleY-squash);c.shadowColor=hero.noise>.6?"#8a78ff":"#42c8ff";c.shadowBlur=30+calmGlow*12;const bg=c.createRadialGradient(-7,-9,1,0,0,hero.r);bg.addColorStop(0,"#f2ffff");bg.addColorStop(.22,echoAbsorb>.05?"#baffd0":"#72d9ff");bg.addColorStop(.58,"#2879ed");bg.addColorStop(1,hero.noise>.6?"#5636b7":"#102d86");c.fillStyle=bg;c.beginPath();
       c.arc(0,0,hero.r,0,7);c.fill();c.restore();
       particles.forEach(p=>{c.fillStyle=p.cloud?`rgba(94,244,157,${Math.min(.65,p.life*.35)})`:`rgba(127,235,177,${p.life})`;c.shadowColor=p.cloud?"#55ef9b":"transparent";c.shadowBlur=p.cloud?8:0;c.beginPath();c.arc(p.x,p.y,p.r*(p.cloud?1.2:1),0,7);c.fill();c.shadowBlur=0})
