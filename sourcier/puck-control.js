@@ -8,10 +8,10 @@
     puckRadius:10,
     follow:34,
     maxPuckSpeed:1050,
-    pushTransfer:.105,
-    tangentTransfer:.012,
-    bubbleDrag:3.15,
-    bubbleMaxSpeed:270,
+    pushTransfer:.14,
+    tangentTransfer:.025,
+    bubbleDrag:1.15,
+    bubbleMaxSpeed:320,
     boundaryMargin:26,
     boundaryStrength:520
   });

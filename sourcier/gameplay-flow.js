@@ -28,5 +28,6 @@
     const index=echoes.findIndex((value,i)=>!taken[i]&&value>=progress-.018);
     return index<0?1:echoes[index];
   }
-  return{createState,update,label,nextEcho};
+  function rewardDuration(collected){return clamp(Math.floor(collected),0,10)*10;}
+  return{createState,update,label,nextEcho,rewardDuration};
 });

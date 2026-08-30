@@ -23,3 +23,9 @@ test("repère le prochain écho non collecté",()=>{
   assert.equal(flow.nextEcho([.1,.4,.8],[true,false,false],.2),.4);
   assert.equal(flow.nextEcho([.1,.4],[true,true],.9),1);
 });
+
+test("convertit les dix échos en récompense d'écoute",()=>{
+  assert.equal(flow.rewardDuration(1),10);
+  assert.equal(flow.rewardDuration(10),100);
+  assert.equal(flow.rewardDuration(12),100);
+});
