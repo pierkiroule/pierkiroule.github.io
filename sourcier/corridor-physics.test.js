@@ -2,16 +2,20 @@ const test=require("node:test");
 const assert=require("node:assert/strict");
 const corridor=require("./corridor-physics.js");
 
-test("seule une poussée vers l'avant fait défiler le parcours",()=>{
-  assert.equal(corridor.advance({vx:120},.2,6000),.22);
-  assert.equal(corridor.advance({vx:-120},.2,6000),.2);
+test("la caméra reste fixe dans la zone morte puis suit progressivement",()=>{
+  assert.deepEqual(corridor.cameraStep(10,300,1000,6000),{scroll:0,progress:0});
+  const middle=corridor.cameraStep(10,550,1000,6000);
+  assert.ok(middle.scroll>0&&middle.scroll<10);
+  assert.deepEqual(corridor.cameraStep(-10,800,1000,6000),{scroll:0,progress:0});
 });
 
 test("les parois sont infranchissables et font rebondir la bulle",()=>{
-  const bubble={y:20,vy:-100,r:10};
-  assert.equal(corridor.constrain(bubble,100,60),-1);
+  const bubble={x:100,y:20,vx:0,vy:-100,r:10};
+  const hit=corridor.constrain(bubble,{top:40,bottom:160,topSlope:0,bottomSlope:0});
+  assert.equal(hit.side,-1);
   assert.equal(bubble.y,50);
-  assert.equal(bubble.vy,68);
+  assert.equal(bubble.vy,62);
+  assert.equal(hit.impact,100);
 });
 
 test("un écho oscille sans sortir du couloir",()=>{

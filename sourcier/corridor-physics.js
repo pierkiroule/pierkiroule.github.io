@@ -6,16 +6,34 @@
   "use strict";
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 
-  function advance(bubble,progress,distance){
-    const forward=Math.max(0,bubble.vx);
-    return clamp(progress+forward/distance,0,1);
+  function cameraStep(forward,x,width,distance){
+    if(forward<=0)return{scroll:0,progress:0};
+    const near=width*.42,far=width*.68;
+    const t=clamp((x-near)/(far-near),0,1);
+    const follow=t*t*(3-2*t);
+    const scroll=forward*follow;
+    return{scroll,progress:scroll/distance};
   }
 
-  function constrain(bubble,center,half,restitution=.68){
-    const top=center-half+bubble.r,bottom=center+half-bubble.r;
-    if(bubble.y<top){bubble.y=top;bubble.vy=Math.abs(bubble.vy)*restitution;return-1;}
-    if(bubble.y>bottom){bubble.y=bottom;bubble.vy=-Math.abs(bubble.vy)*restitution;return 1;}
-    return 0;
+  function reflect(bubble,nx,ny,restitution){
+    const incoming=bubble.vx*nx+bubble.vy*ny;
+    if(incoming>=0)return 0;
+    const impulse=-(1+restitution)*incoming;
+    bubble.vx+=impulse*nx;bubble.vy+=impulse*ny;
+    return-Math.min(0,incoming);
+  }
+
+  function constrain(bubble,walls,restitution=.62){
+    const top=walls.top+bubble.r,bottom=walls.bottom-bubble.r;
+    if(bubble.y<top){
+      bubble.y=top;const length=Math.hypot(walls.topSlope,1),impact=reflect(bubble,-walls.topSlope/length,1/length,restitution);
+      return{side:-1,impact};
+    }
+    if(bubble.y>bottom){
+      bubble.y=bottom;const length=Math.hypot(walls.bottomSlope,1),impact=reflect(bubble,walls.bottomSlope/length,-1/length,restitution);
+      return{side:1,impact};
+    }
+    return{side:0,impact:0};
   }
 
   function echoY(center,half,radius,phase){
@@ -23,5 +41,5 @@
     return center+Math.sin(phase)*travel;
   }
 
-  return{advance,constrain,echoY};
+  return{cameraStep,constrain,echoY};
 });
