@@ -36,6 +36,71 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        /* La révélation finale devient un paysage vivant, pas un simple lecteur audio. */
+        .soundscape-stage {
+            position: relative;
+            min-height: 330px;
+            overflow: hidden;
+            isolation: isolate;
+            background:
+                radial-gradient(circle at 50% 48%, rgba(34, 211, 238, .16), transparent 25%),
+                radial-gradient(circle at 20% 15%, rgba(236, 72, 153, .13), transparent 32%),
+                radial-gradient(circle at 80% 85%, rgba(139, 92, 246, .18), transparent 35%),
+                #030817;
+        }
+        .soundscape-stage::before {
+            content: "";
+            position: absolute;
+            inset: -50%;
+            z-index: -1;
+            background: conic-gradient(from 90deg, transparent, rgba(34,211,238,.08), transparent, rgba(217,70,239,.1), transparent);
+            animation: soundscape-aurora 16s linear infinite;
+        }
+        .soundscape-stage.is-playing {
+            box-shadow: inset 0 0 80px rgba(34,211,238,.13), 0 0 35px rgba(139,92,246,.16);
+        }
+        .soundscape-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .soundscape-copy { position: relative; z-index: 2; pointer-events: none; }
+        .soundscape-controls { position: relative; z-index: 3; }
+        .soundscape-play { box-shadow: 0 0 0 0 rgba(34,211,238,.35); }
+        .is-playing .soundscape-play { animation: soundscape-pulse 1.8s ease-out infinite; }
+        .soundscape-joystick {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            z-index: 4;
+            width: 82px;
+            height: 82px;
+            border: 1px solid rgba(103, 232, 249, .28);
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(15, 23, 42, .78) 0 35%, rgba(8, 47, 73, .48) 36% 100%);
+            box-shadow: inset 0 0 20px rgba(34, 211, 238, .12), 0 8px 28px rgba(0, 0, 0, .3);
+            touch-action: none;
+            cursor: grab;
+        }
+        .soundscape-joystick:active { cursor: grabbing; }
+        .soundscape-joystick:focus-visible { outline: 2px solid #67e8f9; outline-offset: 3px; }
+        .soundscape-stick {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 34px;
+            height: 34px;
+            margin: -17px;
+            border-radius: 999px;
+            pointer-events: none;
+            background: radial-gradient(circle at 35% 30%, #fff, #67e8f9 28%, #8b5cf6 75%);
+            box-shadow: 0 0 18px rgba(103, 232, 249, .65);
+            will-change: transform;
+        }
+        @keyframes soundscape-aurora { to { transform: rotate(360deg); } }
+        @keyframes soundscape-pulse {
+            70% { box-shadow: 0 0 0 18px rgba(34,211,238,0); }
+            100% { box-shadow: 0 0 0 0 rgba(34,211,238,0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .soundscape-stage::before, .is-playing .soundscape-play { animation: none; }
+        }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-purple-950 selection:text-cyan-300">
@@ -208,6 +273,16 @@
             animations: true
         };
 
+        let soundscapeAudioContext = null;
+        let soundscapeSource = null;
+        let soundscapeAnalyser = null;
+        let soundscapeFrame = null;
+        const soundscapePhysics = {
+            x: 0, y: 0, vx: 0, vy: 0,
+            inputX: 0, inputY: 0,
+            dragging: false, pointerId: null, lastTime: 0
+        };
+
         // --- CHARGEMENT DU LOCALSTORAGE ---
         function loadState() {
             try {
@@ -325,6 +400,7 @@
 
         // --- RECONSTRUCTION DE L'INTERFACE SELON L'ÉTAT ---
         function render() {
+            stopSoundscapeVisuals();
             const main = document.getElementById('main-content');
             
             if (state.screen === 'home') {
@@ -335,7 +411,207 @@
                 main.innerHTML = renderQuest();
             } else if (state.screen === 'collection') {
                 main.innerHTML = renderCollection();
+                requestAnimationFrame(initSoundscape);
             }
+        }
+
+        function stopSoundscapeVisuals() {
+            if (soundscapeFrame) cancelAnimationFrame(soundscapeFrame);
+            soundscapeFrame = null;
+            const audio = document.getElementById('eko-soundscape');
+            if (audio) audio.pause();
+            if (soundscapeAudioContext) soundscapeAudioContext.close();
+            soundscapeAudioContext = null;
+            soundscapeSource = null;
+            soundscapeAnalyser = null;
+            soundscapePhysics.dragging = false;
+            soundscapePhysics.pointerId = null;
+            soundscapePhysics.inputX = 0;
+            soundscapePhysics.inputY = 0;
+        }
+
+        function initSoundscape() {
+            if (!document.getElementById('soundscape-canvas')) return;
+            soundscapePhysics.lastTime = performance.now();
+            drawSoundscape();
+        }
+
+        function beginSoundscapeJoystick(event) {
+            const joystick = document.getElementById('soundscape-joystick');
+            if (!joystick) return;
+            soundscapePhysics.dragging = true;
+            soundscapePhysics.pointerId = event.pointerId;
+            joystick.setPointerCapture(event.pointerId);
+            updateSoundscapeJoystick(event);
+        }
+
+        function updateSoundscapeJoystick(event) {
+            if (!soundscapePhysics.dragging || event.pointerId !== soundscapePhysics.pointerId) return;
+            const joystick = document.getElementById('soundscape-joystick');
+            const stick = document.getElementById('soundscape-stick');
+            if (!joystick || !stick) return;
+            const rect = joystick.getBoundingClientRect();
+            let x = (event.clientX - (rect.left + rect.width / 2)) / (rect.width * .34);
+            let y = (event.clientY - (rect.top + rect.height / 2)) / (rect.height * .34);
+            const length = Math.hypot(x, y);
+            if (length > 1) { x /= length; y /= length; }
+            soundscapePhysics.inputX = x;
+            soundscapePhysics.inputY = y;
+            stick.style.transform = `translate(${x * 27}px, ${y * 27}px)`;
+            if (!soundscapeFrame) drawSoundscape();
+        }
+
+        function endSoundscapeJoystick(event) {
+            if (event.pointerId !== soundscapePhysics.pointerId) return;
+            soundscapePhysics.dragging = false;
+            soundscapePhysics.pointerId = null;
+            soundscapePhysics.inputX = 0;
+            soundscapePhysics.inputY = 0;
+            const stick = document.getElementById('soundscape-stick');
+            if (stick) stick.style.transform = 'translate(0, 0)';
+        }
+
+        function controlSoundscapeWithKeys(event) {
+            const directions = {
+                ArrowLeft: [-.42, 0], ArrowRight: [.42, 0],
+                ArrowUp: [0, -.42], ArrowDown: [0, .42]
+            };
+            if (!directions[event.key]) return;
+            event.preventDefault();
+            soundscapePhysics.vx += directions[event.key][0];
+            soundscapePhysics.vy += directions[event.key][1];
+            if (!soundscapeFrame) drawSoundscape();
+        }
+
+        async function toggleSoundscape() {
+            const audio = document.getElementById('eko-soundscape');
+            if (!audio) return;
+
+            if (!soundscapeAudioContext) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                soundscapeAudioContext = new AudioContext();
+                soundscapeAnalyser = soundscapeAudioContext.createAnalyser();
+                soundscapeAnalyser.fftSize = 256;
+                soundscapeAnalyser.smoothingTimeConstant = .82;
+                soundscapeSource = soundscapeAudioContext.createMediaElementSource(audio);
+                soundscapeSource.connect(soundscapeAnalyser);
+                soundscapeAnalyser.connect(soundscapeAudioContext.destination);
+            }
+
+            if (soundscapeAudioContext.state === 'suspended') await soundscapeAudioContext.resume();
+            if (audio.paused) {
+                await audio.play();
+                drawSoundscape();
+            } else {
+                audio.pause();
+            }
+            updateSoundscapeControls();
+        }
+
+        function updateSoundscapeControls() {
+            const audio = document.getElementById('eko-soundscape');
+            const stage = document.getElementById('soundscape-stage');
+            const button = document.getElementById('soundscape-play');
+            const label = document.getElementById('soundscape-status');
+            if (!audio || !stage || !button || !label) return;
+            const playing = !audio.paused && !audio.ended;
+            stage.classList.toggle('is-playing', playing);
+            button.textContent = playing ? '❚❚' : '▶';
+            button.setAttribute('aria-label', playing ? 'Mettre le paysage sonore en pause' : 'Écouter le paysage sonore');
+            label.textContent = playing ? 'Le paysage résonne — la bulle écoute chaque fréquence' : 'Touchez pour faire naître le paysage';
+        }
+
+        function drawSoundscape() {
+            if (soundscapeFrame) cancelAnimationFrame(soundscapeFrame);
+            soundscapeFrame = null;
+            const canvas = document.getElementById('soundscape-canvas');
+            const audio = document.getElementById('eko-soundscape');
+            if (!canvas || !audio) return;
+            const ctx = canvas.getContext('2d');
+            const frequency = new Uint8Array(soundscapeAnalyser ? soundscapeAnalyser.frequencyBinCount : 128);
+
+            function paint(now = performance.now()) {
+                const ratio = window.devicePixelRatio || 1;
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+                if (canvas.width !== width * ratio || canvas.height !== height * ratio) {
+                    canvas.width = width * ratio;
+                    canvas.height = height * ratio;
+                }
+                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+                ctx.clearRect(0, 0, width, height);
+                if (soundscapeAnalyser) soundscapeAnalyser.getByteFrequencyData(frequency);
+                const bass = frequency.slice(0, 16).reduce((a, b) => a + b, 0) / (16 * 255);
+                const energy = frequency.reduce((a, b) => a + b, 0) / (frequency.length * 255);
+                // Intégration physique : poussée du pad, inertie, frottement et rebond souple aux limites.
+                const dt = Math.min((now - (soundscapePhysics.lastTime || now)) / 1000, .034);
+                soundscapePhysics.lastTime = now;
+                const acceleration = 2.65;
+                soundscapePhysics.vx += soundscapePhysics.inputX * acceleration * dt;
+                soundscapePhysics.vy += soundscapePhysics.inputY * acceleration * dt;
+                const drag = Math.pow(.22, dt);
+                soundscapePhysics.vx *= drag;
+                soundscapePhysics.vy *= drag;
+                soundscapePhysics.x += soundscapePhysics.vx * dt;
+                soundscapePhysics.y += soundscapePhysics.vy * dt;
+                const limitX = .72, limitY = .58;
+                if (Math.abs(soundscapePhysics.x) > limitX) {
+                    soundscapePhysics.x = Math.sign(soundscapePhysics.x) * limitX;
+                    soundscapePhysics.vx *= -.58;
+                }
+                if (Math.abs(soundscapePhysics.y) > limitY) {
+                    soundscapePhysics.y = Math.sign(soundscapePhysics.y) * limitY;
+                    soundscapePhysics.vy *= -.58;
+                }
+                const cx = width / 2 + soundscapePhysics.x * width * .35;
+                const cy = height * .48 + soundscapePhysics.y * height * .31;
+                const base = Math.min(width, height) * (.16 + bass * .07);
+
+                // Ondes concentriques, spectre orbital et cœur liquide audioreactif.
+                for (let ring = 3; ring >= 1; ring--) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, base + ring * 23 + energy * ring * 17, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(${ring === 2 ? '217,70,239' : '34,211,238'},${.05 + energy * .18})`;
+                    ctx.lineWidth = 1.3;
+                    ctx.stroke();
+                }
+                const points = 96;
+                ctx.beginPath();
+                for (let i = 0; i <= points; i++) {
+                    const angle = (i / points) * Math.PI * 2 - Math.PI / 2;
+                    const bin = frequency[Math.floor((i % points) / points * frequency.length)] / 255;
+                    const radius = base + bin * 38;
+                    const x = cx + Math.cos(angle) * radius;
+                    const y = cy + Math.sin(angle) * radius;
+                    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+                }
+                ctx.closePath();
+                const glow = ctx.createRadialGradient(cx - base * .3, cy - base * .4, 4, cx, cy, base * 1.55);
+                glow.addColorStop(0, `rgba(255,255,255,${.72 + energy * .25})`);
+                glow.addColorStop(.28, `rgba(34,211,238,${.45 + bass * .4})`);
+                glow.addColorStop(.67, `rgba(139,92,246,${.38 + energy * .4})`);
+                glow.addColorStop(1, 'rgba(236,72,153,.06)');
+                ctx.fillStyle = glow;
+                ctx.shadowColor = '#22d3ee';
+                ctx.shadowBlur = 22 + energy * 45;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                for (let i = 0; i < 32; i++) {
+                    const bin = frequency[i * 2] / 255;
+                    const angle = i / 32 * Math.PI * 2;
+                    const inner = base + 13;
+                    const outer = inner + 8 + bin * 47;
+                    ctx.beginPath();
+                    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+                    ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
+                    ctx.strokeStyle = `hsla(${180 + i * 4},90%,68%,${.18 + bin * .72})`;
+                    ctx.lineWidth = 1 + bin * 2.5;
+                    ctx.stroke();
+                }
+                if (state.animations && document.body.contains(canvas)) soundscapeFrame = requestAnimationFrame(paint);
+            }
+            paint();
         }
 
         // --- GESTIONNAIRES D'ACTIONS DES UTILISATEURS ---
@@ -909,15 +1185,29 @@
 
                     <!-- ÉCRAN COMPLET ACCOMPLI -->
                     ${count === 7 ? `
-                        <div class="bg-gradient-to-br from-cyan-950/30 via-slate-900/60 to-purple-950/30 border border-cyan-500/30 p-6 rounded-2xl text-center space-y-4 shadow-xl">
-                            <span class="text-4xl animate-bounce inline-block">👑</span>
-                            <h4 class="text-lg font-bold text-cyan-300 uppercase tracking-widest">La Traversée est achevée</h4>
-                            <p class="text-xs text-slate-300 leading-relaxed">
-                                Eko a triomphé des tentations et de l'hypnose du réseau. En identifiant ses peurs, son corps endormi et la force de son image virtuelle, il a posé le casque et retrouvé le sol vivant de la réalité.
-                            </p>
-                            <p class="text-[11px] text-slate-400 italic">
-                                Vous pouvez imprimer et garder précieusement la synthèse brute écrite de cet atelier thérapeutique. C'est votre fil de retour.
-                            </p>
+                        <div class="border border-cyan-400/30 rounded-2xl overflow-hidden shadow-2xl">
+                            <div id="soundscape-stage" class="soundscape-stage flex flex-col items-center justify-between p-6 text-center">
+                                <canvas id="soundscape-canvas" class="soundscape-canvas" aria-hidden="true"></canvas>
+                                <div class="soundscape-copy space-y-2">
+                                    <span class="text-[9px] text-cyan-300 font-extrabold uppercase tracking-[.28em]">Révélation finale • cadeau sonore</span>
+                                    <h4 class="text-xl font-serif-poetic font-semibold text-white">Le paysage retrouvé d’Eko</h4>
+                                    <p class="text-[11px] text-slate-300 max-w-sm leading-relaxed">Sept fragments deviennent une seule onde. Écoutez : le vent, le lien et le vivant reprennent leur place.</p>
+                                </div>
+                                <div class="soundscape-controls flex flex-col items-center gap-3">
+                                    <button id="soundscape-play" onclick="toggleSoundscape()" class="soundscape-play w-16 h-16 rounded-full bg-white/95 hover:bg-cyan-100 text-slate-950 text-xl flex items-center justify-center transition-transform hover:scale-105" aria-label="Écouter le paysage sonore">▶</button>
+                                    <span id="soundscape-status" class="text-[10px] text-cyan-200 tracking-wide">Touchez pour faire naître le paysage</span>
+                                </div>
+                                <div id="soundscape-joystick" class="soundscape-joystick" role="application" tabindex="0" aria-label="Joystick pour déplacer la bulle sonore. Utilisez le glissement ou les flèches du clavier." title="Déplacez la bulle" onpointerdown="beginSoundscapeJoystick(event)" onpointermove="updateSoundscapeJoystick(event)" onpointerup="endSoundscapeJoystick(event)" onpointercancel="endSoundscapeJoystick(event)" onkeydown="controlSoundscapeWithKeys(event)">
+                                    <span id="soundscape-stick" class="soundscape-stick"></span>
+                                    <span class="sr-only">Maintenez et glissez pour pousser la bulle. Elle conserve son inertie et rebondit sur les bords.</span>
+                                </div>
+                                <audio id="eko-soundscape" src="Mino.mp3" preload="metadata" onplay="updateSoundscapeControls()" onpause="updateSoundscapeControls()" onended="updateSoundscapeControls()"></audio>
+                            </div>
+                            <div class="bg-slate-950/95 p-5 text-center space-y-3 border-t border-cyan-500/20">
+                                <p class="text-xs text-slate-300 leading-relaxed">Ce paysage sonore vous est offert comme un fil de retour : à réécouter quand les voix deviennent trop fortes, pour retrouver votre rythme et votre propre résonance.</p>
+                                <p class="text-[10px] text-purple-200/80">◉ Pilotez la bulle avec le pad : donnez-lui une impulsion, puis laissez vivre son inertie et ses rebonds.</p>
+                                <a href="Mino.mp3" download="Le-paysage-retrouve-d-Eko.mp3" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-full bg-cyan-950/50 hover:bg-cyan-900/60 border border-cyan-500/30 text-[10px] font-bold uppercase tracking-wider text-cyan-200 transition-colors">↓ Garder ce paysage sonore</a>
+                            </div>
                         </div>
                     ` : ''}
 
