@@ -1,6 +1,7 @@
 (function(root,factory){const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;else root.SilentBubbleFlappy=api;})(typeof globalThis!=="undefined"?globalThis:this,function(){
   "use strict";
-  const DEFAULTS={forwardSpeed:112,lift:430,gravity:360,maxRise:190,maxFall:220,sizeResponse:9};
+  // A deliberately gentle pace leaves children enough time to read the tunnel.
+  const DEFAULTS={forwardSpeed:56,lift:215,gravity:180,maxRise:95,maxFall:110,sizeResponse:9};
   function createState(){return{vy:0,scale:1/3};}
   function step(state,pressed,dt,options={}){
     const config={...DEFAULTS,...options},safeDt=Math.max(.001,Math.min(.034,dt));
