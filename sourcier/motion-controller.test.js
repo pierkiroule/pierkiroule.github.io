@@ -1,28 +1,6 @@
-const test=require("node:test");
-const assert=require("node:assert/strict");
-const motion=require("./motion-controller.js");
-
-test("un mouvement produit une force puis le neutre flottant la ramène vers zéro",()=>{
-  const state=motion.createState({smoothing:1,neutralFollow:8,deadZone:0,gain:5});
-  motion.update(state,{x:0,y:0},0,.016);
-  const first=motion.update(state,{x:.1,y:-.1},16,.016);
-  assert.ok(first.forceX>0&&first.forceY<0);
-  let output=first;for(let i=0;i<100;i++)output=motion.update(state,{x:.1,y:-.1},32+i*16,.016);
-  assert.ok(Math.abs(output.forceX)<.001&&Math.abs(output.forceY)<.001);
-});
-
-test("la bouche déclenche une fois, attend la fermeture et respecte le cooldown",()=>{
-  const state=motion.createState({smoothing:1,mouthSmoothing:1,cooldown:100});
-  motion.update(state,{x:0,y:0,mouth:0},0,.016);
-  assert.equal(motion.update(state,{x:0,y:0,mouth:.8},100,.016).boost,true);
-  assert.equal(motion.update(state,{x:0,y:0,mouth:.9},200,.016).boost,false);
-  motion.update(state,{x:0,y:0,mouth:.1},220,.016);
-  assert.equal(motion.update(state,{x:0,y:0,mouth:.8},240,.016).boost,true);
-});
-
-test("la sortie normalisée reste bornée et expose force, vitesse et boost",()=>{
-  const state=motion.createState({smoothing:1,gain:100});motion.update(state,{x:0,y:0},0,.016);
-  const output=motion.update(state,{x:2,y:-2},16,.016);
-  assert.deepEqual(Object.keys(output),["forceX","forceY","velocityX","velocityY","boost"]);
-  assert.equal(output.forceX,1);assert.equal(output.forceY,-1);
-});
+const test=require("node:test");const assert=require("node:assert/strict");const motion=require("./motion-controller.js");
+test("un mouvement pousse puis le neutre adaptatif rejoint une position tenue",()=>{const s=motion.createState({smoothing:1,range:100,neutralFollowMin:3,neutralFollowMax:6,deadZone:0});motion.update(s,{x:0,y:0},0,.016);const first=motion.update(s,{x:40,y:-20},16,.016);assert.ok(first.forceX>0&&first.forceY<0);let out;for(let i=0;i<240;i++)out=motion.update(s,{x:40,y:-20},32+i*16,.016);assert.ok(Math.abs(out.forceX)<.001&&Math.abs(out.forceY)<.001);});
+test("une petite correction est plus précise qu'un grand geste",()=>{const small=motion.createState({smoothing:1,range:100}),large=motion.createState({smoothing:1,range:100});motion.update(small,{x:0,y:0},0,.016);motion.update(large,{x:0,y:0},0,.016);const a=motion.update(small,{x:12,y:0},1000,1),b=motion.update(large,{x:70,y:0},1000,1);assert.ok(a.forceX>0&&a.forceX<b.forceX*.35);});
+test("la vitesse ajoute une contribution bornée",()=>{const s=motion.createState({smoothing:1,range:100,velocityContribution:.1});motion.update(s,{x:0,y:0},0,.016);const out=motion.update(s,{x:1000,y:0},1,.001);assert.ok(out.forceX<=1&&out.velocityX>0);});
+test("la bouche exige fermeture et cooldown avant un nouveau boost",()=>{const s=motion.createState({smoothing:1,mouthSmoothing:1,cooldown:300});motion.update(s,{x:0,y:0,mouth:0},0,.016);assert.equal(motion.update(s,{x:0,y:0,mouth:.8},300,.016).boost,true);assert.equal(motion.update(s,{x:0,y:0,mouth:.9},700,.016).boost,false);motion.update(s,{x:0,y:0,mouth:.1},710,.016);assert.equal(motion.update(s,{x:0,y:0,mouth:.8},720,.016).boost,true);});
+test("release annule la force sans modifier une physique externe",()=>{const s=motion.createState();motion.update(s,{x:0,y:0},0,.016);motion.update(s,{x:50,y:0},16,.016);assert.equal(motion.release(s).forceX,0);});
