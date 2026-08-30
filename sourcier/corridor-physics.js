@@ -41,5 +41,13 @@
     return center+Math.sin(phase)*travel;
   }
 
-  return{cameraStep,constrain,echoY};
+  function glideStep(bubble,remaining,dt,damping=.72){
+    if(remaining<=0)return{dx:0,dy:0,remaining:0};
+    const step=Math.min(dt,remaining),dx=bubble.vx*step,dy=bubble.vy*step,next=Math.max(0,remaining-step),friction=Math.exp(-damping*step);
+    bubble.vx*=friction;bubble.vy*=friction;
+    if(!next)bubble.vx=bubble.vy=0;
+    return{dx,dy,remaining:next};
+  }
+
+  return{cameraStep,constrain,echoY,glideStep};
 });

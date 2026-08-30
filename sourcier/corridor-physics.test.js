@@ -22,3 +22,10 @@ test("un écho oscille sans sortir du couloir",()=>{
   assert.equal(corridor.echoY(100,50,6,Math.PI/2),139);
   assert.equal(corridor.echoY(100,50,6,-Math.PI/2),61);
 });
+
+test("l'impulsion de drag glisse puis s'arrête après deux secondes",()=>{
+  const bubble={vx:100,vy:20};let remaining=2,distance=0;
+  for(let i=0;i<4;i++){const step=corridor.glideStep(bubble,remaining,.5);remaining=step.remaining;distance+=step.dx;}
+  assert.equal(remaining,0);assert.equal(bubble.vx,0);assert.equal(bubble.vy,0);assert.ok(distance>100);
+  assert.deepEqual(corridor.glideStep(bubble,remaining,.5),{dx:0,dy:0,remaining:0});
+});
