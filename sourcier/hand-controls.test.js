@@ -36,7 +36,7 @@ test("normalise le pinch relativement à la taille de la main", () => {
   assert.equal(hand.pinchAmount(marks.slice(0, 8)), 0);
 });
 
-test("ne déclenche qu'une onde par pinch grâce à l’hystérésis", () => {
+test("ne déclenche qu'une prise du palet par pinch grâce à l’hystérésis", () => {
   const pinched = landmarks(0, 0), open = landmarks(0, 0);
   pinched[9] = open[9] = { x: .5, y: 0 };
   pinched[4] = pinched[8] = { x: .1, y: .1 };
