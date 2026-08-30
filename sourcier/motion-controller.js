@@ -5,10 +5,10 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
   "use strict";
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
-  const DEFAULTS=Object.freeze({smoothing:.3,neutralFollowMin:1.8,neutralFollowMax:3.6,range:70,deadZone:.06,curve:1.65,velocityContribution:.14,velocityLimit:2.2,mouthOpen:.52,mouthClosed:.31,mouthSmoothing:.34,cooldown:300});
+  const DEFAULTS=Object.freeze({smoothing:.3,neutralFollowMin:1.8,neutralFollowMax:3.6,range:70,deadZone:.06,curve:1.65,velocityContribution:.14,velocityLimit:2.2});
 
   function createState(config={}){
-    return{config:{...DEFAULTS,...config},seen:false,x:0,y:0,neutralX:0,neutralY:0,smoothedX:0,smoothedY:0,velocityX:0,velocityY:0,mouth:0,mouthArmed:true,lastBoost:-Infinity,offsetX:0,offsetY:0,output:{forceX:0,forceY:0,velocityX:0,velocityY:0,boost:false}};
+    return{config:{...DEFAULTS,...config},seen:false,x:0,y:0,neutralX:0,neutralY:0,smoothedX:0,smoothedY:0,velocityX:0,velocityY:0,offsetX:0,offsetY:0,output:{forceX:0,forceY:0,velocityX:0,velocityY:0,boost:false}};
   }
 
   // Both touch and face controllers submit a relative 2-D sample here. The slowly
@@ -24,13 +24,7 @@
     state.neutralX+=dx*follow;state.neutralY+=dy*follow;state.offsetX=dx/c.range;state.offsetY=dy/c.range;
     const response=value=>{const sign=Math.sign(value),magnitude=Math.abs(value);if(magnitude<=c.deadZone)return 0;const scaled=clamp((magnitude-c.deadZone)/(1-c.deadZone),0,1);return sign*scaled**c.curve;};
     const velocity=value=>clamp(value/c.range*c.velocityContribution,-c.velocityLimit*c.velocityContribution,c.velocityLimit*c.velocityContribution);
-    let boost=false;
-    if(Number.isFinite(sample.mouth)){
-      state.mouth+=(sample.mouth-state.mouth)*c.mouthSmoothing;
-      if(state.mouthArmed&&state.mouth>=c.mouthOpen&&now-state.lastBoost>=c.cooldown){boost=true;state.mouthArmed=false;state.lastBoost=now;}
-      else if(!state.mouthArmed&&state.mouth<=c.mouthClosed)state.mouthArmed=true;
-    }
-    state.output={forceX:clamp(response(state.offsetX)+velocity(state.velocityX),-1,1),forceY:clamp(response(state.offsetY)+velocity(state.velocityY),-1,1),velocityX:state.velocityX/c.range,velocityY:state.velocityY/c.range,boost};
+    state.output={forceX:clamp(response(state.offsetX)+velocity(state.velocityX),-1,1),forceY:clamp(response(state.offsetY)+velocity(state.velocityY),-1,1),velocityX:state.velocityX/c.range,velocityY:state.velocityY/c.range,boost:false};
     return state.output;
   }
   function release(state){state.seen=false;state.output={forceX:0,forceY:0,velocityX:state.velocityX,velocityY:state.velocityY,boost:false};return state.output;}
