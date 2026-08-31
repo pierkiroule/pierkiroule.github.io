@@ -123,7 +123,7 @@
       const travel=SilentBubbleFlappy.step(flappyState,touchActive,dt);
       hero.vx=SilentBubbleFlappy.DEFAULTS.forwardSpeed;hero.vy=flappyState.vy;hero.controlScale=travel.scale;
       puffFx.wave=lerp(puffFx.wave,0,1-Math.exp(-4.2*dt));puffFx.phase+=dt*1.5;
-      hero.x=clamp(hero.x+travel.dx,W*.32,W*.72);const camera=SilentBubbleCorridor.cameraStep(Math.max(0,travel.dx),hero.x,W,PATH_DISTANCE);hero.x-=camera.scroll;progress=clamp(progress+camera.progress,0,1);cameraY-=travel.dy;hero.y=H*.5;
+      hero.x=clamp(hero.x+travel.dx,W*.32,W*.72);const portraitFollow={near:.32,far:.5},camera=SilentBubbleCorridor.cameraStep(Math.max(0,travel.dx),hero.x,W,PATH_DISTANCE,H>W?portraitFollow:undefined);hero.x-=camera.scroll;progress=clamp(progress+camera.progress,0,1);cameraY-=travel.dy;hero.y=H*.5;
       const walls=wallsAtX(hero.x),probe={x:hero.x,y:hero.y,vx:hero.vx,vy:hero.vy,r:hero.r*hero.controlScale},hit=SilentBubbleCorridor.constrain(probe,walls,GAME_FEEL.bounceRestitution);cameraY-=probe.y-hero.y;hero.vx=probe.vx;hero.vy=probe.vy;
       if(hit.impact>24&&!collisionCooldown&&hit.side!==impactSide){triggerNoise(hit.side);spawnImpact(hero.x,hero.y-hit.side*hero.r)}
       if(!hit.side&&Math.min(hero.y-walls.top,walls.bottom-hero.y)>hero.r+4)impactSide=0;

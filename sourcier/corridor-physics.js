@@ -6,9 +6,9 @@
   "use strict";
   const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 
-  function cameraStep(forward,x,width,distance){
+  function cameraStep(forward,x,width,distance,followZone={near:.42,far:.68}){
     if(forward<=0)return{scroll:0,progress:0};
-    const near=width*.42,far=width*.68;
+    const near=width*followZone.near,far=width*followZone.far;
     const t=clamp((x-near)/(far-near),0,1);
     const follow=t*t*(3-2*t);
     const scroll=forward*follow;

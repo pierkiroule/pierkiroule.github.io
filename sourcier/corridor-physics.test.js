@@ -2,6 +2,12 @@ const test=require("node:test");
 const assert=require("node:assert/strict");
 const corridor=require("./corridor-physics.js");
 
+test("la caméra peut garder la bulle centrée en mode portrait",()=>{
+  const step=corridor.cameraStep(4,180,360,3900,{near:.32,far:.5});
+  assert.equal(step.scroll,4);
+  assert.equal(step.progress,4/3900);
+});
+
 test("la caméra reste fixe dans la zone morte puis suit progressivement",()=>{
   assert.deepEqual(corridor.cameraStep(10,300,1000,6000),{scroll:0,progress:0});
   const middle=corridor.cameraStep(10,550,1000,6000);
