@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="fr" class="h-full bg-black select-none">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Le Doigt qui Écoute — Défi Mémoire Spatiale & Sonore</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      touch-action: none;
+      overflow: hidden;
+      background-color: #020504;
+      color: #edf4ea;
+    }
+    .font-title {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(8, 18, 12, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(210, 245, 215, 0.14);
+    }
+    .glass-btn {
+      background: rgba(237, 243, 233, 0.08);
+      border: 1px solid rgba(237, 243, 233, 0.2);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-btn:hover, .glass-btn:active {
+      background: rgba(237, 243, 233, 0.2);
+      border-color: rgba(237, 243, 233, 0.4);
+      transform: translateY(-1px);
+    }
+    .glow-text {
+      text-shadow: 0 0 14px rgba(180, 245, 190, 0.5);
+    }
+    .radar-disabled {
+      opacity: 0.35;
+      filter: grayscale(1);
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+    ::-webkit-scrollbar-thumb { background: rgba(180, 220, 180, 0.3); border-radius: 4px; }
+  </style>
+</head>
+<body class="h-full w-full relative text-emerald-50">
+
+  <!-- Canvas Principal -->
+  <canvas id="canvas" class="fixed inset-0 w-full h-full block z-0"></canvas>
+
+  <!-- HUD Interface -->
+  <div id="hud" class="fixed inset-0 z-10 pointer-events-none flex flex-col justify-between p-4 md:p-6">
+    
+    <!-- Header Top: Mission & Status -->
+    <div class="flex items-start justify-between w-full max-w-3xl mx-auto pointer-events-auto gap-2">
+      
+      <!-- Button Codex & Settings -->
+      <div class="flex gap-2">
+        <button id="btnCodex" class="glass-btn px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2 hover:text-emerald-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          <span class="hidden sm:inline">Codex</span>
+          <span id="codexBadge" class="bg-emerald-500/30 text-emerald-300 px-1.5 py-0.5 rounded-full text-[10px]">0/5</span>
+        </button>
+
+        <button id="btnSettings" class="glass-btn p-2 rounded-xl text-xs flex items-center justify-center hover:text-emerald-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </button>
+      </div>
+
+      <!-- Center Mission Card -->
+      <div id="missionCard" class="glass-panel px-5 py-3 rounded-2xl text-center max-w-xs sm:max-w-md shadow-2xl transition-all duration-300 flex-1">
+        <div class="flex items-center justify-between text-[9px] font-bold tracking-[0.2em] uppercase mb-1">
+          <span id="missionBadge" class="text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/30">MISSION 1 : EXPLORATION</span>
+          <span id="missionCounter" class="text-emerald-300 font-mono">1 / 5</span>
+        </div>
+        
+        <div id="missionText" class="text-sm sm:text-base font-medium text-emerald-100 font-title">Localisez le rouge-gorge</div>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-emerald-950/60 h-1.5 rounded-full mt-2 overflow-hidden border border-emerald-500/20">
+          <div id="progressBar" class="bg-gradient-to-r from-emerald-500 via-teal-300 to-amber-300 h-full w-0 transition-all duration-500 rounded-full"></div>
+        </div>
+      </div>
+
+      <!-- Controls Hint -->
+      <div class="hidden lg:flex flex-col items-end text-[10px] text-emerald-400/50">
+        <span>Contrôles : Flèches / ZQSD</span>
+        <span>Tactile / Souris : Glisser</span>
+      </div>
+    </div>
+
+    <!-- Bottom Left: Status & Radar Widget -->
+    <div class="flex justify-between items-end w-full pointer-events-auto">
+      
+      <!-- Directional visual hint toggle indicator -->
+      <div id="radarStatusBadge" class="flex glass-panel px-3.5 py-2 rounded-2xl text-xs text-teal-300 items-center gap-2">
+        <span id="radarStatusDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="radarStatusText" class="font-medium">Radar & Flèche : ACTIFS</span>
+      </div>
+
+      <!-- Bottom Right: Dynamic Radar Widget -->
+      <div id="radarWidget" class="relative">
+        <div id="radar" class="glass-panel w-20 h-20 sm:w-24 sm:h-24 rounded-full relative flex items-center justify-center shadow-lg shadow-black/50 transition-all duration-500">
+          <!-- Outer dynamic ring -->
+          <div id="radarRing" class="absolute w-14 h-14 sm:w-16 sm:h-16 rounded-full border border-emerald-400/30 transition-all duration-100"></div>
+          
+          <!-- Inner Core -->
+          <div id="radarCore" class="w-2.5 h-2.5 rounded-full bg-emerald-300/60 shadow-[0_0_12px_rgba(160,240,180,0.5)] transition-all"></div>
+          
+          <!-- Radar Text & Distance Label -->
+          <div class="absolute -bottom-6 flex flex-col items-center">
+            <span id="radarText" class="font-mono text-[9px] font-bold tracking-widest text-emerald-300/60 uppercase">FROID</span>
+            <span id="radarDist" class="font-mono text-[9px] text-teal-300/80 font-bold">-- m</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Discovery Banner Modal -->
+  <div id="found" class="fixed inset-0 z-20 pointer-events-none flex items-center justify-center opacity-0 scale-75 transition-all duration-500">
+    <div class="glass-panel p-8 rounded-3xl text-center border-emerald-400/40 shadow-[0_0_50px_rgba(16,185,129,0.25)] max-w-xs">
+      <div class="w-16 h-16 mx-auto rounded-full border-2 border-emerald-300/80 flex items-center justify-center text-emerald-300 text-2xl mb-3 shadow-[0_0_20px_rgba(52,211,153,0.4)]">
+        ✦
+      </div>
+      <div id="foundTag" class="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase">Présence Révélée</div>
+      <div id="foundName" class="text-xl font-bold font-title text-emerald-100 mt-1 glow-text">ROUGE-GORGE</div>
+      <div id="foundDesc" class="text-xs text-emerald-200/70 mt-2 font-light italic">Un chant flûté qui résonne au petit matin.</div>
+    </div>
+  </div>
+
+  <!-- Intro Modal -->
+  <div id="intro" class="fixed inset-0 z-30 flex items-center justify-center p-4 bg-gradient-to-b from-black/90 via-[#040e08]/95 to-[#020504]">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl max-w-md w-full text-center relative overflow-hidden border-emerald-500/20 shadow-2xl space-y-4">
+      
+      <div class="text-[10px] font-bold tracking-[0.3em] text-amber-400 uppercase">Expérience Sonore & Mémoire Spatiale</div>
+      
+      <h1 class="text-3xl sm:text-4xl font-title font-bold text-emerald-50 leading-tight">
+        Le Doigt<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-200">qui écoute</span>
+      </h1>
+
+      <div class="text-xs sm:text-sm text-emerald-100/80 leading-relaxed text-left bg-black/40 p-4 rounded-2xl border border-emerald-500/20 space-y-2">
+        <p><strong class="text-emerald-300">Mission 1 : Exploration (5 Sons)</strong><br>
+        Découvrez les 5 sources sonores avec l'aide du <strong>radar</strong> et des <strong>indicateurs visuels</strong>. Retenez bien leur emplacement !</p>
+        
+        <p><strong class="text-amber-300">Mission 2 : Défi Mémoire Spatiale</strong><br>
+        Le radar et tous les repères visuels s'éteignent. Retrouvez les 5 sons <strong>uniquement à l'oreille et de mémoire</strong> !</p>
+      </div>
+
+      <!-- Audio Test Tool -->
+      <div class="bg-emerald-950/50 p-3 rounded-2xl border border-emerald-500/20 text-left">
+        <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m2.828-9.9a9 9 0 010 12.728"></path></svg>
+          Test de Stéréo Casque
+        </div>
+        <div class="flex gap-2">
+          <button id="testLeft" class="flex-1 py-1.5 text-[11px] glass-btn rounded-xl text-emerald-200">◄ Gauche</button>
+          <button id="testRight" class="flex-1 py-1.5 text-[11px] glass-btn rounded-xl text-emerald-200">Droite ►</button>
+        </div>
+      </div>
+
+      <button id="start" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-300 text-slate-950 font-bold font-title text-sm tracking-wide shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-[0.98] transition-all">
+        COMMENCER LA MISSION 1
+      </button>
+    </div>
+  </div>
+
+  <!-- Mission 2 Transition Banner Modal -->
+  <div id="mission2Modal" class="fixed inset-0 z-30 hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl max-w-md w-full text-center border-amber-400/40 shadow-2xl space-y-4">
+      <div class="text-4xl text-amber-300 animate-pulse">👁️‍🗨️</div>
+      <div class="text-[10px] font-bold tracking-[0.3em] text-amber-400 uppercase">Mission 1 Accomplie !</div>
+      <h2 class="text-2xl font-title font-bold text-amber-100">Passage en Mode Aveugle</h2>
+      
+      <p class="text-xs sm:text-sm text-emerald-200/80 leading-relaxed text-left bg-black/50 p-4 rounded-2xl border border-amber-500/30">
+        Vous avez identifié les 5 sources sonores.<br><br>
+        <strong>DÉFI MÉMOIRE :</strong> Le radar et la flèche de direction sont désormais <strong>désactivés</strong> ! Vous devez retrouver les 5 présences en vous basant sur la stéréo et votre mémoire spatiale du terrain.
+      </p>
+
+      <button id="btnStartMission2" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-200 text-slate-950 font-bold font-title text-sm uppercase tracking-wide shadow-lg shadow-amber-500/20 hover:brightness-110 transition-all">
+        RELEVER LE DÉFI SANS RADAR
+      </button>
+    </div>
+  </div>
+
+  <!-- Codex Modal -->
+  <div id="codexModal" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-panel w-full max-w-lg p-6 rounded-3xl max-h-[85vh] flex flex-col border-emerald-500/30">
+      <div class="flex justify-between items-center pb-4 border-b border-emerald-500/20">
+        <div>
+          <h2 class="text-xl font-bold font-title text-emerald-100">Codex Sonore</h2>
+          <p class="text-xs text-emerald-300/60">5 Présences Vivantes du Territoire</p>
+        </div>
+        <button id="closeCodex" class="p-2 text-emerald-400 hover:text-emerald-100">✕</button>
+      </div>
+
+      <div id="codexList" class="flex-1 overflow-y-auto py-4 space-y-3">
+        <!-- Dynamically populated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="glass-panel w-full max-w-sm p-6 rounded-3xl border-emerald-500/30 space-y-5">
+      <div class="flex justify-between items-center pb-2 border-b border-emerald-500/20">
+        <h2 class="text-lg font-bold font-title text-emerald-100">Réglages</h2>
+        <button id="closeSettings" class="p-1 text-emerald-400 hover:text-emerald-100">✕</button>
+      </div>
+
+      <!-- Volume Master -->
+      <div class="space-y-1.5">
+        <div class="flex justify-between text-xs text-emerald-200">
+          <span>Volume Principal</span>
+          <span id="volumeValue">70%</span>
+        </div>
+        <input id="volumeSlider" type="range" min="0" max="100" value="70" class="w-full accent-emerald-400 cursor-pointer">
+      </div>
+
+      <!-- Reset Game -->
+      <button id="btnReset" class="w-full py-2.5 rounded-xl border border-red-500/30 bg-red-950/20 text-red-300 text-xs font-medium hover:bg-red-900/40 transition">
+        Réinitialiser la partie
+      </button>
+    </div>
+  </div>
+
+  <!-- Victory / End Modal -->
+  <div id="end" class="fixed inset-0 z-30 hidden items-center justify-center p-4 bg-black/95">
+    <div class="glass-panel p-8 rounded-3xl max-w-md w-full text-center border-amber-400/40 shadow-2xl space-y-4">
+      <div class="text-5xl text-amber-300 animate-bounce">👑</div>
+      <div class="text-[10px] font-bold tracking-[0.3em] text-amber-400 uppercase">Maître de l'Écoute Spatiale</div>
+      <h1 class="text-3xl font-title font-bold text-amber-100">Victoire Totale !</h1>
+      <p class="text-xs sm:text-sm text-emerald-200/80 leading-relaxed">
+        Félicitations ! Vous avez exploré le territoire avec radar, puis vous avez fait preuve d'une <strong class="text-amber-300">mémoire spatiale parfaite</strong> en retrouvant les 5 sons à l'aveugle !
+      </p>
+
+      <div class="pt-4 flex flex-col gap-2">
+        <button id="btnRestart" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-300 to-amber-300 text-slate-950 font-bold font-title text-xs uppercase tracking-wider">
+          Recommencer l'aventure
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================
+    // AUDIO ENGINE & SYNTHESIS (5 DISTINCT SOUND SOURCES)
+    // =========================================================
+    let audioCtx = null;
+    let masterGainNode = null;
+    let convolverNode = null;
+    let noiseBuffer = null;
+    let isAudioInitialized = false;
+
+    const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
+
+    function createReverbBuffer(ctx, duration = 2.0, decay = 2.5) {
+      const sampleRate = ctx.sampleRate;
+      const length = sampleRate * duration;
+      const impulse = ctx.createBuffer(2, length, sampleRate);
+      const left = impulse.getChannelData(0);
+      const right = impulse.getChannelData(1);
+
+      for (let i = 0; i < length; i++) {
+        const n = length - i;
+        const env = Math.pow(n / length, decay);
+        left[i] = (Math.random() * 2 - 1) * env;
+        right[i] = (Math.random() * 2 - 1) * env;
+      }
+      return impulse;
+    }
+
+    function createStereoNoiseBuffer(ctx, seconds = 4) {
+      const length = ctx.sampleRate * seconds;
+      const buffer = ctx.createBuffer(2, length, ctx.sampleRate);
+      const left = buffer.getChannelData(0);
+      const right = buffer.getChannelData(1);
+      let lastL = 0, lastR = 0;
+
+      for (let i = 0; i < length; i++) {
+        const whiteL = Math.random() * 2 - 1;
+        const whiteR = Math.random() * 2 - 1;
+        lastL = lastL * 0.9 + whiteL * 0.1;
+        lastR = lastR * 0.9 + whiteR * 0.1;
+        left[i] = lastL * 2.5;
+        right[i] = lastR * 2.5;
+      }
+      return buffer;
+    }
+
+    function createSourceOutput(source) {
+      const input = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      const gain = audioCtx.createGain();
+      const pan = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+
+      filter.type = "lowpass";
+      filter.frequency.value = 300;
+      gain.gain.value = 0;
+
+      input.connect(filter);
+      filter.connect(gain);
+
+      if (pan) {
+        gain.connect(pan);
+        pan.connect(masterGainNode);
+        if (convolverNode) gain.connect(convolverNode);
+      } else {
+        gain.connect(masterGainNode);
+      }
+
+      source.audio = { input, filter, gain, pan };
+      return input;
+    }
+
+    // 1. ROUGE-GORGE (Bird Chirp)
+    function createRobinSynth(source) {
+      const out = createSourceOutput(source);
+      function phrase() {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const notes = [1900, 2200, 2000, 2500, 2800, 3200];
+        const count = 3 + Math.floor(Math.random() * 3);
+
+        for (let i = 0; i < count; i++) {
+          const start = now + i * 0.08;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sine";
+          const freq = notes[Math.floor(Math.random() * notes.length)];
+
+          osc.frequency.setValueAtTime(freq, start);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.15, start + 0.04);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.9, start + 0.12);
+
+          gain.gain.setValueAtTime(0.001, start);
+          gain.gain.exponentialRampToValueAtTime(0.12, start + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.13);
+
+          osc.connect(gain);
+          gain.connect(out);
+          osc.start(start);
+          osc.stop(start + 0.14);
+        }
+        setTimeout(phrase, 1400 + Math.random() * 2000);
+      }
+      setTimeout(phrase, 400);
+    }
+
+    // 2. RUISSEAU (Water Stream)
+    function createWaterSynth(source) {
+      const out = createSourceOutput(source);
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      noise.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.value = 1800;
+      filter.Q.value = 0.5;
+
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.35;
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(out);
+
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.frequency.value = 0.4;
+      lfoGain.gain.value = 0.12;
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(gain.gain);
+
+      noise.start();
+      lfo.start();
+    }
+
+    // 3. GRENOUILLE (Frog Croak)
+    function createFrogSynth(source) {
+      const out = createSourceOutput(source);
+      function croak() {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = "sawtooth";
+        osc2.type = "triangle";
+
+        osc1.frequency.setValueAtTime(130, now);
+        osc1.frequency.exponentialRampToValueAtTime(75, now + 0.22);
+
+        osc2.frequency.setValueAtTime(260, now);
+        osc2.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(0.16, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(out);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.26);
+        osc2.stop(now + 0.26);
+
+        setTimeout(croak, 1500 + Math.random() * 2500);
+      }
+      setTimeout(croak, 800);
+    }
+
+    // 4. CHOUETTE HULOTTE (Owl)
+    function createOwlSynth(source) {
+      const out = createSourceOutput(source);
+      function hoot() {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(340, now);
+        osc.frequency.exponentialRampToValueAtTime(270, now + 0.35);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(0.2, now + 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(out);
+
+        osc.start(now);
+        osc.stop(now + 0.42);
+
+        setTimeout(() => {
+          if (!audioCtx) return;
+          const now2 = audioCtx.currentTime;
+          const osc2 = audioCtx.createOscillator();
+          const gain2 = audioCtx.createGain();
+          osc2.type = "sine";
+          osc2.frequency.setValueAtTime(300, now2);
+          osc2.frequency.exponentialRampToValueAtTime(250, now2 + 0.3);
+
+          gain2.gain.setValueAtTime(0.001, now2);
+          gain2.gain.exponentialRampToValueAtTime(0.14, now2 + 0.05);
+          gain2.gain.exponentialRampToValueAtTime(0.001, now2 + 0.35);
+
+          osc2.connect(gain2);
+          gain2.connect(out);
+          osc2.start(now2);
+          osc2.stop(now2 + 0.38);
+        }, 500);
+
+        setTimeout(hoot, 3500 + Math.random() * 4000);
+      }
+      setTimeout(hoot, 1200);
+    }
+
+    // 5. PLUIE CRÉPITANTE (Rain)
+    function createRainSynth(source) {
+      const out = createSourceOutput(source);
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      noise.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = "highpass";
+      filter.frequency.value = 2400;
+
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.2;
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(out);
+
+      noise.start();
+    }
+
+    // =========================================================
+    // GAME STATE & MAP DATA (5 FIXED SOURCES)
+    // =========================================================
+    const ARENA = { x: 2000, y: 2000, radius: 1200 };
+    const avatar = { x: ARENA.x, y: ARENA.y };
+    const camera = { x: avatar.x, y: avatar.y };
+
+    // 5 Sound Sources fixed on the territory map
+    const sources = [
+      {
+        id: "robin",
+        label: "ROUGE-GORGE",
+        desc: "Son chant mélodieux annonce le renouveau.",
+        question: "Localisez le Rouge-Gorge",
+        x: 2450, y: 1680, range: 750, findRadius: 85,
+        initSynth: createRobinSynth
+      },
+      {
+        id: "water",
+        label: "RUISSEAU",
+        desc: "L'eau vive s'infiltre à travers les galets.",
+        question: "Localisez le Ruisseau",
+        x: 1600, y: 2420, range: 800, findRadius: 90,
+        initSynth: createWaterSynth
+      },
+      {
+        id: "frog",
+        label: "GRENOUILLE",
+        desc: "Un coassement grave émerge des nénuphars.",
+        question: "Localisez la Grenouille",
+        x: 2550, y: 2500, range: 750, findRadius: 85,
+        initSynth: createFrogSynth
+      },
+      {
+        id: "owl",
+        label: "CHOUETTE HULOTTE",
+        desc: "La gardienne de la nuit lance son appel solennel.",
+        question: "Localisez la Chouette",
+        x: 1450, y: 1650, range: 800, findRadius: 90,
+        initSynth: createOwlSynth
+      },
+      {
+        id: "rain",
+        label: "PLUIE CRÉPITANTE",
+        desc: "Des crépitements cristallins de gouttes d'eau.",
+        question: "Localisez la Pluie",
+        x: 2150, y: 2750, range: 800, findRadius: 90,
+        initSynth: createRainSynth
+      }
+    ];
+
+    // Game Progression Variables
+    let currentMissionMode = 1; // 1 = Exploration (Radar On), 2 = Mémoire (Radar Off)
+    let currentTargetIndex = 0;  // Index in sources array
+    let mission1Found = [false, false, false, false, false];
+    let mission2Found = [false, false, false, false, false];
+    let isDiscovering = false;
+
+    async function initAudioSystem() {
+      if (isAudioInitialized) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioCtx();
+
+      masterGainNode = audioCtx.createGain();
+      masterGainNode.gain.value = 0.7;
+
+      const compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.value = -18;
+      compressor.ratio.value = 3;
+
+      convolverNode = audioCtx.createConvolver();
+      convolverNode.buffer = createReverbBuffer(audioCtx);
+
+      const convolverGain = audioCtx.createGain();
+      convolverGain.gain.value = 0.15;
+
+      convolverNode.connect(convolverGain);
+      convolverGain.connect(masterGainNode);
+
+      masterGainNode.connect(compressor);
+      compressor.connect(audioCtx.destination);
+
+      noiseBuffer = createStereoNoiseBuffer(audioCtx);
+
+      // Initialize sound synths for 5 sources
+      sources.forEach(src => src.initSynth(src));
+
+      if (audioCtx.state === "suspended") {
+        await audioCtx.resume();
+      }
+      isAudioInitialized = true;
+    }
+
+    function playTestBeep(panValue) {
+      if (!audioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioCtx();
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const panner = audioCtx.createStereoPanner ? audioCtx.createStereoPanner() : null;
+
+      osc.type = "sine";
+      osc.frequency.value = panValue < 0 ? 440 : 880;
+
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+      if (panner) {
+        panner.pan.value = panValue;
+        osc.connect(gain);
+        gain.connect(panner);
+        panner.connect(audioCtx.destination);
+      } else {
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+      }
+
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.42);
+    }
+
+    document.getElementById("testLeft").addEventListener("click", () => playTestBeep(-1));
+    document.getElementById("testRight").addEventListener("click", () => playTestBeep(1));
+
+    // =========================================================
+    // CONTROLS & NAVIGATION ENGINE
+    // =========================================================
+    const joystick = { active: false, pointerId: null, originX: 0, originY: 0, x: 0, y: 0, power: 0 };
+    const keysPressed = {};
+    const JOY_RADIUS = 60;
+    const DEADZONE = 0.1;
+    const MAX_SPEED = 6.0;
+
+    window.addEventListener("keydown", e => { keysPressed[e.code] = true; });
+    window.addEventListener("keyup", e => { keysPressed[e.code] = false; });
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.addEventListener("pointerdown", e => {
+      if (!isAudioInitialized) return;
+      joystick.active = true;
+      joystick.pointerId = e.pointerId;
+      joystick.originX = e.clientX;
+      joystick.originY = e.clientY;
+      joystick.x = 0; joystick.y = 0; joystick.power = 0;
+      canvas.setPointerCapture(e.pointerId);
+    });
+
+    canvas.addEventListener("pointermove", e => {
+      if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+
+      let dx = e.clientX - joystick.originX;
+      let dy = e.clientY - joystick.originY;
+      const dist = Math.hypot(dx, dy);
+      const limited = Math.min(dist, JOY_RADIUS);
+
+      if (dist > 0) {
+        dx = (dx / dist) * limited;
+        dy = (dy / dist) * limited;
+      }
+
+      joystick.x = dx / JOY_RADIUS;
+      joystick.y = dy / JOY_RADIUS;
+      joystick.power = Math.min(1, dist / JOY_RADIUS);
+    });
+
+    function releaseJoystick(e) {
+      if (!joystick.active || (e && e.pointerId !== joystick.pointerId)) return;
+      joystick.active = false;
+      joystick.pointerId = null;
+      joystick.x = 0; joystick.y = 0; joystick.power = 0;
+    }
+
+    canvas.addEventListener("pointerup", releaseJoystick);
+    canvas.addEventListener("pointercancel", releaseJoystick);
+
+    let W = window.innerWidth, H = window.innerHeight, DPR = 1;
+    function resizeCanvas() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = W * DPR;
+      canvas.height = H * DPR;
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    function constrainToArena() {
+      const dx = avatar.x - ARENA.x;
+      const dy = avatar.y - ARENA.y;
+      const dist = Math.hypot(dx, dy);
+      const limit = ARENA.radius - 20;
+
+      if (dist > limit) {
+        avatar.x = ARENA.x + (dx / dist) * limit;
+        avatar.y = ARENA.y + (dy / dist) * limit;
+      }
+    }
+
+    function updateMovement() {
+      let moveX = 0, moveY = 0;
+
+      if (keysPressed["KeyW"] || keysPressed["ArrowUp"]) moveY -= 1;
+      if (keysPressed["KeyS"] || keysPressed["ArrowDown"]) moveY += 1;
+      if (keysPressed["KeyA"] || keysPressed["ArrowLeft"]) moveX -= 1;
+      if (keysPressed["KeyD"] || keysPressed["ArrowRight"]) moveX += 1;
+
+      if (moveX !== 0 || moveY !== 0) {
+        const len = Math.hypot(moveX, moveY);
+        avatar.x += (moveX / len) * MAX_SPEED;
+        avatar.y += (moveY / len) * MAX_SPEED;
+        constrainToArena();
+        return;
+      }
+
+      if (joystick.active && joystick.power >= DEADZONE) {
+        const power = (joystick.power - DEADZONE) / (1 - DEADZONE);
+        const speed = MAX_SPEED * Math.pow(power, 1.3);
+        const len = Math.hypot(joystick.x, joystick.y) || 1;
+        avatar.x += (joystick.x / len) * speed;
+        avatar.y += (joystick.y / len) * speed;
+        constrainToArena();
+      }
+    }
+
+    function updateCamera() {
+      camera.x += (avatar.x - camera.x) * 0.1;
+      camera.y += (avatar.y - camera.y) * 0.1;
+    }
+
+    function worldToScreen(wx, wy) {
+      return { x: wx - camera.x + W / 2, y: wy - camera.y + H / 2 };
+    }
+
+    // =========================================================
+    // SPATIAL AUDIO & RADAR UPDATES
+    // =========================================================
+    function updateAudioSpatial() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      sources.forEach((src, idx) => {
+        const dx = src.x - avatar.x;
+        const dy = src.y - avatar.y;
+        const dist = Math.hypot(dx, dy);
+        const proximity = clamp(1 - dist / src.range, 0, 1);
+
+        let volume = Math.pow(proximity, 3.2);
+        if (proximity > 0 && volume < 0.005) volume = 0.005;
+
+        // In active targeted search mode, focus volume on the active target
+        if (idx !== currentTargetIndex) {
+          volume *= 0.3; // Attenuate other background sounds slightly
+        }
+
+        src.audio.gain.gain.setTargetAtTime(volume, now, 0.03);
+
+        if (src.audio.pan) {
+          const pan = clamp(dx / 160, -1, 1);
+          src.audio.pan.pan.setTargetAtTime(pan, now, 0.02);
+        }
+
+        const brightness = Math.pow(proximity, 1.6);
+        const cutoff = 200 + brightness * 8000;
+        src.audio.filter.frequency.setTargetAtTime(cutoff, now, 0.04);
+
+        // Discovery Check
+        if (idx === currentTargetIndex && dist < src.findRadius) {
+          discoverTarget(src, idx);
+        }
+      });
+    }
+
+    let radarEnergy = 0;
+
+    function updateRadarUI(time) {
+      const radarWidget = document.getElementById("radarWidget");
+      const radarRing = document.getElementById("radarRing");
+      const radarCore = document.getElementById("radarCore");
+      const radarText = document.getElementById("radarText");
+      const radarDist = document.getElementById("radarDist");
+
+      // IN MISSION 2: RADAR IS COMPLETELY DISABLED FOR SPATIAL MEMORY CHALLENGE
+      if (currentMissionMode === 2) {
+        radarWidget.classList.add("radar-disabled");
+        radarRing.style.transform = "scale(0.8)";
+        radarRing.style.borderColor = "rgba(239, 68, 68, 0.3)";
+        radarCore.style.backgroundColor = "rgba(239, 68, 68, 0.5)";
+        radarText.textContent = "DESACTIVÉ";
+        radarText.classList.replace("text-emerald-300/60", "text-amber-400");
+        radarDist.textContent = "MODE AVEUGLE";
+        return;
+      }
+
+      // MISSION 1: ACTIVE RADAR GUIDANCE
+      radarWidget.classList.remove("radar-disabled");
+      radarText.classList.replace("text-amber-400", "text-emerald-300/60");
+
+      const target = sources[currentTargetIndex];
+      if (!target) return;
+
+      const dist = Math.hypot(target.x - avatar.x, target.y - avatar.y);
+      let proximity = clamp(1 - dist / 900, 0, 1);
+      proximity = Math.pow(proximity, 1.2);
+
+      radarEnergy += (proximity - radarEnergy) * 0.08;
+
+      const freq = 0.6 + radarEnergy * 4.5;
+      const phase = (time / 1000) * freq * Math.PI * 2;
+      const wave = Math.pow(Math.max(0, Math.sin(phase)), 6);
+
+      const scale = 0.75 + radarEnergy * 0.35 + wave * (0.12 + radarEnergy * 0.25);
+      radarRing.style.transform = `scale(${scale})`;
+      radarRing.style.opacity = 0.2 + radarEnergy * 0.8;
+
+      const hue = 165 - radarEnergy * 125;
+      radarRing.style.borderColor = `hsla(${hue}, 70%, 65%, ${0.2 + wave * 0.6})`;
+      radarCore.style.backgroundColor = `hsla(${hue}, 80%, 70%, ${0.4 + radarEnergy * 0.6})`;
+
+      if (radarEnergy < 0.1) radarText.textContent = "FROID";
+      else if (radarEnergy < 0.35) radarText.textContent = "TIÈDE";
+      else if (radarEnergy < 0.7) radarText.textContent = "CHAUD";
+      else radarText.textContent = "BRÛLANT";
+
+      radarDist.textContent = `${Math.round(dist / 10)} m`;
+    }
+
+    // Target Discovery Logic
+    function discoverTarget(source, index) {
+      if (isDiscovering) return;
+      isDiscovering = true;
+
+      if (currentMissionMode === 1) {
+        mission1Found[index] = true;
+      } else {
+        mission2Found[index] = true;
+      }
+
+      // Play victory fanfare sound
+      if (audioCtx) {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.3); // C6
+        g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+        osc.connect(g);
+        g.connect(masterGainNode);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.62);
+      }
+
+      document.getElementById("foundTag").textContent = currentMissionMode === 1 ? "Mission 1 — Présence Identifiée" : "Mission 2 — Mémoire Validée !";
+      document.getElementById("foundName").textContent = source.label;
+      document.getElementById("foundDesc").textContent = source.desc;
+
+      const foundModal = document.getElementById("found");
+      foundModal.classList.remove("opacity-0", "scale-75");
+      foundModal.classList.add("opacity-100", "scale-100");
+
+      if (navigator.vibrate) navigator.vibrate([20, 40, 70]);
+
+      setTimeout(() => {
+        foundModal.classList.remove("opacity-100", "scale-100");
+        foundModal.classList.add("opacity-0", "scale-75");
+
+        isDiscovering = false;
+        radarEnergy = 0;
+
+        // Progress to next sound
+        currentTargetIndex++;
+
+        // Check Mission 1 completion
+        if (currentMissionMode === 1 && currentTargetIndex >= sources.length) {
+          triggerMission2Transition();
+        } 
+        // Check Mission 2 completion
+        else if (currentMissionMode === 2 && currentTargetIndex >= sources.length) {
+          triggerFinalVictory();
+        } 
+        else {
+          updateUIState();
+        }
+      }, 2000);
+    }
+
+    function triggerMission2Transition() {
+      // Reposition avatar to center for Mission 2 challenge
+      avatar.x = ARENA.x;
+      avatar.y = ARENA.y;
+
+      document.getElementById("mission2Modal").classList.remove("hidden");
+      document.getElementById("mission2Modal").classList.add("flex");
+    }
+
+    function startMission2() {
+      currentMissionMode = 2;
+      currentTargetIndex = 0; // Reset index for blind memory challenge
+
+      document.getElementById("mission2Modal").classList.add("hidden");
+      document.getElementById("mission2Modal").classList.remove("flex");
+
+      // Update HUD elements for Mission 2
+      document.getElementById("missionBadge").textContent = "MISSION 2 : MÉMOIRE SPATIALE";
+      document.getElementById("missionBadge").className = "text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/40";
+      
+      document.getElementById("radarStatusDot").className = "w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse";
+      document.getElementById("radarStatusText").textContent = "MODE AVEUGLE : Radar & Flèche Éteints";
+      document.getElementById("radarStatusBadge").className = "flex glass-panel px-3.5 py-2 rounded-2xl text-xs text-amber-300 items-center gap-2 border-amber-500/30";
+
+      updateUIState();
+    }
+
+    function triggerFinalVictory() {
+      document.getElementById("end").classList.remove("hidden");
+      document.getElementById("end").classList.add("flex");
+    }
+
+    function updateUIState() {
+      if (currentTargetIndex < sources.length) {
+        const cur = sources[currentTargetIndex];
+        const prefix = currentMissionMode === 1 ? "Mission 1 : " : "Défi Mémoire : ";
+        document.getElementById("missionText").textContent = prefix + cur.question;
+        document.getElementById("missionCounter").textContent = `${currentTargetIndex + 1} / ${sources.length}`;
+
+        const pct = (currentTargetIndex / sources.length) * 100;
+        document.getElementById("progressBar").style.width = pct + "%";
+      }
+
+      updateCodexUI();
+    }
+
+    function updateCodexUI() {
+      const foundList = currentMissionMode === 1 ? mission1Found : mission2Found;
+      const count = foundList.filter(Boolean).length;
+      document.getElementById("codexBadge").textContent = `${count}/${sources.length}`;
+
+      const list = document.getElementById("codexList");
+      list.innerHTML = "";
+
+      sources.forEach((src, idx) => {
+        const isDiscovered = foundList[idx];
+        const item = document.createElement("div");
+        item.className = `p-3.5 rounded-2xl flex items-center justify-between border ${
+          isDiscovered 
+            ? "glass-panel border-emerald-500/30 text-emerald-100" 
+            : "bg-black/30 border-white/5 text-emerald-500/30"
+        }`;
+
+        item.innerHTML = `
+          <div>
+            <div class="text-xs font-bold font-title">${isDiscovered ? src.label : "Presence Inconnue"}</div>
+            <div class="text-[10px] opacity-70 mt-0.5">${isDiscovered ? src.desc : "??? - À découvrir dans le territoire"}</div>
+          </div>
+          <div class="text-sm">${isDiscovered ? "✦" : "🔒"}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    // =========================================================
+    // CANVAS RENDER LOOP
+    // =========================================================
+    function drawCanvas(time) {
+      ctx.clearRect(0, 0, W, H);
+
+      // Background
+      const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H));
+      bgGrad.addColorStop(0, "#08140c");
+      bgGrad.addColorStop(0.6, "#040906");
+      bgGrad.addColorStop(1, "#010302");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Arena Outer Circle Boundary
+      const center = worldToScreen(ARENA.x, ARENA.y);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, ARENA.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(160, 230, 180, 0.12)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Outer darkened veil
+      ctx.beginPath();
+      ctx.rect(0, 0, W, H);
+      ctx.arc(center.x, center.y, ARENA.radius, 0, Math.PI * 2, true);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+      ctx.fill();
+      ctx.restore();
+
+      // Draw discovered sources or ripples (ONLY IN MISSION 1)
+      if (currentMissionMode === 1) {
+        sources.forEach((src, idx) => {
+          if (!mission1Found[idx]) return;
+
+          const pos = worldToScreen(src.x, src.y);
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, src.findRadius, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(52, 211, 153, 0.08)";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(52, 211, 153, 0.3)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          const pulse = Math.sin(time * 0.003 + src.x) * 4;
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 6 + pulse, 0, Math.PI * 2);
+          ctx.fillStyle = "#34d399";
+          ctx.shadowColor = "#34d399";
+          ctx.shadowBlur = 12;
+          ctx.fill();
+          ctx.restore();
+        });
+      }
+
+      // Player Avatar Rendering
+      const playerPos = worldToScreen(avatar.x, avatar.y);
+      ctx.save();
+
+      // Directional arrow guidance (ONLY IN MISSION 1)
+      if (currentMissionMode === 1 && currentTargetIndex < sources.length) {
+        const target = sources[currentTargetIndex];
+        const angle = Math.atan2(target.y - avatar.y, target.x - avatar.x);
+        const arrowDist = 28;
+        const arrowX = playerPos.x + Math.cos(angle) * arrowDist;
+        const arrowY = playerPos.y + Math.sin(angle) * arrowDist;
+
+        ctx.save();
+        ctx.translate(arrowX, arrowY);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(8, 0);
+        ctx.lineTo(-6, -5);
+        ctx.lineTo(-3, 0);
+        ctx.lineTo(-6, 5);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(52, 211, 153, 0.85)";
+        ctx.shadowColor = "#34d399";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Avatar Glow Aura
+      const glowGrad = ctx.createRadialGradient(playerPos.x, playerPos.y, 0, playerPos.x, playerPos.y, 35);
+      if (currentMissionMode === 1) {
+        glowGrad.addColorStop(0, "rgba(160, 245, 190, 0.35)");
+      } else {
+        glowGrad.addColorStop(0, "rgba(251, 191, 36, 0.35)"); // Amber glow in blind memory mode
+      }
+      glowGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(playerPos.x, playerPos.y, 35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Avatar Ring Core
+      ctx.beginPath();
+      ctx.arc(playerPos.x, playerPos.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = currentMissionMode === 1 ? "#edf3e9" : "#fef3c7";
+      ctx.shadowColor = currentMissionMode === 1 ? "#a0f5be" : "#f59e0b";
+      ctx.shadowBlur = 15;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function gameLoop(time) {
+      updateMovement();
+      updateCamera();
+      updateAudioSpatial();
+      updateRadarUI(time);
+      drawCanvas(time);
+      requestAnimationFrame(gameLoop);
+    }
+
+    // =========================================================
+    // EVENT BINDINGS
+    // =========================================================
+    document.getElementById("start").addEventListener("click", async () => {
+      await initAudioSystem();
+      document.getElementById("intro").style.display = "none";
+      updateUIState();
+      requestAnimationFrame(gameLoop);
+    });
+
+    document.getElementById("btnStartMission2").addEventListener("click", () => {
+      startMission2();
+    });
+
+    // Codex & Settings Modals
+    const codexModal = document.getElementById("codexModal");
+    document.getElementById("btnCodex").addEventListener("click", () => codexModal.classList.remove("hidden"));
+    document.getElementById("closeCodex").addEventListener("click", () => codexModal.classList.add("hidden"));
+
+    const settingsModal = document.getElementById("settingsModal");
+    document.getElementById("btnSettings").addEventListener("click", () => settingsModal.classList.remove("hidden"));
+    document.getElementById("closeSettings").addEventListener("click", () => settingsModal.classList.add("hidden"));
+
+    // Volume Slider
+    document.getElementById("volumeSlider").addEventListener("input", (e) => {
+      const val = e.target.value;
+      document.getElementById("volumeValue").textContent = val + "%";
+      if (masterGainNode) masterGainNode.gain.value = (val / 100) * 0.9;
+    });
+
+    // Restart & Reset
+    document.getElementById("btnRestart").addEventListener("click", () => window.location.reload());
+    document.getElementById("btnReset").addEventListener("click", () => window.location.reload());
+
+  </script>
+</body>
+</html>
