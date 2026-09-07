@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Silent Dance • Rituel de Classe</title>
+
+<style>
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body {
+    margin:0; width:100%; height:100%; overflow:hidden;
+    background:#050609; font-family:system-ui,-apple-system,sans-serif;
+    color:#f2ebda;
+  }
+
+  canvas { display:block; position:absolute; top:0; left:0; z-index:1; }
+
+  .screen {
+    position:fixed; inset:0; z-index:20;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle at 50% 45%, #10121a 0%, #06070a 70%, #020304 100%);
+    transition:opacity .9s ease, visibility .9s ease;
+    overflow-y:auto; padding:24px;
+  }
+  .screen.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+
+  .inner { text-align:center; padding:20px; max-width:520px; width:100%; }
+
+  .orb {
+    width:16px; height:16px; margin:0 auto 20px; border-radius:50%;
+    background:#f2ebda; box-shadow:0 0 25px rgba(242,235,218,.6);
+    animation:breathe 4s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100%{transform:scale(1);opacity:.8;} 50%{transform:scale(1.8);opacity:.3;} }
+
+  h1 { margin:0; font-family:Georgia,serif; font-weight:400; letter-spacing:-1px;
+       font-size:clamp(30px,7vw,52px); color:#f2ebda; }
+
+  .subtitle { margin-top:8px; color:rgba(242,235,218,.6); font-family:Georgia,serif;
+              font-size:14px; font-style:italic; line-height:1.5; }
+
+  /* --- Cartes de rituel (mode enseignant : gros choix simples) --- */
+  .ritual-grid {
+    display:grid; grid-template-columns:1fr; gap:12px; margin-top:26px;
+  }
+  .ritual-card {
+    text-align:left; padding:16px 18px; border-radius:16px;
+    border:1px solid rgba(242,235,218,.15); background:rgba(242,235,218,.03);
+    cursor:pointer; transition:all .3s ease;
+  }
+  .ritual-card:hover, .ritual-card:active {
+    border-color:rgba(212,175,55,.8); background:rgba(212,175,55,.1);
+  }
+  .ritual-card .name { font-family:Georgia,serif; font-size:17px; color:#f2ebda; }
+  .ritual-card .desc { font-size:12.5px; color:rgba(242,235,218,.55); margin-top:4px; }
+
+  details.advanced { margin-top:22px; text-align:left; }
+  details.advanced summary {
+    cursor:pointer; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:rgba(242,235,218,.4); list-style:none; text-align:center;
+  }
+  details.advanced summary::-webkit-details-marker { display:none; }
+  .adv-panel {
+    margin-top:14px; background:rgba(242,235,218,.03); border:1px solid rgba(242,235,218,.1);
+    border-radius:16px; padding:16px;
+  }
+  .option-group { margin-bottom:14px; }
+  .option-group label { display:block; font-size:11px; color:rgba(242,235,218,.6); margin-bottom:6px; }
+  .options-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  .opt-btn {
+    padding:8px; border:1px solid rgba(242,235,218,.15); border-radius:10px;
+    background:rgba(252,248,238,.02); color:rgba(242,235,218,.7); font-size:11px;
+    cursor:pointer; transition:all .3s ease; text-align:center;
+  }
+  .opt-btn.active { border-color:rgba(212,175,55,.9); background:rgba(212,175,55,.15); color:#fff; font-weight:600; }
+  .mode-row { display:flex; gap:8px; }
+  .mode-row .opt-btn { flex:1; }
+
+  .privacy-note {
+    margin-top:20px; font-size:10.5px; color:rgba(242,235,218,.35); line-height:1.5;
+  }
+
+  /* --- Calendrier de série (petit rappel avant de lancer) --- */
+  .calendar-strip {
+    display:flex; flex-wrap:wrap; gap:5px; justify-content:center; margin-top:18px;
+  }
+  .cal-day {
+    width:16px; height:16px; border-radius:4px;
+    background:rgba(242,235,218,.08); border:1px solid rgba(242,235,218,.1);
+  }
+  .cal-day.done { background:rgba(212,175,55,.75); border-color:rgba(212,175,55,.95); }
+  .cal-day.today { box-shadow:0 0 0 2px rgba(242,235,218,.4); }
+
+  button.primary-btn {
+    margin-top:22px; width:100%; padding:15px; border:1px solid rgba(212,175,55,.5);
+    border-radius:999px; color:#f2ebda; background:rgba(212,175,55,.12);
+    backdrop-filter:blur(12px); font-size:14px; letter-spacing:1.2px; cursor:pointer;
+    transition:all .4s ease; font-family:Georgia,serif;
+  }
+  button.primary-btn:hover { background:rgba(212,175,55,.25); border-color:rgba(212,175,55,.9); }
+  button.primary-btn:disabled { opacity:.35; cursor:default; }
+
+  .back-link {
+    display:inline-block; margin-top:16px; font-size:11px; color:rgba(242,235,218,.4);
+    cursor:pointer; text-decoration:underline;
+  }
+
+  /* --- UI en jeu --- */
+  #ui { position:fixed; inset:0; z-index:5; pointer-events:none; opacity:0; transition:opacity 1.5s ease; }
+  #brand { position:absolute; top:max(20px,env(safe-area-inset-top)); left:20px;
+           color:rgba(242,235,218,.7); font-family:Georgia,serif; font-size:14px; }
+  #progress-container { position:absolute; top:max(20px,env(safe-area-inset-top)); right:20px;
+                         display:flex; align-items:center; gap:10px; }
+  #state { color:rgba(242,235,218,.6); font-size:10px; letter-spacing:2px; text-transform:uppercase; font-family:Georgia,serif; }
+  .progress-ring { width:30px; height:30px; transform:rotate(-90deg); }
+  .progress-ring__circle-bg { stroke:rgba(242,235,218,.1); stroke-width:2.5; }
+  .progress-ring__circle { stroke:rgba(212,175,55,.9); stroke-width:2.5;
+                            stroke-dasharray:81.68; stroke-dashoffset:81.68; transition:stroke-dashoffset .2s linear; }
+  #target-time-display { position:absolute; top:max(58px,env(safe-area-inset-top)); right:20px;
+                          color:rgba(212,175,55,.8); font-family:Georgia,serif; font-size:11px; }
+  #message { position:absolute; bottom:max(26px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+             color:rgba(242,235,218,.5); font-family:Georgia,serif; font-size:12.5px; font-style:italic;
+             white-space:nowrap; transition:opacity 1.5s; text-align:center; }
+
+  /* Zone tactile pour le mode "sans micro" */
+  #touch-zone {
+    position:fixed; inset:0; z-index:4; display:none; touch-action:none;
+  }
+  #touch-hint {
+    position:fixed; bottom:max(70px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+    z-index:6; color:rgba(242,235,218,.45); font-family:Georgia,serif; font-size:12px;
+    font-style:italic; pointer-events:none; opacity:0; transition:opacity 1.5s;
+  }
+
+  /* --- Victoire --- */
+  #victory-modal {
+    position:fixed; inset:0; z-index:30; display:none; align-items:center; justify-content:center;
+    background:rgba(4,5,8,.92); backdrop-filter:blur(16px); opacity:0; transition:opacity 1.2s ease; padding:20px;
+  }
+  .victory-card {
+    background:rgba(18,21,32,.95); border:1px solid rgba(212,175,55,.3); padding:30px 26px;
+    border-radius:22px; text-align:center; max-width:640px; width:100%; max-height:90vh; overflow-y:auto;
+    box-shadow:0 20px 60px rgba(0,0,0,.7);
+  }
+  .victory-card h2 { font-family:Georgia,serif; font-size:24px; color:#f2ebda; margin:0 0 6px; font-weight:400; }
+  .victory-card p { color:rgba(242,235,218,.7); font-family:Georgia,serif; font-size:13px; font-style:italic; margin-bottom:18px; }
+
+  .birds-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); gap:8px; margin-bottom:20px;
+    padding:10px; background:rgba(0,0,0,.25); border-radius:14px; border:1px solid rgba(252,248,238,.05);
+  }
+  .bird-item {
+    aspect-ratio:1; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:21px; cursor:pointer; transition:all .3s ease; position:relative; user-select:none;
+  }
+  .bird-item.locked { background:rgba(242,235,218,.02); border:1px dashed rgba(242,235,218,.12); filter:grayscale(1); opacity:.35; cursor:default; }
+  .bird-item.unlocked { background:rgba(242,235,218,.03); border:1px solid rgba(212,175,55,.25); }
+  .bird-item.unlocked:hover { background:rgba(212,175,55,.2); border-color:rgba(212,175,55,.8); transform:translateY(-2px) scale(1.05); }
+  .bird-item.playing { animation:birdSing .6s ease infinite alternate; border-color:#ffd700; box-shadow:0 0 15px rgba(255,215,0,.5); }
+  @keyframes birdSing { 0%{transform:scale(1);} 100%{transform:scale(1.15) rotate(5deg);} }
+  .bird-num { font-size:8px; position:absolute; bottom:3px; color:rgba(242,235,218,.4); font-family:sans-serif; }
+
+  .action-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .sec-btn { padding:11px 20px; border-radius:999px; border:1px solid rgba(242,235,218,.3);
+             background:rgba(242,235,218,.05); color:#f2ebda; cursor:pointer; font-size:12.5px; transition:all .3s; }
+  .sec-btn:hover { background:rgba(242,235,218,.15); }
+
+  #modal-error {
+    position:fixed; inset:0; z-index:30; display:none; align-items:center; justify-content:center;
+    background:rgba(4,5,7,.88); backdrop-filter:blur(10px); padding:20px;
+  }
+  .modal-card { background:rgba(18,21,32,.92); border:1px solid rgba(242,235,218,.2); padding:26px 30px;
+                border-radius:16px; text-align:center; color:#f2ebda; max-width:380px; }
+  .modal-card p { font-size:13.5px; line-height:1.6; margin-bottom:16px; }
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN 1 : CHOIX DU RITUEL (enseignant, avant de projeter au tableau) -->
+<div id="screen-setup" class="screen">
+  <div class="inner">
+    <div class="orb"></div>
+    <h1>Graine de Silence°</h1>
+    <div class="subtitle">Choisissez le rituel du jour. Les élèves n'ont rien à régler.</div>
+
+    <div class="calendar-strip" id="calendar-strip"></div>
+
+    <div class="ritual-grid" id="ritual-grid">
+      <div class="ritual-card" data-time="20" data-sens="0.03" data-tol="4">
+        <div class="name">Réveil du matin</div>
+        <div class="desc">20 secondes · très tolérant · pour démarrer la journée</div>
+      </div>
+      <div class="ritual-card" data-time="30" data-sens="0.022" data-tol="3">
+        <div class="name">Retour de récré</div>
+        <div class="desc">30 secondes · tolérant · pour se recentrer après le bruit</div>
+      </div>
+      <div class="ritual-card active" data-time="60" data-sens="0.018" data-tol="2">
+        <div class="name">Silence profond</div>
+        <div class="desc">1 minute · standard · rituel complet</div>
+      </div>
+    </div>
+
+    <details class="advanced">
+      <summary>Réglages avancés</summary>
+      <div class="adv-panel">
+        <div class="option-group">
+          <label>Mode d'écoute</label>
+          <div class="mode-row">
+            <div class="opt-btn active" data-input="mic">Avec micro</div>
+            <div class="opt-btn" data-input="touch">Sans micro (toucher)</div>
+          </div>
+        </div>
+        <div class="option-group">
+          <label>Durée cible (secondes)</label>
+          <div class="options-grid" id="time-options">
+            <div class="opt-btn" data-time="15">15s</div>
+            <div class="opt-btn" data-time="30">30s</div>
+            <div class="opt-btn" data-time="45">45s</div>
+            <div class="opt-btn active" data-time="60">60s</div>
+            <div class="opt-btn" data-time="90">90s</div>
+            <div class="opt-btn" data-time="120">2min</div>
+          </div>
+        </div>
+        <div class="option-group">
+          <label>Sensibilité au bruit</label>
+          <div class="options-grid" id="sens-options" style="grid-template-columns:repeat(4,1fr);">
+            <div class="opt-btn" data-sens="0.035">Très souple</div>
+            <div class="opt-btn" data-sens="0.022">Souple</div>
+            <div class="opt-btn active" data-sens="0.018">Normale</div>
+            <div class="opt-btn" data-sens="0.012">Stricte</div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <button id="start" class="primary-btn">Lancer le rituel</button>
+    <div class="privacy-note">Aucun son n'est enregistré ni envoyé. Le micro sert uniquement, en direct, à mesurer le niveau sonore sur cet appareil.</div>
+  </div>
+</div>
+
+<!-- UI EN JEU -->
+<div id="ui">
+  <div id="brand">Silent Dance •°</div>
+  <div id="progress-container">
+    <div id="state">Graine</div>
+    <svg class="progress-ring">
+      <circle class="progress-ring__circle-bg" r="13" cx="16" cy="16" fill="transparent"/>
+      <circle id="progress-circle" class="progress-ring__circle" r="13" cx="16" cy="16" fill="transparent"/>
+    </svg>
+  </div>
+  <div id="target-time-display">0 / 60s</div>
+  <div id="message">Faites silence... la graine écoute le vide.</div>
+</div>
+<div id="touch-zone"></div>
+<div id="touch-hint">Maintenez l'écran appuyé pour retenir votre souffle</div>
+
+<!-- VICTOIRE -->
+<div id="victory-modal">
+  <div class="victory-card">
+    <h2 id="victory-title">La Fleur est Éclose 🪷</h2>
+    <p id="victory-sub">Le silence du jour a réveillé un nouvel oiseau.</p>
+    <div class="birds-grid" id="birds-container"></div>
+    <div class="action-row">
+      <button class="sec-btn" id="sing-all-btn">🎶 Symphonie de l'Aube</button>
+      <button class="sec-btn" id="new-ritual-btn">🌱 Nouveau rituel</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-error">
+  <div class="modal-card">
+    <p>Le micro n'est pas accessible. Vous pouvez utiliser le mode "sans micro (toucher)" dans les réglages avancés à la place.</p>
+    <button class="sec-btn" id="modal-close">Fermer</button>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+
+<script type="module">
+import * as THREE from "three";
+
+/* =========================================================
+   0. SÉRIE / CALENDRIER LOCAL (rituel quotidien de classe)
+========================================================= */
+const STORAGE_KEY = "silentDanceCalendar_v1";
+const TOTAL_BIRDS = 31;
+
+function loadCalendar(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+  catch { return {}; }
+}
+function saveCalendar(cal){ localStorage.setItem(STORAGE_KEY, JSON.stringify(cal)); }
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+
+let calendar = loadCalendar();
+
+function completedCount(){
+  return Object.values(calendar).filter(Boolean).length;
+}
+
+function renderCalendarStrip(){
+  const strip = document.getElementById("calendar-strip");
+  strip.innerHTML = "";
+  const now = new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const today = todayKey();
+  for(let d=1; d<=daysInMonth; d++){
+    const key = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const el = document.createElement("div");
+    el.className = "cal-day" + (calendar[key] ? " done" : "") + (key===today ? " today" : "");
+    strip.appendChild(el);
+  }
+}
+renderCalendarStrip();
+
+/* =========================================================
+   1. PARAMÈTRES DU RITUEL (choisis par l'enseignant)
+========================================================= */
+let targetDuration = 60;
+let currentSensitivity = 0.018;
+let toleranceSeconds = 2;      // grâce avant que le bruit fasse redescendre le score
+let inputMode = "mic";         // "mic" ou "touch"
+
+document.querySelectorAll(".ritual-card").forEach(card => {
+  card.addEventListener("click", () => {
+    document.querySelectorAll(".ritual-card").forEach(c => c.classList.remove("active"));
+    card.classList.add("active");
+    targetDuration = parseInt(card.dataset.time);
+    currentSensitivity = parseFloat(card.dataset.sens);
+    toleranceSeconds = parseFloat(card.dataset.tol);
+    syncAdvancedPanel();
+  });
+});
+
+function syncAdvancedPanel(){
+  document.querySelectorAll('#time-options .opt-btn').forEach(b =>
+    b.classList.toggle("active", parseInt(b.dataset.time) === targetDuration));
+  document.querySelectorAll('#sens-options .opt-btn').forEach(b =>
+    b.classList.toggle("active", parseFloat(b.dataset.sens) === currentSensitivity));
+}
+
+document.querySelectorAll('#time-options .opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#time-options .opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    targetDuration = parseInt(btn.dataset.time);
+    document.querySelectorAll(".ritual-card").forEach(c => c.classList.remove("active"));
+  });
+});
+document.querySelectorAll('#sens-options .opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#sens-options .opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSensitivity = parseFloat(btn.dataset.sens);
+    document.querySelectorAll(".ritual-card").forEach(c => c.classList.remove("active"));
+  });
+});
+document.querySelectorAll('.mode-row .opt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-row .opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    inputMode = btn.dataset.input;
+  });
+});
+
+/* =========================================================
+   2. SCÈNE 3D (reprise du prototype initial)
+========================================================= */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x050609);
+const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(0,0,10);
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:"high-performance" });
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+const world = new THREE.Group();
+scene.add(world);
+
+function createPollenTexture(){
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(32,32,0,32,32,32);
+  grad.addColorStop(0,'rgba(255,255,255,1.0)');
+  grad.addColorStop(0.2,'rgba(245,230,200,0.8)');
+  grad.addColorStop(0.6,'rgba(212,175,55,0.25)');
+  grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(32,32,32,0,Math.PI*2); ctx.fill();
+  return new THREE.CanvasTexture(canvas);
+}
+const pollenTexture = createPollenTexture();
+
+const bgGeometry = new THREE.PlaneGeometry(35,35);
+const bgMaterial = new THREE.ShaderMaterial({
+  depthWrite:false,
+  uniforms:{ uTime:{value:0}, uSilence:{value:0}, uProgress:{value:0} },
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`
+    varying vec2 vUv; uniform float uTime; uniform float uSilence; uniform float uProgress;
+    vec3 permute(vec3 x){ return mod(((x*34.0)+1.0)*x,289.0); }
+    float snoise(vec2 v){
+      const vec4 C = vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+      vec2 i=floor(v+dot(v,C.yy)); vec2 x0=v-i+dot(i,C.xx);
+      vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);
+      vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1; i=mod(i,289.0);
+      vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));
+      vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);
+      m=m*m; m=m*m;
+      vec3 x=2.0*fract(p*C.www)-1.0; vec3 h=abs(x)-0.5;
+      vec3 ox=floor(x+0.5); vec3 a0=x-ox;
+      m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
+      vec3 g; g.x=a0.x*x0.x+h.x*x0.y; g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+      return 130.0*dot(m,g);
+    }
+    void main(){
+      vec2 uv=vUv-0.5; float dist=length(uv);
+      float paper=snoise(vUv*280.0)*0.025;
+      float aura=snoise(uv*2.0+uTime*0.04)*0.5+0.5;
+      vec3 bgDark=vec3(0.02,0.03,0.05); vec3 bgDeepIndigo=vec3(0.04,0.06,0.12); vec3 bgGoldAura=vec3(0.20,0.15,0.06);
+      vec3 color=mix(bgDark,bgDeepIndigo,aura*0.5);
+      float goldMask=smoothstep(0.85,0.0,dist)*uProgress*0.6;
+      color=mix(color,bgGoldAura,goldMask*uSilence);
+      color+=paper;
+      gl_FragColor=vec4(color,1.0);
+    }`
+});
+const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
+bgMesh.position.z = -15;
+scene.add(bgMesh);
+
+const seedGroup = new THREE.Group();
+world.add(seedGroup);
+const seedCoreGeo = new THREE.IcosahedronGeometry(0.35,3);
+const seedCoreMat = new THREE.MeshBasicMaterial({ color:0xfff0d0, wireframe:true, transparent:true, opacity:0.9 });
+const seedMesh = new THREE.Mesh(seedCoreGeo, seedCoreMat);
+seedGroup.add(seedMesh);
+const seedRings = [];
+for(let i=0;i<3;i++){
+  const ringGeo = new THREE.TorusGeometry(0.5+i*0.2, 0.005, 8, 80);
+  const ringMat = new THREE.MeshBasicMaterial({ color:0xd4af37, transparent:true, opacity:0.3 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = i*0.5; ring.rotation.y = i*0.3;
+  seedGroup.add(ring); seedRings.push(ring);
+}
+
+const PETAL_LAYERS = 4, PETALS_PER_LAYER = 12;
+const petalGroup = new THREE.Group();
+world.add(petalGroup);
+const petalMeshes = [];
+for(let layer=0; layer<PETAL_LAYERS; layer++){
+  for(let i=0; i<PETALS_PER_LAYER; i++){
+    const points = [];
+    const angle = (i/PETALS_PER_LAYER)*Math.PI*2;
+    const layerRadius = 0.5+layer*0.8;
+    for(let j=0;j<=30;j++){
+      const t=j/30;
+      const petalWidth = Math.sin(t*Math.PI)*(0.15+layer*0.05);
+      const rad = t*layerRadius;
+      const offsetX = Math.sin(t*Math.PI*1.5)*0.12;
+      const x = Math.cos(angle)*rad + Math.cos(angle+Math.PI/2)*(petalWidth+offsetX);
+      const y = Math.sin(angle)*rad + Math.sin(angle+Math.PI/2)*(petalWidth+offsetX);
+      const z = Math.sin(t*Math.PI)*0.25*(1-layer*0.2);
+      points.push(new THREE.Vector3(x,y,z));
+    }
+    const curve = new THREE.CatmullRomCurve3(points);
+    const tubeGeo = new THREE.TubeGeometry(curve, 40, 0.008+layer*0.002, 6, false);
+    const mat = new THREE.MeshBasicMaterial({ color:new THREE.Color(), transparent:true, opacity:0, blending:THREE.AdditiveBlending });
+    const mesh = new THREE.Mesh(tubeGeo, mat);
+    petalGroup.add(mesh);
+    petalMeshes.push({ mesh, mat, layer, index:i });
+  }
+}
+
+const POLLEN_COUNT = 2500;
+const pollenGeo = new THREE.BufferGeometry();
+const pPositions = new Float32Array(POLLEN_COUNT*3);
+const pColors = new Float32Array(POLLEN_COUNT*3);
+const pSizes = new Float32Array(POLLEN_COUNT);
+const pSeeds = [];
+for(let i=0;i<POLLEN_COUNT;i++){
+  const angle = Math.random()*Math.PI*2;
+  const ring = Math.pow(Math.random(),0.7);
+  const rad = 0.2 + ring*4.0;
+  pPositions[i*3] = Math.cos(angle)*rad;
+  pPositions[i*3+1] = Math.sin(angle)*rad;
+  pPositions[i*3+2] = (Math.random()-0.5)*1.2;
+  pSizes[i] = 1.0 + Math.random()*2.5;
+  pSeeds.push({ angle, rad, ring, speed:0.3+Math.random()*0.8, phase:Math.random()*Math.PI*2 });
+}
+pollenGeo.setAttribute("position", new THREE.BufferAttribute(pPositions,3));
+pollenGeo.setAttribute("color", new THREE.BufferAttribute(pColors,3));
+pollenGeo.setAttribute("size", new THREE.BufferAttribute(pSizes,1));
+const pollenMat = new THREE.ShaderMaterial({
+  transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, vertexColors:true,
+  uniforms:{ uTexture:{value:pollenTexture}, uPixelRatio:{value:Math.min(devicePixelRatio,2)} },
+  vertexShader:`attribute float size; varying vec3 vColor; uniform float uPixelRatio;
+    void main(){ vColor=color; vec4 mvPosition=modelViewMatrix*vec4(position,1.0);
+      gl_PointSize = size*3.5*uPixelRatio*(6.0/-mvPosition.z); gl_Position = projectionMatrix*mvPosition; }`,
+  fragmentShader:`uniform sampler2D uTexture; varying vec3 vColor;
+    void main(){ vec4 texColor=texture2D(uTexture, gl_PointCoord); if(texColor.a<0.01) discard;
+      gl_FragColor = vec4(vColor*texColor.rgb, texColor.a*0.85); }`
+});
+const pollenPoints = new THREE.Points(pollenGeo, pollenMat);
+world.add(pollenPoints);
+
+/* =========================================================
+   3. ENTRÉE : MICRO (tolérant) OU TOUCHER (sans micro)
+========================================================= */
+let analyser = null, audioArray = null;
+let level = 0, noiseFloor = 0.012;
+let silence = 0, silenceTimer = 0;
+let graceRemaining = 0;   // grâce restante avant que le bruit fasse redescendre le score
+let isChallengeActive = false, isChallengeWon = false;
+
+async function startMicro(){
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio:{ echoCancellation:false, noiseSuppression:false, autoGainControl:false }
+  });
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const audioContext = new AudioContext();
+  const source = audioContext.createMediaStreamSource(stream);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 1024;
+  analyser.smoothingTimeConstant = 0.45;
+  source.connect(analyser);
+  audioArray = new Uint8Array(analyser.fftSize);
+}
+
+function updateMicChallenge(dt){
+  if(!analyser || !isChallengeActive || isChallengeWon) return;
+  analyser.getByteTimeDomainData(audioArray);
+  let sum = 0;
+  for(let i=0;i<audioArray.length;i++){ const v=(audioArray[i]-128)/128; sum += v*v; }
+  const rawLevel = Math.sqrt(sum/audioArray.length);
+  level += (rawLevel-level) * Math.min(1, dt*8);
+  if(level < noiseFloor) noiseFloor += (level-noiseFloor)*dt*0.8;
+  else noiseFloor += (level-noiseFloor)*dt*0.008;
+
+  const threshold = Math.max(currentSensitivity, noiseFloor*2.0 + 0.005);
+  const ratio = level/threshold;
+  const targetSilence = THREE.MathUtils.clamp(1.6-ratio, 0, 1);
+  silence += (targetSilence-silence) * Math.min(1, dt*(targetSilence<silence?4.0:0.8));
+  applyProgress(dt);
+}
+
+function applyProgress(dt){
+  if(silence > 0.6){
+    silenceTimer += dt;
+    graceRemaining = toleranceSeconds; // on recharge la tolérance pendant les bons moments
+  } else {
+    // un bruit ponctuel (un enfant qui tousse) est toléré grâce quelques secondes
+    if(graceRemaining > 0){ graceRemaining -= dt; }
+    else { silenceTimer = Math.max(0, silenceTimer - dt*0.8); }
+  }
+  if(silenceTimer >= targetDuration && !isChallengeWon) triggerVictory();
+}
+
+// Mode tactile (sans micro) : maintenir = silence
+const touchZone = document.getElementById("touch-zone");
+let touching = false;
+touchZone.addEventListener("pointerdown", () => { touching = true; });
+touchZone.addEventListener("pointerup", () => { touching = false; });
+touchZone.addEventListener("pointercancel", () => { touching = false; });
+touchZone.addEventListener("pointerleave", () => { touching = false; });
+
+function updateTouchChallenge(dt){
+  if(!isChallengeActive || isChallengeWon) return;
+  const targetSilence = touching ? 1 : 0;
+  silence += (targetSilence-silence) * Math.min(1, dt*(targetSilence<silence?3.0:2.0));
+  applyProgress(dt);
+}
+
+/* =========================================================
+   4. OISEAUX & SYNTHÉTISEUR
+========================================================= */
+const BIRD_EMOJIS = [
+  "🕊️","🐦","🐥","🦅","🦉","🦩","🦚","🦜","🦆","🦢",
+  "🐧","🦤","🐦‍⬛","🕊","🐤","🐣","🦅","🦉","🦩","🦚",
+  "🦜","🦆","🦢","🕊️","🐦","🐥","🦤","🐦‍⬛","🦚","🦜","🕊️"
+];
+const BIRD_NAMES = [
+  "Colombe de Paix","Rossignol des Bois","Mésange Bleue","Aigle Céleste","Chouette effraie",
+  "Flamant d'Aurore","Paon de Lumière","Perroquet Émeraude","Canard Sauvage","Cygne d'Opale",
+  "Manchot Étoilé","Dodo du Silence","Merle Enchanteur","Tourterelle d'Argent","Poussin Doré",
+  "Hirondelle printanière","Falcon Vénérable","Hibou Mystique","Flamant Rose","Paon Céleste",
+  "Ara Ararauna","Sarcelle d'Été","Cygne Noir","Colombe Vénale","Rouge-gorge",
+  "Roitelet Huppé","Geai des Chênes","Corbeau de Brume","Paon d'Ambre","Kakapo Céleste","Oiseau du Paradis"
+];
+
+let audioCtx = null;
+function getAudioCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+
+function playBirdSong(index){
+  const ctx = getAudioCtx();
+  if(ctx.state === 'suspended') ctx.resume();
+  const now = ctx.currentTime;
+  const masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(0.15, now);
+  masterGain.connect(ctx.destination);
+  const baseFreq = 1200 + (index*95)%2200;
+  const chirpsCount = 3 + (index%4);
+  for(let i=0;i<chirpsCount;i++){
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = (index%2===0) ? 'sine' : 'triangle';
+    const startTime = now + i*0.18 + (Math.random()*0.05);
+    const duration = 0.08 + (Math.random()*0.08);
+    const freqOffset = (Math.random()-0.5)*400;
+    osc.frequency.setValueAtTime(baseFreq+freqOffset, startTime);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq+freqOffset+600, startTime+duration*0.6);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq+freqOffset-200, startTime+duration);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.3, startTime+duration*0.2);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime+duration);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(startTime); osc.stop(startTime+duration);
+  }
+}
+
+function setupBirdsUI(unlockedCount){
+  const container = document.getElementById("birds-container");
+  container.innerHTML = "";
+  BIRD_EMOJIS.forEach((emoji, idx) => {
+    const unlocked = idx < unlockedCount;
+    const item = document.createElement("div");
+    item.className = "bird-item " + (unlocked ? "unlocked" : "locked");
+    item.title = unlocked ? `${BIRD_NAMES[idx]} (#${idx+1})` : "À débloquer par un futur rituel";
+    item.innerHTML = `${unlocked ? emoji : "🌫️"}<span class="bird-num">${idx+1}</span>`;
+    if(unlocked){
+      item.addEventListener("click", () => {
+        item.classList.add("playing");
+        playBirdSong(idx);
+        setTimeout(() => item.classList.remove("playing"), 800);
+      });
+    }
+    container.appendChild(item);
+  });
+}
+
+function triggerVictory(){
+  isChallengeWon = true;
+
+  const wasAlreadyDoneToday = !!calendar[todayKey()];
+  if(!wasAlreadyDoneToday){
+    calendar[todayKey()] = true;
+    saveCalendar(calendar);
+  }
+
+  const unlocked = Math.min(TOTAL_BIRDS, completedCount());
+  document.getElementById("victory-title").textContent = wasAlreadyDoneToday
+    ? "Le rituel du jour est déjà accompli 🪷"
+    : `Jour ${unlocked} : un nouvel oiseau s'est posé 🪷`;
+  document.getElementById("victory-sub").textContent = wasAlreadyDoneToday
+    ? "Vous pouvez tout de même écouter le sanctuaire."
+    : "Chaque jour de silence réveille un oiseau de plus dans le sanctuaire.";
+
+  setupBirdsUI(unlocked);
+  const victoryModal = document.getElementById("victory-modal");
+  victoryModal.style.display = "flex";
+  setTimeout(() => victoryModal.style.opacity = "1", 50);
+}
+
+document.getElementById("sing-all-btn").addEventListener("click", () => {
+  const items = document.querySelectorAll(".bird-item.unlocked");
+  items.forEach((item, idx) => {
+    setTimeout(() => {
+      item.classList.add("playing");
+      playBirdSong(idx);
+      setTimeout(() => item.classList.remove("playing"), 600);
+    }, idx*150);
+  });
+});
+document.getElementById("new-ritual-btn").addEventListener("click", () => location.reload());
+
+/* =========================================================
+   5. PARALLAX
+========================================================= */
+let mouseX=0, mouseY=0, targetCamX=0, targetCamY=0;
+window.addEventListener('mousemove', (e) => {
+  mouseX = (e.clientX/innerWidth-0.5)*1.2;
+  mouseY = (e.clientY/innerHeight-0.5)*1.2;
+});
+
+/* =========================================================
+   6. BOUCLE D'ANIMATION
+========================================================= */
+const clock = new THREE.Clock();
+let visualTime = 0;
+const tempColor = new THREE.Color();
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.04);
+
+  if(inputMode === "mic") updateMicChallenge(dt);
+  else updateTouchChallenge(dt);
+
+  const progressRatio = Math.min(1, silenceTimer/targetDuration);
+  const dance = THREE.MathUtils.smoothstep(silence, 0.1, 0.95);
+  visualTime += dt*(0.08+dance*0.92);
+
+  bgMaterial.uniforms.uTime.value = visualTime;
+  bgMaterial.uniforms.uSilence.value = silence;
+  bgMaterial.uniforms.uProgress.value = progressRatio;
+
+  world.rotation.z = Math.sin(visualTime*0.15)*0.1*dance;
+  world.rotation.y = Math.cos(visualTime*0.1)*0.08*dance;
+
+  seedMesh.rotation.x += dt*0.4;
+  seedMesh.rotation.y += dt*0.5;
+  const seedScale = 0.8+progressRatio*0.5+Math.sin(visualTime*2.0)*0.06*dance;
+  seedMesh.scale.setScalar(seedScale);
+
+  seedRings.forEach((ring, idx) => {
+    ring.rotation.z += dt*(0.1+idx*0.05);
+    ring.scale.setScalar(1+progressRatio*0.4);
+  });
+
+  petalMeshes.forEach((item) => {
+    const layerThreshold = item.layer/PETAL_LAYERS;
+    const isUnlocked = progressRatio >= layerThreshold;
+    const targetOpacity = isUnlocked ? (0.2+silence*0.6)*progressRatio : 0;
+    item.mat.opacity += (targetOpacity-item.mat.opacity)*dt*2.0;
+    const wave = Math.sin(visualTime*0.8+item.index*0.4);
+    const expansion = 0.6+progressRatio*0.6+wave*0.05*dance;
+    item.mesh.scale.set(expansion, expansion, expansion);
+    let hue = (0.58-item.layer*0.05+visualTime*0.005)%1;
+    if(progressRatio > 0.8) hue = (0.12+item.layer*0.02)%1;
+    item.mat.color.setHSL(hue, 0.3+silence*0.6, 0.35+silence*0.45);
+  });
+
+  const pPos = pollenGeo.attributes.position.array;
+  const pCol = pollenGeo.attributes.color.array;
+  for(let i=0;i<POLLEN_COUNT;i++){
+    const seed = pSeeds[i];
+    const isVisible = progressRatio >= seed.ring;
+    const wave = Math.sin(visualTime*seed.speed+seed.phase);
+    const r = seed.rad*(0.8+progressRatio*0.3+wave*0.08*dance);
+    const angle = seed.angle+visualTime*0.02*dance;
+    pPos[i*3] = Math.cos(angle)*r;
+    pPos[i*3+1] = Math.sin(angle)*r;
+    const hue = (0.11+seed.ring*0.1)%1;
+    const light = isVisible ? (0.25+silence*0.55) : 0;
+    tempColor.setHSL(hue, 0.6, light);
+    pCol[i*3]=tempColor.r; pCol[i*3+1]=tempColor.g; pCol[i*3+2]=tempColor.b;
+  }
+  pollenGeo.attributes.position.needsUpdate = true;
+  pollenGeo.attributes.color.needsUpdate = true;
+
+  if(isChallengeActive && !isChallengeWon){
+    const progressCircle = document.getElementById("progress-circle");
+    const stateText = document.getElementById("state");
+    const targetTimeDisplay = document.getElementById("target-time-display");
+    progressCircle.style.strokeDashoffset = 81.68*(1-progressRatio);
+    targetTimeDisplay.textContent = `${Math.floor(silenceTimer)}s / ${targetDuration}s`;
+    if(progressRatio < 0.25) stateText.textContent = "Graine";
+    else if(progressRatio < 0.50) stateText.textContent = "Germination";
+    else if(progressRatio < 0.75) stateText.textContent = "Floraison";
+    else stateText.textContent = "Appel de l'Oiseau";
+  }
+
+  targetCamX += (mouseX-targetCamX)*dt*2.0;
+  targetCamY += (-mouseY-targetCamY)*dt*2.0;
+  camera.position.x = targetCamX;
+  camera.position.y = targetCamY;
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene, camera);
+}
+animate();
+
+/* =========================================================
+   7. DÉMARRAGE
+========================================================= */
+const startBtn = document.getElementById("start");
+const modalError = document.getElementById("modal-error");
+const modalClose = document.getElementById("modal-close");
+const screenSetup = document.getElementById("screen-setup");
+
+startBtn.addEventListener("click", async () => {
+  try {
+    if(inputMode === "mic"){
+      await startMicro();
+    }
+    getAudioCtx();
+    isChallengeActive = true;
+
+    screenSetup.classList.add("hidden");
+    document.getElementById("ui").style.opacity = "1";
+
+    if(inputMode === "touch"){
+      touchZone.style.display = "block";
+      document.getElementById("touch-hint").style.opacity = "1";
+    }
+
+    setTimeout(() => {
+      document.getElementById("message").style.opacity = "0";
+      if(inputMode === "touch") document.getElementById("touch-hint").style.opacity = "0";
+    }, 7000);
+
+  } catch(error){
+    if(inputMode === "mic") modalError.style.display = "flex";
+  }
+});
+modalClose.addEventListener("click", () => { modalError.style.display = "none"; });
+
+window.addEventListener("resize", () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  pollenMat.uniforms.uPixelRatio.value = Math.min(devicePixelRatio,2);
+});
+</script>
+</body>
+</html>
