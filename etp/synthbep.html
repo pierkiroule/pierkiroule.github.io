@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Synthèses BEP</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  max-width:760px;
+  margin:auto;
+  padding:18px;
+  background:#f4f5f6;
+  color:#222;
+}
+h1{font-size:24px}
+button{
+  padding:9px 12px;
+  margin:3px;
+  border:0;
+  border-radius:8px;
+  cursor:pointer;
+}
+.card{
+  background:white;
+  padding:20px;
+  margin-top:15px;
+  border-radius:12px;
+}
+.bloc{
+  margin:15px 0;
+  padding-bottom:12px;
+  border-bottom:1px solid #eee;
+}
+h3{
+  font-size:15px;
+  margin:0 0 5px;
+}
+p{
+  margin:0;
+  line-height:1.45;
+}
+.verbatim{
+  margin-top:6px;
+  font-style:italic;
+  color:#555;
+}
+.objectif{
+  background:#eaf6ee;
+  padding:15px;
+  border-radius:9px;
+}
+.smart{
+  font-size:13px;
+  margin-top:10px;
+  color:#456;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Exemples de synthèses BEP</h1>
+<p>De la parole du patient à un objectif éducatif SMART.</p>
+
+<div id="buttons"></div>
+<div id="result"></div>
+
+<script>
+
+const cas={
+
+"VIH":{
+titre:"Patient vivant avec le VIH",
+
+quotidien:[
+"Travaille avec des horaires variables. Certaines prises peuvent être décalées.",
+"« Quand je finis tard, ça m'arrive de décaler mon traitement. »"
+],
+
+connaissances:[
+"Connaît son traitement. Des interrogations persistent concernant la transmission.",
+"« Je lis des choses différentes sur Internet. Je voudrais être sûr. »"
+],
+
+vecu:[
+"Le VIH devient surtout préoccupant dans sa vie affective.",
+"« C'est quand je rencontre quelqu'un que ça revient dans ma tête. »"
+],
+
+entourage:[
+"Quelques proches connaissent sa situation.",
+"« Ma sœur sait. Au travail je préfère garder ça pour moi. »"
+],
+
+projet:[
+"Souhaite vivre plus sereinement une nouvelle relation.",
+"« J'aimerais rencontrer quelqu'un sans que le VIH prenne toute la place. »"
+],
+
+facilitants:[
+"Autonome et habitué à rechercher de l'information.",
+"« Mon traitement, je le gère seul depuis longtemps. »"
+],
+
+limitants:[
+"Informations contradictoires et inquiétudes concernant la transmission.",
+"« Je ne sais plus toujours ce qui est vrai. »"
+],
+
+besoin:[
+"Consolider ses connaissances concernant la transmission.",
+"« Je voudrais pouvoir expliquer clairement les choses à quelqu'un. »"
+],
+
+objectif:"À l'issue de la séance, être capable d'expliquer avec ses propres mots les conditions de transmission et de non-transmission du VIH et d'identifier au moins 2 ressources fiables où vérifier une information, pour pouvoir aborder plus sereinement une nouvelle relation.",
+
+strategie:"Échange à partir de ses questions, tri de situations « transmission / non-transmission » puis recherche et sélection de ressources fiables."
+},
+
+"TCA ado":{
+titre:"Adolescente avec TCA",
+
+quotidien:[
+"Les repas et leur anticipation prennent une place importante dans son quotidien.",
+"« Dès le matin je pense à ce que je vais devoir manger le soir. »"
+],
+
+connaissances:[
+"Possède de nombreuses connaissances mais applique des règles alimentaires rigides.",
+"« Je regarde tout, les calories, les quantités… »"
+],
+
+vecu:[
+"Anxiété importante face aux repas imprévus.",
+"« Si je ne sais pas ce qu'il va y avoir, je panique. »"
+],
+
+entourage:[
+"Parents présents et plusieurs amies proches.",
+"« Mes parents veulent m'aider mais à table ça finit souvent en dispute. »"
+],
+
+projet:[
+"Souhaite pouvoir retrouver certaines sorties avec ses amies.",
+"« J'aimerais pouvoir aller manger une pizza avec mes copines. »"
+],
+
+facilitants:[
+"Identifie clairement une situation qu'elle souhaite retrouver.",
+"« Ça, j'aimerais vraiment réussir à le refaire. »"
+],
+
+limitants:[
+"Anxiété et ambivalence face au changement.",
+"« J'ai envie que ça change mais contrôler me rassure aussi. »"
+],
+
+besoin:[
+"Développer des stratégies pour faire face à l'anxiété lors de situations alimentaires imprévues.",
+"« Il faudrait que j'arrive à moins paniquer quand je ne sais pas exactement ce qu'il y aura. »"
+],
+
+objectif:"Dans les 2 prochaines semaines, être capable d'identifier 2 situations qui augmentent son anxiété autour des repas et d'expérimenter au moins 1 stratégie choisie avec l'équipe dans une situation préparée ensemble, pour pouvoir progressivement retrouver des repas avec ses amies.",
+
+strategie:"Repérage des situations anxiogènes, choix d'une stratégie avec l'adolescente puis expérimentation progressive dans le cadre défini avec l'équipe."
+},
+
+"Alcool":{
+titre:"Patient accompagné en addictologie",
+
+quotidien:[
+"Consommations principalement le soir après le travail.",
+"« Le premier verre, c'est la fin de ma journée. »"
+],
+
+connaissances:[
+"Commence à identifier le lien entre consommation, sommeil et fatigue.",
+"« Je pensais que ça m'aidait à dormir. En fait je suis crevé le lendemain. »"
+],
+
+vecu:[
+"Souhaite réduire mais craint de perdre son principal moyen de détente.",
+"« C'est mon bouton OFF. »"
+],
+
+entourage:[
+"Sœur soutenante. Certaines relations sont associées à la consommation.",
+"« Avec certains copains, l'apéro est automatique. »"
+],
+
+projet:[
+"Souhaite être plus disponible pour ses enfants le week-end.",
+"« J'aimerais être en forme quand ils arrivent le samedi. »"
+],
+
+facilitants:[
+"Commence à identifier les déclencheurs.",
+"« Les jours où ça va au boulot, je bois moins. »"
+],
+
+limitants:[
+"Stress et automatisation des habitudes.",
+"« À 19 heures je ne réfléchis même plus. »"
+],
+
+besoin:[
+"Repérer ses principaux déclencheurs et expérimenter des alternatives.",
+"« Il faudrait que je trouve autre chose pour décrocher. »"
+],
+
+objectif:"Pendant les 7 prochains jours, être capable de repérer et noter au moins 3 situations déclenchant une envie de boire et d'expérimenter dans au moins 2 de ces situations une alternative choisie, pour identifier ce qui peut l'aider à mieux dormir et être plus disponible pour ses enfants.",
+
+strategie:"Auto-observation pendant une semaine, identification des déclencheurs puis expérimentation de plusieurs alternatives choisies avec le patient."
+},
+
+"Cardio":{
+titre:"Patient avec maladie cardiovasculaire",
+
+quotidien:[
+"A fortement réduit son activité depuis son hospitalisation.",
+"« Maintenant je prends même la voiture pour aller chercher le pain. »"
+],
+
+connaissances:[
+"Comprend l'intérêt de l'activité physique mais interprète difficilement certaines sensations.",
+"« Si mon cœur accélère, je ne sais pas si c'est normal. »"
+],
+
+vecu:[
+"Peur d'un nouvel événement cardiaque.",
+"« Dès que je sens quelque chose, je m'arrête. »"
+],
+
+entourage:[
+"Conjointe présente mais également inquiète.",
+"« Ma femme me dit de ne surtout pas forcer. »"
+],
+
+projet:[
+"Souhaite reprendre la randonnée.",
+"« Je voudrais refaire une randonnée avec ma femme. »"
+],
+
+facilitants:[
+"Activité fortement investie avant l'événement.",
+"« Marcher, ça a toujours été mon truc. »"
+],
+
+limitants:[
+"Peur de l'effort et difficulté à différencier sensations attendues et signes d'alerte.",
+"« Je ne sais pas ce qui doit vraiment m'inquiéter. »"
+],
+
+besoin:[
+"Apprendre à interpréter les sensations liées à l'effort et reconnaître les signes d'alerte.",
+"« Si je savais quand continuer et quand m'arrêter, ça me rassurerait. »"
+],
+
+objectif:"À l'issue de la séance, être capable, face à 5 situations d'effort proposées, de distinguer les sensations attendues des principaux signes d'alerte et d'indiquer la conduite à tenir dans chaque situation, pour reprendre progressivement la marche avec davantage de sécurité.",
+
+strategie:"Cartes de situations, classement des sensations, explicitation des conduites à tenir puis mise en pratique dans le cadre du programme d'activité physique défini par l'équipe."
+},
+
+"Diabète ado":{
+titre:"Adolescent avec diabète de type 1",
+
+quotidien:[
+"Gère une grande partie de son diabète mais anticipe moins lors des sorties.",
+"« Avec mes potes, j'ai moins envie de penser au diabète. »"
+],
+
+connaissances:[
+"Possède de bonnes connaissances et maîtrise les principaux gestes.",
+"« Je sais faire, ça fait des années que je l'ai. »"
+],
+
+vecu:[
+"Lassitude face aux contraintes quotidiennes.",
+"« Des fois j'en ai juste marre de tout calculer. »"
+],
+
+entourage:[
+"Parents encore très présents. Amis proches informés.",
+"« Mes potes savent pour mon diabète. Mes parents vérifient tout. »"
+],
+
+projet:[
+"Souhaite partir plusieurs jours sans ses parents.",
+"« Cet été je veux partir trois jours avec mes potes. »"
+],
+
+facilitants:[
+"Bonnes compétences et forte motivation pour gagner en autonomie.",
+"« Une hypo, je sais la gérer tout seul. »"
+],
+
+limitants:[
+"Anticipation plus difficile lorsqu'il est avec ses pairs.",
+"« Mon problème c'est surtout d'oublier des trucs avant de partir. »"
+],
+
+besoin:[
+"Renforcer sa capacité à anticiper les situations lors d'un séjour sans ses parents.",
+"« Je voudrais être sûr que je peux partir sans rien oublier. »"
+],
+
+objectif:"À l'issue de la séance, être capable de préparer seul un séjour de 3 jours en identifiant le matériel nécessaire, les adaptations à prévoir et la conduite à tenir face à 3 situations imprévues, pour pouvoir partir avec ses amis sans ses parents en sécurité.",
+
+strategie:"Simulation « Tu pars trois jours avec tes amis » : préparation du sac, organisation des soins et résolution de trois cartes d'imprévus."
+}
+
+};
+
+const rubriques=[
+["Quotidien","quotidien"],
+["Connaissances / représentations","connaissances"],
+["Vécu dominant","vecu"],
+["Entourage","entourage"],
+["Projet / envie","projet"],
+["Facilitants de l'apprentissage","facilitants"],
+["Limitants de l'apprentissage","limitants"],
+["Besoin éducatif prioritaire","besoin"]
+];
+
+const buttons=document.getElementById("buttons");
+const result=document.getElementById("result");
+
+Object.keys(cas).forEach(nom=>{
+  const b=document.createElement("button");
+  b.textContent=nom;
+  b.onclick=()=>afficher(nom);
+  buttons.appendChild(b);
+});
+
+function afficher(nom){
+
+  const c=cas[nom];
+
+  let html=`<div class="card"><h2>${c.titre}</h2>`;
+
+  rubriques.forEach(([titre,cle])=>{
+    html+=`
+      <div class="bloc">
+        <h3>${titre}</h3>
+        <p>${c[cle][0]}</p>
+        <p class="verbatim">${c[cle][1]}</p>
+      </div>
+    `;
+  });
+
+  html+=`
+    <div class="objectif">
+      <h3>Objectif éducatif prioritaire SMART</h3>
+      <p><strong>${c.objectif}</strong></p>
+      <p class="smart">
+        Une capacité observable • une situation •
+        un critère de réussite • une temporalité •
+        un « pour… » qui donne du sens
+      </p>
+    </div>
+
+    <div class="bloc">
+      <h3>Stratégie éducative</h3>
+      <p>${c.strategie}</p>
+    </div>
+
+    </div>
+  `;
+
+  result.innerHTML=html;
+}
+
+afficher("Diabète ado");
+
+</script>
+</body>
+</html>
