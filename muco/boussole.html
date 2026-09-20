@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>La Boussole décisionnelle</title>
+
+<style>
+
+/* =========================================================
+   BASE — MOBILE FIRST
+========================================================= */
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+  --ink:#24312d;
+  --muted:#68716c;
+
+  --accent:#4f8f79;
+  --accent-soft:#dceee7;
+  --accent-glow:rgba(79,143,121,.22);
+
+  --paper:#f8f5ee;
+}
+
+html,
+body{
+  margin:0;
+  min-height:100%;
+}
+
+body{
+  min-height:100dvh;
+  overflow-x:hidden;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color:var(--ink);
+
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      #ffffff 0%,
+      var(--accent-soft) 48%,
+      var(--paper) 100%
+    );
+
+  transition:
+    background 700ms ease;
+}
+
+
+/* =========================================================
+   APP
+========================================================= */
+
+.app{
+  width:100%;
+  min-height:100dvh;
+
+  padding:
+    max(18px,env(safe-area-inset-top))
+    16px
+    max(20px,env(safe-area-inset-bottom));
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+
+/* =========================================================
+   TOP
+========================================================= */
+
+.top{
+  width:100%;
+  max-width:720px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:15px;
+}
+
+.context{
+  font-size:8px;
+  font-weight:800;
+
+  letter-spacing:.14em;
+  text-transform:uppercase;
+
+  color:var(--muted);
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+  margin-top:22px;
+
+  text-align:center;
+}
+
+.eyebrow{
+  color:var(--accent);
+
+  font-size:8px;
+  font-weight:850;
+
+  letter-spacing:.19em;
+  text-transform:uppercase;
+
+  transition:color .5s ease;
+}
+
+h1{
+  margin:6px 0 5px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(35px,10vw,48px);
+
+  font-weight:400;
+
+  line-height:.96;
+  letter-spacing:-.055em;
+}
+
+.tagline{
+  margin:0;
+
+  font-family:Georgia,serif;
+  font-size:13px;
+  font-style:italic;
+
+  color:var(--muted);
+}
+
+
+/* =========================================================
+   COMPASS ZONE
+========================================================= */
+
+.compass-zone{
+  width:100%;
+
+  margin-top:17px;
+
+  display:flex;
+  justify-content:center;
+}
+
+.compass{
+  position:relative;
+
+  width:min(82vw,340px);
+  aspect-ratio:1;
+
+  touch-action:none;
+  user-select:none;
+}
+
+
+/* =========================================================
+   COLOURED AURA
+========================================================= */
+
+.aura{
+  position:absolute;
+
+  inset:-7%;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--accent-glow),
+      transparent 67%
+    );
+
+  filter:blur(12px);
+
+  transition:
+    background .6s ease;
+
+  animation:
+    breathe 5s ease-in-out infinite;
+}
+
+@keyframes breathe{
+
+  0%,100%{
+    transform:scale(.96);
+    opacity:.65;
+  }
+
+  50%{
+    transform:scale(1.05);
+    opacity:1;
+  }
+
+}
+
+
+/* =========================================================
+   MAIN DISC
+========================================================= */
+
+.disc{
+  position:absolute;
+
+  inset:8%;
+
+  border-radius:50%;
+
+  overflow:hidden;
+
+  background:
+    radial-gradient(
+      circle at 38% 30%,
+      rgba(255,255,255,.97),
+      rgba(255,255,255,.75) 40%,
+      var(--accent-soft) 100%
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.9);
+
+  box-shadow:
+    0 25px 60px
+    rgba(40,55,48,.12),
+
+    inset
+    0 0 40px
+    rgba(255,255,255,.8);
+
+  transition:
+    background .6s ease;
+}
+
+
+/* watercolor stain */
+
+.disc::before{
+  content:"";
+
+  position:absolute;
+
+  width:55%;
+  height:55%;
+
+  left:5%;
+  top:4%;
+
+  border-radius:
+    48% 52% 60% 40% /
+    43% 60% 40% 57%;
+
+  background:
+    var(--accent-glow);
+
+  filter:blur(22px);
+
+  opacity:.55;
+
+  transition:
+    background .6s ease;
+
+  animation:
+    floatInk 8s ease-in-out infinite alternate;
+}
+
+@keyframes floatInk{
+
+  to{
+    transform:
+      translate(50%,45%)
+      rotate(25deg)
+      scale(1.25);
+  }
+
+}
+
+
+/* inner circle */
+
+.disc::after{
+  content:"";
+
+  position:absolute;
+
+  inset:29%;
+
+  border-radius:50%;
+
+  border:
+    1px solid
+    rgba(36,49,45,.08);
+}
+
+
+/* =========================================================
+   AXES
+========================================================= */
+
+.axis{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  pointer-events:none;
+
+  opacity:.55;
+}
+
+.axis.vertical{
+  width:1px;
+  height:69%;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:
+    linear-gradient(
+      transparent,
+      rgba(36,49,45,.20),
+      transparent
+    );
+}
+
+.axis.horizontal{
+  height:1px;
+  width:69%;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(36,49,45,.20),
+      transparent
+    );
+}
+
+
+/* =========================================================
+   DIRECTIONS
+========================================================= */
+
+.direction{
+  position:absolute;
+
+  z-index:12;
+
+  width:105px;
+
+  text-align:center;
+
+  color:#777f7a;
+
+  cursor:pointer;
+
+  transition:
+    transform .35s ease,
+    color .35s ease,
+    opacity .35s ease;
+}
+
+.direction strong{
+  display:block;
+
+  font-size:9px;
+  font-weight:900;
+
+  line-height:1.1;
+
+  letter-spacing:.11em;
+  text-transform:uppercase;
+}
+
+.direction .dot{
+  width:7px;
+  height:7px;
+
+  margin:6px auto;
+
+  border-radius:50%;
+
+  background:#b5b9b6;
+
+  transition:
+    transform .35s ease,
+    background .35s ease,
+    box-shadow .35s ease;
+}
+
+
+/* positions */
+
+.north{
+  top:-1%;
+  left:50%;
+
+  transform:
+    translateX(-50%);
+}
+
+.east{
+  right:-10%;
+  top:50%;
+
+  transform:
+    translateY(-50%);
+}
+
+.south{
+  bottom:-1%;
+  left:50%;
+
+  transform:
+    translateX(-50%);
+}
+
+.west{
+  left:-10%;
+  top:50%;
+
+  transform:
+    translateY(-50%);
+}
+
+
+/* active direction */
+
+.direction.active{
+  color:var(--accent);
+}
+
+.direction.active .dot{
+  background:var(--accent);
+
+  transform:scale(1.45);
+
+  box-shadow:
+    0 0 0 7px
+    var(--accent-glow);
+}
+
+
+/* =========================================================
+   NEEDLE
+========================================================= */
+
+.needle-layer{
+  position:absolute;
+  inset:0;
+
+  z-index:5;
+
+  pointer-events:none;
+
+  transform:rotate(0deg);
+}
+
+.needle{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:4px;
+  height:30%;
+
+  transform:
+    translate(-50%,-100%);
+
+  transform-origin:center bottom;
+
+  border-radius:
+    100% 100% 10px 10px;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(36,49,45,.15),
+      var(--accent) 60%,
+      #fff
+    );
+
+  box-shadow:
+    0 5px 18px
+    var(--accent-glow);
+
+  transition:
+    background .5s ease;
+}
+
+.needle::before{
+  content:"";
+
+  position:absolute;
+
+  top:-6px;
+  left:50%;
+
+  width:13px;
+  height:13px;
+
+  transform:
+    translateX(-50%)
+    rotate(45deg);
+
+  border-radius:
+    9px 2px 9px 2px;
+
+  background:
+    var(--accent);
+
+  transition:
+    background .5s ease;
+}
+
+
+/* =========================================================
+   CENTER
+========================================================= */
+
+.center{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  z-index:7;
+
+  width:92px;
+  height:92px;
+
+  border-radius:50%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+
+  background:
+    rgba(255,255,255,.90);
+
+  backdrop-filter:
+    blur(8px);
+
+  border:
+    1px solid
+    rgba(255,255,255,.95);
+
+  box-shadow:
+    0 12px 30px
+    rgba(40,55,48,.10);
+}
+
+.center small{
+  margin-bottom:3px;
+
+  font-size:7px;
+  font-weight:850;
+
+  letter-spacing:.16em;
+  text-transform:uppercase;
+
+  color:var(--muted);
+}
+
+.center span{
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:14px;
+  line-height:1.05;
+}
+
+
+/* pivot */
+
+.pivot{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  z-index:20;
+
+  width:12px;
+  height:12px;
+
+  border-radius:50%;
+
+  background:
+    var(--accent);
+
+  box-shadow:
+    0 0 0 6px
+    var(--accent-glow);
+
+  transition:
+    background .5s ease,
+    box-shadow .5s ease;
+
+  pointer-events:none;
+}
+
+
+/* =========================================================
+   REFLECTION
+========================================================= */
+
+.reflection{
+  width:100%;
+  max-width:570px;
+
+  margin-top:7px;
+
+  padding:
+    20px
+    17px
+    17px;
+
+  border-radius:25px;
+
+  text-align:center;
+
+  background:
+    rgba(255,255,255,.64);
+
+  border:
+    1px solid
+    rgba(255,255,255,.92);
+
+  box-shadow:
+    0 18px 45px
+    rgba(36,49,45,.07);
+
+  backdrop-filter:
+    blur(14px);
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease,
+    background .5s ease;
+}
+
+.reflection.fade{
+  opacity:.25;
+
+  transform:
+    translateY(5px);
+}
+
+
+/* selected axis */
+
+.axis-title{
+  color:var(--accent);
+
+  font-size:9px;
+  font-weight:900;
+
+  letter-spacing:.17em;
+  text-transform:uppercase;
+
+  transition:color .5s ease;
+}
+
+
+/* main question */
+
+.question{
+  max-width:520px;
+
+  margin:
+    8px auto
+    15px;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:
+    clamp(20px,5.7vw,28px);
+
+  line-height:1.15;
+
+  letter-spacing:-.03em;
+}
+
+
+/* prompts */
+
+.prompts{
+  display:grid;
+
+  grid-template-columns:1fr;
+
+  gap:6px;
+}
+
+.prompt{
+  padding:
+    9px
+    12px;
+
+  border-radius:14px;
+
+  background:
+    var(--accent-soft);
+
+  color:
+    var(--ink);
+
+  font-size:10px;
+
+  line-height:1.25;
+
+  transition:
+    background .5s ease;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.hint{
+  margin-top:12px;
+
+  font-size:9px;
+
+  color:var(--muted);
+
+  text-align:center;
+}
+
+.hint span{
+  display:inline-block;
+
+  margin-right:4px;
+
+  color:var(--accent);
+
+  font-size:15px;
+
+  animation:
+    gesture 2.3s ease-in-out infinite;
+}
+
+@keyframes gesture{
+
+  0%,100%{
+    transform:rotate(-12deg);
+  }
+
+  50%{
+    transform:rotate(12deg);
+  }
+
+}
+
+footer{
+  max-width:450px;
+
+  margin-top:8px;
+
+  text-align:center;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size:10px;
+  font-style:italic;
+
+  line-height:1.4;
+
+  color:var(--muted);
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
+
+@media(max-width:370px){
+
+  h1{
+    font-size:32px;
+  }
+
+  .compass{
+    width:79vw;
+  }
+
+  .direction{
+    width:88px;
+  }
+
+  .east{
+    right:-12%;
+  }
+
+  .west{
+    left:-12%;
+  }
+
+  .question{
+    font-size:19px;
+  }
+
+}
+
+
+/* =========================================================
+   TABLET / DESKTOP
+========================================================= */
+
+@media(min-width:700px){
+
+  .app{
+    padding-top:28px;
+  }
+
+  .hero{
+    margin-top:35px;
+  }
+
+  .compass{
+    width:360px;
+  }
+
+  .east{
+    right:-7%;
+  }
+
+  .west{
+    left:-7%;
+  }
+
+  .reflection{
+    padding:
+      23px
+      25px
+      20px;
+  }
+
+  .prompts{
+    grid-template-columns:
+      repeat(3,1fr);
+  }
+
+  .prompt{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-height:45px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+
+<main class="app">
+
+
+  <!-- HEADER -->
+
+  <div class="top">
+
+    <div class="logo">
+      La Boussole décisionnelle
+    </div>
+
+    <div class="context">
+      CRCM · Anténatal
+    </div>
+
+  </div>
+
+
+
+  <!-- HERO -->
+
+  <header class="hero">
+
+    <div class="eyebrow">
+      Accompagnement à la décision
+    </div>
+
+    <h1>
+      S’orienter sans<br>
+      être orienté.
+    </h1>
+
+    <p class="tagline">
+      Une décision, quatre façons de la regarder.
+    </p>
+
+  </header>
+
+
+
+  <!-- COMPASS -->
+
+  <section class="compass-zone">
+
+    <div
+      class="compass"
+      id="compass"
+    >
+
+      <div class="aura"></div>
+
+      <div class="disc"></div>
+
+      <div class="axis vertical"></div>
+
+      <div class="axis horizontal"></div>
+
+
+
+      <!-- NORTH -->
+
+      <div
+        class="direction north active"
+        data-index="0"
+      >
+
+        <strong>
+          Comprendre
+        </strong>
+
+        <div class="dot"></div>
+
+      </div>
+
+
+
+      <!-- EAST -->
+
+      <div
+        class="direction east"
+        data-index="1"
+      >
+
+        <strong>
+          Ressentir
+        </strong>
+
+        <div class="dot"></div>
+
+      </div>
+
+
+
+      <!-- SOUTH -->
+
+      <div
+        class="direction south"
+        data-index="2"
+      >
+
+        <strong>
+          Ce qui compte
+        </strong>
+
+        <div class="dot"></div>
+
+      </div>
+
+
+
+      <!-- WEST -->
+
+      <div
+        class="direction west"
+        data-index="3"
+      >
+
+        <strong>
+          Avancer
+        </strong>
+
+        <div class="dot"></div>
+
+      </div>
+
+
+
+      <!-- NEEDLE -->
+
+      <div
+        class="needle-layer"
+        id="needle"
+      >
+
+        <div class="needle"></div>
+
+      </div>
+
+
+
+      <!-- CENTER -->
+
+      <div class="center">
+
+        <small>
+          Notre
+        </small>
+
+        <span>
+          décision
+        </span>
+
+      </div>
+
+
+      <div class="pivot"></div>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- QUESTION -->
+
+  <section
+    class="reflection"
+    id="reflection"
+  >
+
+    <div
+      class="axis-title"
+      id="axisTitle"
+    >
+      COMPRENDRE
+    </div>
+
+
+    <div
+      class="question"
+      id="question"
+    >
+      Qu’avons-nous compris de la situation aujourd’hui ?
+    </div>
+
+
+    <div
+      class="prompts"
+      id="prompts"
+    ></div>
+
+  </section>
+
+
+
+  <div class="hint">
+
+    <span>↻</span>
+
+    Touchez une direction ou faites tourner l’aiguille.
+
+  </div>
+
+
+  <footer>
+
+    La boussole ne donne pas la bonne direction.
+    Elle aide à éclairer la vôtre.
+
+  </footer>
+
+
+</main>
+
+
+
+<script>
+
+/* =========================================================
+   CONTENT + COLORS
+========================================================= */
+
+const axes = [
+
+  {
+    name:
+      "COMPRENDRE",
+
+    question:
+      "Qu’avons-nous compris de la situation aujourd’hui ?",
+
+    prompts:[
+      "Qu’est-ce que nous savons ?",
+      "Qu’est-ce qui reste flou ?",
+      "Que voudrions-nous mieux comprendre ?"
+    ],
+
+    accent:
+      "#438a73",
+
+    soft:
+      "#dceee7",
+
+    glow:
+      "rgba(67,138,115,.24)"
+  },
+
+
+  {
+    name:
+      "RESSENTIR",
+
+    question:
+      "Qu’est-ce que cette situation nous fait vivre aujourd’hui ?",
+
+    prompts:[
+      "Qu’est-ce qui nous inquiète ?",
+      "Quelles images avons-nous de la maladie ?",
+      "Qu’est-ce qui nous fait le plus hésiter ?"
+    ],
+
+    accent:
+      "#c16d61",
+
+    soft:
+      "#f4ded9",
+
+    glow:
+      "rgba(193,109,97,.24)"
+  },
+
+
+  {
+    name:
+      "CE QUI COMPTE",
+
+    question:
+      "Dans cette décision, qu’est-ce qui compte vraiment pour nous ?",
+
+    prompts:[
+      "Qu’est-ce qui compte pour notre enfant ?",
+      "Qu’est-ce qui compte pour notre famille ?",
+      "Qu’aimerions-nous préserver avant tout ?"
+    ],
+
+    accent:
+      "#a78336",
+
+    soft:
+      "#f2e8c9",
+
+    glow:
+      "rgba(167,131,54,.24)"
+  },
+
+
+  {
+    name:
+      "AVANCER",
+
+    question:
+      "De quoi aurions-nous besoin pour avancer dans notre réflexion ?",
+
+    prompts:[
+      "Avons-nous besoin d’une information ?",
+      "Avons-nous besoin de temps ?",
+      "Avec qui aurions-nous besoin d’en parler ?"
+    ],
+
+    accent:
+      "#6879a9",
+
+    soft:
+      "#e1e5f2",
+
+    glow:
+      "rgba(104,121,169,.24)"
+  }
+
+];
+
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const compass =
+  document.getElementById(
+    "compass"
+  );
+
+const needle =
+  document.getElementById(
+    "needle"
+  );
+
+const reflection =
+  document.getElementById(
+    "reflection"
+  );
+
+const axisTitle =
+  document.getElementById(
+    "axisTitle"
+  );
+
+const question =
+  document.getElementById(
+    "question"
+  );
+
+const prompts =
+  document.getElementById(
+    "prompts"
+  );
+
+const directions =
+  [
+    ...document.querySelectorAll(
+      ".direction"
+    )
+  ];
+
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let angle = 0;
+
+let dragging = false;
+
+let offset = 0;
+
+let current = -1;
+
+let animationId = null;
+
+
+
+/* =========================================================
+   POINTER ANGLE
+========================================================= */
+
+function pointerAngle(e){
+
+  const rect =
+    compass.getBoundingClientRect();
+
+  const cx =
+    rect.left +
+    rect.width / 2;
+
+  const cy =
+    rect.top +
+    rect.height / 2;
+
+  const dx =
+    e.clientX - cx;
+
+  const dy =
+    e.clientY - cy;
+
+  let a =
+    Math.atan2(
+      dx,
+      -dy
+    ) *
+    180 /
+    Math.PI;
+
+  if(a < 0){
+    a += 360;
+  }
+
+  return a;
+
+}
+
+
+
+/* =========================================================
+   ROTATION
+========================================================= */
+
+function setAngle(a){
+
+  angle =
+    ((a % 360) + 360) % 360;
+
+  needle.style.transform =
+    `rotate(${angle}deg)`;
+
+}
+
+
+
+function nearest(){
+
+  return (
+    Math.round(
+      angle / 90
+    ) % 4
+  );
+
+}
+
+
+
+/* =========================================================
+   VISUAL STATE
+========================================================= */
+
+function applyTheme(index){
+
+  const data =
+    axes[index];
+
+  document.documentElement
+    .style
+    .setProperty(
+      "--accent",
+      data.accent
+    );
+
+  document.documentElement
+    .style
+    .setProperty(
+      "--accent-soft",
+      data.soft
+    );
+
+  document.documentElement
+    .style
+    .setProperty(
+      "--accent-glow",
+      data.glow
+    );
+
+}
+
+
+
+function highlight(index){
+
+  directions.forEach(
+    (item,i) => {
+
+      item.classList.toggle(
+        "active",
+        i === index
+      );
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+function show(index){
+
+  if(index === current){
+    highlight(index);
+    applyTheme(index);
+    return;
+  }
+
+  current = index;
+
+  const data =
+    axes[index];
+
+  reflection.classList.add(
+    "fade"
+  );
+
+  applyTheme(index);
+
+  highlight(index);
+
+
+  setTimeout(() => {
+
+    axisTitle.textContent =
+      data.name;
+
+    question.textContent =
+      data.question;
+
+
+    prompts.innerHTML =
+      data.prompts
+        .map(
+          item =>
+            `<div class="prompt">
+              ${item}
+            </div>`
+        )
+        .join("");
+
+
+    reflection.classList.remove(
+      "fade"
+    );
+
+  },140);
+
+}
+
+
+
+/* =========================================================
+   DRAG
+========================================================= */
+
+compass.addEventListener(
+  "pointerdown",
+  e => {
+
+    dragging = true;
+
+    cancelAnimationFrame(
+      animationId
+    );
+
+    compass.setPointerCapture(
+      e.pointerId
+    );
+
+    offset =
+      pointerAngle(e) -
+      angle;
+
+  }
+);
+
+
+
+compass.addEventListener(
+  "pointermove",
+  e => {
+
+    if(!dragging){
+      return;
+    }
+
+    setAngle(
+      pointerAngle(e) -
+      offset
+    );
+
+    const index =
+      nearest();
+
+    highlight(index);
+    applyTheme(index);
+
+  }
+);
+
+
+
+compass.addEventListener(
+  "pointerup",
+  e => {
+
+    if(!dragging){
+      return;
+    }
+
+    dragging = false;
+
+    try{
+
+      compass.releasePointerCapture(
+        e.pointerId
+      );
+
+    }catch{}
+
+    snap();
+
+  }
+);
+
+
+
+compass.addEventListener(
+  "pointercancel",
+  () => {
+
+    dragging = false;
+
+    snap();
+
+  }
+);
+
+
+
+/* =========================================================
+   SNAP
+========================================================= */
+
+function snap(){
+
+  const index =
+    nearest();
+
+  animateTo(
+    index * 90,
+    () => show(index)
+  );
+
+}
+
+
+
+/* =========================================================
+   ANIMATE NEEDLE
+========================================================= */
+
+function animateTo(
+  target,
+  callback
+){
+
+  cancelAnimationFrame(
+    animationId
+  );
+
+  const from =
+    angle;
+
+  let difference =
+    target - from;
+
+
+  if(difference > 180){
+    difference -= 360;
+  }
+
+  if(difference < -180){
+    difference += 360;
+  }
+
+
+  const start =
+    performance.now();
+
+  const duration =
+    430;
+
+
+  function frame(now){
+
+    const p =
+      Math.min(
+        1,
+        (now-start) /
+        duration
+      );
+
+
+    const ease =
+      1 -
+      Math.pow(
+        1-p,
+        4
+      );
+
+
+    setAngle(
+      from +
+      difference *
+      ease
+    );
+
+
+    if(p < 1){
+
+      animationId =
+        requestAnimationFrame(
+          frame
+        );
+
+    }else{
+
+      setAngle(target);
+
+      if(callback){
+        callback();
+      }
+
+    }
+
+  }
+
+
+  animationId =
+    requestAnimationFrame(
+      frame
+    );
+
+}
+
+
+
+/* =========================================================
+   TAP DIRECTIONS
+========================================================= */
+
+directions.forEach(
+  (item,index) => {
+
+    item.addEventListener(
+      "pointerdown",
+      e => {
+
+        e.stopPropagation();
+
+      }
+    );
+
+
+    item.addEventListener(
+      "click",
+      () => {
+
+        animateTo(
+          index * 90,
+          () => show(index)
+        );
+
+      }
+    );
+
+  }
+);
+
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+setAngle(0);
+
+show(0);
+
+</script>
+
+</body>
+</html>
