@@ -1,1 +1,1219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F6F3E8">
+<title>Jardinier EM</title>
 
+<style>
+:root{
+  --bg:#F6F3E8;
+  --card:#FFFDF7;
+  --ink:#26352A;
+  --muted:#6D786F;
+  --green:#54764A;
+  --green2:#789A68;
+  --soft:#E4EAD9;
+  --line:#D8DCCF;
+  --accent:#D6A83E;
+  --shadow:0 10px 30px rgba(44,61,45,.10);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(circle at top right,#E8F0DC 0,transparent 30%),
+    var(--bg);
+  color:var(--ink);
+}
+
+button,input{font:inherit}
+
+.app{
+  width:min(680px,100%);
+  margin:auto;
+  min-height:100vh;
+  padding:22px 18px 90px;
+}
+
+/* HEADER */
+
+header{
+  margin-bottom:24px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.logo{
+  width:50px;
+  height:50px;
+  border-radius:16px;
+  background:var(--green);
+  display:grid;
+  place-items:center;
+  font-size:27px;
+  box-shadow:var(--shadow);
+}
+
+h1{
+  font-size:24px;
+  margin:0;
+  line-height:1.05;
+}
+
+.subtitle{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+/* PROGRESS */
+
+.progress-wrap{
+  margin:26px 0;
+}
+
+.progress{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  position:relative;
+}
+
+.progress:before{
+  content:"";
+  position:absolute;
+  height:5px;
+  left:12%;
+  right:12%;
+  top:23px;
+  background:#D8DDCF;
+  border-radius:10px;
+}
+
+.progress-fill{
+  position:absolute;
+  height:5px;
+  left:12%;
+  top:23px;
+  background:var(--green2);
+  border-radius:10px;
+  transition:width .7s ease;
+}
+
+.step{
+  z-index:1;
+  text-align:center;
+}
+
+.step .bubble{
+  width:50px;
+  height:50px;
+  margin:auto;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  background:#E2E3DC;
+  border:4px solid var(--bg);
+  filter:grayscale(1);
+  transition:.35s;
+}
+
+.step.active .bubble{
+  background:#DDEACF;
+  filter:none;
+  transform:scale(1.08);
+}
+
+.step.current .bubble{
+  box-shadow:0 0 0 5px rgba(84,118,74,.13);
+}
+
+.step small{
+  display:block;
+  margin-top:7px;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.4px;
+  color:#92988F;
+}
+
+.step.active small{color:var(--green)}
+
+/* CARDS */
+
+.card{
+  background:rgba(255,253,247,.95);
+  border:1px solid rgba(70,90,65,.08);
+  border-radius:24px;
+  padding:22px;
+  box-shadow:var(--shadow);
+  margin-bottom:16px;
+}
+
+.eyebrow{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--green);
+  font-weight:900;
+}
+
+h2{
+  margin:7px 0 5px;
+  font-size:27px;
+  line-height:1.1;
+}
+
+.casequote{
+  font-family:Georgia,serif;
+  font-size:18px;
+  font-style:italic;
+  color:#58645B;
+  margin:12px 0 18px;
+}
+
+.challenge{
+  padding:14px 16px;
+  background:#EEF2E8;
+  border-radius:16px;
+  line-height:1.4;
+  font-weight:650;
+}
+
+/* BUTTONS */
+
+.roles{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin:18px 0;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.role-btn{
+  padding:13px 5px;
+  border-radius:14px;
+  background:#EEEFE9;
+  color:var(--ink);
+  font-weight:750;
+}
+
+.role-btn.active{
+  color:white;
+  background:var(--green);
+}
+
+.primary{
+  width:100%;
+  padding:15px;
+  border-radius:16px;
+  background:var(--green);
+  color:white;
+  font-weight:800;
+}
+
+.secondary{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  background:#EEF0E8;
+  color:var(--ink);
+  font-weight:750;
+  margin-top:8px;
+}
+
+/* ROLE CONTENT */
+
+.role-content{
+  display:none;
+  animation:appear .35s ease;
+}
+
+.role-content.show{display:block}
+
+.role-title{
+  font-size:18px;
+  font-weight:850;
+  margin-bottom:10px;
+}
+
+.role-content p,
+.role-content li{
+  line-height:1.55;
+}
+
+.role-content ul{
+  padding-left:21px;
+}
+
+.rule{
+  margin-top:15px;
+  padding:14px;
+  border-left:4px solid var(--accent);
+  background:#FAF4DE;
+  border-radius:4px 14px 14px 4px;
+}
+
+/* TIMER */
+
+.timerbox{
+  text-align:center;
+}
+
+.timer{
+  font-size:55px;
+  font-weight:300;
+  font-variant-numeric:tabular-nums;
+  margin:8px 0 16px;
+}
+
+.timer-controls{
+  display:flex;
+  gap:8px;
+}
+
+.timer-controls button{
+  flex:1;
+  padding:12px;
+  border-radius:14px;
+  background:#EEF0E8;
+  font-weight:750;
+}
+
+/* DEBRIEF */
+
+.question{
+  border-bottom:1px solid var(--line);
+  padding:13px 0;
+  line-height:1.4;
+}
+
+.question:last-child{border:0}
+
+/* UNLOCK */
+
+.unlock{
+  text-align:center;
+}
+
+.unlock input{
+  width:100%;
+  text-align:center;
+  text-transform:uppercase;
+  letter-spacing:3px;
+  padding:15px;
+  border:2px solid #D9DDCF;
+  border-radius:15px;
+  background:white;
+  outline:none;
+  margin:12px 0 8px;
+}
+
+.unlock input:focus{border-color:var(--green2)}
+
+.hint{
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* LOCKED */
+
+.locked{
+  text-align:center;
+  color:var(--muted);
+  padding:35px 20px;
+}
+
+.lock{
+  font-size:38px;
+  margin-bottom:8px;
+}
+
+/* CELEBRATION */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(246,243,232,.94);
+  backdrop-filter:blur(7px);
+  z-index:50;
+  display:none;
+  place-items:center;
+  padding:25px;
+}
+
+.overlay.show{
+  display:grid;
+}
+
+.celebrate{
+  text-align:center;
+  max-width:420px;
+  animation:pop .55s cubic-bezier(.2,1.4,.5,1);
+}
+
+.big-plant{
+  font-size:85px;
+  animation:grow 1.2s ease;
+}
+
+.celebrate h2{
+  font-size:31px;
+  margin:15px 0 8px;
+}
+
+.celebrate p{
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.5;
+}
+
+.particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.particle{
+  position:absolute;
+  font-size:22px;
+  animation:fall 2.2s linear forwards;
+}
+
+/* FINAL */
+
+.harvest{
+  text-align:center;
+}
+
+.harvest-icon{
+  font-size:70px;
+}
+
+.quote-final{
+  font-family:Georgia,serif;
+  font-style:italic;
+  font-size:20px;
+  line-height:1.5;
+  margin:18px 0;
+}
+
+/* ANIMATIONS */
+
+@keyframes appear{
+  from{opacity:0;transform:translateY(7px)}
+  to{opacity:1;transform:none}
+}
+
+@keyframes pop{
+  from{opacity:0;transform:scale(.65)}
+  to{opacity:1;transform:scale(1)}
+}
+
+@keyframes grow{
+  0%{transform:scale(.25) translateY(80px)}
+  65%{transform:scale(1.12)}
+  100%{transform:scale(1)}
+}
+
+@keyframes fall{
+  0%{transform:translateY(-10vh) rotate(0);opacity:1}
+  100%{transform:translateY(110vh) rotate(300deg);opacity:0}
+}
+
+.fade{
+  animation:appear .45s ease;
+}
+
+.reset{
+  margin-top:35px;
+  text-align:center;
+  font-size:12px;
+  color:#9A9E96;
+  cursor:pointer;
+}
+
+@media(max-width:420px){
+  .app{padding:17px 13px 80px}
+  .card{padding:18px}
+  h2{font-size:24px}
+  .roles{gap:5px}
+  .role-btn{font-size:12px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <div class="brand">
+    <div class="logo">🌱</div>
+    <div>
+      <h1>Jardinier EM</h1>
+      <p class="subtitle">Cultiver la motivation au changement</p>
+    </div>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress">
+    <div class="progress-fill" id="progressFill"></div>
+
+    <div class="step" id="p0">
+      <div class="bubble">🌰</div>
+      <small>ENGAGER</small>
+    </div>
+
+    <div class="step" id="p1">
+      <div class="bubble">🌧️</div>
+      <small>FOCALISER</small>
+    </div>
+
+    <div class="step" id="p2">
+      <div class="bubble">☀️</div>
+      <small>ÉVOQUER</small>
+    </div>
+
+    <div class="step" id="p3">
+      <div class="bubble">🌻</div>
+      <small>PLANIFIER</small>
+    </div>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<div class="reset" onclick="resetApp()">
+  Réinitialiser la progression
+</div>
+
+</div>
+
+<!-- CELEBRATION -->
+<div class="overlay" id="overlay">
+  <div class="particles" id="particles"></div>
+
+  <div class="celebrate">
+    <div class="big-plant" id="celebrateIcon">🌱</div>
+    <div class="eyebrow">Bravo, soignant jardinier !</div>
+    <h2 id="celebrateTitle"></h2>
+    <p id="celebrateText"></p>
+    <button class="primary" onclick="closeCelebration()">
+      Découvrir la suite
+    </button>
+  </div>
+</div>
+
+<script>
+
+/* ===============================
+   DONNÉES
+================================ */
+
+const sequences = [
+
+{
+ icon:"🌰",
+ process:"ENGAGER",
+ garden:"Ensemencer",
+ patient:"M. Chêne",
+ quote:"« Je ne me sens pas malade. »",
+ challenge:"Créer une relation qui donne envie de parler… sans chercher à convaincre.",
+
+ situation:`
+ <p><strong>M. Chêne, 75 ans</strong>, vit avec un diabète de type 2 ancien et déséquilibré.</p>
+ <p>Il présente plusieurs complications mais se sent globalement bien. Il vit seul, voit régulièrement ses enfants et petits-enfants et tient à ses habitudes.</p>
+ `,
+
+ caregiver:`
+ <div class="role-title">👩‍⚕️ Vous êtes le soignant</div>
+ <p>Ses résultats vous préoccupent.</p>
+ <p>Vous aimeriez qu'il surveille davantage ses glycémies, utilise mieux son protocole et modifie certaines habitudes.</p>
+ <div class="rule">
+ <strong>Votre mission</strong><br>
+ Menez l'entretien comme vous le feriez spontanément.<br><br>
+ Vous n'avez pas à obtenir un changement : cherchez d'abord à <strong>comprendre M. Chêne.</strong>
+ </div>`,
+
+ patientRole:`
+ <div class="role-title">👤 Vous êtes M. Chêne</div>
+ <p>Vous vous sentez globalement bien et ne voulez pas que le diabète transforme votre vie en vie de « malade ».</p>
+ <p>Vous tenez à vos habitudes.</p>
+ <div class="rule">
+ Si vous vous sentez écouté, développez ce qui compte pour vous.<br><br>
+ Si le soignant insiste ou argumente, défendez naturellement votre manière de vivre.
+ </div>`,
+
+ observer:`
+ <div class="role-title">👀 Vous êtes observateur</div>
+ <p>Tracez mentalement deux colonnes :</p>
+ <p>🟢 <strong>ÇA OUVRE</strong><br>
+ Ce qui fait raconter, réfléchir, développer.</p>
+ <p>🔴 <strong>ÇA FERME</strong><br>
+ Ce qui fait justifier, défendre ou se retirer.</p>
+ <div class="rule">Notez si possible les <strong>mots exacts</strong> du soignant et du patient.</div>`,
+
+ debrief:[
+ "Quand le patient s'est-il senti réellement écouté ?",
+ "À quel moment a-t-il eu envie de se défendre ?",
+ "Quand le soignant a-t-il eu envie de corriger ou convaincre ?",
+ "Quelle intervention a le plus ouvert l'entretien ?"
+ ],
+
+ gardener:"On ne fait pas pousser une plante en tirant dessus."
+},
+
+{
+ icon:"🌧️",
+ process:"FOCALISER",
+ garden:"Arroser juste",
+ patient:"Mme Lavande",
+ quote:"« Mon mari passe avant moi. »",
+ challenge:"Choisir ensemble ce qui mérite d'être travaillé.",
+
+ situation:`
+ <p><strong>Mme Lavande, 79 ans</strong>, vit avec un diabète de type 2 depuis 26 ans.</p>
+ <p>Son HbA1c est à 8,65 %. Une insulinothérapie rapide aux repas lui a été proposée.</p>
+ <p>Elle est très fatiguée et s'occupe quotidiennement de son mari dépendant après un AVC.</p>
+ `,
+
+ caregiver:`
+ <div class="role-title">👩‍⚕️ Vous êtes le soignant</div>
+ <p>Plusieurs sujets sont possibles : glycémies, insuline, alimentation, fatigue, surveillance, charge d'aidante…</p>
+ <div class="rule">
+ <strong>Votre mission :</strong><br>
+ déterminer <strong>avec Mme Lavande</strong> ce qu'il serait utile de travailler aujourd'hui.<br><br>
+ 🚫 Vous n'avez pas à lui faire accepter l'insuline rapide.
+ </div>`,
+
+ patientRole:`
+ <div class="role-title">👤 Vous êtes Mme Lavande</div>
+ <p>Vous savez que votre diabète n'est pas bien équilibré.</p>
+ <p>Mais vous avez beaucoup à gérer et ne voulez pas ajouter trois injections quotidiennes.</p>
+ <p>Vous avez l'impression que les professionnels ne voient pas toujours les efforts que vous faites déjà.</p>
+ <div class="rule">
+ Si le soignant cherche réellement à comprendre vos priorités, acceptez progressivement de réfléchir avec lui.
+ </div>`,
+
+ observer:`
+ <div class="role-title">👀 Vous êtes observateur</div>
+ <p>Repérez :</p>
+ <p>👩‍⚕️ <strong>L'agenda du soignant</strong></p>
+ <p>👤 <strong>L'agenda de la patiente</strong></p>
+ <p>🤝 <strong>L'agenda partagé</strong></p>
+ <div class="rule">
+ Notez la phrase précise qui permet éventuellement de passer à une direction commune.
+ </div>`,
+
+ debrief:[
+ "Quels étaient les différents sujets possibles ?",
+ "Quel était l'agenda du professionnel ?",
+ "Quel était celui de Mme Lavande ?",
+ "À quel moment une direction commune est-elle apparue ?",
+ "Qui a finalement choisi ce qui allait être travaillé ?"
+ ],
+
+ gardener:"On ne peut pas tout arroser en même temps."
+},
+
+{
+ icon:"☀️",
+ process:"ÉVOQUER",
+ garden:"Aider à pousser",
+ patient:"M. Romarin",
+ quote:"« Avec ma pompe… mais sans elle… »",
+ challenge:"Faire émerger ses raisons de changer plutôt que lui donner les vôtres.",
+
+ situation:`
+ <p><strong>M. Romarin, 20 ans</strong>, présente un diabète associé à une mucoviscidose et utilise une pompe.</p>
+ <p>Ses résultats s'améliorent lorsqu'il porte régulièrement son dispositif, mais il le retire régulièrement, notamment l'été.</p>
+ <p>Le sport, sa vie affective, son permis, l'emploi et son autonomie sont importants pour lui.</p>
+ `,
+
+ caregiver:`
+ <div class="role-title">👩‍⚕️ Vous êtes le soignant</div>
+ <p>Vous connaissez parfaitement les arguments médicaux en faveur du port de la pompe.</p>
+ <div class="rule">
+ <strong>Votre mission :</strong><br>
+ découvrir <strong>SES</strong> raisons éventuelles de faire évoluer la situation.<br><br>
+ 🚫 Pendant les premières minutes, interdiction d'utiliser vos arguments médicaux pour convaincre.
+ </div>`,
+
+ patientRole:`
+ <div class="role-title">👤 Vous êtes M. Romarin</div>
+ <p>Vous êtes réellement partagé.</p>
+ <p><strong>Sans pompe :</strong> liberté, sport plus simple, sentiment d'être comme les autres.</p>
+ <p><strong>Avec pompe :</strong> meilleurs résultats et bénéfices pour votre santé future.</p>
+ <div class="rule">
+ Ne donnez pas immédiatement toutes vos raisons de changer. Elles apparaissent si les interventions du soignant vous amènent réellement à y réfléchir.
+ </div>`,
+
+ observer:`
+ <div class="role-title">👀 Vous êtes chasseur de pousses</div>
+ <p>🍂 Repérez le <strong>discours-maintien</strong>.</p>
+ <p>🌱 Repérez le <strong>discours-changement</strong>.</p>
+ <p>Puis cherchez :</p>
+ <p><strong>D</strong>ésir • <strong>C</strong>apacité • <strong>R</strong>aisons • <strong>B</strong>esoin</p>
+ <div class="rule">
+ À chaque « pousse », demandez-vous : <strong>qu'a dit le soignant juste avant ?</strong>
+ </div>`,
+
+ debrief:[
+ "Quelles étaient les deux faces de l'ambivalence ?",
+ "Quels discours-maintien avez-vous entendus ?",
+ "Quels discours-changement avez-vous entendus ?",
+ "Qu'est-ce qui a permis à une « pousse » d'apparaître ?",
+ "Le soignant a-t-il essayé de faire pencher lui-même la balance ?"
+ ],
+
+ gardener:"Repérer les jeunes pousses et nourrir ce qui pousse."
+},
+
+{
+ icon:"🌻",
+ process:"PLANIFIER",
+ garden:"Aider à fleurir",
+ patient:"Mme Capucine",
+ quote:"« Je pourrais peut-être essayer autrement… »",
+ challenge:"Ne planifier ni trop tôt, ni à la place du patient.",
+
+ situation:`
+ <p><strong>Mme Capucine</strong> présente un diabète de type 1 et utilise une pompe automatisée.</p>
+ <p>Elle diminue régulièrement les doses proposées et réalise parfois ses bolus tardivement.</p>
+ <p>Elle a vécu autrefois une hypoglycémie sévère mais affirme ne pas avoir peur des hypoglycémies.</p>
+ `,
+
+ caregiver:`
+ <div class="role-title">👩‍⚕️ Vous êtes le soignant</div>
+ <p>Attention : vous ne savez pas pourquoi Mme Capucine diminue ses doses.</p>
+ <p>🌰 Engagez<br>🌧️ Focalisez<br>☀️ Évoquez</p>
+ <div class="rule">
+ 🌻 <strong>Ne planifiez que si son discours montre qu'elle est prête.</strong><br><br>
+ Si elle ne l'est pas, vous n'avez pas à aboutir à un plan.
+ </div>`,
+
+ patientRole:`
+ <div class="role-title">👤 Vous êtes Mme Capucine</div>
+ <p>Vous avez une longue expérience de votre diabète.</p>
+ <p>Vous n'aimez pas que l'on vous explique trop rapidement ce que vous ressentez.</p>
+ <div class="rule">
+ Si vous vous sentez comprise, vous pouvez progressivement dire :<br><br>
+ « Je pourrais peut-être… »<br><br>
+ puis, si le projet devient réellement le vôtre :<br><br>
+ <strong>« Je vais essayer… »</strong>
+ </div>`,
+
+ observer:`
+ <div class="role-title">👀 Vous êtes observateur</div>
+ <p>Repérez <strong>la bascule</strong>.</p>
+ <p>🌱 <strong>DCRB</strong><br>
+ J'aimerais… Je pourrais… Ce serait important…</p>
+ <p>🌻 <strong>Discours mobilisateur</strong><br>
+ Je vais… Je suis prêt à… J'ai commencé…</p>
+ <div class="rule">
+ À quel moment devient-il légitime de commencer à planifier ?
+ </div>`,
+
+ debrief:[
+ "À quel moment l'idée semblait-elle vraiment appartenir à Mme Capucine ?",
+ "Quel élément de son discours indiquait une disponibilité ?",
+ "Le soignant a-t-il proposé une solution trop tôt ?",
+ "Avez-vous repéré une bascule DCRB → mobilisation ?",
+ "Le premier pas est-il choisi, réaliste et suffisamment petit ?"
+ ],
+
+ gardener:"On n'ouvre pas une fleur avec les doigts."
+}
+
+];
+
+const codes=["GRAINE","PLUIE","SOLEIL","FLEUR"];
+
+const celebrations=[
+ {
+  icon:"🌧️",
+  title:"Votre graine est plantée.",
+  text:"Bravo ! Vous avez appris à préparer le terrain sans tirer sur la plante. Il est temps d'apprendre à arroser juste."
+ },
+ {
+  icon:"☀️",
+  title:"Votre jardin prend vie.",
+  text:"Bravo ! Vous savez maintenant choisir avec le patient ce qui mérite votre attention. Faisons émerger les premières pousses."
+ },
+ {
+  icon:"🌻",
+  title:"Ça pousse !",
+  text:"Bravo ! Vous avez appris à repérer et nourrir le discours-changement. Il reste à accompagner la floraison."
+ },
+ {
+  icon:"🌰🌰🌰",
+  title:"Belle récolte !",
+  text:"Bravo, soignants jardiniers ! Vous avez parcouru les quatre processus. Chaque expérience peut maintenant produire de nouvelles graines de compétences."
+ }
+];
+
+/* ===============================
+   STATE
+================================ */
+
+let unlocked=parseInt(localStorage.getItem("jardinierUnlocked")||"0");
+let current=Math.min(unlocked,3);
+let timerSeconds=600;
+let timerInterval=null;
+
+/* ===============================
+   RENDER
+================================ */
+
+function render(){
+
+ updateProgress();
+
+ if(unlocked>3){
+   renderHarvest();
+   return;
+ }
+
+ const s=sequences[current];
+
+ document.getElementById("main").innerHTML=`
+ <section class="card fade">
+
+   <div class="eyebrow">
+     ${s.icon} Séquence ${current+1} · ${s.process}
+   </div>
+
+   <h2>${s.garden}</h2>
+
+   <div class="casequote">
+     ${s.patient} — ${s.quote}
+   </div>
+
+   <div class="challenge">
+     🎯 ${s.challenge}
+   </div>
+
+ </section>
+
+ <section class="card">
+   <div class="eyebrow">Situation</div>
+   ${s.situation}
+ </section>
+
+ <section class="card">
+
+   <div class="eyebrow">Choisissez votre rôle</div>
+
+   <div class="roles">
+     <button class="role-btn" onclick="showRole('caregiver',this)">
+       👩‍⚕️<br>Soignant
+     </button>
+
+     <button class="role-btn" onclick="showRole('patient',this)">
+       👤<br>Patient
+     </button>
+
+     <button class="role-btn" onclick="showRole('observer',this)">
+       👀<br>Observateur
+     </button>
+   </div>
+
+   <div id="caregiver" class="role-content">
+     ${s.caregiver}
+   </div>
+
+   <div id="patient" class="role-content">
+     ${s.patientRole}
+   </div>
+
+   <div id="observer" class="role-content">
+     ${s.observer}
+   </div>
+
+ </section>
+
+ <section class="card timerbox">
+   <div class="eyebrow">Expérimentation</div>
+   <div class="timer" id="timer">10:00</div>
+
+   <div class="timer-controls">
+     <button onclick="startTimer()">▶ Démarrer</button>
+     <button onclick="pauseTimer()">Ⅱ Pause</button>
+     <button onclick="resetTimer()">↺</button>
+   </div>
+ </section>
+
+ <section class="card">
+   <div class="eyebrow">Débrief</div>
+   <h2 style="font-size:22px">Qu'avez-vous observé ?</h2>
+
+   ${s.debrief.map(q=>`
+      <div class="question">${q}</div>
+   `).join("")}
+
+   <div class="rule">
+     🌿 <strong>Le geste du jardinier</strong><br>
+     ${s.gardener}
+   </div>
+ </section>
+
+ ${unlockBlock()}
+ `;
+
+ updateTimer();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function unlockBlock(){
+
+ const next=current+1;
+
+ if(next>=4){
+   return `
+   <section class="card unlock">
+     <div class="eyebrow">Fin de la dernière séquence</div>
+     <h2>Prêts pour la récolte ?</h2>
+     <p class="hint">Entrez le dernier code donné par le formateur.</p>
+
+     <input id="codeInput"
+       placeholder="CODE"
+       autocomplete="off">
+
+     <button class="primary" onclick="tryUnlock()">
+       Débloquer la récolte
+     </button>
+   </section>`;
+ }
+
+ return `
+ <section class="card unlock">
+   <div class="eyebrow">Prochaine étape</div>
+   <h2>Votre jardin peut-il continuer à pousser ?</h2>
+
+   <p class="hint">
+     Entrez le code donné par le formateur.
+   </p>
+
+   <input id="codeInput"
+     placeholder="CODE"
+     autocomplete="off"
+     onkeydown="if(event.key==='Enter')tryUnlock()">
+
+   <button class="primary" onclick="tryUnlock()">
+     Débloquer la suite
+   </button>
+ </section>`;
+}
+
+/* ===============================
+   ROLES
+================================ */
+
+function showRole(id,btn){
+
+ document.querySelectorAll(".role-content")
+   .forEach(x=>x.classList.remove("show"));
+
+ document.querySelectorAll(".role-btn")
+   .forEach(x=>x.classList.remove("active"));
+
+ document.getElementById(id).classList.add("show");
+ btn.classList.add("active");
+}
+
+/* ===============================
+   PROGRESS
+================================ */
+
+function updateProgress(){
+
+ for(let i=0;i<4;i++){
+   const p=document.getElementById("p"+i);
+   p.classList.toggle("active",i<=Math.min(unlocked,3));
+   p.classList.toggle("current",i===current && unlocked<=3);
+ }
+
+ const widths=["0%","25.3%","50.6%","76%","76%"];
+ document.getElementById("progressFill").style.width=
+   widths[Math.min(unlocked,4)];
+}
+
+/* ===============================
+   UNLOCK
+================================ */
+
+function tryUnlock(){
+
+ const input=document.getElementById("codeInput");
+ const value=input.value.trim().toUpperCase();
+
+ const expected=codes[current+1] || "FLEUR";
+
+ /*
+ Séquence 1 terminée → PLUIE
+ Séquence 2 terminée → SOLEIL
+ Séquence 3 terminée → FLEUR
+ Séquence 4 terminée → FLEUR
+ */
+
+ let correct;
+
+ if(current===0) correct="PLUIE";
+ if(current===1) correct="SOLEIL";
+ if(current===2) correct="FLEUR";
+ if(current===3) correct="FLEUR";
+
+ if(value!==correct){
+   input.style.borderColor="#B85D4E";
+   input.value="";
+   input.placeholder="Réessayez…";
+   return;
+ }
+
+ if(current===3){
+   unlocked=4;
+ }else{
+   unlocked=current+1;
+ }
+
+ localStorage.setItem("jardinierUnlocked",unlocked);
+
+ showCelebration(current);
+}
+
+/* ===============================
+   CELEBRATION
+================================ */
+
+function showCelebration(index){
+
+ const c=celebrations[index];
+
+ document.getElementById("celebrateIcon").textContent=c.icon;
+ document.getElementById("celebrateTitle").textContent=c.title;
+ document.getElementById("celebrateText").textContent=c.text;
+
+ makeParticles();
+
+ document.getElementById("overlay").classList.add("show");
+}
+
+function makeParticles(){
+
+ const box=document.getElementById("particles");
+ box.innerHTML="";
+
+ const symbols=["🌱","🍃","🌿","✨","🌰"];
+
+ for(let i=0;i<18;i++){
+
+   const e=document.createElement("div");
+   e.className="particle";
+
+   e.textContent=
+     symbols[Math.floor(Math.random()*symbols.length)];
+
+   e.style.left=Math.random()*100+"vw";
+   e.style.animationDelay=Math.random()*.8+"s";
+   e.style.fontSize=(16+Math.random()*18)+"px";
+
+   box.appendChild(e);
+ }
+}
+
+function closeCelebration(){
+
+ document.getElementById("overlay").classList.remove("show");
+
+ if(unlocked>=4){
+   renderHarvest();
+   return;
+ }
+
+ current=unlocked;
+ resetTimer();
+ render();
+}
+
+/* ===============================
+   TIMER
+================================ */
+
+function startTimer(){
+
+ if(timerInterval)return;
+
+ timerInterval=setInterval(()=>{
+
+   if(timerSeconds>0){
+     timerSeconds--;
+     updateTimer();
+   }else{
+     pauseTimer();
+     navigator.vibrate?.([150,80,150]);
+   }
+
+ },1000);
+}
+
+function pauseTimer(){
+ clearInterval(timerInterval);
+ timerInterval=null;
+}
+
+function resetTimer(){
+ pauseTimer();
+ timerSeconds=600;
+ updateTimer();
+}
+
+function updateTimer(){
+
+ const el=document.getElementById("timer");
+ if(!el)return;
+
+ const m=Math.floor(timerSeconds/60);
+ const s=timerSeconds%60;
+
+ el.textContent=
+   String(m).padStart(2,"0")+":"+
+   String(s).padStart(2,"0");
+}
+
+/* ===============================
+   HARVEST
+================================ */
+
+function renderHarvest(){
+
+ current=3;
+ updateProgress();
+
+ document.getElementById("main").innerHTML=`
+
+ <section class="card harvest fade">
+
+   <div class="harvest-icon">🌻</div>
+
+   <div class="eyebrow">
+     La récolte
+   </div>
+
+   <h2>Bravo,<br>soignants jardiniers !</h2>
+
+   <p>
+     Vous avez parcouru les quatre processus de
+     l'entretien motivationnel.
+   </p>
+
+ </section>
+
+ <section class="card">
+
+   <div class="question">
+     🌰 <strong>ENGAGER</strong><br>
+     Créer les conditions de la rencontre.
+   </div>
+
+   <div class="question">
+     🌧️ <strong>FOCALISER</strong><br>
+     Choisir ensemble ce qui mérite notre attention.
+   </div>
+
+   <div class="question">
+     ☀️ <strong>ÉVOQUER</strong><br>
+     Faire émerger et renforcer la motivation propre du patient.
+   </div>
+
+   <div class="question">
+     🌻 <strong>PLANIFIER</strong><br>
+     Accompagner une action choisie et réaliste.
+   </div>
+
+ </section>
+
+ <section class="card harvest">
+
+   <div style="font-size:55px">
+     🌻 → 🌰 🌰 🌰
+   </div>
+
+   <div class="quote-final">
+     « La récolte, ce sont aussi les compétences
+     acquises pour les changements futurs. »
+   </div>
+
+   <p>
+     Chaque expérience peut produire de nouvelles
+     <strong>graines de compétences.</strong>
+   </p>
+
+ </section>
+
+ <section class="card harvest">
+
+   <div style="font-size:58px">🧑‍🌾</div>
+
+   <h2>Le renversement final</h2>
+
+   <p>
+     Le soignant ne cultive pas la motivation
+     à la place du patient.
+   </p>
+
+   <div class="challenge">
+     Il crée les conditions qui lui permettent
+     de germer, pousser et fleurir.
+   </div>
+
+   <p class="quote-final">
+     Le patient devient progressivement
+     jardinier de sa propre motivation.
+   </p>
+
+ </section>
+ `;
+
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ===============================
+   RESET
+================================ */
+
+function resetApp(){
+
+ if(!confirm("Réinitialiser toute la progression ?"))return;
+
+ localStorage.removeItem("jardinierUnlocked");
+
+ unlocked=0;
+ current=0;
+ resetTimer();
+ render();
+}
+
+/* START */
+
+render();
+
+</script>
+</body>
+</html>
