@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hypno•° Tempo•°</title>
+
+<style>
+:root{
+  --bg:#f5f3ee;
+  --card:#fff;
+  --ink:#252722;
+  --muted:#77796f;
+  --line:#deddd5;
+  --accent:#566c5c;
+  --soft:#e7ece7;
+  --radius:22px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button{font:inherit}
+.app{
+  width:min(900px,100%);
+  margin:auto;
+  padding:24px 16px 70px;
+}
+.eyebrow{
+  font-size:12px;
+  letter-spacing:.18em;
+  color:var(--muted);
+  font-weight:800;
+}
+h1{
+  margin:7px 0 5px;
+  font-size:clamp(29px,7vw,48px);
+  letter-spacing:-.04em;
+}
+.subtitle{
+  margin:0;
+  color:var(--muted);
+  font-size:17px;
+}
+.question{
+  margin:32px 0 14px;
+  font-size:20px;
+  font-weight:750;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.card{
+  border:1px solid var(--line);
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:18px;
+}
+.choice{
+  width:100%;
+  min-height:140px;
+  text-align:left;
+  cursor:pointer;
+  transition:.18s;
+}
+.choice:hover{transform:translateY(-2px)}
+.choice.active{
+  background:var(--soft);
+  border-color:var(--accent);
+}
+.icon{font-size:34px}
+.choice strong{
+  display:block;
+  margin-top:12px;
+  font-size:17px;
+}
+.choice small{
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  line-height:1.35;
+}
+.panel{
+  margin-top:18px;
+  display:none;
+}
+.panel.show{display:block}
+.step{
+  font-size:11px;
+  letter-spacing:.14em;
+  font-weight:800;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:12px;
+}
+.pill{
+  border:1px solid var(--line);
+  background:white;
+  border-radius:999px;
+  padding:11px 15px;
+  cursor:pointer;
+}
+.pill.active{
+  background:var(--accent);
+  color:white;
+  border-color:var(--accent);
+}
+.metaGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin-top:12px;
+}
+.meta{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  text-align:left;
+  cursor:pointer;
+}
+.meta:hover{background:var(--soft)}
+.meta .mi{font-size:28px}
+.meta strong{
+  display:block;
+  margin-top:6px;
+}
+.result{
+  margin-top:22px;
+  display:none;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:26px;
+  overflow:hidden;
+}
+.result.show{display:block}
+.resultHead{
+  padding:22px;
+  background:var(--soft);
+}
+.resultHead .big{font-size:42px}
+.resultHead h2{
+  margin:5px 0;
+  font-size:27px;
+}
+.resultBody{padding:22px}
+.label{
+  font-size:11px;
+  letter-spacing:.12em;
+  font-weight:850;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.block{margin-bottom:22px}
+.quote{
+  padding:18px;
+  border-left:4px solid var(--accent);
+  background:#fafaf7;
+  border-radius:0 16px 16px 0;
+  font-size:18px;
+  line-height:1.55;
+}
+.techs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.tech{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:7px 11px;
+  font-size:13px;
+}
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.action{
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+  font-weight:700;
+}
+.action.secondary{
+  background:white;
+  color:var(--ink);
+  border:1px solid var(--line);
+}
+.secure{
+  margin-top:20px;
+  border:1px dashed var(--accent);
+  border-radius:18px;
+  padding:16px;
+}
+.secure strong{display:block;margin-bottom:5px}
+.help{
+  margin-top:24px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.5;
+}
+@media(max-width:600px){
+  .app{padding-top:18px}
+  .choice{min-height:125px}
+  .metaGrid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+
+<body>
+<main class="app">
+
+  <div class="eyebrow">HYPNO•° TEMPO•°</div>
+  <h1>Voyager dans le temps</h1>
+  <p class="subtitle">
+    Une machine pédagogique pour apprendre à faire jouer le patient avec son temps vécu.
+  </p>
+
+  <div class="question">Que veux-tu lui faire expérimenter ?</div>
+
+  <div class="grid" id="families">
+
+    <button class="card choice" data-family="distordre">
+      <div class="icon">⏱️</div>
+      <strong>DÉFORMER</strong>
+      <small>Découvrir que le temps vécu peut changer de vitesse.</small>
+    </button>
+
+    <button class="card choice" data-family="avant">
+      <div class="icon">↩️</div>
+      <strong>VOYAGER AVANT</strong>
+      <small>Explorer ce qui précède sans nécessairement y rester.</small>
+    </button>
+
+    <button class="card choice" data-family="apres">
+      <div class="icon">🔭</div>
+      <strong>VOYAGER APRÈS</strong>
+      <small>Explorer ce qui pourrait venir.</small>
+    </button>
+
+    <button class="card choice" data-family="relier">
+      <div class="icon">🧵</div>
+      <strong>RELIER</strong>
+      <small>Faire communiquer plusieurs moments de soi.</small>
+    </button>
+
+  </div>
+
+  <section class="card panel" id="missionPanel">
+    <div class="step">ÉTAPE 2 · MISSION</div>
+    <h2 id="missionTitle">Que veux-tu faire pendant ce voyage ?</h2>
+    <div class="pills" id="missions"></div>
+  </section>
+
+  <section class="card panel" id="metaPanel">
+    <div class="step">ÉTAPE 3 · MÉTAPHORE</div>
+    <h2>Avec quel véhicule imaginaire ?</h2>
+    <p style="color:var(--muted)">
+      La métaphore influence la manière dont le patient expérimente le temps.
+    </p>
+    <div class="metaGrid" id="metaphors"></div>
+  </section>
+
+  <section class="result" id="result">
+
+    <div class="resultHead">
+      <div class="big" id="resultIcon">🌊</div>
+      <div class="step">TA PARTITION TEMPO•°</div>
+      <h2 id="resultName"></h2>
+      <div id="resultMission"></div>
+    </div>
+
+    <div class="resultBody">
+
+      <div class="block">
+        <div class="label">🎯 APPRENTISSAGE TEMPOREL</div>
+        <div id="learning"></div>
+      </div>
+
+      <div class="block">
+        <div class="label">🧠 CE QUE TU CHERCHES À FAIRE VIVRE</div>
+        <div id="experience"></div>
+      </div>
+
+      <div class="block">
+        <div class="label">💬 FORMULATION INSPIRANTE</div>
+        <div class="quote" id="phrase"></div>
+      </div>
+
+      <div class="block">
+        <div class="label">❓ RELANCE POSSIBLE</div>
+        <div id="question"></div>
+      </div>
+
+      <div class="block">
+        <div class="label">🌀 TECHNIQUES ASSOCIÉES</div>
+        <div class="techs" id="techniques"></div>
+      </div>
+
+      <div class="block">
+        <div class="label">🏠 ET POUR REVENIR ?</div>
+        <div id="returnText"></div>
+      </div>
+
+      <div class="secure">
+        <strong>🪺 Temps sécure</strong>
+        Le patient peut-il voyager dans cette expérience tout en gardant
+        la possibilité de revenir ici, maintenant ?
+      </div>
+
+      <div class="actions" style="margin-top:20px">
+        <button class="action" id="anotherPhrase">🎲 Autre formulation</button>
+        <button class="action secondary" id="restart">↺ Nouveau voyage</button>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="help">
+    Support pédagogique : TEMPO•° aide à raisonner et à imaginer une expérience.
+    Il ne fournit pas un protocole clinique automatique.
+  </div>
+
+</main>
+
+<script>
+const DATA = {
+
+  distordre:{
+    missions:{
+      "🐢 Ralentir":{
+        learning:"Le temps vécu peut ralentir.",
+        experience:"Créer davantage d’espace subjectif entre les instants.",
+        techniques:[
+          "Distorsion temporelle",
+          "Focalisation",
+          "Absorption"
+        ],
+        metaphors:[
+          {
+            icon:"🎬",
+            name:"Le ralenti",
+            phrases:[
+              "Comme dans un film dont certaines images pourraient ralentir… juste assez pour découvrir tout ce qui existe entre deux instants.",
+              "Et si ce moment pouvait se dérouler image après image… à une vitesse qui vous laisse davantage de place ?"
+            ],
+            question:"Qu’est-ce qui devient différent lorsque ce moment ralentit ?"
+          },
+          {
+            icon:"🌊",
+            name:"La vague",
+            phrases:[
+              "Une vague peut prendre son temps pour monter… atteindre son point le plus haut… puis redescendre à son propre rythme.",
+              "Peut-être laisser ce moment suivre le rythme d’une vague plutôt que celui de l’horloge."
+            ],
+            question:"Quel serait le rythme naturel de cette vague ?"
+          },
+          {
+            icon:"❄️",
+            name:"Le flocon",
+            phrases:[
+              "Un flocon peut sembler prendre énormément de temps pour parcourir seulement quelques mètres.",
+              "Comme si quelques secondes pouvaient contenir tout le temps nécessaire à cette lente descente."
+            ],
+            question:"Que remarquez-vous lorsqu’il n’est plus nécessaire d’aller vite ?"
+          }
+        ]
+      },
+
+      "🐇 Accélérer":{
+        learning:"Une durée peut être vécue comme plus courte.",
+        experience:"Contracter subjectivement une période pénible ou peu pertinente.",
+        techniques:[
+          "Contraction temporelle",
+          "Absorption",
+          "Suggestion temporelle"
+        ],
+        metaphors:[
+          {
+            icon:"🚂",
+            name:"Le train",
+            phrases:[
+              "Depuis un train, certains paysages passent presque avant qu’on ait eu le temps de les regarder.",
+              "Certaines portions du trajet peuvent simplement défiler… pendant que vous êtes déjà un peu plus loin."
+            ],
+            question:"Quelle partie du trajet pourrait passer plus vite ?"
+          },
+          {
+            icon:"🎞️",
+            name:"Le film",
+            phrases:[
+              "Comme un film dont quelques minutes pourraient devenir seulement quelques images.",
+              "Certaines scènes peuvent passer rapidement sans qu’il soit nécessaire d’en regarder chaque seconde."
+            ],
+            question:"Quelles scènes pourraient simplement défiler ?"
+          },
+          {
+            icon:"☁️",
+            name:"Les nuages",
+            phrases:[
+              "Certains nuages traversent tout le ciel pendant que l’attention était posée ailleurs.",
+              "Et le temps peut parfois passer comme passent les nuages lorsqu’on regarde autre chose."
+            ],
+            question:"Où votre attention pourrait-elle se poser pendant ce temps ?"
+          }
+        ]
+      },
+
+      "⏸️ Suspendre":{
+        learning:"Le temps peut momentanément compter moins.",
+        experience:"Créer une parenthèse dans la continuité habituelle.",
+        techniques:[
+          "Absorption",
+          "Catalepsie",
+          "Suggestion de suspension"
+        ],
+        metaphors:[
+          {
+            icon:"🎵",
+            name:"La pause",
+            phrases:[
+              "Entre deux notes, il existe parfois un instant où rien n’a besoin d’arriver.",
+              "Peut-être écouter cet espace entre deux moments comme le silence entre deux notes."
+            ],
+            question:"Que devient le temps dans cet espace ?"
+          },
+          {
+            icon:"💧",
+            name:"La goutte",
+            phrases:[
+              "Comme une goutte qui resterait un instant suspendue avant de tomber.",
+              "Un instant peut parfois rester là… suffisamment longtemps pour que quelque chose se repose."
+            ],
+            question:"Que pourrait-il se passer pendant cet instant suspendu ?"
+          }
+        ]
+      }
+    }
+  },
+
+  avant:{
+    missions:{
+
+      "💎 Retrouver":{
+        learning:"Quelque chose d’ancien peut rester disponible aujourd’hui.",
+        experience:"Explorer l’avant pour rapporter une ressource dans le présent.",
+        techniques:[
+          "Régression ressource",
+          "Revivification",
+          "Ancrage"
+        ],
+        metaphors:[
+          {
+            icon:"🌳",
+            name:"Les racines",
+            phrases:[
+              "Un arbre ne voit pas ses racines… et pourtant quelque chose de ce qui l’a nourri continue de circuler.",
+              "Peut-être existe-t-il dans votre histoire quelque chose que vous n’avez pas besoin de revoir pour sentir que cela vous nourrit encore."
+            ],
+            question:"Qu’est-ce que vos racines savent encore faire aujourd’hui ?"
+          },
+          {
+            icon:"📚",
+            name:"La bibliothèque",
+            phrases:[
+              "Comme retrouver dans une bibliothèque un livre que l’on avait presque oublié savoir lire.",
+              "Votre histoire contient peut-être déjà une page où cette capacité était présente."
+            ],
+            question:"Quel livre aimeriez-vous retrouver ?"
+          },
+          {
+            icon:"🧳",
+            name:"Le bagage",
+            phrases:[
+              "Certains voyages nous laissent quelque chose que l’on transporte longtemps après être revenu.",
+              "Et si vous pouviez retourner juste assez loin pour récupérer ce qui mérite de voyager avec vous ?"
+            ],
+            question:"Qu’aimeriez-vous rapporter avec vous ?"
+          }
+        ]
+      },
+
+      "👁️ Observer":{
+        learning:"Je peux regarder un avant sans devoir le revivre comme maintenant.",
+        experience:"Créer une distance entre l’observateur présent et une expérience passée.",
+        techniques:[
+          "Régression dissociée",
+          "Écran",
+          "Double dissociation"
+        ],
+        metaphors:[
+          {
+            icon:"📖",
+            name:"L’album",
+            phrases:[
+              "On peut feuilleter un album et regarder aujourd’hui quelque chose qui appartient à hier.",
+              "Certaines pages peuvent être regardées de loin, d’autres tournées, sans avoir besoin d’entrer dans l’image."
+            ],
+            question:"À quelle distance serait-il confortable de regarder cette page ?"
+          },
+          {
+            icon:"🎬",
+            name:"Le cinéma",
+            phrases:[
+              "On peut regarder une ancienne scène sur un écran tout en sachant dans quel fauteuil on est assis aujourd’hui.",
+              "Peut-être voir cette scène comme un film ancien depuis l’endroit où vous êtes maintenant."
+            ],
+            question:"Que remarquez-vous depuis votre fauteuil d’aujourd’hui ?"
+          },
+          {
+            icon:"🚂",
+            name:"La gare",
+            phrases:[
+              "Un train peut repasser devant une gare sans avoir besoin de s’y arrêter.",
+              "Vous pourriez reconnaître cette ancienne gare tout en restant dans le train qui continue."
+            ],
+            question:"Avez-vous besoin d’y descendre pour savoir qu’elle existe ?"
+          }
+        ]
+      },
+
+      "🍂 Laisser":{
+        learning:"Ce qui a été peut faire partie de moi sans être encore en train d’arriver.",
+        experience:"Différencier passé et présent sans effacer l’histoire.",
+        techniques:[
+          "Dissociation",
+          "Réorientation temporelle",
+          "Suggestion métaphorique"
+        ],
+        metaphors:[
+          {
+            icon:"🚤",
+            name:"Le sillage",
+            phrases:[
+              "Le sillage reste visible quelque temps alors que le bateau est déjà ailleurs.",
+              "Une trace peut rester présente alors que ce qui l’a produite est déjà passé."
+            ],
+            question:"Qu’est-ce qui peut rester comme trace sans rester comme présence ?"
+          },
+          {
+            icon:"🍂",
+            name:"Les saisons",
+            phrases:[
+              "Un arbre peut garder la trace de plusieurs saisons sans conserver toutes ses feuilles.",
+              "Certaines choses appartiennent à une saison passée et participent pourtant à ce qui pousse aujourd’hui."
+            ],
+            question:"Qu’est-ce qui appartient maintenant à une autre saison ?"
+          }
+        ]
+      }
+    }
+  },
+
+  apres:{
+    missions:{
+
+      "🌅 Visiter":{
+        learning:"Un après peut exister sans être déjà écrit.",
+        experience:"Rendre perceptible un futur possible.",
+        techniques:[
+          "Progression en âge",
+          "Futurisation",
+          "Pseudo-orientation temporelle"
+        ],
+        metaphors:[
+          {
+            icon:"🌅",
+            name:"L’horizon",
+            phrases:[
+              "On n’a pas besoin de savoir exactement ce qui se trouve derrière l’horizon pour savoir que le paysage continue.",
+              "Peut-être simplement laisser apparaître l’idée qu’au-delà de ce que vous voyez aujourd’hui, le paysage continue."
+            ],
+            question:"Qu’est-ce qui vous indique que le paysage continue ?"
+          },
+          {
+            icon:"🚪",
+            name:"La porte",
+            phrases:[
+              "Une porte peut ouvrir sur un espace que l’on n’a pas encore exploré.",
+              "Vous pourriez imaginer ouvrir une porte sur un moment un peu plus loin dans votre histoire."
+            ],
+            question:"Qu’aimeriez-vous découvrir derrière cette porte ?"
+          }
+        ]
+      },
+
+      "🎯 Préparer":{
+        learning:"Je peux expérimenter un futur avant qu’il n’arrive.",
+        experience:"Créer une répétition mentale souple.",
+        techniques:[
+          "Future pacing",
+          "Répétition mentale",
+          "Futurisation"
+        ],
+        metaphors:[
+          {
+            icon:"🎼",
+            name:"La répétition",
+            phrases:[
+              "Un musicien peut entendre intérieurement quelques mesures avant même de les jouer.",
+              "Comme une répétition tranquille où l’on peut essayer avant que le vrai moment arrive."
+            ],
+            question:"Qu’aimeriez-vous pouvoir répéter tranquillement ?"
+          },
+          {
+            icon:"🗺️",
+            name:"La carte",
+            phrases:[
+              "Regarder une carte ne fait pas le voyage, mais permet parfois de savoir un peu mieux où l’on va.",
+              "Vous pourriez parcourir cette situation comme on repère un itinéraire avant de partir."
+            ],
+            question:"Quel passage serait utile de reconnaître à l’avance ?"
+          }
+        ]
+      },
+
+      "🔀 Bifurquer":{
+        learning:"Le futur imaginé n’est pas nécessairement le seul futur possible.",
+        experience:"Desserrer un scénario vécu comme inéluctable.",
+        techniques:[
+          "Futurisation multiple",
+          "Progression en âge",
+          "Métaphore"
+        ],
+        metaphors:[
+          {
+            icon:"🔀",
+            name:"L’embranchement",
+            phrases:[
+              "Un chemin qui paraît unique depuis ici peut révéler plusieurs embranchements lorsqu’on avance.",
+              "Peut-être existe-t-il des bifurcations que vous ne pouvez pas encore voir depuis l’endroit où vous êtes."
+            ],
+            question:"Quel autre chemin pourrait aussi exister ?"
+          },
+          {
+            icon:"🌱",
+            name:"Les graines",
+            phrases:[
+              "Plusieurs graines peuvent être présentes avant que l’on sache laquelle trouvera les bonnes conditions pour pousser.",
+              "Le futur peut contenir plusieurs possibles encore trop petits pour être clairement visibles."
+            ],
+            question:"Qu’est-ce qui pourrait déjà être en train de germer ?"
+          }
+        ]
+      }
+    }
+  },
+
+  relier:{
+    missions:{
+
+      "🔗 Relier":{
+        learning:"Plusieurs moments différents peuvent appartenir à une même histoire.",
+        experience:"Faire communiquer les temporalités sans les confondre.",
+        techniques:[
+          "Ligne du temps",
+          "Ancrage",
+          "Réassociation"
+        ],
+        metaphors:[
+          {
+            icon:"🧵",
+            name:"Le fil",
+            phrases:[
+              "Si un fil reliait celui que vous étiez, celui que vous êtes et celui que vous devenez… qu’est-ce qui pourrait circuler dans ce fil ?",
+              "Peut-être sentir un fil qui traverse différents moments sans avoir besoin de les rendre identiques."
+            ],
+            question:"Qu’est-ce qui reste relié malgré les changements ?"
+          },
+          {
+            icon:"🌉",
+            name:"Le pont",
+            phrases:[
+              "Un pont relie deux rives précisément parce qu’elles restent deux rives différentes.",
+              "Il n’est pas nécessaire de supprimer la distance pour permettre à quelque chose de passer d’une rive à l’autre."
+            ],
+            question:"Qu’aimeriez-vous pouvoir faire passer sur ce pont ?"
+          },
+          {
+            icon:"✨",
+            name:"La constellation",
+            phrases:[
+              "Des étoiles restent séparées et pourtant, lorsqu’on les relie, une forme peut apparaître.",
+              "Certains moments de votre histoire peuvent rester distincts tout en dessinant quelque chose ensemble."
+            ],
+            question:"Quelle forme apparaît lorsque vous reliez ces moments ?"
+          }
+        ]
+      },
+
+      "↔️ Différencier":{
+        learning:"Ce qui a été peut rester important sans être encore maintenant.",
+        experience:"Créer une frontière temporelle suffisamment nette.",
+        techniques:[
+          "Dissociation",
+          "Réorientation présent",
+          "Ligne du temps"
+        ],
+        metaphors:[
+          {
+            icon:"🚤",
+            name:"Le sillage",
+            phrases:[
+              "Le sillage témoigne du passage du bateau alors même que le bateau est déjà plus loin.",
+              "La trace peut être ici sans que l’événement qui l’a créée soit encore en train d’arriver."
+            ],
+            question:"Qu’est-ce qui est aujourd’hui une trace plutôt qu’un événement ?"
+          },
+          {
+            icon:"📖",
+            name:"Le livre",
+            phrases:[
+              "Deux chapitres appartiennent au même livre sans être la même page.",
+              "Ce chapitre appartient à votre histoire… et vous pouvez remarquer quelle page est ouverte aujourd’hui."
+            ],
+            question:"Quelle page est ouverte maintenant ?"
+          }
+        ]
+      },
+
+      "🎁 Transmettre":{
+        learning:"Une ressource peut circuler d’un moment de soi à un autre.",
+        experience:"Utiliser la continuité temporelle comme vecteur de ressources.",
+        techniques:[
+          "Ancrage",
+          "Régression ressource",
+          "Progression en âge",
+          "Suggestion post-hypnotique"
+        ],
+        metaphors:[
+          {
+            icon:"🏃",
+            name:"Le relais",
+            phrases:[
+              "Quelque chose peut être transmis d’un moment à l’autre comme un témoin que l’on se passe dans une course.",
+              "Qu’est-ce que celui que vous étiez pourrait confier à celui que vous êtes aujourd’hui ?"
+            ],
+            question:"Quel témoin mérite de continuer le voyage ?"
+          },
+          {
+            icon:"✉️",
+            name:"La lettre",
+            phrases:[
+              "Une lettre peut traverser le temps entre celui qui l’écrit et celui qui la reçoit.",
+              "Si une version de vous pouvait envoyer quelques mots à une autre version de vous…"
+            ],
+            question:"Qui écrirait à qui ? Et pour transmettre quoi ?"
+          }
+        ]
+      }
+    }
+  }
+};
+
+let family=null;
+let mission=null;
+let metaphor=null;
+let phraseIndex=0;
+
+const $=id=>document.getElementById(id);
+
+document.querySelectorAll(".choice").forEach(button=>{
+  button.addEventListener("click",()=>{
+    family=button.dataset.family;
+    mission=null;
+    metaphor=null;
+
+    document.querySelectorAll(".choice").forEach(b=>b.classList.remove("active"));
+    button.classList.add("active");
+
+    showMissions();
+  });
+});
+
+function showMissions(){
+  const box=$("missions");
+  box.innerHTML="";
+
+  Object.keys(DATA[family].missions).forEach(name=>{
+    const b=document.createElement("button");
+    b.className="pill";
+    b.textContent=name;
+
+    b.addEventListener("click",()=>{
+      mission=name;
+
+      document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+
+      showMetaphors();
+    });
+
+    box.appendChild(b);
+  });
+
+  $("missionPanel").classList.add("show");
+  $("metaPanel").classList.remove("show");
+  $("result").classList.remove("show");
+}
+
+function showMetaphors(){
+  const box=$("metaphors");
+  box.innerHTML="";
+
+  DATA[family].missions[mission].metaphors.forEach((m,index)=>{
+    const b=document.createElement("button");
+    b.className="meta";
+    b.innerHTML=`
+      <div class="mi">${m.icon}</div>
+      <strong>${m.name}</strong>
+    `;
+
+    b.addEventListener("click",()=>{
+      metaphor=index;
+      phraseIndex=0;
+      renderResult();
+    });
+
+    box.appendChild(b);
+  });
+
+  $("metaPanel").classList.add("show");
+  $("result").classList.remove("show");
+}
+
+function renderResult(){
+
+  const data=DATA[family].missions[mission];
+  const m=data.metaphors[metaphor];
+
+  $("resultIcon").textContent=m.icon;
+  $("resultName").textContent=m.name;
+  $("resultMission").textContent=mission;
+
+  $("learning").textContent=data.learning;
+  $("experience").textContent=data.experience;
+
+  $("phrase").textContent=
+    "« "+m.phrases[phraseIndex % m.phrases.length]+" »";
+
+  $("question").textContent=
+    "« "+m.question+" »";
+
+  const techBox=$("techniques");
+  techBox.innerHTML="";
+
+  data.techniques.forEach(t=>{
+    const span=document.createElement("span");
+    span.className="tech";
+    span.textContent=t;
+    techBox.appendChild(span);
+  });
+
+  let retour="";
+
+  if(family==="avant"){
+    retour=
+      "Réorienter clairement vers ici et maintenant. Le patient revient avec ce qui lui est utile, tandis que l’avant reprend sa place dans l’histoire.";
+  }
+
+  if(family==="apres"){
+    retour=
+      "Revenir au présent. L’après exploré reste un possible : c’est depuis maintenant que la suite peut se construire.";
+  }
+
+  if(family==="distordre"){
+    retour=
+      "Laisser progressivement revenir le rythme ordinaire, les sensations du corps et les repères du présent.";
+  }
+
+  if(family==="relier"){
+    retour=
+      "Revenir au présent en laissant chaque moment retrouver sa juste distance, tout en conservant ce qui les relie.";
+  }
+
+  $("returnText").textContent=retour;
+
+  $("result").classList.add("show");
+
+  $("result").scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+}
+
+$("anotherPhrase").addEventListener("click",()=>{
+  if(metaphor===null)return;
+
+  phraseIndex++;
+  renderResult();
+});
+
+$("restart").addEventListener("click",()=>{
+  family=null;
+  mission=null;
+  metaphor=null;
+  phraseIndex=0;
+
+  document.querySelectorAll(".choice")
+    .forEach(b=>b.classList.remove("active"));
+
+  $("missionPanel").classList.remove("show");
+  $("metaPanel").classList.remove("show");
+  $("result").classList.remove("show");
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+});
+</script>
+</body>
+</html>
