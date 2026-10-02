@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Métatrésor — Pépite métaphorique</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --ink:#111;
+  --paper:#fffdf8;
+  --gold:#ffbf2f;
+  --card:#ffd166;
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+button{
+  font:inherit;
+  color:inherit;
+  cursor:pointer;
+}
+
+.app{
+  width:100%;
+  max-width:1050px;
+  min-height:100vh;
+  margin:auto;
+  padding:clamp(22px,5vw,55px);
+}
+
+.screen{
+  display:none;
+  min-height:calc(100vh - 110px);
+}
+
+.screen.active{
+  display:flex;
+  flex-direction:column;
+}
+
+
+/* =========================
+   COMMON
+========================= */
+
+.logo{
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:1000;
+  letter-spacing:-.06em;
+}
+
+.logo span{
+  color:var(--gold);
+}
+
+button:focus-visible{
+  outline:4px solid var(--ink);
+  outline-offset:3px;
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+#home{
+  justify-content:center;
+}
+
+.kicker{
+  font-size:.8rem;
+  font-weight:1000;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+}
+
+h1{
+  max-width:900px;
+  margin:28px 0 0;
+  font-size:clamp(3.8rem,9vw,8rem);
+  line-height:.87;
+  letter-spacing:-.075em;
+}
+
+.intro{
+  max-width:760px;
+  margin-top:30px;
+  font-size:clamp(1.3rem,2.5vw,1.8rem);
+  line-height:1.4;
+  font-weight:800;
+}
+
+.rule{
+  max-width:760px;
+  margin-top:30px;
+  padding:20px 22px;
+  border:3px solid var(--ink);
+  border-radius:22px;
+  background:white;
+  font-size:1.05rem;
+  line-height:1.5;
+  font-weight:800;
+}
+
+.rule strong{
+  background:var(--gold);
+  padding:2px 5px;
+}
+
+.start{
+  align-self:flex-start;
+  margin-top:30px;
+  padding:17px 28px;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:var(--ink);
+  color:white;
+  font-weight:1000;
+}
+
+.resume{
+  display:none;
+  align-self:flex-start;
+  margin-top:10px;
+  padding:14px 23px;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:white;
+  font-weight:1000;
+}
+
+
+/* =========================
+   GAME
+========================= */
+
+#game{
+  --c:var(--card);
+}
+
+.game-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.small-logo{
+  font-size:1.3rem;
+  font-weight:1000;
+  letter-spacing:-.04em;
+}
+
+.treasure{
+  padding:9px 15px;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:white;
+  font-weight:1000;
+}
+
+.treasure strong{
+  color:#d58d00;
+}
+
+
+/* PROCESS */
+
+.process{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-top:34px;
+}
+
+.emoji{
+  width:72px;
+  height:72px;
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:3px solid var(--ink);
+  border-radius:21px;
+  background:var(--c);
+  font-size:2.4rem;
+}
+
+.process-name{
+  font-size:clamp(2rem,5vw,4.2rem);
+  line-height:.9;
+  letter-spacing:-.055em;
+  font-weight:1000;
+}
+
+.process-action{
+  margin-top:7px;
+  font-size:clamp(1rem,2vw,1.25rem);
+  font-weight:850;
+}
+
+
+/* QUESTION */
+
+.question{
+  margin-top:27px;
+  padding:clamp(22px,4vw,34px);
+  border:3px solid var(--ink);
+  border-radius:27px;
+  background:var(--c);
+}
+
+.question-label{
+  margin-bottom:8px;
+  font-size:.7rem;
+  font-weight:1000;
+  letter-spacing:.14em;
+}
+
+.question-text{
+  font-size:clamp(2.1rem,5.5vw,4.8rem);
+  line-height:.95;
+  letter-spacing:-.055em;
+  font-weight:1000;
+}
+
+
+/* NUANCIER */
+
+.nuancier{
+  margin-top:28px;
+}
+
+.nuancier-title{
+  font-size:.78rem;
+  letter-spacing:.12em;
+  font-weight:1000;
+}
+
+.nuancier-help{
+  margin-top:5px;
+  font-size:.95rem;
+  font-weight:750;
+}
+
+.words{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.word{
+  padding:9px 14px;
+  border:2px solid var(--ink);
+  border-radius:999px;
+  background:white;
+  font-weight:900;
+}
+
+
+/* FIND */
+
+.bottom{
+  margin-top:auto;
+  padding-top:32px;
+}
+
+.challenge{
+  margin-bottom:12px;
+  text-align:center;
+  font-size:1rem;
+  font-weight:900;
+}
+
+.find{
+  width:100%;
+  min-height:100px;
+  border:3px solid var(--ink);
+  border-radius:25px;
+  background:var(--gold);
+  color:var(--ink);
+  font-size:clamp(2rem,5vw,3.5rem);
+  line-height:1;
+  font-weight:1000;
+  transition:.1s;
+}
+
+.find small{
+  display:block;
+  margin-top:9px;
+  font-size:.7rem;
+  letter-spacing:.05em;
+}
+
+.find:active{
+  transform:scale(.985);
+}
+
+.quit{
+  display:block;
+  margin:12px auto 0;
+  border:0;
+  background:transparent;
+  font-weight:900;
+  text-decoration:underline;
+}
+
+
+/* =========================
+   PEPITE
+========================= */
+
+#pepite{
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+
+.gem{
+  font-size:clamp(5rem,12vw,8rem);
+  animation:pop .45s cubic-bezier(.2,.9,.3,1.4);
+}
+
+@keyframes pop{
+  0%{
+    transform:scale(.2) rotate(-20deg);
+    opacity:0;
+  }
+  100%{
+    transform:scale(1) rotate(0);
+    opacity:1;
+  }
+}
+
+.pepite-title{
+  margin-top:18px;
+  font-size:clamp(3.5rem,9vw,7rem);
+  line-height:.85;
+  letter-spacing:-.07em;
+  font-weight:1000;
+}
+
+.pepite-process{
+  margin-top:20px;
+  font-size:1.1rem;
+  font-weight:850;
+}
+
+.total{
+  margin-top:28px;
+  padding:14px 22px;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:white;
+  font-size:1.15rem;
+  font-weight:1000;
+}
+
+.total strong{
+  color:#d58d00;
+}
+
+.next{
+  margin-top:25px;
+  padding:16px 25px;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:var(--ink);
+  color:white;
+  font-weight:1000;
+}
+
+
+/* =========================
+   END
+========================= */
+
+#end{
+  justify-content:center;
+}
+
+.end-title{
+  margin-top:28px;
+  max-width:850px;
+  font-size:clamp(3.5rem,9vw,7rem);
+  line-height:.87;
+  letter-spacing:-.07em;
+  font-weight:1000;
+}
+
+.end-score{
+  margin-top:30px;
+  color:#d58d00;
+  font-size:clamp(7rem,18vw,12rem);
+  line-height:.8;
+  letter-spacing:-.08em;
+  font-weight:1000;
+}
+
+.end-label{
+  margin-top:14px;
+  font-size:clamp(1.4rem,3vw,2rem);
+  font-weight:1000;
+}
+
+.collection{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:30px;
+}
+
+.collection-item{
+  padding:8px 12px;
+  border:2px solid var(--ink);
+  border-radius:999px;
+  background:white;
+  font-weight:850;
+}
+
+.restart{
+  align-self:flex-start;
+  margin-top:30px;
+  padding:16px 25px;
+  border:3px solid var(--ink);
+  border-radius:999px;
+  background:var(--ink);
+  color:white;
+  font-weight:1000;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+  .app{
+    padding:20px;
+  }
+
+  .screen{
+    min-height:calc(100vh - 40px);
+  }
+
+  .game-header{
+    align-items:flex-start;
+  }
+
+  .treasure{
+    font-size:.85rem;
+  }
+
+  .process{
+    margin-top:25px;
+  }
+
+  .question{
+    margin-top:22px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+
+<!-- ACCUEIL -->
+
+<section id="home" class="screen active">
+
+  <div class="kicker">
+    Jeu de créativité métaphorique
+  </div>
+
+  <div class="logo">
+    MÉTA<span>TRÉSOR</span>
+  </div>
+
+  <h1>
+    Trouverez-vous<br>
+    des pépites<br>
+    métaphoriques ?
+  </h1>
+
+  <div class="intro">
+    À chaque tour, découvrez une nouvelle façon
+    de transformer le temps en métaphore.
+  </div>
+
+  <div class="rule">
+    Explorez le nuancier proposé.<br>
+    Puis cherchez <strong>une autre métaphore.</strong><br><br>
+
+    Dès qu'une proposition nouvelle et pertinente apparaît :
+    <strong>PÉPITE !</strong>
+  </div>
+
+  <button class="start" id="startBtn">
+    COMMENCER →
+  </button>
+
+  <button class="resume" id="resumeBtn">
+    REPRENDRE →
+  </button>
+
+</section>
+
+
+
+<!-- JEU -->
+
+<section id="game" class="screen">
+
+  <div class="game-header">
+
+    <div class="small-logo">
+      MÉTA<span style="color:#d58d00">TRÉSOR</span>
+    </div>
+
+    <div class="treasure">
+      💎 <strong id="score">0</strong>
+    </div>
+
+  </div>
+
+
+  <div class="process">
+
+    <div class="emoji" id="emoji"></div>
+
+    <div>
+
+      <div
+        class="process-name"
+        id="processName"
+      ></div>
+
+      <div
+        class="process-action"
+        id="processAction"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <div class="question">
+
+    <div class="question-label">
+      VOTRE DÉFI
+    </div>
+
+    <div
+      class="question-text"
+      id="question"
+    ></div>
+
+  </div>
+
+
+  <div class="nuancier">
+
+    <div class="nuancier-title">
+      QUELQUES PISTES…
+    </div>
+
+    <div class="nuancier-help">
+      Trouvez une métaphore qui n'est pas dans ce nuancier.
+    </div>
+
+    <div
+      class="words"
+      id="words"
+    ></div>
+
+  </div>
+
+
+  <div class="bottom">
+
+    <div class="challenge">
+      Une autre idée vient d'apparaître ?
+    </div>
+
+    <button
+      class="find"
+      id="findBtn"
+    >
+      💎 PÉPITE !
+      <small>
+        LE TOUR EST GAGNÉ
+      </small>
+    </button>
+
+    <button
+      class="quit"
+      id="quitBtn"
+    >
+      quitter
+    </button>
+
+  </div>
+
+</section>
+
+
+
+<!-- PEPITE -->
+
+<section id="pepite" class="screen">
+
+  <div class="gem">
+    💎
+  </div>
+
+  <div class="pepite-title">
+    PÉPITE<br>
+    TROUVÉE !
+  </div>
+
+  <div
+    class="pepite-process"
+    id="pepiteProcess"
+  ></div>
+
+  <div class="total">
+    VOTRE TRÉSOR :
+    <strong id="pepiteScore">0</strong>
+    💎
+  </div>
+
+  <button
+    class="next"
+    id="nextBtn"
+  >
+    NOUVELLE CARTE →
+  </button>
+
+</section>
+
+
+
+<!-- FIN -->
+
+<section id="end" class="screen">
+
+  <div class="logo">
+    MÉTA<span>TRÉSOR</span>
+  </div>
+
+  <div class="end-title">
+    Votre trésor<br>
+    métaphorique.
+  </div>
+
+  <div
+    class="end-score"
+    id="endScore"
+  >
+    0
+  </div>
+
+  <div class="end-label">
+    💎 PÉPITES TROUVÉES
+  </div>
+
+  <div
+    class="collection"
+    id="collection"
+  ></div>
+
+  <button
+    class="restart"
+    id="restartBtn"
+  >
+    REJOUER →
+  </button>
+
+</section>
+
+</main>
+
+
+<script>
+"use strict";
+
+
+/* =========================
+   PROCESSUS
+========================= */
+
+const processes=[
+
+{
+ emoji:"🪨",
+ name:"MATÉRIALISER",
+ color:"#FFD166",
+
+ action:
+ "Donnez au temps une matière ou un objet.",
+
+ question:
+ "Le temps qui passe, c'est un peu comme…",
+
+ words:[
+  "du sable",
+  "un fil",
+  "un tissu",
+  "une pelote",
+  "de l'argile",
+  "une corde",
+  "une pierre",
+  "de la cire",
+  "une feuille",
+  "une matière"
+ ]
+},
+
+{
+ emoji:"🗺️",
+ name:"SPATIALISER",
+ color:"#A8DADC",
+
+ action:
+ "Transformez le temps en espace.",
+
+ question:
+ "Si le temps était un espace, ce serait…",
+
+ words:[
+  "un chemin",
+  "une route",
+  "un paysage",
+  "un horizon",
+  "un couloir",
+  "une porte",
+  "un jardin",
+  "un sentier",
+  "une vallée",
+  "un escalier"
+ ]
+},
+
+{
+ emoji:"🧍",
+ name:"PERSONNIFIER",
+ color:"#FFB4A2",
+
+ action:
+ "Faites du temps un personnage.",
+
+ question:
+ "Si le temps était quelqu'un, ce serait…",
+
+ words:[
+  "un compagnon",
+  "un voyageur",
+  "un guide",
+  "un visiteur",
+  "un passeur",
+  "un marcheur",
+  "un sage",
+  "un messager",
+  "un gardien",
+  "un enfant"
+ ]
+},
+
+{
+ emoji:"🌊",
+ name:"METTRE EN MOUVEMENT",
+ color:"#90CAF9",
+
+ action:
+ "Faites bouger le temps.",
+
+ question:
+ "Le temps qui passe, ça bouge comme…",
+
+ words:[
+  "une rivière",
+  "une vague",
+  "un courant",
+  "le vent",
+  "une roue",
+  "une marée",
+  "un train",
+  "un nuage",
+  "une barque",
+  "une cascade"
+ ]
+},
+
+{
+ emoji:"🎵",
+ name:"RYTHMER",
+ color:"#CDB4DB",
+
+ action:
+ "Donnez au temps un rythme.",
+
+ question:
+ "Si le temps avait un rythme, ce serait comme…",
+
+ words:[
+  "une musique",
+  "une respiration",
+  "un battement",
+  "une pulsation",
+  "un balancement",
+  "une mélodie",
+  "une danse",
+  "un métronome",
+  "un refrain",
+  "un silence"
+ ]
+},
+
+{
+ emoji:"✨",
+ name:"TRANSFORMER",
+ color:"#B7E4C7",
+
+ action:
+ "Faites changer le temps de forme.",
+
+ question:
+ "Le temps qui se transforme, c'est comme…",
+
+ words:[
+  "une lumière",
+  "une brume",
+  "de la glace",
+  "une ombre",
+  "une couleur",
+  "un nœud",
+  "un nuage",
+  "de la cire",
+  "de l'argile",
+  "une forme"
+ ]
+},
+
+{
+ emoji:"⚡",
+ name:"ACCÉLÉRER",
+ color:"#FFE66D",
+
+ action:
+ "Faites sentir un temps qui accélère.",
+
+ question:
+ "Le temps qui accélère, c'est comme…",
+
+ words:[
+  "un train",
+  "une voiture",
+  "une pente",
+  "un torrent",
+  "une roue",
+  "le vent",
+  "une course",
+  "une cascade",
+  "des pas",
+  "un toboggan"
+ ]
+},
+
+{
+ emoji:"🍃",
+ name:"RALENTIR",
+ color:"#D8F3DC",
+
+ action:
+ "Faites sentir un temps qui ralentit.",
+
+ question:
+ "Le temps qui ralentit, c'est comme…",
+
+ words:[
+  "une feuille",
+  "un nuage",
+  "une rivière calme",
+  "une respiration",
+  "une vague",
+  "un escargot",
+  "des pas",
+  "une plume",
+  "la neige",
+  "un crépuscule"
+ ]
+},
+
+{
+ emoji:"💧",
+ name:"SUSPENDRE",
+ color:"#DDE7FF",
+
+ action:
+ "Créez un instant où le temps semble s'arrêter.",
+
+ question:
+ "Le temps suspendu, c'est comme…",
+
+ words:[
+  "une goutte",
+  "un silence",
+  "un souffle",
+  "une photo",
+  "une vague",
+  "un pendule",
+  "une feuille",
+  "un équilibre",
+  "une pause",
+  "un flocon"
+ ]
+}
+
+];
+
+
+/* =========================
+   STATE
+========================= */
+
+const STORAGE_KEY=
+  "metatresor_v1";
+
+let state={
+  order:[],
+  position:0,
+  score:0,
+  found:[]
+};
+
+let locked=false;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+const $=id=>
+  document.getElementById(id);
+
+const screens=
+  document.querySelectorAll(".screen");
+
+
+function show(id){
+
+  screens.forEach(screen=>
+    screen.classList.remove("active")
+  );
+
+  $(id).classList.add("active");
+
+  window.scrollTo(0,0);
+
+}
+
+
+function shuffleIndexes(){
+
+  const array=
+    processes.map((_,i)=>i);
+
+  for(
+    let i=array.length-1;
+    i>0;
+    i--
+  ){
+
+    const j=
+      Math.floor(
+        Math.random()*(i+1)
+      );
+
+    [
+      array[i],
+      array[j]
+    ]=[
+      array[j],
+      array[i]
+    ];
+
+  }
+
+  return array;
+
+}
+
+
+function current(){
+
+  const index=
+    state.order[state.position];
+
+  return processes[index];
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+function save(){
+
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(state)
+    );
+
+  }catch(e){}
+
+}
+
+
+function load(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(
+        STORAGE_KEY
+      );
+
+    if(!raw) return false;
+
+    const saved=
+      JSON.parse(raw);
+
+    if(
+      !saved ||
+      !Array.isArray(saved.order) ||
+      saved.order.length!==
+        processes.length
+    ){
+      return false;
+    }
+
+    state=saved;
+
+    return true;
+
+  }catch(e){
+
+    return false;
+
+  }
+
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+function updateHome(){
+
+  const hasSave=
+    state.order.length===
+    processes.length &&
+    state.position<
+    processes.length;
+
+  $("resumeBtn").style.display=
+    hasSave
+      ? "inline-block"
+      : "none";
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+function start(){
+
+  state={
+    order:shuffleIndexes(),
+    position:0,
+    score:0,
+    found:[]
+  };
+
+  locked=false;
+
+  save();
+
+  renderGame();
+
+  show("game");
+
+}
+
+
+/* =========================
+   GAME
+========================= */
+
+function renderGame(){
+
+  const p=current();
+
+  if(!p){
+
+    finish();
+    return;
+
+  }
+
+  locked=false;
+
+  $("game").style.setProperty(
+    "--c",
+    p.color
+  );
+
+  $("score").textContent=
+    state.score;
+
+  $("emoji").textContent=
+    p.emoji;
+
+  $("processName").textContent=
+    p.name;
+
+  $("processAction").textContent=
+    p.action;
+
+  $("question").textContent=
+    p.question;
+
+
+  const words=$("words");
+
+  words.innerHTML="";
+
+  p.words.forEach(text=>{
+
+    const span=
+      document.createElement(
+        "span"
+      );
+
+    span.className="word";
+
+    span.textContent=text;
+
+    words.appendChild(span);
+
+  });
+
+}
+
+
+/* =========================
+   PEPITE
+========================= */
+
+function pepite(){
+
+  if(locked) return;
+
+  locked=true;
+
+  const p=current();
+
+  state.score++;
+
+  state.found.push(
+    state.order[state.position]
+  );
+
+  save();
+
+  $("pepiteProcess").textContent=
+    p.emoji+" "+p.name;
+
+  $("pepiteScore").textContent=
+    state.score;
+
+  show("pepite");
+
+}
+
+
+/* =========================
+   NEXT
+========================= */
+
+function next(){
+
+  state.position++;
+
+  save();
+
+  if(
+    state.position>=
+    processes.length
+  ){
+
+    finish();
+    return;
+
+  }
+
+  renderGame();
+
+  show("game");
+
+}
+
+
+/* =========================
+   END
+========================= */
+
+function finish(){
+
+  $("endScore").textContent=
+    state.score;
+
+  const collection=
+    $("collection");
+
+  collection.innerHTML="";
+
+  state.found.forEach(index=>{
+
+    const p=
+      processes[index];
+
+    const item=
+      document.createElement(
+        "span"
+      );
+
+    item.className=
+      "collection-item";
+
+    item.textContent=
+      p.emoji+" "+p.name;
+
+    collection.appendChild(item);
+
+  });
+
+  show("end");
+
+}
+
+
+/* =========================
+   RESUME
+========================= */
+
+function resume(){
+
+  if(
+    state.position>=
+    processes.length
+  ){
+
+    finish();
+    return;
+
+  }
+
+  renderGame();
+
+  show("game");
+
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+$("startBtn")
+.addEventListener(
+  "click",
+  start
+);
+
+$("resumeBtn")
+.addEventListener(
+  "click",
+  resume
+);
+
+$("findBtn")
+.addEventListener(
+  "click",
+  pepite
+);
+
+$("nextBtn")
+.addEventListener(
+  "click",
+  next
+);
+
+$("restartBtn")
+.addEventListener(
+  "click",
+  start
+);
+
+$("quitBtn")
+.addEventListener(
+  "click",
+  ()=>{
+
+    save();
+
+    updateHome();
+
+    show("home");
+
+  }
+);
+
+
+/* ESPACE = PÉPITE */
+
+document.addEventListener(
+  "keydown",
+  event=>{
+
+    if(
+      event.code==="Space" &&
+      $("game")
+        .classList
+        .contains("active")
+    ){
+
+      event.preventDefault();
+
+      pepite();
+
+    }
+
+  }
+);
+
+
+/* =========================
+   INIT
+========================= */
+
+load();
+
+updateHome();
+
+show("home");
+
+</script>
+
+</body>
+</html>
