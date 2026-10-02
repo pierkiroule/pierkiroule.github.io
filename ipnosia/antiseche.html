@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jouer avec le temps</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --ink:#111;
+  --paper:#fffdf7;
+  --yellow:#FFD166;
+  --blue:#A8DADC;
+  --green:#B7E4C7;
+  --active:#FFD166;
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  padding:clamp(18px,4vw,42px);
+}
+
+.app{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+}
+
+
+/* HEADER */
+
+header{
+  margin-bottom:25px;
+}
+
+.kicker{
+  font-size:.72rem;
+  font-weight:1000;
+  letter-spacing:.15em;
+}
+
+h1{
+  margin:6px 0 0;
+  font-size:clamp(2.6rem,7vw,5rem);
+  line-height:.9;
+  letter-spacing:-.065em;
+}
+
+
+/* ======================
+   3 BUTTONS
+====================== */
+
+.tabs{
+  position:sticky;
+  top:10px;
+  z-index:10;
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+
+  margin-bottom:18px;
+
+  background:var(--paper);
+  padding:6px 0;
+}
+
+.tab{
+  min-height:70px;
+
+  border:3px solid var(--ink);
+  border-radius:18px;
+
+  background:white;
+  color:var(--ink);
+
+  font-weight:1000;
+  cursor:pointer;
+
+  transition:
+    transform .1s,
+    background .15s;
+}
+
+.tab:hover{
+  transform:translateY(-2px);
+}
+
+.tab.active{
+  background:var(--tab-color);
+}
+
+.tab-icon{
+  display:block;
+  margin-bottom:4px;
+  font-size:1.6rem;
+}
+
+.tab-name{
+  font-size:clamp(.72rem,2vw,1rem);
+}
+
+
+/* ======================
+   CARD
+====================== */
+
+.card{
+  overflow:hidden;
+
+  border:3px solid var(--ink);
+  border-radius:28px;
+
+  background:white;
+}
+
+.hero{
+  padding:clamp(24px,5vw,40px);
+
+  background:var(--active);
+
+  border-bottom:3px solid var(--ink);
+}
+
+.hero-icon{
+  font-size:3rem;
+}
+
+.hero h2{
+  margin:10px 0 0;
+
+  font-size:clamp(2.6rem,7vw,5rem);
+  line-height:.88;
+  letter-spacing:-.065em;
+}
+
+.goal{
+  max-width:650px;
+  margin-top:15px;
+
+  font-size:clamp(1.15rem,2.5vw,1.5rem);
+  line-height:1.3;
+  font-weight:850;
+}
+
+
+/* CONTENT */
+
+.content{
+  padding:clamp(22px,5vw,38px);
+}
+
+.section{
+  margin-top:28px;
+}
+
+.section:first-child{
+  margin-top:0;
+}
+
+.label{
+  margin-bottom:9px;
+
+  font-size:.7rem;
+  letter-spacing:.14em;
+  font-weight:1000;
+}
+
+
+/* AMORCE */
+
+.amorce{
+  padding:18px 20px;
+
+  border:3px solid var(--ink);
+  border-radius:18px;
+
+  background:var(--paper);
+
+  font-size:clamp(1.25rem,3vw,1.7rem);
+  line-height:1.3;
+  font-weight:900;
+}
+
+
+/* CHIPS */
+
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.chip{
+  padding:8px 11px;
+
+  border:2px solid var(--ink);
+  border-radius:999px;
+
+  background:white;
+
+  font-size:.92rem;
+  font-weight:850;
+}
+
+
+/* RECIPE */
+
+.recipe{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.step{
+  padding:10px 13px;
+
+  border:2px solid var(--ink);
+  border-radius:12px;
+
+  background:var(--active);
+
+  font-weight:1000;
+}
+
+.arrow{
+  font-size:1.3rem;
+  font-weight:1000;
+}
+
+
+/* QUESTIONS */
+
+.questions{
+  display:grid;
+  gap:8px;
+}
+
+.question{
+  padding:12px 15px;
+
+  border-left:5px solid var(--active);
+
+  background:var(--paper);
+
+  font-size:1rem;
+  line-height:1.35;
+  font-weight:800;
+}
+
+
+/* TIP */
+
+.tip{
+  margin-top:30px;
+
+  padding:20px;
+
+  border:3px solid var(--ink);
+  border-radius:20px;
+
+  background:var(--active);
+
+  font-size:clamp(1.15rem,3vw,1.5rem);
+  line-height:1.25;
+  font-weight:1000;
+}
+
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+  body{
+    padding:16px;
+  }
+
+  header{
+    margin-bottom:16px;
+  }
+
+  .tabs{
+    top:0;
+  }
+
+  .tab{
+    min-height:64px;
+    padding:7px 3px;
+  }
+
+  .tab-icon{
+    font-size:1.4rem;
+  }
+
+  .tab-name{
+    font-size:.65rem;
+  }
+
+}
+</style>
+</head>
+
+
+<body>
+
+<main class="app">
+
+<header>
+
+  <div class="kicker">
+    ANTISÈCHE • HYPNOSE
+  </div>
+
+  <h1>
+    Jouer avec le temps
+  </h1>
+
+</header>
+
+
+<!-- 3 BUTTONS -->
+
+<nav class="tabs">
+
+  <button
+    class="tab active"
+    data-key="distorsion"
+    style="--tab-color:#FFD166"
+  >
+    <span class="tab-icon">⏳</span>
+    <span class="tab-name">DISTORSION</span>
+  </button>
+
+  <button
+    class="tab"
+    data-key="regression"
+    style="--tab-color:#A8DADC"
+  >
+    <span class="tab-icon">↩️</span>
+    <span class="tab-name">RÉGRESSION</span>
+  </button>
+
+  <button
+    class="tab"
+    data-key="progression"
+    style="--tab-color:#B7E4C7"
+  >
+    <span class="tab-icon">↗️</span>
+    <span class="tab-name">PROGRESSION</span>
+  </button>
+
+</nav>
+
+
+<!-- ANTISECHE -->
+
+<section class="card">
+
+  <div class="hero">
+
+    <div
+      class="hero-icon"
+      id="icon"
+    ></div>
+
+    <h2 id="title"></h2>
+
+    <div
+      class="goal"
+      id="goal"
+    ></div>
+
+  </div>
+
+
+  <div class="content">
+
+
+    <section class="section">
+
+      <div class="label">
+        POUR COMMENCER
+      </div>
+
+      <div
+        class="amorce"
+        id="starter"
+      ></div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="label">
+        MOTS UTILES
+      </div>
+
+      <div
+        class="chips"
+        id="words"
+      ></div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="label">
+        MINI-RECETTE
+      </div>
+
+      <div
+        class="recipe"
+        id="recipe"
+      ></div>
+
+    </section>
+
+
+    <section class="section">
+
+      <div class="label">
+        RELANCES UTILES
+      </div>
+
+      <div
+        class="questions"
+        id="questions"
+      ></div>
+
+    </section>
+
+
+    <div
+      class="tip"
+      id="tip"
+    ></div>
+
+
+  </div>
+
+</section>
+
+</main>
+
+
+<script>
+"use strict";
+
+
+/* =========================
+   DATA
+========================= */
+
+const data={
+
+
+distorsion:{
+
+  color:"#FFD166",
+
+  icon:"⏳",
+
+  title:"DISTORSION",
+
+  goal:
+    "Étirer, raccourcir ou suspendre le temps.",
+
+  starter:
+    "« Et pendant que… »",
+
+  words:[
+    "déjà",
+    "encore",
+    "peu à peu",
+    "lentement",
+    "soudain",
+    "un instant",
+    "pendant que",
+    "juste avant"
+  ],
+
+  recipe:[
+    "RYTHMER",
+    "AMPLIFIER",
+    "CONTRASTER"
+  ],
+
+  questions:[
+    "« Et si cela ralentissait encore un peu… ? »",
+    "« Et pendant cet instant… ? »",
+    "« Et puis, soudain… ? »",
+    "« Que se passe-t-il quand ça va beaucoup plus vite ? »"
+  ],
+
+  tip:
+    "⭐ La voix fait ce que fait le temps : ralentissez pour ralentir, accélérez pour accélérer, faites silence pour suspendre."
+
+},
+
+
+regression:{
+
+  color:"#A8DADC",
+
+  icon:"↩️",
+
+  title:"RÉGRESSION",
+
+  goal:
+    "Rapprocher une expérience passée et la rendre plus présente.",
+
+  starter:
+    "« Laissez revenir un moment où… »",
+
+  words:[
+    "à ce moment-là",
+    "juste avant",
+    "retrouver",
+    "se rappeler",
+    "revenir",
+    "et là…",
+    "à cet endroit",
+    "à nouveau"
+  ],
+
+  recipe:[
+    "ÉVOQUER",
+    "SENSORIALISER",
+    "PRÉSENTIFIER"
+  ],
+
+  questions:[
+    "« Qu'est-ce qui revient en premier ? »",
+    "« Qu'est-ce que vous voyez ? »",
+    "« Qu'est-ce que vous entendez ? »",
+    "« Et là, qu'est-ce que vous ressentez ? »"
+  ],
+
+  tip:
+    "⭐ Passez progressivement du souvenir raconté au souvenir vécu : moins raconter ce qui s'est passé, davantage remarquer ce qui est là."
+
+},
+
+
+progression:{
+
+  color:"#B7E4C7",
+
+  icon:"↗️",
+
+  title:"PROGRESSION",
+
+  goal:
+    "Avancer dans le temps et rendre un futur perceptible.",
+
+  starter:
+    "« Imaginez-vous dans quelque temps… »",
+
+  words:[
+    "bientôt",
+    "plus tard",
+    "progressivement",
+    "un jour",
+    "dans quelque temps",
+    "plus loin",
+    "et là…",
+    "depuis là-bas"
+  ],
+
+  recipe:[
+    "AVANCER",
+    "SENSORIALISER",
+    "OBSERVER"
+  ],
+
+  questions:[
+    "« Où êtes-vous ? »",
+    "« Qu'est-ce que vous remarquez ? »",
+    "« Qu'est-ce qui est différent ? »",
+    "« Depuis là-bas, comment voyez-vous le chemin parcouru ? »"
+  ],
+
+  tip:
+    "⭐ Faites comme si on y était : ne parlez pas seulement du futur, faites-le voir, entendre et ressentir."
+
+}
+
+};
+
+
+/* =========================
+   DOM
+========================= */
+
+const $=id=>
+  document.getElementById(id);
+
+const tabs=
+  document.querySelectorAll(".tab");
+
+
+/* =========================
+   RENDER
+========================= */
+
+function render(key){
+
+  const item=data[key];
+
+  document.documentElement
+    .style
+    .setProperty(
+      "--active",
+      item.color
+    );
+
+
+  $("icon").textContent=
+    item.icon;
+
+  $("title").textContent=
+    item.title;
+
+  $("goal").textContent=
+    item.goal;
+
+  $("starter").textContent=
+    item.starter;
+
+  $("tip").textContent=
+    item.tip;
+
+
+  /* WORDS */
+
+  $("words").innerHTML="";
+
+  item.words.forEach(word=>{
+
+    const span=
+      document.createElement("span");
+
+    span.className="chip";
+    span.textContent=word;
+
+    $("words").appendChild(span);
+
+  });
+
+
+  /* RECIPE */
+
+  $("recipe").innerHTML="";
+
+  item.recipe.forEach(
+    (step,index)=>{
+
+      const span=
+        document.createElement("span");
+
+      span.className="step";
+      span.textContent=step;
+
+      $("recipe").appendChild(span);
+
+
+      if(
+        index<
+        item.recipe.length-1
+      ){
+
+        const arrow=
+          document.createElement("span");
+
+        arrow.className="arrow";
+        arrow.textContent="→";
+
+        $("recipe")
+          .appendChild(arrow);
+
+      }
+
+    }
+  );
+
+
+  /* QUESTIONS */
+
+  $("questions").innerHTML="";
+
+  item.questions.forEach(text=>{
+
+    const div=
+      document.createElement("div");
+
+    div.className="question";
+    div.textContent=text;
+
+    $("questions")
+      .appendChild(div);
+
+  });
+
+
+  /* ACTIVE TAB */
+
+  tabs.forEach(tab=>{
+
+    tab.classList.toggle(
+      "active",
+      tab.dataset.key===key
+    );
+
+  });
+
+
+  /* SAVE LAST TAB */
+
+  try{
+
+    localStorage.setItem(
+      "hypnose_temps_tab",
+      key
+    );
+
+  }catch(e){}
+
+}
+
+
+/* =========================
+   EVENTS
+========================= */
+
+tabs.forEach(tab=>{
+
+  tab.addEventListener(
+    "click",
+    ()=>render(
+      tab.dataset.key
+    )
+  );
+
+});
+
+
+/* =========================
+   INIT
+========================= */
+
+let initial="distorsion";
+
+try{
+
+  const saved=
+    localStorage.getItem(
+      "hypnose_temps_tab"
+    );
+
+  if(data[saved]){
+    initial=saved;
+  }
+
+}catch(e){}
+
+render(initial);
+
+</script>
+
+</body>
+</html>
