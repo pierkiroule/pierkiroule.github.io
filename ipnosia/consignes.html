@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fffdf7">
+<title>Consignes Exos</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --ink:#0b0b0b;
+  --paper:#fffdf7;
+  --yellow:#ffd34e;
+  --blue:#9fddff;
+  --green:#aee6b8;
+  --active:var(--yellow);
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+button{
+  font:inherit;
+  color:inherit;
+}
+
+.app{
+  max-width:850px;
+  margin:auto;
+  padding:20px 18px 70px;
+}
+
+
+/* HEADER */
+
+header{
+  padding:8px 2px 22px;
+}
+
+.eyebrow{
+  font-size:.72rem;
+  font-weight:1000;
+  letter-spacing:.16em;
+}
+
+h1{
+  margin:6px 0 0;
+  font-size:clamp(2.8rem,10vw,5rem);
+  line-height:.88;
+  letter-spacing:-.06em;
+}
+
+
+/* TABS */
+
+.tabs-wrap{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:8px 0;
+  background:var(--paper);
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+.tab{
+  min-height:70px;
+  padding:8px 4px;
+  border:3px solid var(--ink);
+  border-radius:17px;
+  background:white;
+  cursor:pointer;
+  font-weight:1000;
+}
+
+.tab.active{
+  background:var(--tab);
+  box-shadow:4px 4px 0 var(--ink);
+  transform:translate(-2px,-2px);
+}
+
+.tab .ico{
+  display:block;
+  font-size:1.5rem;
+  margin-bottom:4px;
+}
+
+.tab .name{
+  display:block;
+  font-size:clamp(.62rem,2.5vw,.88rem);
+}
+
+
+/* MAIN CARD */
+
+.card{
+  margin-top:12px;
+  border:3px solid var(--ink);
+  border-radius:26px;
+  overflow:hidden;
+  background:white;
+}
+
+.hero{
+  padding:28px 24px;
+  background:var(--active);
+  border-bottom:3px solid var(--ink);
+}
+
+.hero-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+}
+
+.hero-icon{
+  font-size:3rem;
+}
+
+.time{
+  flex:none;
+  padding:8px 12px;
+  border:2px solid var(--ink);
+  border-radius:999px;
+  background:white;
+  font-weight:1000;
+}
+
+.hero h2{
+  margin:13px 0 8px;
+  font-size:clamp(2.3rem,8vw,4.3rem);
+  line-height:.9;
+  letter-spacing:-.055em;
+}
+
+.mission{
+  max-width:650px;
+  font-size:1.15rem;
+  line-height:1.35;
+  font-weight:850;
+}
+
+
+/* CONTENT */
+
+.content{
+  padding:25px 22px 30px;
+}
+
+.block{
+  margin-top:30px;
+}
+
+.block:first-child{
+  margin-top:0;
+}
+
+.label{
+  margin-bottom:10px;
+  font-size:.69rem;
+  font-weight:1000;
+  letter-spacing:.14em;
+}
+
+
+/* SITUATIONS */
+
+.situations{
+  display:grid;
+  gap:7px;
+}
+
+.situation{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  width:100%;
+  padding:13px 14px;
+  border:2px solid var(--ink);
+  border-radius:13px;
+  background:white;
+  text-align:left;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.situation.selected{
+  background:var(--active);
+}
+
+.number{
+  display:grid;
+  place-items:center;
+  flex:0 0 27px;
+  height:27px;
+  border:2px solid var(--ink);
+  border-radius:50%;
+  font-size:.75rem;
+  font-weight:1000;
+  background:white;
+}
+
+
+/* CHALLENGE */
+
+.challenge{
+  padding:17px;
+  border:3px solid var(--ink);
+  border-radius:17px;
+  background:var(--active);
+}
+
+.challenge-title{
+  font-size:clamp(1.2rem,4vw,1.6rem);
+  font-weight:1000;
+}
+
+.steps{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:12px;
+}
+
+.step{
+  padding:7px 9px;
+  border:2px solid var(--ink);
+  border-radius:9px;
+  background:white;
+  font-size:.82rem;
+  font-weight:1000;
+}
+
+.arrow{
+  font-weight:1000;
+}
+
+
+/* TIPS */
+
+.tips{
+  display:grid;
+  gap:9px;
+}
+
+.tip{
+  position:relative;
+  padding:12px 13px 12px 38px;
+  border-left:5px solid var(--active);
+  background:var(--paper);
+  font-size:.98rem;
+  line-height:1.38;
+  font-weight:750;
+}
+
+.tip::before{
+  content:"→";
+  position:absolute;
+  left:12px;
+  top:11px;
+  font-weight:1000;
+}
+
+
+/* GOLD TIP */
+
+.gold-tip{
+  padding:18px;
+  border:3px solid var(--ink);
+  border-radius:18px;
+  background:var(--active);
+  font-size:clamp(1.1rem,4vw,1.4rem);
+  line-height:1.3;
+  font-weight:1000;
+}
+
+
+/* OBSERVER */
+
+.observer{
+  padding:18px;
+  border:3px dashed var(--ink);
+  border-radius:18px;
+}
+
+.observer strong{
+  display:block;
+  margin-bottom:7px;
+  font-size:.72rem;
+  letter-spacing:.12em;
+}
+
+.observer-question{
+  font-size:1.08rem;
+  line-height:1.35;
+  font-weight:900;
+}
+
+
+/* TIMER */
+
+.timer-box{
+  margin-top:32px;
+  padding-top:25px;
+  border-top:3px solid var(--ink);
+}
+
+.timer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.clock{
+  font-size:clamp(2.4rem,10vw,4rem);
+  line-height:1;
+  font-weight:1000;
+  font-variant-numeric:tabular-nums;
+}
+
+.timer-actions{
+  display:flex;
+  gap:7px;
+}
+
+.timer-btn{
+  min-height:48px;
+  padding:0 15px;
+  border:3px solid var(--ink);
+  border-radius:12px;
+  background:white;
+  cursor:pointer;
+  font-weight:1000;
+}
+
+.timer-btn.primary{
+  background:var(--active);
+}
+
+
+/* NEXT */
+
+.next{
+  width:100%;
+  margin-top:25px;
+  padding:16px;
+  border:3px solid var(--ink);
+  border-radius:16px;
+  background:var(--ink);
+  color:white;
+  cursor:pointer;
+  font-weight:1000;
+  font-size:1rem;
+}
+
+
+/* MOBILE */
+
+@media(max-width:520px){
+
+  .app{
+    padding:12px 12px 55px;
+  }
+
+  header{
+    padding-top:10px;
+  }
+
+  .tab{
+    min-height:64px;
+  }
+
+  .content{
+    padding:21px 17px 25px;
+  }
+
+  .timer{
+    align-items:flex-end;
+  }
+
+  .timer-actions{
+    flex-direction:column;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <header>
+    <div class="eyebrow">HYPNOSE • TRAVAIL EN TRINÔME</div>
+    <h1>Consignes<br>Exos</h1>
+  </header>
+
+
+  <div class="tabs-wrap">
+    <nav class="tabs">
+
+      <button class="tab active"
+              data-key="distorsion"
+              style="--tab:#ffd34e">
+        <span class="ico">⏳</span>
+        <span class="name">DISTORSION</span>
+      </button>
+
+      <button class="tab"
+              data-key="regression"
+              style="--tab:#9fddff">
+        <span class="ico">↩️</span>
+        <span class="name">RÉGRESSION</span>
+      </button>
+
+      <button class="tab"
+              data-key="progression"
+              style="--tab:#aee6b8">
+        <span class="ico">↗️</span>
+        <span class="name">PROGRESSION</span>
+      </button>
+
+    </nav>
+  </div>
+
+
+  <article class="card">
+
+    <section class="hero">
+
+      <div class="hero-top">
+        <div class="hero-icon" id="icon"></div>
+        <div class="time">15 MIN</div>
+      </div>
+
+      <h2 id="title"></h2>
+
+      <div class="mission" id="mission"></div>
+
+    </section>
+
+
+    <section class="content">
+
+      <div class="block">
+
+        <div class="label">1 · LE PATIENT CHOISIT UNE SITUATION</div>
+
+        <div class="situations" id="situations"></div>
+
+      </div>
+
+
+      <div class="block">
+
+        <div class="label">2 · PRATICIEN — VOTRE DÉFI</div>
+
+        <div class="challenge">
+
+          <div class="challenge-title" id="challenge"></div>
+
+          <div class="steps" id="steps"></div>
+
+        </div>
+
+      </div>
+
+
+      <div class="block">
+
+        <div class="label">3 · TIPS</div>
+
+        <div class="tips" id="tips"></div>
+
+      </div>
+
+
+      <div class="block">
+
+        <div class="gold-tip" id="goldTip"></div>
+
+      </div>
+
+
+      <div class="block">
+
+        <div class="observer">
+
+          <strong>👁 OBSERVATEUR</strong>
+
+          <div class="observer-question"
+               id="observer"></div>
+
+        </div>
+
+      </div>
+
+
+      <div class="timer-box">
+
+        <div class="label">CHRONO DE L'EXERCICE</div>
+
+        <div class="timer">
+
+          <div class="clock" id="clock">15:00</div>
+
+          <div class="timer-actions">
+
+            <button class="timer-btn primary"
+                    id="startTimer">
+              ▶ START
+            </button>
+
+            <button class="timer-btn"
+                    id="resetTimer">
+              ↺
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <button class="next" id="next">
+        EXERCICE SUIVANT →
+      </button>
+
+    </section>
+
+  </article>
+
+</main>
+
+
+<script>
+const DATA={
+
+distorsion:{
+  color:"#ffd34e",
+  icon:"⏳",
+  title:"DISTORSION",
+  mission:"Faire vivre le temps autrement : le ralentir, l'accélérer ou le suspendre.",
+
+  situations:[
+    "Une attente qui paraît interminable",
+    "Un soin à rendre subjectivement plus court",
+    "Une douleur qui semble étirer le temps",
+    "Un moment agréable à prolonger",
+    "Une situation où l'on compte les minutes"
+  ],
+
+  challenge:"Jouez avec la perception du temps.",
+
+  steps:[
+    "RYTHMER",
+    "MODIFIER",
+    "CONTRASTER"
+  ],
+
+  tips:[
+    "Pour ralentir : ralentissez votre débit, détaillez, espacez.",
+    "Pour accélérer : raccourcissez les phrases — « puis… et déjà… »",
+    "Pour suspendre : « juste avant que… » puis laissez un silence.",
+    "Essayez : déjà · encore · peu à peu · pendant que · soudain · un instant.",
+    "Métaphorisez : étirer · raccourcir · suspendre · accélérer · laisser filer."
+  ],
+
+  gold:"⭐ Faites avec votre voix ce que vous suggérez au temps.",
+
+  observer:"À quel moment avez-vous senti que la perception du temps changeait ?"
+},
+
+
+regression:{
+  color:"#9fddff",
+  icon:"↩️",
+  title:"RÉGRESSION",
+  mission:"Aider le patient à retrouver une expérience passée ressource.",
+
+  situations:[
+    "Un souvenir de calme",
+    "Un moment de sécurité",
+    "Une expérience de réussite",
+    "Un moment de confiance",
+    "Une expérience sensorielle agréable"
+  ],
+
+  challenge:"Ne faites pas seulement raconter le souvenir. Aidez à le retrouver.",
+
+  steps:[
+    "ÉVOQUER",
+    "SENSORIALISER",
+    "PRÉSENTIFIER"
+  ],
+
+  tips:[
+    "Commencez largement : « Laissez revenir un moment où… »",
+    "Demandez ce qui revient en premier.",
+    "Explorez : image · son · sensation · mouvement · lieu.",
+    "Rapprochez : « À ce moment-là… » puis « Et là… »",
+    "Laissez le patient compléter : ne remplissez pas le souvenir à sa place."
+  ],
+
+  gold:"⭐ Passez progressivement du souvenir raconté au souvenir vécu.",
+
+  observer:"À quel moment le patient semble-t-il moins raconter et davantage revivre ?"
+},
+
+
+progression:{
+  color:"#aee6b8",
+  icon:"↗️",
+  title:"PROGRESSION",
+  mission:"Aider le patient à explorer une situation future de façon concrète.",
+
+  situations:[
+    "Se projeter après un soin",
+    "Une situation devenue plus facile",
+    "Un petit changement souhaité",
+    "Un projet réalisé",
+    "Une prochaine utilisation d'une ressource"
+  ],
+
+  challenge:"Faites du futur un endroit mental que le patient peut explorer.",
+
+  steps:[
+    "AVANCER",
+    "SENSORIALISER",
+    "EXPLORER"
+  ],
+
+  tips:[
+    "Commencez : « Imaginez-vous dans quelque temps… »",
+    "Demandez simplement : « Où êtes-vous ? »",
+    "Puis : « Qu'est-ce que vous remarquez ? »",
+    "Explorez : image · son · sensation · posture · environnement.",
+    "Cherchez de petites différences plutôt qu'un changement spectaculaire.",
+    "Changez de point de vue : « Depuis là-bas, comment voyez-vous les choses ? »"
+  ],
+
+  gold:"⭐ Ne parlez pas seulement du futur : faites comme si on y était.",
+
+  observer:"À quel moment le futur devient-il suffisamment concret pour être perçu et ressenti ?"
+}
+
+};
+
+
+const ORDER=[
+  "distorsion",
+  "regression",
+  "progression"
+];
+
+const $=id=>document.getElementById(id);
+
+let current="distorsion";
+
+
+function render(key){
+
+  current=key;
+
+  const d=DATA[key];
+
+  document.documentElement
+    .style
+    .setProperty("--active",d.color);
+
+  $("icon").textContent=d.icon;
+  $("title").textContent=d.title;
+  $("mission").textContent=d.mission;
+  $("challenge").textContent=d.challenge;
+  $("goldTip").textContent=d.gold;
+  $("observer").textContent=d.observer;
+
+
+  /* situations */
+
+  $("situations").innerHTML="";
+
+  d.situations.forEach((text,i)=>{
+
+    const button=document.createElement("button");
+
+    button.className="situation";
+
+    button.innerHTML=
+      `<span class="number">${i+1}</span>
+       <span>${text}</span>`;
+
+    button.onclick=()=>{
+
+      document
+        .querySelectorAll(".situation")
+        .forEach(x=>x.classList.remove("selected"));
+
+      button.classList.add("selected");
+    };
+
+    $("situations").appendChild(button);
+  });
+
+
+  /* steps */
+
+  $("steps").innerHTML="";
+
+  d.steps.forEach((step,i)=>{
+
+    const s=document.createElement("span");
+    s.className="step";
+    s.textContent=step;
+
+    $("steps").appendChild(s);
+
+    if(i<d.steps.length-1){
+
+      const arrow=document.createElement("span");
+      arrow.className="arrow";
+      arrow.textContent="→";
+
+      $("steps").appendChild(arrow);
+    }
+  });
+
+
+  /* tips */
+
+  $("tips").innerHTML="";
+
+  d.tips.forEach(text=>{
+
+    const tip=document.createElement("div");
+
+    tip.className="tip";
+    tip.textContent=text;
+
+    $("tips").appendChild(tip);
+  });
+
+
+  /* tabs */
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(tab=>{
+
+      tab.classList.toggle(
+        "active",
+        tab.dataset.key===key
+      );
+
+    });
+
+
+  resetTimer();
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+
+/* TABS */
+
+document
+  .querySelectorAll(".tab")
+  .forEach(tab=>{
+
+    tab.onclick=()=>render(tab.dataset.key);
+
+  });
+
+
+/* NEXT */
+
+$("next").onclick=()=>{
+
+  const index=ORDER.indexOf(current);
+
+  const next=
+    ORDER[(index+1)%ORDER.length];
+
+  render(next);
+};
+
+
+/* ======================
+   TIMER 15 MIN
+====================== */
+
+let remaining=15*60;
+let interval=null;
+let running=false;
+
+
+function drawClock(){
+
+  const min=
+    Math.floor(remaining/60);
+
+  const sec=
+    remaining%60;
+
+  $("clock").textContent=
+    String(min).padStart(2,"0")
+    +":"
+    +String(sec).padStart(2,"0");
+
+}
+
+
+function startTimer(){
+
+  if(running){
+
+    clearInterval(interval);
+    running=false;
+
+    $("startTimer").textContent="▶ REPRENDRE";
+
+    return;
+  }
+
+  running=true;
+
+  $("startTimer").textContent="Ⅱ PAUSE";
+
+  interval=setInterval(()=>{
+
+    if(remaining>0){
+
+      remaining--;
+      drawClock();
+
+    }else{
+
+      clearInterval(interval);
+      running=false;
+
+      $("startTimer").textContent="TERMINÉ";
+
+      if(navigator.vibrate){
+        navigator.vibrate([200,100,200]);
+      }
+
+    }
+
+  },1000);
+
+}
+
+
+function resetTimer(){
+
+  clearInterval(interval);
+
+  interval=null;
+  running=false;
+  remaining=15*60;
+
+  drawClock();
+
+  $("startTimer").textContent="▶ START";
+}
+
+
+$("startTimer").onclick=startTimer;
+$("resetTimer").onclick=resetTimer;
+
+
+/* INIT */
+
+render("distorsion");
+</script>
+
+</body>
+</html>
