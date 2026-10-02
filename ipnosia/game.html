@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Le temps, c'est quoi ?</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#fffdf7;
+  color:#000;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.app{
+  max-width:900px;
+  margin:auto;
+  padding:24px;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+  border-bottom:4px solid #000;
+  padding-bottom:18px;
+}
+
+.kicker{
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.15em;
+}
+
+h1{
+  margin:5px 0 0;
+  font-size:clamp(34px,6vw,70px);
+  line-height:.95;
+}
+
+.stats{
+  text-align:right;
+  font-weight:900;
+}
+
+.timer{
+  font-size:30px;
+}
+
+.score{
+  margin-top:5px;
+  font-size:18px;
+}
+
+/* QUESTION */
+
+.question{
+  min-height:300px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:30px 10px;
+}
+
+.question-label{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+
+.expression{
+  margin-top:25px;
+  font-size:clamp(35px,7vw,72px);
+  line-height:1.05;
+  font-weight:900;
+}
+
+.feedback{
+  min-height:35px;
+  margin-top:25px;
+  font-size:20px;
+  font-weight:900;
+}
+
+/* BUTTONS */
+
+.categories{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.cat{
+  border:3px solid #000;
+  background:white;
+  color:#000;
+  border-radius:14px;
+  min-height:80px;
+  padding:12px;
+  font-size:17px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.1s;
+}
+
+.cat:hover{
+  transform:translateY(-2px);
+}
+
+.cat:active{
+  transform:scale(.97);
+}
+
+.cat.good{
+  background:#b9efc5;
+}
+
+.cat.bad{
+  background:#ff9c9c;
+}
+
+/* FOOT */
+
+footer{
+  margin-top:25px;
+  border-top:4px solid #000;
+  padding-top:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:900;
+}
+
+.restart{
+  border:3px solid #000;
+  background:#ffd84f;
+  color:#000;
+  padding:12px 20px;
+  border-radius:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+/* END */
+
+.end{
+  display:none;
+  margin-top:30px;
+  border:4px solid #000;
+  padding:30px;
+  border-radius:18px;
+  text-align:center;
+}
+
+.end h2{
+  font-size:clamp(30px,5vw,55px);
+  margin:0 0 15px;
+}
+
+.end-score{
+  font-size:30px;
+  font-weight:900;
+}
+
+.reveal{
+  margin-top:25px;
+  font-size:22px;
+  line-height:1.4;
+  font-weight:700;
+}
+
+@media(max-width:650px){
+
+  header{
+    align-items:flex-start;
+  }
+
+  .categories{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .cat{
+    min-height:70px;
+    font-size:15px;
+  }
+
+  .question{
+    min-height:260px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+  <div>
+    <div class="kicker">JEU FLASH · HYPNOSE & TEMPORALITÉ</div>
+    <h1>Le temps,<br>c'est quoi ?</h1>
+  </div>
+
+  <div class="stats">
+    <div class="timer" id="timer">00:00</div>
+    <div class="score" id="score">0 / 0</div>
+  </div>
+
+</header>
+
+
+<main>
+
+<section class="question">
+
+  <div class="question-label">
+    CETTE EXPRESSION TRANSFORME LE TEMPS EN…
+  </div>
+
+  <div class="expression" id="expression">
+    « Le temps file »
+  </div>
+
+  <div class="feedback" id="feedback">
+    Classez !
+  </div>
+
+</section>
+
+
+<section class="categories">
+
+<button class="cat" data-category="ARGENT">
+💰<br>ARGENT
+</button>
+
+<button class="cat" data-category="ESPACE">
+🗺️<br>ESPACE
+</button>
+
+<button class="cat" data-category="MOUVEMENT">
+🏃<br>MOUVEMENT
+</button>
+
+<button class="cat" data-category="EAU">
+💧<br>EAU
+</button>
+
+<button class="cat" data-category="MATIÈRE">
+🧶<br>MATIÈRE
+</button>
+
+<button class="cat" data-category="PERSONNAGE">
+🧍<br>PERSONNAGE
+</button>
+
+</section>
+
+
+<footer>
+
+<div>
+<span id="number">1</span> / 15
+</div>
+
+<button class="restart" id="restart">
+↻ REJOUER
+</button>
+
+</footer>
+
+
+<section class="end" id="end">
+
+<h2>Temps écoulé !</h2>
+
+<div class="end-score" id="endScore"></div>
+
+<div class="reveal">
+
+Nous parlons constamment du temps<br>
+<strong>en le transformant en autre chose.</strong>
+
+<br><br>
+
+💰 argent · 🗺️ espace · 🏃 mouvement<br>
+💧 eau · 🧶 matière · 🧍 personnage
+
+<br><br>
+
+Le langage rend déjà le temps<br>
+<strong>perceptible et manipulable.</strong>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
+
+const BANK = [
+
+["Gagner du temps","ARGENT"],
+["Perdre son temps","ARGENT"],
+["Économiser du temps","ARGENT"],
+["Dépenser son temps","ARGENT"],
+
+["Avoir l'avenir devant soi","ESPACE"],
+["Laisser le passé derrière soi","ESPACE"],
+["Revenir en arrière","ESPACE"],
+["Le chemin parcouru","ESPACE"],
+
+["Le temps file","MOUVEMENT"],
+["Le temps court","MOUVEMENT"],
+["Le temps s'envole","MOUVEMENT"],
+["Courir après le temps","MOUVEMENT"],
+
+["Le temps s'écoule","EAU"],
+["Le cours du temps","EAU"],
+["Remonter le temps","EAU"],
+
+["Au fil du temps","MATIÈRE"],
+["Un moment suspendu","MATIÈRE"],
+["Une tranche de vie","MATIÈRE"],
+["Prendre son temps","MATIÈRE"],
+
+["Le temps nous rattrape","PERSONNAGE"],
+["Le temps fait son œuvre","PERSONNAGE"],
+["Laisser faire le temps","PERSONNAGE"]
+
+];
+
+
+const expression =
+document.getElementById("expression");
+
+const feedback =
+document.getElementById("feedback");
+
+const scoreEl =
+document.getElementById("score");
+
+const numberEl =
+document.getElementById("number");
+
+const timerEl =
+document.getElementById("timer");
+
+const end =
+document.getElementById("end");
+
+const endScore =
+document.getElementById("endScore");
+
+const buttons =
+document.querySelectorAll(".cat");
+
+
+let deck=[];
+let index=0;
+let score=0;
+let locked=false;
+
+let startTime;
+let timerInterval;
+
+
+function shuffle(array){
+
+return [...array].sort(
+()=>Math.random()-.5
+);
+
+}
+
+
+function start(){
+
+clearInterval(timerInterval);
+
+deck=shuffle(BANK).slice(0,15);
+
+index=0;
+score=0;
+locked=false;
+
+end.style.display="none";
+
+scoreEl.textContent="0 / 0";
+
+startTime=Date.now();
+
+timerInterval=setInterval(updateTimer,250);
+
+showQuestion();
+
+}
+
+
+function updateTimer(){
+
+const seconds=
+Math.floor((Date.now()-startTime)/1000);
+
+const min=
+String(Math.floor(seconds/60))
+.padStart(2,"0");
+
+const sec=
+String(seconds%60)
+.padStart(2,"0");
+
+timerEl.textContent=
+min+":"+sec;
+
+}
+
+
+function showQuestion(){
+
+buttons.forEach(b=>{
+b.classList.remove("good","bad");
+});
+
+if(index>=deck.length){
+
+finish();
+return;
+
+}
+
+expression.textContent=
+"« "+deck[index][0]+" »";
+
+feedback.textContent=
+"Classez !";
+
+numberEl.textContent=
+index+1;
+
+locked=false;
+
+}
+
+
+function answer(button){
+
+if(locked) return;
+
+locked=true;
+
+const selected=
+button.dataset.category;
+
+const correct=
+deck[index][1];
+
+
+if(selected===correct){
+
+score++;
+
+button.classList.add("good");
+
+feedback.textContent=
+"✓ "+correct+" !";
+
+}else{
+
+button.classList.add("bad");
+
+const correctButton=
+document.querySelector(
+'[data-category="'+correct+'"]'
+);
+
+correctButton.classList.add("good");
+
+feedback.textContent=
+"→ "+correct;
+
+}
+
+
+scoreEl.textContent=
+score+" / "+(index+1);
+
+
+setTimeout(()=>{
+
+index++;
+
+showQuestion();
+
+},700);
+
+}
+
+
+function finish(){
+
+clearInterval(timerInterval);
+
+expression.textContent=
+"TERMINÉ !";
+
+feedback.textContent="";
+
+document.querySelector(".categories")
+.style.display="none";
+
+end.style.display="block";
+
+endScore.textContent=
+score+" / "+deck.length+
+" · "+timerEl.textContent;
+
+}
+
+
+buttons.forEach(button=>{
+
+button.addEventListener(
+"click",
+()=>answer(button)
+);
+
+});
+
+
+document.getElementById("restart")
+.addEventListener("click",()=>{
+
+document.querySelector(".categories")
+.style.display="grid";
+
+start();
+
+});
+
+
+start();
+
+</script>
+
+</body>
+</html>
