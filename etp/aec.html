@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>J'apprends à construire un conducteur d'AEC</title>
+  <style>
+    :root {
+      --primary: #176b68;
+      --dark: #193b40;
+      --light: #eaf5f2;
+      --bg: #f6f8f7;
+      --muted: #607277;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--dark);
+      font-family: system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 44px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      line-height: 1.2;
+      margin: 12px auto;
+      max-width: 750px;
+    }
+
+    header p { opacity: .9; }
+
+    main {
+      max-width: 850px;
+      margin: auto;
+      padding: 28px 18px 60px;
+    }
+
+    .intro, .step, .conclusion {
+      background: white;
+      border-radius: 18px;
+      padding: 26px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 18px #163b4010;
+    }
+
+    .intro {
+      border-left: 5px solid var(--primary);
+    }
+
+    .step-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .number {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--light);
+      color: var(--primary);
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .step h2 {
+      font-size: 1.25rem;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .time {
+      display: inline-block;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: .9rem;
+      margin-top: 4px;
+    }
+
+    ul { padding-left: 22px; }
+    li { margin: 7px 0; }
+
+    .example {
+      background: var(--light);
+      border-radius: 12px;
+      padding: 15px 18px;
+      margin-top: 18px;
+    }
+
+    .example strong { color: var(--primary); }
+
+    .question {
+      font-weight: 700;
+      font-size: 1.08rem;
+      color: var(--primary);
+    }
+
+    .conclusion {
+      background: var(--dark);
+      color: white;
+      text-align: center;
+    }
+
+    .conclusion h2 { margin-top: 0; }
+
+    .tag {
+      display: inline-block;
+      background: #ffffff20;
+      border: 1px solid #ffffff50;
+      border-radius: 30px;
+      padding: 5px 14px;
+      font-size: .85rem;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+      padding: 20px;
+    }
+
+    @media print {
+      body { background: white; }
+      header { padding: 20px; }
+      main { padding: 10px; }
+      .intro, .step, .conclusion {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div>FORMATION ETP • TRAVAIL EN SOUS-GROUPES</div>
+  <h1>J'apprends à construire<br>un conducteur de séance</h1>
+  <p>À partir d'une activité éducative ciblée (AEC)</p>
+  <div class="tag">45 minutes · Groupes de 4 à 5</div>
+</header>
+
+<main>
+
+  <section class="intro">
+    <h2>Votre mission</h2>
+    <p>
+      Vous êtes une équipe de soignants.
+      Votre défi est de concevoir le conducteur
+      d'une activité éducative ciblée (AEC)
+      de 20 à 30 minutes.
+    </p>
+    <p>
+      <strong>Objectif :</strong> produire un document
+      suffisamment clair pour qu'une autre équipe
+      puisse animer votre activité.
+    </p>
+  </section>
+
+  <section class="step">
+    <div class="step-head">
+      <div class="number">1</div>
+      <div>
+        <h2>Choisissez votre situation</h2>
+        <span class="time">5 minutes</span>
+      </div>
+    </div>
+
+    <p>Ensemble, choisissez :</p>
+    <ul>
+      <li>Une pathologie chronique</li>
+      <li>Un public : enfants, adolescents, adultes, aidants...</li>
+      <li>Un besoin éducatif concret</li>
+      <li>Une compétence à développer</li>
+    </ul>
+
+    <div class="example">
+      <strong>Exemple</strong><br>
+      Diabète de type 1 · Adolescents ·
+      Apprendre à reconnaître et gérer
+      une hypoglycémie.
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-head">
+      <div class="number">2</div>
+      <div>
+        <h2>Formulez votre objectif</h2>
+        <span class="time">5 minutes</span>
+      </div>
+    </div>
+
+    <p class="question">
+      À la fin de l'activité, que sera capable
+      de faire le patient ?
+    </p>
+
+    <p>
+      Formulez un objectif précis, réaliste
+      et observable.
+    </p>
+
+    <div class="example">
+      <strong>Exemple</strong><br>
+      « À l'issue de l'activité, le patient sera
+      capable d'identifier les signes
+      d'une hypoglycémie et de choisir
+      une conduite adaptée. »
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-head">
+      <div class="number">3</div>
+      <div>
+        <h2>Construisez votre conducteur</h2>
+        <span class="time">15 minutes</span>
+      </div>
+    </div>
+
+    <p>
+      Organisez votre activité de 20 à 30 minutes
+      en plusieurs séquences.
+    </p>
+
+    <p>Pour chaque séquence, précisez :</p>
+    <ul>
+      <li><strong>Durée :</strong> combien de minutes ?</li>
+      <li><strong>Objectif :</strong> pourquoi cette étape ?</li>
+      <li><strong>Activité :</strong> que fait le patient ?</li>
+      <li><strong>Animation :</strong> que dit et fait le soignant ?</li>
+      <li><strong>Supports :</strong> avec quel matériel ?</li>
+      <li><strong>Évaluation :</strong> comment vérifier les acquis ?</li>
+    </ul>
+
+    <div class="example">
+      <strong>Un déroulement possible</strong><br>
+      1. Accueillir et explorer les représentations<br>
+      2. Faire découvrir et expérimenter<br>
+      3. Mettre en pratique<br>
+      4. Faire le bilan des apprentissages
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-head">
+      <div class="number">4</div>
+      <div>
+        <h2>Testez votre conducteur</h2>
+        <span class="time">10 minutes</span>
+      </div>
+    </div>
+
+    <p>
+      Échangez votre conducteur avec
+      un autre sous-groupe.
+    </p>
+
+    <p class="question">
+      Pourriez-vous animer cette activité
+      demain, sans explication supplémentaire ?
+    </p>
+
+    <ul>
+      <li>Les consignes sont-elles compréhensibles ?</li>
+      <li>Le patient est-il réellement actif ?</li>
+      <li>Les activités répondent-elles à l'objectif ?</li>
+      <li>Les durées sont-elles réalistes ?</li>
+      <li>Les acquis peuvent-ils être évalués ?</li>
+    </ul>
+
+    <p>
+      Identifiez deux points forts et
+      une piste d'amélioration.
+    </p>
+  </section>
+
+  <section class="step">
+    <div class="step-head">
+      <div class="number">5</div>
+      <div>
+        <h2>Partagez vos apprentissages</h2>
+        <span class="time">10 minutes</span>
+      </div>
+    </div>
+
+    <p>En grand groupe, partagez :</p>
+    <ul>
+      <li>Une difficulté rencontrée</li>
+      <li>Une découverte importante</li>
+      <li>Un conseil pour construire un bon conducteur</li>
+    </ul>
+  </section>
+
+  <section class="conclusion">
+    <h2>À retenir</h2>
+    <p>
+      Un conducteur n'est pas une liste
+      de contenus à transmettre.
+    </p>
+    <p>
+      <strong>
+        C'est un guide pour faire vivre
+        une expérience d'apprentissage
+        au patient.
+      </strong>
+    </p>
+    <p>
+      Il doit être clair, participatif,
+      réaliste, évaluable et adaptable.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  Atelier pédagogique · Formation ETP 40 h
+</footer>
+
+</body>
+</html>
