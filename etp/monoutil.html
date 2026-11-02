@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'Atelier des outils • ETP</title>
+
+<style>
+:root {
+  --primary: #176b68;
+  --dark: #193b40;
+  --light: #eaf5f2;
+  --bg: #f6f8f7;
+  --muted: #607277;
+  --orange: #e5a45a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--dark);
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(135deg, #176b68, #193b40);
+  color: white;
+  text-align: center;
+  padding: 55px 20px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: .78rem;
+  font-weight: 700;
+  opacity: .85;
+}
+
+header h1 {
+  font-size: clamp(2.2rem, 7vw, 3.8rem);
+  line-height: 1.15;
+  margin: 15px auto;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: .92;
+}
+
+.tag {
+  display: inline-block;
+  border: 1px solid #ffffff60;
+  border-radius: 30px;
+  padding: 7px 18px;
+  margin-top: 15px;
+  font-size: .9rem;
+}
+
+main {
+  max-width: 850px;
+  margin: auto;
+  padding: 30px 18px 70px;
+}
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px #163b4010;
+}
+
+.situation {
+  border-left: 5px solid var(--orange);
+}
+
+.mission {
+  background: var(--light);
+  border-left: 5px solid var(--primary);
+}
+
+h2 {
+  font-size: 1.45rem;
+  line-height: 1.3;
+  margin-top: 0;
+}
+
+h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+p { margin: 10px 0; }
+
+ul {
+  padding-left: 22px;
+  margin-bottom: 0;
+}
+
+li { margin: 8px 0; }
+
+.step-head {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.number {
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--light);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.4rem;
+}
+
+.time {
+  color: var(--primary);
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.question {
+  color: var(--primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.example {
+  background: var(--light);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 20px;
+}
+
+.example strong {
+  color: var(--primary);
+}
+
+.highlight {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.rule {
+  border-top: 1px solid #e0e8e5;
+  margin: 18px 0;
+}
+
+.final {
+  background: var(--dark);
+  color: white;
+  text-align: center;
+}
+
+.final h2 {
+  color: white;
+}
+
+.final strong {
+  color: #a6e2d2;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: .85rem;
+  padding: 25px;
+}
+
+@media(max-width: 600px) {
+  header { padding: 40px 18px; }
+  .card { padding: 22px 20px; }
+}
+
+@media print {
+  body { background: white; }
+  header { padding: 20px; }
+  main { padding: 10px; }
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    break-inside: avoid;
+    padding: 16px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="eyebrow">
+    Formation ETP · Travail en sous-groupes
+  </div>
+
+  <h1>L'Atelier<br>des outils</h1>
+
+  <p class="subtitle">
+    Et si je faisais de l'éducation thérapeutique
+    avec les moyens du bord ?
+  </p>
+
+  <div class="tag">
+    60 minutes · Groupes de 2 ou 3
+  </div>
+</header>
+
+<main>
+
+<section class="card situation">
+  <h2>Votre situation</h2>
+
+  <p>
+    Vous venez de vous former à l'éducation
+    thérapeutique du patient.
+  </p>
+
+  <p>
+    Vous aimeriez mettre en pratique
+    ce que vous avez appris.
+  </p>
+
+  <p>
+    Mais vous êtes peut-être seul à être formé
+    dans votre équipe. Vous ne disposez pas
+    d'un programme structuré d'ETP.
+    Vous avez peu de temps et peu de moyens.
+  </p>
+
+  <p class="highlight">
+    Et pourtant, vous pouvez déjà faire évoluer
+    votre posture et vos pratiques éducatives !
+  </p>
+</section>
+
+<section class="card mission">
+  <h2>Votre défi</h2>
+
+  <p>
+    Imaginez et fabriquez un outil éducatif
+    simple, utile et adapté à votre pratique.
+  </p>
+
+  <p>
+    Un outil que vous pourriez utiliser
+    dès demain avec vos patients.
+  </p>
+
+  <p>
+    <strong>Chacun crée son propre outil.</strong>
+    Votre binôme ou trinôme est là pour
+    vous aider à réfléchir, inventer et tester.
+  </p>
+
+  <p>
+    Pas besoin de matériel sophistiqué :
+    papier, feutres, cartes, objets,
+    dessins ou téléphone suffisent.
+  </p>
+</section>
+
+<section class="card">
+
+  <div class="step-head">
+    <div class="number">1</div>
+    <div>
+      <h3>Je pars de ma pratique</h3>
+      <div class="time">10 minutes</div>
+    </div>
+  </div>
+
+  <p>
+    Pensez à une situation concrète
+    rencontrée avec vos patients.
+  </p>
+
+  <ul>
+    <li>
+      À quel moment de ma pratique
+      pourrais-je proposer une activité éducative ?
+    </li>
+    <li>
+      Quelle difficulté revient souvent
+      chez mes patients ?
+    </li>
+    <li>
+      Quelle compétence aimerais-je
+      les aider à développer ?
+    </li>
+  </ul>
+
+  <div class="example">
+    <strong>Exemple</strong><br>
+    Mes patients ont du mal à reconnaître
+    les signes d'alerte de leur maladie.
+    Je voudrais les aider à savoir
+    quand et comment réagir.
+  </div>
+
+</section>
+
+<section class="card">
+
+  <div class="step-head">
+    <div class="number">2</div>
+    <div>
+      <h3>J'imagine mon outil</h3>
+      <div class="time">10 minutes</div>
+    </div>
+  </div>
+
+  <p class="question">
+    Que pourrait faire le patient
+    avec cet outil pour apprendre ?
+  </p>
+
+  <p>
+    Imaginez un outil qui lui permette de :
+  </p>
+
+  <ul>
+    <li>Exprimer ses représentations</li>
+    <li>Explorer une difficulté</li>
+    <li>Comprendre une situation</li>
+    <li>Faire des choix</li>
+    <li>S'entraîner à agir</li>
+    <li>Identifier ses ressources</li>
+  </ul>
+
+  <div class="example">
+    <strong>Quelques idées</strong><br>
+    Un jeu de cartes, une réglette,
+    un arbre de décision, une roue,
+    un jeu de rôle, un support imagé,
+    un parcours ou un objet à manipuler.
+  </div>
+
+  <p class="highlight">
+    L'important n'est pas la forme de l'outil,
+    mais ce qu'il permet au patient de faire.
+  </p>
+
+</section>
+
+<section class="card">
+
+  <div class="step-head">
+    <div class="number">3</div>
+    <div>
+      <h3>Je fabrique mon prototype</h3>
+      <div class="time">20 minutes</div>
+    </div>
+  </div>
+
+  <p>
+    Passez à la fabrication !
+  </p>
+
+  <p>
+    Réalisez une première version simple
+    de votre outil éducatif.
+  </p>
+
+  <ul>
+    <li>
+      Donnez un nom à votre outil.
+    </li>
+    <li>
+      Fabriquez un prototype utilisable.
+    </li>
+    <li>
+      Imaginez une utilisation
+      en 5 à 10 minutes avec un patient.
+    </li>
+    <li>
+      Préparez une consigne simple
+      à donner au patient.
+    </li>
+    <li>
+      Prévoyez comment repérer
+      ce que le patient a appris.
+    </li>
+  </ul>
+
+  <div class="example">
+    <strong>Notre conseil</strong><br>
+    Commencez petit ! Un outil simple,
+    facile à utiliser et adapté à votre pratique
+    vaut mieux qu'un dispositif complexe
+    qui restera dans un placard.
+  </div>
+
+</section>
+
+<section class="card">
+
+  <div class="step-head">
+    <div class="number">4</div>
+    <div>
+      <h3>Nous testons nos outils</h3>
+      <div class="time">15 minutes</div>
+    </div>
+  </div>
+
+  <p>
+    À tour de rôle, présentez et testez
+    vos outils au sein de votre groupe.
+  </p>
+
+  <p>
+    L'un joue le soignant,
+    l'autre le patient.
+  </p>
+
+  <p>
+    Après chaque essai, échangez :
+  </p>
+
+  <ul>
+    <li>L'outil est-il facile à comprendre ?</li>
+    <li>Le patient est-il réellement actif ?</li>
+    <li>Que permet-il d'apprendre ?</li>
+    <li>Est-il adapté au public visé ?</li>
+    <li>Que pourrait-on améliorer ?</li>
+  </ul>
+
+  <p class="highlight">
+    Testez, observez, ajustez !
+  </p>
+
+</section>
+
+<section class="card">
+
+  <div class="step-head">
+    <div class="number">5</div>
+    <div>
+      <h3>Je prépare mon premier usage</h3>
+      <div class="time">5 minutes</div>
+    </div>
+  </div>
+
+  <p>
+    Avant de repartir, posez-vous
+    trois dernières questions :
+  </p>
+
+  <ul>
+    <li>
+      Avec quel patient pourrais-je
+      utiliser cet outil ?
+    </li>
+    <li>
+      À quel moment de ma pratique ?
+    </li>
+    <li>
+      Quelle petite amélioration
+      dois-je encore apporter ?
+    </li>
+  </ul>
+
+  <div class="example">
+    <strong>Votre objectif</strong><br>
+    Repartir avec votre propre outil,
+    une consigne d'utilisation
+    et une première occasion concrète
+    de l'expérimenter.
+  </div>
+
+</section>
+
+<section class="card final">
+
+  <h2>À retenir</h2>
+
+  <p>
+    Un outil n'est pas éducatif
+    simplement parce qu'il informe.
+  </p>
+
+  <p>
+    <strong>
+      Il devient éducatif lorsqu'il permet
+      au patient de participer,
+      réfléchir, expérimenter et apprendre.
+    </strong>
+  </p>
+
+  <div class="rule"></div>
+
+  <p>
+    Pas besoin de tout révolutionner.
+  </p>
+
+  <p>
+    <strong>
+      Commencez par un outil.
+      Une situation.
+      Une compétence.
+    </strong>
+  </p>
+
+</section>
+
+</main>
+
+<footer>
+  L'Atelier des outils · Formation ETP 40 h
+</footer>
+
+</body>
+</html>
