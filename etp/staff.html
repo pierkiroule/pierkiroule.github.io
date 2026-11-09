@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Staff éducatif CPTS – Guide animateur</title>
+<style>
+:root {
+  --fond:#f6f5f0;
+  --papier:#fff;
+  --encre:#263b36;
+  --vert:#326a59;
+  --clair:#eaf2ed;
+  --orange:#a46b37;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:var(--fond);
+  color:var(--encre);
+  font:16px/1.55 system-ui,sans-serif;
+}
+header {
+  background:var(--encre);
+  color:white;
+  padding:26px 20px;
+}
+main {
+  max-width:850px;
+  margin:auto;
+  padding:20px;
+}
+h1 { font-size:1.7rem; margin:0; }
+h2 { font-size:1.35rem; margin:0 0 14px; }
+h3 { font-size:1rem; color:var(--vert); }
+p { margin:8px 0 14px; }
+.subtitle { opacity:.8; }
+.card {
+  background:var(--papier);
+  padding:22px;
+  border-radius:15px;
+  margin-bottom:18px;
+  box-shadow:0 2px 12px #0000000a;
+}
+nav {
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  margin-bottom:18px;
+}
+button {
+  font:inherit;
+  cursor:pointer;
+  border:1px solid #cbd8d0;
+  background:white;
+  color:var(--encre);
+  border-radius:10px;
+  padding:10px 14px;
+}
+button.active {
+  background:var(--vert);
+  color:white;
+}
+button:focus-visible {
+  outline:3px solid var(--orange);
+}
+.field { margin:15px 0; }
+.field strong {
+  display:block;
+  color:var(--vert);
+  margin-bottom:3px;
+}
+.objectif {
+  background:var(--clair);
+  border-left:4px solid var(--vert);
+  padding:16px;
+  border-radius:8px;
+  margin:20px 0;
+}
+.questions {
+  background:#faf5ec;
+  padding:16px 20px;
+  border-radius:12px;
+}
+.questions h3 { color:#815528; margin-top:0; }
+.questions li { margin:9px 0; }
+.small { font-size:.87rem; opacity:.7; }
+.controls {
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:18px;
+}
+footer {
+  text-align:center;
+  padding:25px;
+  font-size:.8rem;
+  color:#64746d;
+}
+@media print {
+  header,nav,.controls,.print { display:none; }
+  body { background:white; }
+  .card { box-shadow:none; padding:0; }
+  main { max-width:none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Staff éducatif • CPTS</h1>
+  <div class="subtitle">
+    Guide de l'animateur · 6 situations cliniques
+  </div>
+</header>
+
+<main>
+<section class="card">
+  <h2>Conduire le staff</h2>
+  <p>
+    <strong>Intention :</strong> construire une lecture
+    éducative partagée, centrée sur le projet de vie
+    du patient plutôt que sur sa seule maladie.
+  </p>
+  <p>
+    <strong>Consigne :</strong> pour chaque situation,
+    identifier ce qui compte pour le patient,
+    les compétences à développer et la contribution
+    possible des professionnels du territoire.
+  </p>
+  <p class="small">
+    Durée indicative : 30 minutes.
+    Six cas fictifs. Les objectifs présentés sont
+    des propositions à confirmer avec les patients.
+  </p>
+</section>
+
+<nav id="navigation" aria-label="Choisir un patient"></nav>
+
+<article class="card" id="fiche" aria-live="polite"></article>
+
+<div class="controls">
+  <button id="precedent">← Précédent</button>
+  <button id="suivant">Suivant →</button>
+</div>
+
+<section class="card">
+  <h2>Déroulé proposé · 30 minutes</h2>
+  <p><strong>0–3 min :</strong> rappeler la démarche
+  éducative et la place du projet de vie.</p>
+  <p><strong>3–21 min :</strong> parcourir les six cas,
+  environ trois minutes par patient.</p>
+  <p><strong>21–27 min :</strong> discuter des besoins
+  communs et des coopérations possibles en CPTS.</p>
+  <p><strong>27–30 min :</strong> dégager les enseignements
+  pour les pratiques du territoire.</p>
+  <button class="print" onclick="window.print()">
+    Imprimer la fiche affichée
+  </button>
+</section>
+</main>
+
+<footer>
+  Support pédagogique – Situations fictives
+</footer>
+
+<script>
+const patients = [
+  {
+    nom:"Mme Martin",
+    age:"67 ans",
+    pathologie:"Diabète et pluripathologie",
+    profil:"Vit seule. Diabète de type 2, hypertension et douleurs chroniques. Difficultés de coordination depuis le départ de son médecin traitant.",
+    projet:"Rester autonome à domicile et rendre visite régulièrement à ses petits-enfants.",
+    besoins:"Comprendre ses traitements, organiser son suivi et repérer les situations nécessitant une consultation.",
+    freins:"Douleurs, isolement, inquiétude, difficultés à identifier les interlocuteurs.",
+    ressources:"Motivation, suivi infirmier, liens familiaux.",
+    action:"organiser son suivi de santé et identifier les professionnels à solliciter",
+    finalite:"préserver son autonomie à domicile",
+    questions:[
+      "Quelle difficulté relève d'un apprentissage et laquelle relève de l'organisation des soins ?",
+      "Comment éviter de faire porter au patient la responsabilité des défauts de coordination ?",
+      "Quels professionnels de la CPTS pourraient faciliter son parcours ?"
+    ]
+  },
+  {
+    nom:"M. Bernard",
+    age:"54 ans",
+    pathologie:"Diabète de type 2 et obésité",
+    profil:"Chauffeur routier. Diabète récent et obésité. Horaires irréguliers et repas souvent pris à l'extérieur.",
+    projet:"Continuer son métier et préserver sa santé pour sa famille.",
+    besoins:"Adapter son alimentation aux déplacements et comprendre les effets de ses habitudes sur sa glycémie.",
+    freins:"Manque de temps, contraintes professionnelles, culpabilité, peur de changer ses habitudes.",
+    ressources:"Soutien de son épouse, motivation familiale, connaissance de ses habitudes.",
+    action:"composer des repas adaptés à son diabète lors de ses déplacements",
+    finalite:"continuer son métier tout en préservant sa santé",
+    questions:[
+      "Comment partir de ses contraintes réelles plutôt que des recommandations idéales ?",
+      "Quelles compétences pratiques seraient utiles dès demain ?",
+      "Quelles ressources éducatives du territoire mobiliser ?"
+    ]
+  },
+  {
+    nom:"Mme Le Goff",
+    age:"42 ans",
+    pathologie:"Douleurs chroniques",
+    profil:"Douleurs persistantes depuis plusieurs années. Réduction progressive des activités et sentiment d'incompréhension.",
+    projet:"Reprendre la randonnée avec ses amis et retrouver une vie sociale satisfaisante.",
+    besoins:"Comprendre la douleur, distinguer douleur et danger, adapter progressivement les activités.",
+    freins:"Fatigue, peur de l'aggravation, découragement et perte de confiance.",
+    ressources:"Intérêt pour la marche, amis disponibles, stratégies personnelles de soulagement.",
+    action:"adapter progressivement son activité physique à ses capacités",
+    finalite:"reprendre des randonnées avec ses amis",
+    questions:[
+      "Comment accueillir son vécu sans réduire la douleur à une question psychologique ?",
+      "Quelle compétence favoriserait la reprise d'activité ?",
+      "Comment articuler accompagnement éducatif, soins et activité adaptée ?"
+    ]
+  },
+  {
+    nom:"Lucas",
+    age:"17 ans",
+    pathologie:"Asthme",
+    profil:"Lycéen et footballeur en club. Asthme persistant. Oublis réguliers du traitement de fond.",
+    projet:"Poursuivre le football en compétition et gagner en indépendance.",
+    besoins:"Différencier les traitements, reconnaître les signes d'alerte et gérer l'asthme pendant le sport.",
+    freins:"Oublis, peur d'être différent, minimisation des symptômes, réticence à solliciter les adultes.",
+    ressources:"Motivation sportive, soutien familial, entraîneur attentif.",
+    action:"reconnaître les signes d'alerte et appliquer son plan d'action personnalisé",
+    finalite:"pratiquer le football en sécurité et gagner en autonomie",
+    questions:[
+      "Comment soutenir son autonomie sans renforcer le contrôle parental ?",
+      "Comment utiliser le football comme levier éducatif ?",
+      "Quelle place pour les parents et l'entraîneur avec l'accord de Lucas ?"
+    ]
+  },
+  {
+    nom:"Mme Diallo",
+    age:"35 ans",
+    pathologie:"Hypertension artérielle",
+    profil:"Travaille à temps partiel et élève deux enfants. Hypertension diagnostiquée après sa dernière grossesse. Traitement pris irrégulièrement.",
+    projet:"Rester en bonne santé pour accompagner ses enfants et poursuivre son travail.",
+    besoins:"Comprendre une maladie peu symptomatique, l'utilité du traitement et son intégration dans le quotidien.",
+    freins:"Charge familiale, manque de temps, inquiétudes sur les effets secondaires.",
+    ressources:"Motivation familiale, capacités d'organisation, soutien ponctuel du conjoint.",
+    action:"mettre en place une routine adaptée pour prendre régulièrement son traitement",
+    finalite:"préserver sa santé et rester disponible pour ses enfants",
+    questions:[
+      "Que sait-on réellement de ses raisons de ne pas prendre le traitement ?",
+      "Comment explorer ses représentations sans jugement ?",
+      "Quelles solutions construire avec elle plutôt que lui prescrire une organisation ?"
+    ]
+  },
+  {
+    nom:"M. Petit",
+    age:"73 ans",
+    pathologie:"Insuffisance cardiaque",
+    profil:"Deux hospitalisations récentes. Vit avec son épouse, impliquée dans la gestion des traitements.",
+    projet:"Rester à domicile, reprendre le jardinage et éviter de nouvelles hospitalisations.",
+    besoins:"Reconnaître les signes de décompensation, surveiller ses symptômes et savoir qui contacter.",
+    freins:"Peur de l'essoufflement, manque de confiance, difficulté à interpréter les symptômes.",
+    ressources:"Épouse impliquée, suivi infirmier, motivation pour le jardinage.",
+    action:"repérer les signes d'aggravation et réagir selon son plan d'action",
+    finalite:"rester à domicile et reprendre sereinement le jardinage",
+    questions:[
+      "Comment développer sa capacité à agir sans accroître son anxiété ?",
+      "Comment associer l'épouse sans renforcer sa charge d'aidante ?",
+      "Comment organiser un recours rapide en cas de signes d'alerte ?"
+    ]
+  }
+];
+
+let index = 0;
+
+const navigation = document.getElementById("navigation");
+const fiche = document.getElementById("fiche");
+
+patients.forEach((p,i)=>{
+  const b=document.createElement("button");
+  b.textContent=`${i+1}. ${p.nom}`;
+  b.addEventListener("click",()=>afficher(i));
+  navigation.appendChild(b);
+});
+
+function afficher(i) {
+  index=(i+patients.length)%patients.length;
+  const p=patients[index];
+
+  fiche.innerHTML=`
+    <div class="small">
+      Situation ${index+1} / ${patients.length}
+    </div>
+    <h2>${p.nom}, ${p.age}</h2>
+    <p><em>${p.pathologie}</em></p>
+
+    <div class="field">
+      <strong>Profil du patient</strong>
+      ${p.profil}
+    </div>
+    <div class="field">
+      <strong>Projet de vie</strong>
+      ${p.projet}
+    </div>
+    <div class="field">
+      <strong>Besoins éducatifs</strong>
+      ${p.besoins}
+    </div>
+    <div class="field">
+      <strong>Freins et difficultés</strong>
+      ${p.freins}
+    </div>
+    <div class="field">
+      <strong>Ressources</strong>
+      ${p.ressources}
+    </div>
+
+    <div class="objectif">
+      <strong>Objectif éducatif prioritaire proposé</strong>
+      <p>
+        Le patient souhaite prioritairement être capable de
+        <strong>${p.action}</strong>
+        pour ${p.finalite}.
+      </p>
+    </div>
+
+    <div class="questions">
+      <h3>Questions pour animer la discussion</h3>
+      <ol>
+        ${p.questions.map(q=>`<li>${q}</li>`).join("")}
+      </ol>
+    </div>
+  `;
+
+  [...navigation.children].forEach((b,j)=>{
+    b.classList.toggle("active",j===index);
+    b.setAttribute("aria-pressed",String(j===index));
+  });
+}
+
+document.getElementById("precedent")
+  .addEventListener("click",()=>afficher(index-1));
+
+document.getElementById("suivant")
+  .addEventListener("click",()=>afficher(index+1));
+
+afficher(0);
+</script>
+</body>
+</html>
