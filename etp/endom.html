@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeu de rôle ETP – Endométriose</title>
+<style>
+  :root {
+    --primary: #704a78;
+    --light: #f6f0f7;
+    --border: #ded7e0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #f5f5f5;
+    color: #29252b;
+    font: 16px/1.5 system-ui, sans-serif;
+  }
+
+  main {
+    max-width: 800px;
+    margin: 24px auto;
+    padding: 28px;
+    background: white;
+    border-radius: 16px;
+  }
+
+  h1 { color: var(--primary); margin-bottom: 4px; }
+  h2 { color: var(--primary); font-size: 1.15rem; }
+  .subtitle { color: #666; margin-top: 0; }
+
+  .tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+
+  .tag {
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: var(--light);
+    font-size: .85rem;
+  }
+
+  section { margin-top: 26px; }
+
+  .card {
+    background: var(--light);
+    border-left: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .roles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .role {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .role h3 { margin-top: 0; color: var(--primary); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 11px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  th { background: var(--light); }
+
+  li { margin-bottom: 7px; }
+
+  .question {
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  button {
+    background: var(--primary);
+    color: white;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 18px;
+    cursor: pointer;
+  }
+
+  @media(max-width: 600px) {
+    main { margin: 0; padding: 20px; border-radius: 0; }
+    .roles { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { background: white; font-size: 12px; }
+    main { margin: 0; padding: 0; }
+    button { display: none; }
+    section { break-inside: avoid; }
+  }
+</style>
+</head>
+
+<body>
+<main>
+  <h1>Jeu de rôle ETP</h1>
+  <p class="subtitle">Connaître l'endométriose</p>
+
+  <div class="tags">
+    <span class="tag">30 minutes</span>
+    <span class="tag">2 animateurs</span>
+    <span class="tag">6 patientes</span>
+    <span class="tag">Étude de cas</span>
+  </div>
+
+  <section>
+    <h2>Votre mission</h2>
+    <p>
+      Vous animez une séance collective d'ETP.
+      Votre objectif est d'aider les patientes à mieux
+      comprendre l'endométriose à partir d'un cas clinique.
+    </p>
+  </section>
+
+  <section>
+    <h2>1. Répartissez-vous les rôles</h2>
+    <div class="roles">
+      <div class="role">
+        <h3>Animateur 1</h3>
+        <strong>Facilitateur</strong>
+        <ul>
+          <li>Présente le cas</li>
+          <li>Pose les questions</li>
+          <li>Distribue la parole</li>
+          <li>Gère le temps</li>
+          <li>Évalue les acquis</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <h3>Animateur 2</h3>
+        <strong>Expert</strong>
+        <ul>
+          <li>Écoute les échanges</li>
+          <li>Repère les idées reçues</li>
+          <li>Clarifie les connaissances</li>
+          <li>Répond aux questions</li>
+          <li>Complète la synthèse</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Votre conducteur</h2>
+    <table>
+      <thead>
+        <tr><th>Durée</th><th>Activité</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>5 min</td><td>Accueil et lecture du cas</td></tr>
+        <tr><td>15 min</td><td>Échanges avec les patientes</td></tr>
+        <tr><td>5 min</td><td>Synthèse de l'expert</td></tr>
+        <tr><td>5 min</td><td>Évaluation des acquis</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. Le cas clinique</h2>
+    <div class="card">
+      <strong>Julie, 27 ans</strong>
+      <p>
+        Depuis l'adolescence, Julie souffre de règles très
+        douloureuses. Elle manque parfois le travail.
+        Elle présente aussi des douleurs pendant les rapports
+        sexuels et des troubles digestifs.
+      </p>
+      <p>
+        Son médecin évoque une possible endométriose.
+      </p>
+      <p>
+        <em>
+          « Est-ce grave ? Pourrai-je avoir des enfants ?
+          Existe-t-il des solutions ? »
+        </em>
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Animez les échanges</h2>
+    <p>Le facilitateur pose trois questions au groupe :</p>
+    <ol>
+      <li>Qu'est-ce qui vous interpelle dans cette situation ?</li>
+      <li>Que savez-vous de l'endométriose ?</li>
+      <li>Que conseilleriez-vous à Julie ?</li>
+    </ol>
+    <p>
+      L'expert complète les réponses sans transformer
+      la séance en cours magistral.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. Messages clés de l'expert</h2>
+    <ul>
+      <li>Les douleurs menstruelles invalidantes ne sont pas à banaliser.</li>
+      <li>L'endométriose peut provoquer des symptômes variés.</li>
+      <li>Le diagnostic repose sur une évaluation médicale adaptée.</li>
+      <li>L'endométriose ne signifie pas nécessairement infertilité.</li>
+      <li>Des traitements et accompagnements existent.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Évaluez les apprentissages</h2>
+    <div class="card">
+      <p class="question">
+        « Quelle information importante retenez-vous
+        pour mieux comprendre l'endométriose ? »
+      </p>
+      <p>Chaque participante partage une réponse.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Critères de réussite</h2>
+    <ul>
+      <li>Les patientes ont pu s'exprimer.</li>
+      <li>Les deux animateurs ont des rôles complémentaires.</li>
+      <li>Les informations sont fiables et compréhensibles.</li>
+      <li>Les acquis sont évalués en fin de séance.</li>
+    </ul>
+  </section>
+
+  <section>
+    <button onclick="window.print()">Imprimer la fiche</button>
+  </section>
+</main>
+</body>
+</html>
