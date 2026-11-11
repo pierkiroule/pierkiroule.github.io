@@ -7,18 +7,13 @@
  content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3efe7">
 <title>Empreintes du Vivant •°</title>
-
 <style>
 :root{
   --paper:#f3efe7;
-  --ink:#34342f;
-  --muted:#89857c;
+  --ink:#34352f;
+  --muted:#89877e;
 }
-
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 html,body{
   margin:0;
   width:100%;
@@ -29,7 +24,6 @@ html,body{
   color:var(--ink);
   font-family:Georgia,serif;
 }
-
 #scene{
   position:fixed;
   inset:0;
@@ -39,16 +33,14 @@ html,body{
   user-select:none;
   -webkit-user-select:none;
 }
-
 header{
   position:fixed;
   z-index:3;
-  top:calc(18px + env(safe-area-inset-top));
-  left:20px;
-  right:20px;
+  top:calc(17px + env(safe-area-inset-top));
+  left:19px;
+  right:15px;
   pointer-events:none;
 }
-
 h1{
   margin:0;
   font-size:clamp(24px,6vw,42px);
@@ -56,57 +48,49 @@ h1{
   letter-spacing:-.055em;
   line-height:1.08;
 }
-
 header p{
   margin:8px 0 0;
   font-size:12px;
   font-style:italic;
   color:var(--muted);
 }
-
 #mic{
   position:fixed;
   z-index:4;
-  bottom:calc(22px + env(safe-area-inset-bottom));
+  bottom:calc(20px + env(safe-area-inset-bottom));
   left:50%;
   transform:translateX(-50%);
-  min-width:112px;
+  min-width:115px;
   min-height:48px;
   padding:12px 22px;
   border:1px solid #c9c4b9;
   border-radius:30px;
-  background:rgba(243,239,231,.94);
+  background:rgba(243,239,231,.95);
   color:var(--ink);
   font:13px system-ui,sans-serif;
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
-
 #mic.active{
   background:var(--ink);
   color:var(--paper);
 }
-
 #status{
   position:fixed;
   z-index:3;
-  bottom:calc(82px + env(safe-area-inset-bottom));
+  bottom:calc(80px + env(safe-area-inset-bottom));
+  left:0;
   width:100%;
   text-align:center;
-  color:var(--muted);
   font:11px system-ui,sans-serif;
+  color:var(--muted);
   pointer-events:none;
 }
-
 @media(min-width:700px){
-  header{
-    top:30px;
-    left:34px;
-  }
+  header{top:28px;left:32px}
 }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -114,140 +98,108 @@ header p{
   <p>Ce qui nous traverse laisse une trace.</p>
 </header>
 
-<svg
-  id="scene"
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="-220 -390 440 780"
-  preserveAspectRatio="xMidYMid meet"
->
-  <g
-    id="contours"
+<svg id="scene"
+ xmlns="http://www.w3.org/2000/svg"
+ viewBox="-195 -350 390 700"
+ preserveAspectRatio="xMidYMid meet">
+  <g id="contours"
     fill="none"
-    stroke="#34342f"
-    stroke-linecap="round"
+    stroke="#34352f"
     stroke-linejoin="round"
-  ></g>
-
-  <g
-    id="words"
+    stroke-linecap="round"></g>
+  <g id="words"
     text-anchor="middle"
-    font-family="Georgia,serif"
-    font-style="italic"
-    fill="#34342f"
-    pointer-events="none"
-  ></g>
+    pointer-events="none"></g>
 </svg>
 
-<div id="status">Effleurer les empreintes</div>
-
-<button id="mic" aria-pressed="false">
-  Micro
-</button>
+<div id="status">Toucher, étirer, laisser revenir</div>
+<button id="mic" aria-pressed="false">Micro</button>
 
 <script>
 "use strict";
-
-// ======================================
-// OUTILS
-// ======================================
 
 const $=id=>document.getElementById(id);
 const NS="http://www.w3.org/2000/svg";
 const TAU=Math.PI*2;
 
-const clamp=(v,a,b)=>
-  Math.max(a,Math.min(b,v));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,k)=>a+(b-a)*k;
+const gauss=(x,s)=>Math.exp(-.5*(x/s)**2);
 
-const lerp=(a,b,k)=>
-  a+(b-a)*k;
-
-function smooth(v){
-  v=clamp(v,0,1);
-  return v*v*(3-2*v);
+function smooth(x){
+  x=clamp(x,0,1);
+  return x*x*(3-2*x);
 }
 
-function gauss(x,s){
-  return Math.exp(-.5*(x/s)**2);
-}
-
-function angleDist(a,b){
+function adiff(a,b){
   return Math.atan2(
     Math.sin(a-b),
     Math.cos(a-b)
   );
 }
 
-// ======================================
-// MOBILE FIRST
-// ======================================
+// ====================================
+// TRAME
+// ====================================
 
 const svg=$("scene");
-const contourGroup=$("contours");
-const wordGroup=$("words");
+const contours=$("contours");
 
-const COUNT=37;
-const STEPS=144;
-
-const BASE=65;
-const GAP=5.1;
-const MIN_GAP=2.5;
+const COUNT=38;
+const STEPS=160;
+const BASE=64;
+const GAP=5.15;
+const MIN_GAP=2.35;
+const YS=.88;
 
 const paths=[];
+const angles=new Float32Array(STEPS);
+const cosines=new Float32Array(STEPS);
+const sines=new Float32Array(STEPS);
+
+for(let i=0;i<STEPS;i++){
+  const a=i/STEPS*TAU;
+  angles[i]=a;
+  cosines[i]=Math.cos(a);
+  sines[i]=Math.sin(a);
+}
+
+for(let j=0;j<COUNT;j++){
+  const p=document.createElementNS(NS,"path");
+  p.setAttribute("fill","none");
+  p.setAttribute("vector-effect","non-scaling-stroke");
+  contours.appendChild(p);
+  paths.push(p);
+}
 
 function resize(){
   const w=window.innerWidth;
   const h=window.innerHeight;
-
-  const visibleWidth=w<h?390:650;
-  const visibleHeight=visibleWidth*h/w;
+  const vw=w<h?390:650;
+  const vh=vw*h/w;
 
   svg.setAttribute(
     "viewBox",
-    [
-      -visibleWidth/2,
-      -visibleHeight/2,
-      visibleWidth,
-      visibleHeight
-    ].join(" ")
+    `${-vw/2} ${-vh/2} ${vw} ${vh}`
   );
 }
 
 window.addEventListener("resize",resize);
 resize();
 
-for(let j=0;j<COUNT;j++){
-  const p=document.createElementNS(
-    NS,"path"
-  );
-
-  p.setAttribute("fill","none");
-  p.setAttribute(
-    "vector-effect",
-    "non-scaling-stroke"
-  );
-
-  contourGroup.appendChild(p);
-  paths.push(p);
-}
-
-// ======================================
+// ====================================
 // MICRO
-// ======================================
+// ====================================
 
-let audioContext=null;
+let context=null;
 let analyser=null;
 let bins=null;
 let stream=null;
 let source=null;
-
 let micActive=false;
 let micBusy=false;
 
-const sound={
-  low:0,
-  mid:0,
-  high:0
-};
+const sound={low:0,mid:0,high:0};
 
 async function stopMic(){
   micActive=false;
@@ -256,19 +208,13 @@ async function stopMic(){
     source.disconnect();
     source=null;
   }
-
   if(stream){
-    stream.getTracks().forEach(
-      track=>track.stop()
-    );
+    stream.getTracks().forEach(t=>t.stop());
     stream=null;
   }
-
-  if(audioContext){
-    try{
-      await audioContext.close();
-    }catch(e){}
-    audioContext=null;
+  if(context){
+    try{await context.close()}catch(e){}
+    context=null;
   }
 
   analyser=null;
@@ -277,12 +223,11 @@ async function stopMic(){
   $("mic").classList.remove("active");
   $("mic").setAttribute("aria-pressed","false");
   $("mic").textContent="Micro";
-  $("status").textContent="Effleurer les empreintes";
+  $("status").textContent="Toucher, étirer, laisser revenir";
 }
 
 $("mic").onclick=async()=>{
   if(micBusy)return;
-
   micBusy=true;
 
   if(micActive){
@@ -296,32 +241,23 @@ $("mic").onclick=async()=>{
       window.AudioContext||
       window.webkitAudioContext;
 
-    if(!AudioClass){
-      throw new Error("Audio indisponible");
-    }
+    context=new AudioClass();
 
-    audioContext=new AudioClass();
-
-    analyser=audioContext.createAnalyser();
+    analyser=context.createAnalyser();
     analyser.fftSize=1024;
     analyser.smoothingTimeConstant=.88;
 
-    bins=new Uint8Array(
-      analyser.frequencyBinCount
-    );
+    bins=new Uint8Array(analyser.frequencyBinCount);
 
     stream=await navigator.mediaDevices
       .getUserMedia({audio:true});
 
-    source=audioContext
-      .createMediaStreamSource(stream);
-
+    source=context.createMediaStreamSource(stream);
     source.connect(analyser);
 
-    await audioContext.resume();
+    await context.resume();
 
     micActive=true;
-
     $("mic").classList.add("active");
     $("mic").setAttribute("aria-pressed","true");
     $("mic").textContent="Micro actif";
@@ -336,24 +272,20 @@ $("mic").onclick=async()=>{
 };
 
 function band(a,b){
-  if(!audioContext||!bins)return 0;
+  if(!context||!bins)return 0;
 
-  const hz=audioContext.sampleRate/
-    analyser.fftSize;
-
-  const first=Math.floor(a/hz);
-  const last=Math.min(
+  const hz=context.sampleRate/analyser.fftSize;
+  const start=Math.floor(a/hz);
+  const end=Math.min(
     bins.length,
     Math.ceil(b/hz)
   );
 
   let sum=0,n=0;
-
-  for(let i=first;i<last;i++){
+  for(let i=start;i<end;i++){
     sum+=bins[i]/255;
     n++;
   }
-
   return n?sum/n:0;
 }
 
@@ -362,291 +294,240 @@ function updateSound(t,dt){
 
   if(micActive&&analyser){
     analyser.getByteFrequencyData(bins);
-
     low=band(35,300);
     mid=band(300,1800);
     high=band(1800,8500);
   }else{
-    low=.17+.1*Math.sin(t*.43);
-    mid=.13+.08*Math.sin(t*.71+1);
-    high=.08+.04*Math.sin(t*1.09+2);
+    low=.17+.09*Math.sin(t*.42);
+    mid=.13+.07*Math.sin(t*.7+1);
+    high=.07+.04*Math.sin(t*1.1+2);
   }
 
   const k=1-Math.exp(-dt*4);
-
   sound.low=lerp(sound.low,low,k);
   sound.mid=lerp(sound.mid,mid,k);
   sound.high=lerp(sound.high,high,k);
 }
 
-// ======================================
-// FORME-MÈRE INVISIBLE
-// ======================================
+// ====================================
+// FORME-MÈRE
+// ====================================
 
 function mother(a,t){
   return 1+
-    Math.sin(a*2-t*.11+.4)*.15+
-    Math.sin(a*3+t*.08+1.8)*.105+
-    Math.sin(a*5-t*.06+2.3)*.06+
-    Math.sin(a*8+t*.04)*.022+
-    Math.sin(a*13-t*.03+1)*.009+
-    Math.sin(a*3-t*.3)*sound.low*.15+
-    Math.sin(a*6+t*.35)*sound.mid*.1;
+    .15*Math.sin(a*2-t*.11+.4)+
+    .10*Math.sin(a*3+t*.08+1.8)+
+    .055*Math.sin(a*5-t*.06+2.3)+
+    .025*Math.sin(a*8+t*.04)+
+    .13*sound.low*Math.sin(a*3-t*.3)+
+    .09*sound.mid*Math.sin(a*6+t*.35);
 }
 
-// ======================================
-// RÉSONANCES ORGANIQUES
-// ======================================
+// ====================================
+// RESPIRATIONS AUTONOMES
+// ====================================
 
-const organisms=[
-  {
-    a:.4,r:8,
-    va:.11,vr:.15,
-    wa:.7,wr:6,
-    power:.85,phase:0
-  },
-  {
-    a:2.5,r:23,
-    va:-.09,vr:-.11,
-    wa:.9,wr:8,
-    power:-.7,phase:2
-  },
-  {
-    a:4.8,r:17,
-    va:.07,vr:.13,
-    wa:.6,wr:7,
-    power:.75,phase:4
-  },
-  {
-    a:5.7,r:31,
-    va:-.05,vr:-.07,
-    wa:.85,wr:5,
-    power:.5,phase:1.4
-  }
+const breaths=[
+  {a:.4,r:7,va:.1,p:0,w:6,s:.85},
+  {a:2.6,r:21,va:-.07,p:2,w:9,s:-.7},
+  {a:4.7,r:13,va:.06,p:4,w:7,s:.7},
+  {a:5.8,r:31,va:-.05,p:1,w:5,s:.6}
 ];
 
-function organicField(j,a,t){
-  let value=0;
+function breathing(j,a,t){
+  let v=0;
 
-  for(const o of organisms){
-    const ca=o.a+t*o.va;
+  for(const b of breaths){
+    const ca=b.a+t*b.va;
+    const cr=b.r+Math.sin(t*.13+b.p)*5;
 
-    const cr=
-      o.r+
-      Math.sin(t*o.vr+o.phase)*6;
-
-    const envelope=
-      gauss(angleDist(a,ca),o.wa)*
-      gauss(j-cr,o.wr);
-
-    value+=
-      o.power*
-      envelope*
-      Math.sin(
-        t*.55-j*.11+o.phase
-      );
+    v+=
+      b.s*
+      gauss(adiff(a,ca),.7)*
+      gauss(j-cr,b.w)*
+      Math.sin(t*.55-j*.11+b.p);
   }
 
-  return value;
+  return v;
 }
-
-// ======================================
-// ESPACES VIDES ÉMERGENTS
-// ======================================
 
 const voids=[
-  {
-    a:1.1,r:12,
-    phase:0,speed:.08,
-    wa:.65,wr:4,
-    strength:1.6
-  },
-  {
-    a:3.8,r:25,
-    phase:2.4,speed:-.06,
-    wa:.75,wr:5,
-    strength:1.4
-  },
-  {
-    a:5.2,r:32,
-    phase:4.1,speed:.05,
-    wa:.55,wr:3.5,
-    strength:1.15
-  }
+  {a:1.2,r:12,p:0,v:.06,s:1.65},
+  {a:3.7,r:25,p:2.5,v:-.05,s:1.45},
+  {a:5.1,r:33,p:4.1,v:.04,s:1.2}
 ];
 
-function voidField(j,a,t){
-  let value=0;
+function opening(j,a,t){
+  let v=0;
 
-  for(const v of voids){
+  for(const o of voids){
     const life=smooth(
-      .5+.5*Math.sin(
-        t*.17+v.phase
-      )
+      .5+.5*Math.sin(t*.17+o.p)
     );
 
-    const ca=v.a+t*v.speed;
-
-    const cr=
-      v.r+
-      Math.sin(t*.1+v.phase)*4;
-
-    value+=
-      v.strength*
-      life*
-      gauss(angleDist(a,ca),v.wa)*
-      gauss(j-cr,v.wr);
+    v+=
+      o.s*life*
+      gauss(adiff(a,o.a+t*o.v),.68)*
+      gauss(j-o.r,4.3);
   }
 
-  return value;
+  return v;
 }
 
-// ======================================
-// PINCEAU ÉLASTIQUE
-// ======================================
+// ====================================
+// MEMBRANE : ONDE TACTILE
+// ====================================
+
+// La première rangée est la membrane
+// centrale invisible.
+// Les suivantes forment les cernes.
+
+const ROWS=COUNT+1;
+const SIZE=ROWS*STEPS;
+
+const displacement=new Float32Array(SIZE);
+const velocity=new Float32Array(SIZE);
+const force=new Float32Array(SIZE);
 
 const touches=new Map();
 
-const SIZE=COUNT*STEPS;
-
-const elastic=new Float32Array(SIZE);
-const velocity=new Float32Array(SIZE);
-const brushForce=new Float32Array(SIZE);
-
-const angleStep=TAU/STEPS;
-
-function indexOf(j,i){
-  return j*STEPS+i;
-}
+const idx=(j,i)=>j*STEPS+i;
 
 function toSVG(e){
   const p=svg.createSVGPoint();
-
   p.x=e.clientX;
   p.y=e.clientY;
 
-  const matrix=svg.getScreenCTM();
+  const m=svg.getScreenCTM();
 
-  return matrix
-    ?p.matrixTransform(matrix.inverse())
+  return m
+    ?p.matrixTransform(m.inverse())
     :{x:0,y:0};
 }
 
-function locate(x,y){
-  const adjustedY=y/.88;
-
+function polar(x,y){
+  const yy=y/YS;
   return {
-    x,
-    y:adjustedY,
-    a:Math.atan2(adjustedY,x),
-    r:clamp(
-      (Math.hypot(x,adjustedY)-BASE)/GAP,
-      0,COUNT-1
-    )
+    a:Math.atan2(yy,x),
+    r:Math.hypot(x,yy)
   };
 }
 
-function pointerDown(e){
+function down(e){
   e.preventDefault();
-
   svg.setPointerCapture(e.pointerId);
 
   const p=toSVG(e);
-  const pos=locate(p.x,p.y);
-
   touches.set(e.pointerId,{
-    x:pos.x,
-    y:pos.y,
-    px:pos.x,
-    py:pos.y,
-    strength:0
+    x:p.x,
+    y:p.y,
+    px:p.x,
+    py:p.y,
+    ox:p.x,
+    oy:p.y,
+    age:0
   });
 }
 
-function pointerMove(e){
+function move(e){
   const touch=touches.get(e.pointerId);
   if(!touch)return;
 
   e.preventDefault();
-
   const p=toSVG(e);
-  const pos=locate(p.x,p.y);
-
-  touch.x=pos.x;
-  touch.y=pos.y;
+  touch.x=p.x;
+  touch.y=p.y;
 }
 
-function pointerUp(e){
+function up(e){
   touches.delete(e.pointerId);
 }
 
-svg.addEventListener("pointerdown",pointerDown);
-svg.addEventListener("pointermove",pointerMove);
-svg.addEventListener("pointerup",pointerUp);
-svg.addEventListener("pointercancel",pointerUp);
+svg.addEventListener("pointerdown",down);
+svg.addEventListener("pointermove",move);
+svg.addEventListener("pointerup",up);
+svg.addEventListener("pointercancel",up);
 
-// ======================================
-// DÉFORMATION PAR LE GESTE
-// ======================================
+// ====================================
+// INJECTION DE L'ONDE
+// ====================================
 
-function applyBrush(dt){
-  brushForce.fill(0);
+function inject(dt){
+  force.fill(0);
 
   for(const touch of touches.values()){
-    touch.strength=lerp(
-      touch.strength,
-      1,
-      1-Math.exp(-dt*4)
-    );
+    touch.age+=dt;
 
     const dx=touch.x-touch.px;
-    const dy=touch.y-touch.py;
+    const dy=(touch.y-touch.py)/YS;
 
-    const distance=Math.hypot(dx,dy);
-
-    if(distance<.001)continue;
+    const travel=Math.hypot(dx,dy);
+    if(travel<.001)continue;
 
     const samples=Math.min(
       12,
-      Math.max(1,Math.ceil(distance/7))
+      Math.max(1,Math.ceil(travel/7))
     );
 
     for(let s=0;s<samples;s++){
       const u=(s+.5)/samples;
-
       const x=lerp(touch.px,touch.x,u);
       const y=lerp(touch.py,touch.y,u);
-
-      const pos=locate(x,y);
+      const p=polar(x,y);
 
       const radialDrag=
-        dx*Math.cos(pos.a)+
-        dy*Math.sin(pos.a);
+        dx*Math.cos(p.a)+
+        dy*Math.sin(p.a);
 
-      const drag=clamp(
-        radialDrag,-18,18
-      )/samples;
+      const tangentialDrag=
+        -dx*Math.sin(p.a)+
+        dy*Math.cos(p.a);
 
-      for(let j=0;j<COUNT;j++){
-        const wr=gauss(j-pos.r,5.5);
+      // La forme centrale réagit
+      // même si le doigt part du vide.
+      const centerInfluence=
+        smooth((BASE+35-p.r)/85);
 
-        if(wr<.003)continue;
+      const strength=
+        1+centerInfluence*2.8;
+
+      const targetRow=clamp(
+        (p.r-BASE)/GAP,
+        0,
+        COUNT
+      );
+
+      for(let j=0;j<ROWS;j++){
+        const distance=j-targetRow;
+
+        const radialWeight=gauss(
+          distance,
+          centerInfluence>.2?8:5
+        );
+
+        if(radialWeight<.002)continue;
 
         for(let i=0;i<STEPS;i++){
-          const a=i*angleStep;
-
-          const wa=gauss(
-            angleDist(a,pos.a),
-            .42
-          );
+          const da=adiff(angles[i],p.a);
+          const angularWeight=gauss(da,.55);
 
           const weight=
-            wr*wa*touch.strength;
+            radialWeight*angularWeight;
 
-          if(weight<.003)continue;
+          if(weight<.002)continue;
 
-          brushForce[indexOf(j,i)]+=
-            drag*weight*1.5;
+          // Le geste radial tire la membrane.
+          // Le geste tangentiel crée
+          // une légère torsion.
+          const gesture=
+            radialDrag+
+            tangentialDrag*Math.sin(da)*.6;
+
+          force[idx(j,i)]+=
+            clamp(gesture,-22,22)*
+            weight*
+            strength/
+            samples;
         }
       }
     }
@@ -656,88 +537,76 @@ function applyBrush(dt){
   }
 }
 
-// ======================================
-// RETOUR VISCOÉLASTIQUE
-// ======================================
+// ====================================
+// PROPAGATION ÉLASTIQUE
+// ====================================
 
-function updateElastic(dt){
-  const step=Math.min(dt,.035);
+function simulate(dt){
+  const step=Math.min(dt,.033);
 
-  const spring=9;
-  const damping=5.8;
+  // Onde amortie.
+  const spring=5.2;
+  const damping=3.5;
 
-  for(let j=0;j<COUNT;j++){
+  // Couplage radial plus marqué :
+  // l'onde traverse les cernes.
+  const radialCoupling=65;
+  const angularCoupling=15;
+
+  for(let j=0;j<ROWS;j++){
     for(let i=0;i<STEPS;i++){
-      const idx=indexOf(j,i);
+      const k=idx(j,i);
 
-      const left=indexOf(
+      const left=idx(
         j,(i+STEPS-1)%STEPS
       );
-
-      const right=indexOf(
+      const right=idx(
         j,(i+1)%STEPS
       );
 
       const inner=j>0
-        ?indexOf(j-1,i)
-        :idx;
+        ?idx(j-1,i)
+        :k;
 
-      const outer=j<COUNT-1
-        ?indexOf(j+1,i)
-        :idx;
+      const outer=j<ROWS-1
+        ?idx(j+1,i)
+        :k;
 
-      const diffusion=
-        (
-          elastic[left]+
-          elastic[right]+
-          elastic[inner]+
-          elastic[outer]-
-          4*elastic[idx]
-        )*2.5;
+      const radialLaplacian=
+        displacement[inner]+
+        displacement[outer]-
+        2*displacement[k];
+
+      const angularLaplacian=
+        displacement[left]+
+        displacement[right]-
+        2*displacement[k];
 
       const acceleration=
-        -spring*elastic[idx]-
-        damping*velocity[idx]+
-        diffusion+
-        brushForce[idx]*38;
+        radialLaplacian*radialCoupling+
+        angularLaplacian*angularCoupling-
+        spring*displacement[k]-
+        damping*velocity[k]+
+        force[k]*85;
 
-      velocity[idx]+=
+      velocity[k]+=
         acceleration*step;
     }
   }
 
-  for(let i=0;i<SIZE;i++){
-    elastic[i]+=velocity[i]*step;
+  for(let k=0;k<SIZE;k++){
+    displacement[k]+=velocity[k]*step;
 
-    elastic[i]=clamp(
-      elastic[i],-15,15
+    displacement[k]=clamp(
+      displacement[k],
+      -36,36
     );
   }
 }
 
-function updateTouches(dt){
-  applyBrush(dt);
-  updateElastic(dt);
-}
-
-// ======================================
-// OPACITÉ PICTURALE
-// ======================================
-
-function opacityField(j,t){
-  return clamp(
-    .37+j/COUNT*.35+
-    Math.sin(j*.41-t*.26)*.12+
-    Math.sin(j*.17+t*.18)*.09+
-    sound.high*
-    Math.sin(j*.62-t*.7)*.12,
-    .12,.91
-  );
-}
-
-// ======================================
-// UN MOT, UNE PRÉSENCE
-// ======================================
+// ====================================
+// MOTS DU PASSAGE
+// ====================================
 
 const lexicon=[
   "absence",
@@ -760,42 +629,34 @@ const lexicon=[
   "vivant"
 ];
 
-const word=document.createElementNS(
-  NS,"text"
-);
+const word=document.createElementNS(NS,"text");
 
 word.setAttribute("text-anchor","middle");
 word.setAttribute("dominant-baseline","middle");
 word.setAttribute("font-family","Georgia,serif");
 word.setAttribute("font-style","italic");
-word.setAttribute("font-size","24");
-word.setAttribute("fill","#34342f");
+word.setAttribute("font-size","25");
+word.setAttribute("fill","#34352f");
 word.setAttribute("opacity","0");
 
-wordGroup.appendChild(word);
+$("words").appendChild(word);
 
 let wordIndex=-1;
 let wordClock=0;
 
-const WORD_CYCLE=13;
-const WORD_FADE_IN=3;
-const WORD_HOLD=5;
-const WORD_FADE_OUT=3;
+const WORD_CYCLE=14;
+const FADE_IN=3;
+const HOLD=6;
+const FADE_OUT=3;
 
 function nextWord(){
-  let index;
-
+  let n;
   do{
-    index=Math.floor(
-      Math.random()*lexicon.length
-    );
-  }while(
-    index===wordIndex &&
-    lexicon.length>1
-  );
+    n=Math.floor(Math.random()*lexicon.length);
+  }while(n===wordIndex);
 
-  wordIndex=index;
-  word.textContent=lexicon[index];
+  wordIndex=n;
+  word.textContent=lexicon[n];
 }
 
 nextWord();
@@ -809,115 +670,95 @@ function updateWords(dt,t){
   }
 
   const u=wordClock;
-  let opacity=0;
+  let alpha=0;
 
-  if(u<WORD_FADE_IN){
-    opacity=smooth(
-      u/WORD_FADE_IN
-    );
-
-  }else if(
-    u<WORD_FADE_IN+WORD_HOLD
-  ){
-    opacity=1;
-
-  }else if(
-    u<
-    WORD_FADE_IN+
-    WORD_HOLD+
-    WORD_FADE_OUT
-  ){
-    opacity=1-smooth(
-      (
-        u-
-        WORD_FADE_IN-
-        WORD_HOLD
-      )/WORD_FADE_OUT
+  if(u<FADE_IN){
+    alpha=smooth(u/FADE_IN);
+  }else if(u<FADE_IN+HOLD){
+    alpha=1;
+  }else if(u<FADE_IN+HOLD+FADE_OUT){
+    alpha=1-smooth(
+      (u-FADE_IN-HOLD)/FADE_OUT
     );
   }
 
   word.setAttribute(
     "opacity",
-    (opacity*.92).toFixed(3)
-  );
-
-  const x=Math.sin(t*.09)*2.5;
-  const y=Math.cos(t*.07)*3;
-
-  word.setAttribute(
-    "x",x.toFixed(2)
+    (alpha*.94).toFixed(3)
   );
 
   word.setAttribute(
-    "y",y.toFixed(2)
+    "x",
+    (Math.sin(t*.08)*2).toFixed(2)
   );
 
-  const size=24+Math.sin(t*.2)*.5;
-
   word.setAttribute(
-    "font-size",
-    size.toFixed(2)
+    "y",
+    (Math.cos(t*.07)*2).toFixed(2)
   );
 }
 
-// ======================================
-// RENDU DES EMPREINTES
-// ======================================
+// ====================================
+// DESSIN DES CERNES
+// ====================================
 
 const radial=new Float32Array(STEPS);
 
-function draw(t){
-  for(let i=0;i<STEPS;i++){
-    const a=i*angleStep;
+function opacity(j,t){
+  return clamp(
+    .38+j/COUNT*.32+
+    Math.sin(j*.4-t*.25)*.12+
+    Math.sin(j*.17+t*.19)*.08,
+    .16,.9
+  );
+}
 
-    radial[i]=BASE*mother(a,t);
+function draw(t){
+  // La membrane centrale est invisible.
+  for(let i=0;i<STEPS;i++){
+    radial[i]=
+      BASE*mother(angles[i],t)+
+      displacement[idx(0,i)];
   }
 
   for(let j=0;j<COUNT;j++){
     let d="";
 
     for(let i=0;i<STEPS;i++){
-      const a=i*angleStep;
+      const a=angles[i];
 
-      const idx=indexOf(j,i);
-
-      const previous=j>0
-        ?elastic[indexOf(j-1,i)]
-        :0;
-
-      const elasticGap=
-        elastic[idx]-previous;
-
-      const natural=organicField(
-        j,a,t
-      );
-
-      const empty=voidField(
-        j,a,t
-      );
+      const natural=breathing(j,a,t);
+      const empty=opening(j,a,t);
 
       const audio=
-        Math.sin(
-          a*5-t*.6-j*.13
-        )*sound.mid*.55;
+        Math.sin(a*5-t*.6-j*.13)*
+        sound.mid*.5;
+
+      const baseGap=
+        GAP*(
+          1+
+          natural*.4+
+          empty*.9+
+          audio*.35
+        );
+
+      // La membrane transmet
+      // sa déformation aux cernes.
+      const waveGap=
+        displacement[idx(j+1,i)]-
+        displacement[idx(j,i)];
 
       const gap=Math.max(
         MIN_GAP,
-        GAP*(
-          1+
-          natural*.45+
-          empty*.9+
-          audio*.4
-        )+
-        elasticGap
+        baseGap+waveGap
       );
 
       radial[i]+=gap;
 
       const r=radial[i];
 
-      const x=Math.cos(a)*r;
-      const y=Math.sin(a)*r*.88;
+      const x=cosines[i]*r;
+      const y=sines[i]*r*YS;
 
       d+=(i===0?"M":"L")+
         x.toFixed(2)+" "+
@@ -926,30 +767,25 @@ function draw(t){
 
     d+="Z";
 
-    const path=paths[j];
-
-    path.setAttribute("d",d);
-
-    path.setAttribute(
+    const p=paths[j];
+    p.setAttribute("d",d);
+    p.setAttribute(
       "opacity",
-      opacityField(j,t).toFixed(3)
+      opacity(j,t).toFixed(3)
     );
-
-    const width=
-      .55+
-      j/COUNT*.4+
-      Math.sin(j*.6+t*.1)*.07;
-
-    path.setAttribute(
+    p.setAttribute(
       "stroke-width",
-      width.toFixed(2)
+      (
+        .55+j/COUNT*.4+
+        Math.sin(j*.6+t*.1)*.07
+      ).toFixed(2)
     );
   }
 }
 
-// ======================================
+// ====================================
 // ANIMATION
-// ======================================
+// ====================================
 
 let time=0;
 let last=0;
@@ -960,14 +796,15 @@ function animate(now){
 
   const dt=Math.min(
     (now-last||16)/1000,
-    .05
+    .04
   );
 
   last=now;
   time+=dt;
 
   updateSound(time,dt);
-  updateTouches(dt);
+  inject(dt);
+  simulate(dt);
   updateWords(dt,time);
 
   if(now-lastDraw>=33){
