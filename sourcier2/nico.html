@@ -7,13 +7,16 @@
  content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3efe7">
 <title>Empreintes du Vivant •°</title>
+
 <style>
 :root{
   --paper:#f3efe7;
   --ink:#34352f;
   --muted:#89877e;
 }
+
 *{box-sizing:border-box}
+
 html,body{
   margin:0;
   width:100%;
@@ -24,6 +27,7 @@ html,body{
   color:var(--ink);
   font-family:Georgia,serif;
 }
+
 #scene{
   position:fixed;
   inset:0;
@@ -33,6 +37,7 @@ html,body{
   user-select:none;
   -webkit-user-select:none;
 }
+
 header{
   position:fixed;
   z-index:3;
@@ -41,6 +46,7 @@ header{
   right:15px;
   pointer-events:none;
 }
+
 h1{
   margin:0;
   font-size:clamp(24px,6vw,42px);
@@ -48,12 +54,14 @@ h1{
   letter-spacing:-.055em;
   line-height:1.08;
 }
+
 header p{
   margin:8px 0 0;
   font-size:12px;
   font-style:italic;
   color:var(--muted);
 }
+
 #mic{
   position:fixed;
   z-index:4;
@@ -71,10 +79,12 @@ header p{
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
+
 #mic.active{
   background:var(--ink);
   color:var(--paper);
 }
+
 #status{
   position:fixed;
   z-index:3;
@@ -86,11 +96,16 @@ header p{
   color:var(--muted);
   pointer-events:none;
 }
+
 @media(min-width:700px){
-  header{top:28px;left:32px}
+  header{
+    top:28px;
+    left:32px;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -98,33 +113,54 @@ header p{
   <p>Ce qui nous traverse laisse une trace.</p>
 </header>
 
-<svg id="scene"
- xmlns="http://www.w3.org/2000/svg"
- viewBox="-195 -350 390 700"
- preserveAspectRatio="xMidYMid meet">
-  <g id="contours"
+<svg
+  id="scene"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="-195 -350 390 700"
+  preserveAspectRatio="xMidYMid meet"
+>
+  <g
+    id="contours"
     fill="none"
     stroke="#34352f"
     stroke-linejoin="round"
-    stroke-linecap="round"></g>
-  <g id="words"
+    stroke-linecap="round"
+  ></g>
+
+  <g
+    id="words"
     text-anchor="middle"
-    pointer-events="none"></g>
+    pointer-events="none"
+  ></g>
 </svg>
 
-<div id="status">Toucher, étirer, laisser revenir</div>
-<button id="mic" aria-pressed="false">Micro</button>
+<div id="status">
+  Toucher, étirer, laisser revenir
+</div>
+
+<button id="mic" aria-pressed="false">
+  Micro
+</button>
 
 <script>
 "use strict";
+
+// ====================================
+// OUTILS
+// ====================================
 
 const $=id=>document.getElementById(id);
 const NS="http://www.w3.org/2000/svg";
 const TAU=Math.PI*2;
 
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const lerp=(a,b,k)=>a+(b-a)*k;
-const gauss=(x,s)=>Math.exp(-.5*(x/s)**2);
+const clamp=(v,a,b)=>
+  Math.max(a,Math.min(b,v));
+
+const lerp=(a,b,k)=>
+  a+(b-a)*k;
+
+const gauss=(x,s)=>
+  Math.exp(-.5*(x/s)**2);
 
 function smooth(x){
   x=clamp(x,0,1);
@@ -147,27 +183,40 @@ const contours=$("contours");
 
 const COUNT=38;
 const STEPS=160;
+
 const BASE=64;
 const GAP=5.15;
 const MIN_GAP=2.35;
 const YS=.88;
 
+const ROWS=COUNT+1;
+const SIZE=ROWS*STEPS;
+
 const paths=[];
+
 const angles=new Float32Array(STEPS);
 const cosines=new Float32Array(STEPS);
 const sines=new Float32Array(STEPS);
 
 for(let i=0;i<STEPS;i++){
   const a=i/STEPS*TAU;
+
   angles[i]=a;
   cosines[i]=Math.cos(a);
   sines[i]=Math.sin(a);
 }
 
 for(let j=0;j<COUNT;j++){
-  const p=document.createElementNS(NS,"path");
+  const p=document.createElementNS(
+    NS,"path"
+  );
+
   p.setAttribute("fill","none");
-  p.setAttribute("vector-effect","non-scaling-stroke");
+  p.setAttribute(
+    "vector-effect",
+    "non-scaling-stroke"
+  );
+
   contours.appendChild(p);
   paths.push(p);
 }
@@ -175,6 +224,7 @@ for(let j=0;j<COUNT;j++){
 function resize(){
   const w=window.innerWidth;
   const h=window.innerHeight;
+
   const vw=w<h?390:650;
   const vh=vw*h/w;
 
@@ -196,10 +246,15 @@ let analyser=null;
 let bins=null;
 let stream=null;
 let source=null;
+
 let micActive=false;
 let micBusy=false;
 
-const sound={low:0,mid:0,high:0};
+const sound={
+  low:0,
+  mid:0,
+  high:0
+};
 
 async function stopMic(){
   micActive=false;
@@ -208,12 +263,18 @@ async function stopMic(){
     source.disconnect();
     source=null;
   }
+
   if(stream){
-    stream.getTracks().forEach(t=>t.stop());
+    stream.getTracks().forEach(
+      track=>track.stop()
+    );
     stream=null;
   }
+
   if(context){
-    try{await context.close()}catch(e){}
+    try{
+      await context.close();
+    }catch(e){}
     context=null;
   }
 
@@ -221,13 +282,18 @@ async function stopMic(){
   bins=null;
 
   $("mic").classList.remove("active");
-  $("mic").setAttribute("aria-pressed","false");
+  $("mic").setAttribute(
+    "aria-pressed","false"
+  );
   $("mic").textContent="Micro";
-  $("status").textContent="Toucher, étirer, laisser revenir";
+
+  $("status").textContent=
+    "Toucher, étirer, laisser revenir";
 }
 
 $("mic").onclick=async()=>{
   if(micBusy)return;
+
   micBusy=true;
 
   if(micActive){
@@ -241,31 +307,48 @@ $("mic").onclick=async()=>{
       window.AudioContext||
       window.webkitAudioContext;
 
+    if(!AudioClass){
+      throw new Error(
+        "Audio indisponible"
+      );
+    }
+
     context=new AudioClass();
 
     analyser=context.createAnalyser();
     analyser.fftSize=1024;
     analyser.smoothingTimeConstant=.88;
 
-    bins=new Uint8Array(analyser.frequencyBinCount);
+    bins=new Uint8Array(
+      analyser.frequencyBinCount
+    );
 
     stream=await navigator.mediaDevices
       .getUserMedia({audio:true});
 
-    source=context.createMediaStreamSource(stream);
+    source=context
+      .createMediaStreamSource(stream);
+
     source.connect(analyser);
 
     await context.resume();
 
     micActive=true;
+
     $("mic").classList.add("active");
-    $("mic").setAttribute("aria-pressed","true");
+    $("mic").setAttribute(
+      "aria-pressed","true"
+    );
     $("mic").textContent="Micro actif";
-    $("status").textContent="Écouter ce qui résonne";
+
+    $("status").textContent=
+      "Écouter ce qui résonne";
 
   }catch(e){
     await stopMic();
-    $("status").textContent="Micro indisponible";
+
+    $("status").textContent=
+      "Micro indisponible";
   }
 
   micBusy=false;
@@ -274,18 +357,24 @@ $("mic").onclick=async()=>{
 function band(a,b){
   if(!context||!bins)return 0;
 
-  const hz=context.sampleRate/analyser.fftSize;
+  const hz=
+    context.sampleRate/
+    analyser.fftSize;
+
   const start=Math.floor(a/hz);
   const end=Math.min(
     bins.length,
     Math.ceil(b/hz)
   );
 
-  let sum=0,n=0;
+  let sum=0;
+  let n=0;
+
   for(let i=start;i<end;i++){
     sum+=bins[i]/255;
     n++;
   }
+
   return n?sum/n:0;
 }
 
@@ -294,9 +383,11 @@ function updateSound(t,dt){
 
   if(micActive&&analyser){
     analyser.getByteFrequencyData(bins);
+
     low=band(35,300);
     mid=band(300,1800);
     high=band(1800,8500);
+
   }else{
     low=.17+.09*Math.sin(t*.42);
     mid=.13+.07*Math.sin(t*.7+1);
@@ -304,13 +395,22 @@ function updateSound(t,dt){
   }
 
   const k=1-Math.exp(-dt*4);
-  sound.low=lerp(sound.low,low,k);
-  sound.mid=lerp(sound.mid,mid,k);
-  sound.high=lerp(sound.high,high,k);
+
+  sound.low=lerp(
+    sound.low,low,k
+  );
+
+  sound.mid=lerp(
+    sound.mid,mid,k
+  );
+
+  sound.high=lerp(
+    sound.high,high,k
+  );
 }
 
 // ====================================
-// FORME-MÈRE
+// FORME-MÈRE INVISIBLE
 // ====================================
 
 function mother(a,t){
@@ -328,10 +428,26 @@ function mother(a,t){
 // ====================================
 
 const breaths=[
-  {a:.4,r:7,va:.1,p:0,w:6,s:.85},
-  {a:2.6,r:21,va:-.07,p:2,w:9,s:-.7},
-  {a:4.7,r:13,va:.06,p:4,w:7,s:.7},
-  {a:5.8,r:31,va:-.05,p:1,w:5,s:.6}
+  {
+    a:.4,r:7,
+    va:.1,p:0,
+    w:6,s:.85
+  },
+  {
+    a:2.6,r:21,
+    va:-.07,p:2,
+    w:9,s:-.7
+  },
+  {
+    a:4.7,r:13,
+    va:.06,p:4,
+    w:7,s:.7
+  },
+  {
+    a:5.8,r:31,
+    va:-.05,p:1,
+    w:5,s:.6
+  }
 ];
 
 function breathing(j,a,t){
@@ -339,7 +455,10 @@ function breathing(j,a,t){
 
   for(const b of breaths){
     const ca=b.a+t*b.va;
-    const cr=b.r+Math.sin(t*.13+b.p)*5;
+
+    const cr=
+      b.r+
+      Math.sin(t*.13+b.p)*5;
 
     v+=
       b.s*
@@ -351,10 +470,23 @@ function breathing(j,a,t){
   return v;
 }
 
+// ====================================
+// ESPACES VIDES
+// ====================================
+
 const voids=[
-  {a:1.2,r:12,p:0,v:.06,s:1.65},
-  {a:3.7,r:25,p:2.5,v:-.05,s:1.45},
-  {a:5.1,r:33,p:4.1,v:.04,s:1.2}
+  {
+    a:1.2,r:12,
+    p:0,v:.06,s:1.65
+  },
+  {
+    a:3.7,r:25,
+    p:2.5,v:-.05,s:1.45
+  },
+  {
+    a:5.1,r:33,
+    p:4.1,v:.04,s:1.2
+  }
 ];
 
 function opening(j,a,t){
@@ -362,12 +494,17 @@ function opening(j,a,t){
 
   for(const o of voids){
     const life=smooth(
-      .5+.5*Math.sin(t*.17+o.p)
+      .5+.5*Math.sin(
+        t*.17+o.p
+      )
     );
 
     v+=
       o.s*life*
-      gauss(adiff(a,o.a+t*o.v),.68)*
+      gauss(
+        adiff(a,o.a+t*o.v),
+        .68
+      )*
       gauss(j-o.r,4.3);
   }
 
@@ -375,26 +512,39 @@ function opening(j,a,t){
 }
 
 // ====================================
-// MEMBRANE : ONDE TACTILE
+// MEMBRANE ÉLASTIQUE
 // ====================================
 
-// La première rangée est la membrane
-// centrale invisible.
-// Les suivantes forment les cernes.
+const displacement=
+  new Float32Array(SIZE);
 
-const ROWS=COUNT+1;
-const SIZE=ROWS*STEPS;
+const velocity=
+  new Float32Array(SIZE);
 
-const displacement=new Float32Array(SIZE);
-const velocity=new Float32Array(SIZE);
-const force=new Float32Array(SIZE);
+const force=
+  new Float32Array(SIZE);
+
+const held=
+  new Float32Array(SIZE);
+
+const heldVelocity=
+  new Float32Array(SIZE);
+
+const holdTarget=
+  new Float32Array(SIZE);
 
 const touches=new Map();
 
-const idx=(j,i)=>j*STEPS+i;
+const idx=(j,i)=>
+  j*STEPS+i;
+
+// ====================================
+// COORDONNÉES TACTILES
+// ====================================
 
 function toSVG(e){
   const p=svg.createSVGPoint();
+
   p.x=e.clientX;
   p.y=e.clientY;
 
@@ -407,6 +557,7 @@ function toSVG(e){
 
 function polar(x,y){
   const yy=y/YS;
+
   return {
     a:Math.atan2(yy,x),
     r:Math.hypot(x,yy)
@@ -415,42 +566,65 @@ function polar(x,y){
 
 function down(e){
   e.preventDefault();
-  svg.setPointerCapture(e.pointerId);
+
+  svg.setPointerCapture(
+    e.pointerId
+  );
 
   const p=toSVG(e);
+
   touches.set(e.pointerId,{
     x:p.x,
     y:p.y,
     px:p.x,
     py:p.y,
-    ox:p.x,
-    oy:p.y,
     age:0
   });
 }
 
 function move(e){
-  const touch=touches.get(e.pointerId);
+  const touch=touches.get(
+    e.pointerId
+  );
+
   if(!touch)return;
 
   e.preventDefault();
+
   const p=toSVG(e);
+
   touch.x=p.x;
   touch.y=p.y;
 }
 
 function up(e){
-  touches.delete(e.pointerId);
+  touches.delete(
+    e.pointerId
+  );
 }
 
-svg.addEventListener("pointerdown",down);
-svg.addEventListener("pointermove",move);
-svg.addEventListener("pointerup",up);
-svg.addEventListener("pointercancel",up);
+svg.addEventListener(
+  "pointerdown",down
+);
+
+svg.addEventListener(
+  "pointermove",move
+);
+
+svg.addEventListener(
+  "pointerup",up
+);
+
+svg.addEventListener(
+  "pointercancel",up
+);
 
 // ====================================
-// INJECTION DE L'ONDE
+// GLISSEMENT : ONDE IMMÉDIATE
 // ====================================
+
+const HOLD_DELAY=.35;
+const HOLD_GROW=3.8;
 
 function inject(dt){
   force.fill(0);
@@ -462,73 +636,87 @@ function inject(dt){
     const dy=(touch.y-touch.py)/YS;
 
     const travel=Math.hypot(dx,dy);
-    if(travel<.001)continue;
 
-    const samples=Math.min(
-      12,
-      Math.max(1,Math.ceil(travel/7))
-    );
-
-    for(let s=0;s<samples;s++){
-      const u=(s+.5)/samples;
-      const x=lerp(touch.px,touch.x,u);
-      const y=lerp(touch.py,touch.y,u);
-      const p=polar(x,y);
-
-      const radialDrag=
-        dx*Math.cos(p.a)+
-        dy*Math.sin(p.a);
-
-      const tangentialDrag=
-        -dx*Math.sin(p.a)+
-        dy*Math.cos(p.a);
-
-      // La forme centrale réagit
-      // même si le doigt part du vide.
-      const centerInfluence=
-        smooth((BASE+35-p.r)/85);
-
-      const strength=
-        1+centerInfluence*2.8;
-
-      const targetRow=clamp(
-        (p.r-BASE)/GAP,
-        0,
-        COUNT
+    if(travel>.001){
+      const samples=Math.min(
+        14,
+        Math.max(
+          1,
+          Math.ceil(travel/5)
+        )
       );
 
-      for(let j=0;j<ROWS;j++){
-        const distance=j-targetRow;
+      for(let s=0;s<samples;s++){
+        const u=(s+.5)/samples;
 
-        const radialWeight=gauss(
-          distance,
-          centerInfluence>.2?8:5
+        const x=lerp(
+          touch.px,touch.x,u
         );
 
-        if(radialWeight<.002)continue;
+        const y=lerp(
+          touch.py,touch.y,u
+        );
 
-        for(let i=0;i<STEPS;i++){
-          const da=adiff(angles[i],p.a);
-          const angularWeight=gauss(da,.55);
+        const q=polar(x,y);
 
-          const weight=
-            radialWeight*angularWeight;
+        const radialDrag=
+          dx*Math.cos(q.a)+
+          dy*Math.sin(q.a);
 
-          if(weight<.002)continue;
+        const tangentialDrag=
+          -dx*Math.sin(q.a)+
+          dy*Math.cos(q.a);
 
-          // Le geste radial tire la membrane.
-          // Le geste tangentiel crée
-          // une légère torsion.
-          const gesture=
-            radialDrag+
-            tangentialDrag*Math.sin(da)*.6;
+        // Renforcement près du vide central.
+        const centerBoost=
+          1+3.8*smooth(
+            (BASE+45-q.r)/105
+          );
 
-          force[idx(j,i)]+=
-            clamp(gesture,-22,22)*
-            weight*
-            strength/
-            samples;
+        const row=clamp(
+          (q.r-BASE)/GAP,
+          0,COUNT
+        );
+
+        for(let j=0;j<ROWS;j++){
+          const wr=gauss(
+            j-row,9
+          );
+
+          if(wr<.002)continue;
+
+          for(let i=0;i<STEPS;i++){
+            const da=adiff(
+              angles[i],q.a
+            );
+
+            const wa=gauss(
+              da,.62
+            );
+
+            const weight=wr*wa;
+
+            if(weight<.002)continue;
+
+            const gesture=
+              radialDrag+
+              tangentialDrag*
+              Math.sin(da)*.8;
+
+            force[idx(j,i)]+=
+              clamp(
+                gesture,-28,28
+              )*
+              weight*
+              centerBoost/
+              samples;
+          }
         }
+      }
+
+      // Un geste réinitialise l'appui long.
+      if(travel>2){
+        touch.age=0;
       }
     }
 
@@ -538,70 +726,153 @@ function inject(dt){
 }
 
 // ====================================
-// PROPAGATION ÉLASTIQUE
+// APPUI LONG : ATTRACTION
 // ====================================
 
-function simulate(dt){
-  const step=Math.min(dt,.033);
+function updateHold(dt){
+  holdTarget.fill(0);
 
-  // Onde amortie.
-  const spring=5.2;
-  const damping=3.5;
+  for(const touch of touches.values()){
+    const hold=smooth(
+      (touch.age-HOLD_DELAY)/
+      HOLD_GROW
+    );
 
-  // Couplage radial plus marqué :
-  // l'onde traverse les cernes.
-  const radialCoupling=65;
-  const angularCoupling=15;
+    if(hold<=0)continue;
 
-  for(let j=0;j<ROWS;j++){
-    for(let i=0;i<STEPS;i++){
-      const k=idx(j,i);
+    const p=polar(
+      touch.x,touch.y
+    );
 
-      const left=idx(
-        j,(i+STEPS-1)%STEPS
+    const row=clamp(
+      (p.r-BASE)/GAP,
+      0,COUNT
+    );
+
+    for(let j=0;j<ROWS;j++){
+      const dr=j-row;
+
+      const wr=gauss(
+        dr,7
       );
-      const right=idx(
-        j,(i+1)%STEPS
-      );
 
-      const inner=j>0
-        ?idx(j-1,i)
-        :k;
+      if(wr<.002)continue;
 
-      const outer=j<ROWS-1
-        ?idx(j+1,i)
-        :k;
+      for(let i=0;i<STEPS;i++){
+        const da=adiff(
+          angles[i],p.a
+        );
 
-      const radialLaplacian=
-        displacement[inner]+
-        displacement[outer]-
-        2*displacement[k];
+        const wa=gauss(
+          da,.52
+        );
 
-      const angularLaplacian=
-        displacement[left]+
-        displacement[right]-
-        2*displacement[k];
+        const weight=
+          wr*wa*hold;
 
-      const acceleration=
-        radialLaplacian*radialCoupling+
-        angularLaplacian*angularCoupling-
-        spring*displacement[k]-
-        damping*velocity[k]+
-        force[k]*85;
+        if(weight<.002)continue;
 
-      velocity[k]+=
-        acceleration*step;
+        // Attraction progressive.
+        const pull=
+          -Math.tanh(dr*.25)*18;
+
+        holdTarget[idx(j,i)]+=
+          pull*weight;
+      }
     }
   }
 
   for(let k=0;k<SIZE;k++){
-    displacement[k]+=velocity[k]*step;
+    const acceleration=
+      (
+        holdTarget[k]-
+        held[k]
+      )*22-
+      heldVelocity[k]*8.5;
 
-    displacement[k]=clamp(
-      displacement[k],
-      -36,36
-    );
+    heldVelocity[k]+=
+      acceleration*dt;
+
+    held[k]+=
+      heldVelocity[k]*dt;
   }
+}
+
+// ====================================
+// PROPAGATION DE L'ONDE
+// ====================================
+
+function simulate(dt){
+  const steps=3;
+  const h=Math.min(dt,.04)/steps;
+
+  const spring=6.5;
+  const damping=4.2;
+
+  const radialCoupling=110;
+  const angularCoupling=24;
+
+  for(let sub=0;sub<steps;sub++){
+    for(let j=0;j<ROWS;j++){
+      for(let i=0;i<STEPS;i++){
+        const k=idx(j,i);
+
+        const left=idx(
+          j,
+          (i+STEPS-1)%STEPS
+        );
+
+        const right=idx(
+          j,
+          (i+1)%STEPS
+        );
+
+        const inner=j>0
+          ?idx(j-1,i)
+          :k;
+
+        const outer=j<ROWS-1
+          ?idx(j+1,i)
+          :k;
+
+        const radialLap=
+          displacement[inner]+
+          displacement[outer]-
+          2*displacement[k];
+
+        const angularLap=
+          displacement[left]+
+          displacement[right]-
+          2*displacement[k];
+
+        const acceleration=
+          radialLap*
+          radialCoupling+
+          angularLap*
+          angularCoupling-
+          spring*
+          displacement[k]-
+          damping*
+          velocity[k]+
+          force[k]*145;
+
+        velocity[k]+=
+          acceleration*h;
+      }
+    }
+
+    for(let k=0;k<SIZE;k++){
+      displacement[k]+=
+        velocity[k]*h;
+
+      displacement[k]=clamp(
+        displacement[k],
+        -48,48
+      );
+    }
+  }
+
+  updateHold(dt);
 }
 
 // ====================================
@@ -629,15 +900,37 @@ const lexicon=[
   "vivant"
 ];
 
-const word=document.createElementNS(NS,"text");
+const word=document.createElementNS(
+  NS,"text"
+);
 
-word.setAttribute("text-anchor","middle");
-word.setAttribute("dominant-baseline","middle");
-word.setAttribute("font-family","Georgia,serif");
-word.setAttribute("font-style","italic");
-word.setAttribute("font-size","25");
-word.setAttribute("fill","#34352f");
-word.setAttribute("opacity","0");
+word.setAttribute(
+  "text-anchor","middle"
+);
+
+word.setAttribute(
+  "dominant-baseline","middle"
+);
+
+word.setAttribute(
+  "font-family","Georgia,serif"
+);
+
+word.setAttribute(
+  "font-style","italic"
+);
+
+word.setAttribute(
+  "font-size","25"
+);
+
+word.setAttribute(
+  "fill","#34352f"
+);
+
+word.setAttribute(
+  "opacity","0"
+);
 
 $("words").appendChild(word);
 
@@ -651,8 +944,12 @@ const FADE_OUT=3;
 
 function nextWord(){
   let n;
+
   do{
-    n=Math.floor(Math.random()*lexicon.length);
+    n=Math.floor(
+      Math.random()*
+      lexicon.length
+    );
   }while(n===wordIndex);
 
   wordIndex=n;
@@ -670,15 +967,26 @@ function updateWords(dt,t){
   }
 
   const u=wordClock;
+
   let alpha=0;
 
   if(u<FADE_IN){
-    alpha=smooth(u/FADE_IN);
-  }else if(u<FADE_IN+HOLD){
+    alpha=smooth(
+      u/FADE_IN
+    );
+
+  }else if(
+    u<FADE_IN+HOLD
+  ){
     alpha=1;
-  }else if(u<FADE_IN+HOLD+FADE_OUT){
+
+  }else if(
+    u<FADE_IN+HOLD+FADE_OUT
+  ){
     alpha=1-smooth(
-      (u-FADE_IN-HOLD)/FADE_OUT
+      (
+        u-FADE_IN-HOLD
+      )/FADE_OUT
     );
   }
 
@@ -689,20 +997,22 @@ function updateWords(dt,t){
 
   word.setAttribute(
     "x",
-    (Math.sin(t*.08)*2).toFixed(2)
+    (
+      Math.sin(t*.08)*2
+    ).toFixed(2)
   );
 
   word.setAttribute(
     "y",
-    (Math.cos(t*.07)*2).toFixed(2)
+    (
+      Math.cos(t*.07)*2
+    ).toFixed(2)
   );
 }
 
 // ====================================
-// DESSIN DES CERNES
+// OPACITÉ DES CERNES
 // ====================================
-
-const radial=new Float32Array(STEPS);
 
 function opacity(j,t){
   return clamp(
@@ -713,12 +1023,23 @@ function opacity(j,t){
   );
 }
 
+// ====================================
+// DESSIN DES CERNES
+// ====================================
+
+const radial=new Float32Array(
+  STEPS
+);
+
 function draw(t){
-  // La membrane centrale est invisible.
+  // Membrane centrale invisible.
   for(let i=0;i<STEPS;i++){
     radial[i]=
-      BASE*mother(angles[i],t)+
-      displacement[idx(0,i)];
+      BASE*mother(
+        angles[i],t
+      )+
+      displacement[idx(0,i)]+
+      held[idx(0,i)];
   }
 
   for(let j=0;j<COUNT;j++){
@@ -727,11 +1048,18 @@ function draw(t){
     for(let i=0;i<STEPS;i++){
       const a=angles[i];
 
-      const natural=breathing(j,a,t);
-      const empty=opening(j,a,t);
+      const natural=breathing(
+        j,a,t
+      );
+
+      const empty=opening(
+        j,a,t
+      );
 
       const audio=
-        Math.sin(a*5-t*.6-j*.13)*
+        Math.sin(
+          a*5-t*.6-j*.13
+        )*
         sound.mid*.5;
 
       const baseGap=
@@ -742,12 +1070,13 @@ function draw(t){
           audio*.35
         );
 
-      // La membrane transmet
-      // sa déformation aux cernes.
       const waveGap=
-        displacement[idx(j+1,i)]-
-        displacement[idx(j,i)];
+        displacement[idx(j+1,i)]+
+        held[idx(j+1,i)]-
+        displacement[idx(j,i)]-
+        held[idx(j,i)];
 
+      // Espacement minimal conservé.
       const gap=Math.max(
         MIN_GAP,
         baseGap+waveGap
@@ -768,16 +1097,24 @@ function draw(t){
     d+="Z";
 
     const p=paths[j];
-    p.setAttribute("d",d);
+
+    p.setAttribute(
+      "d",d
+    );
+
     p.setAttribute(
       "opacity",
       opacity(j,t).toFixed(3)
     );
+
     p.setAttribute(
       "stroke-width",
       (
-        .55+j/COUNT*.4+
-        Math.sin(j*.6+t*.1)*.07
+        .55+
+        j/COUNT*.4+
+        Math.sin(
+          j*.6+t*.1
+        )*.07
       ).toFixed(2)
     );
   }
@@ -807,7 +1144,8 @@ function animate(now){
   simulate(dt);
   updateWords(dt,time);
 
-  if(now-lastDraw>=33){
+  // Jusqu'à 60 images/s.
+  if(now-lastDraw>=16){
     lastDraw=now;
     draw(time);
   }
