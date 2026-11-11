@@ -1,0 +1,983 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+ content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3efe7">
+<title>Empreintes du Vivant •°</title>
+
+<style>
+:root{
+  --paper:#f3efe7;
+  --ink:#34342f;
+  --muted:#89857c;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Georgia,serif;
+}
+
+#scene{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+header{
+  position:fixed;
+  z-index:3;
+  top:calc(18px + env(safe-area-inset-top));
+  left:20px;
+  right:20px;
+  pointer-events:none;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(24px,6vw,42px);
+  font-weight:400;
+  letter-spacing:-.055em;
+  line-height:1.08;
+}
+
+header p{
+  margin:8px 0 0;
+  font-size:12px;
+  font-style:italic;
+  color:var(--muted);
+}
+
+#mic{
+  position:fixed;
+  z-index:4;
+  bottom:calc(22px + env(safe-area-inset-bottom));
+  left:50%;
+  transform:translateX(-50%);
+  min-width:112px;
+  min-height:48px;
+  padding:12px 22px;
+  border:1px solid #c9c4b9;
+  border-radius:30px;
+  background:rgba(243,239,231,.94);
+  color:var(--ink);
+  font:13px system-ui,sans-serif;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+#mic.active{
+  background:var(--ink);
+  color:var(--paper);
+}
+
+#status{
+  position:fixed;
+  z-index:3;
+  bottom:calc(82px + env(safe-area-inset-bottom));
+  width:100%;
+  text-align:center;
+  color:var(--muted);
+  font:11px system-ui,sans-serif;
+  pointer-events:none;
+}
+
+@media(min-width:700px){
+  header{
+    top:30px;
+    left:34px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Empreintes du Vivant •°</h1>
+  <p>Ce qui nous traverse laisse une trace.</p>
+</header>
+
+<svg
+  id="scene"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="-220 -390 440 780"
+  preserveAspectRatio="xMidYMid meet"
+>
+  <g
+    id="contours"
+    fill="none"
+    stroke="#34342f"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  ></g>
+
+  <g
+    id="words"
+    text-anchor="middle"
+    font-family="Georgia,serif"
+    font-style="italic"
+    fill="#34342f"
+    pointer-events="none"
+  ></g>
+</svg>
+
+<div id="status">Effleurer les empreintes</div>
+
+<button id="mic" aria-pressed="false">
+  Micro
+</button>
+
+<script>
+"use strict";
+
+// ======================================
+// OUTILS
+// ======================================
+
+const $=id=>document.getElementById(id);
+const NS="http://www.w3.org/2000/svg";
+const TAU=Math.PI*2;
+
+const clamp=(v,a,b)=>
+  Math.max(a,Math.min(b,v));
+
+const lerp=(a,b,k)=>
+  a+(b-a)*k;
+
+function smooth(v){
+  v=clamp(v,0,1);
+  return v*v*(3-2*v);
+}
+
+function gauss(x,s){
+  return Math.exp(-.5*(x/s)**2);
+}
+
+function angleDist(a,b){
+  return Math.atan2(
+    Math.sin(a-b),
+    Math.cos(a-b)
+  );
+}
+
+// ======================================
+// MOBILE FIRST
+// ======================================
+
+const svg=$("scene");
+const contourGroup=$("contours");
+const wordGroup=$("words");
+
+const COUNT=37;
+const STEPS=144;
+
+const BASE=65;
+const GAP=5.1;
+const MIN_GAP=2.5;
+
+const paths=[];
+
+function resize(){
+  const w=window.innerWidth;
+  const h=window.innerHeight;
+
+  const visibleWidth=w<h?390:650;
+  const visibleHeight=visibleWidth*h/w;
+
+  svg.setAttribute(
+    "viewBox",
+    [
+      -visibleWidth/2,
+      -visibleHeight/2,
+      visibleWidth,
+      visibleHeight
+    ].join(" ")
+  );
+}
+
+window.addEventListener("resize",resize);
+resize();
+
+for(let j=0;j<COUNT;j++){
+  const p=document.createElementNS(
+    NS,"path"
+  );
+
+  p.setAttribute("fill","none");
+  p.setAttribute(
+    "vector-effect",
+    "non-scaling-stroke"
+  );
+
+  contourGroup.appendChild(p);
+  paths.push(p);
+}
+
+// ======================================
+// MICRO
+// ======================================
+
+let audioContext=null;
+let analyser=null;
+let bins=null;
+let stream=null;
+let source=null;
+
+let micActive=false;
+let micBusy=false;
+
+const sound={
+  low:0,
+  mid:0,
+  high:0
+};
+
+async function stopMic(){
+  micActive=false;
+
+  if(source){
+    source.disconnect();
+    source=null;
+  }
+
+  if(stream){
+    stream.getTracks().forEach(
+      track=>track.stop()
+    );
+    stream=null;
+  }
+
+  if(audioContext){
+    try{
+      await audioContext.close();
+    }catch(e){}
+    audioContext=null;
+  }
+
+  analyser=null;
+  bins=null;
+
+  $("mic").classList.remove("active");
+  $("mic").setAttribute("aria-pressed","false");
+  $("mic").textContent="Micro";
+  $("status").textContent="Effleurer les empreintes";
+}
+
+$("mic").onclick=async()=>{
+  if(micBusy)return;
+
+  micBusy=true;
+
+  if(micActive){
+    await stopMic();
+    micBusy=false;
+    return;
+  }
+
+  try{
+    const AudioClass=
+      window.AudioContext||
+      window.webkitAudioContext;
+
+    if(!AudioClass){
+      throw new Error("Audio indisponible");
+    }
+
+    audioContext=new AudioClass();
+
+    analyser=audioContext.createAnalyser();
+    analyser.fftSize=1024;
+    analyser.smoothingTimeConstant=.88;
+
+    bins=new Uint8Array(
+      analyser.frequencyBinCount
+    );
+
+    stream=await navigator.mediaDevices
+      .getUserMedia({audio:true});
+
+    source=audioContext
+      .createMediaStreamSource(stream);
+
+    source.connect(analyser);
+
+    await audioContext.resume();
+
+    micActive=true;
+
+    $("mic").classList.add("active");
+    $("mic").setAttribute("aria-pressed","true");
+    $("mic").textContent="Micro actif";
+    $("status").textContent="Écouter ce qui résonne";
+
+  }catch(e){
+    await stopMic();
+    $("status").textContent="Micro indisponible";
+  }
+
+  micBusy=false;
+};
+
+function band(a,b){
+  if(!audioContext||!bins)return 0;
+
+  const hz=audioContext.sampleRate/
+    analyser.fftSize;
+
+  const first=Math.floor(a/hz);
+  const last=Math.min(
+    bins.length,
+    Math.ceil(b/hz)
+  );
+
+  let sum=0,n=0;
+
+  for(let i=first;i<last;i++){
+    sum+=bins[i]/255;
+    n++;
+  }
+
+  return n?sum/n:0;
+}
+
+function updateSound(t,dt){
+  let low,mid,high;
+
+  if(micActive&&analyser){
+    analyser.getByteFrequencyData(bins);
+
+    low=band(35,300);
+    mid=band(300,1800);
+    high=band(1800,8500);
+  }else{
+    low=.17+.1*Math.sin(t*.43);
+    mid=.13+.08*Math.sin(t*.71+1);
+    high=.08+.04*Math.sin(t*1.09+2);
+  }
+
+  const k=1-Math.exp(-dt*4);
+
+  sound.low=lerp(sound.low,low,k);
+  sound.mid=lerp(sound.mid,mid,k);
+  sound.high=lerp(sound.high,high,k);
+}
+
+// ======================================
+// FORME-MÈRE INVISIBLE
+// ======================================
+
+function mother(a,t){
+  return 1+
+    Math.sin(a*2-t*.11+.4)*.15+
+    Math.sin(a*3+t*.08+1.8)*.105+
+    Math.sin(a*5-t*.06+2.3)*.06+
+    Math.sin(a*8+t*.04)*.022+
+    Math.sin(a*13-t*.03+1)*.009+
+    Math.sin(a*3-t*.3)*sound.low*.15+
+    Math.sin(a*6+t*.35)*sound.mid*.1;
+}
+
+// ======================================
+// RÉSONANCES ORGANIQUES
+// ======================================
+
+const organisms=[
+  {
+    a:.4,r:8,
+    va:.11,vr:.15,
+    wa:.7,wr:6,
+    power:.85,phase:0
+  },
+  {
+    a:2.5,r:23,
+    va:-.09,vr:-.11,
+    wa:.9,wr:8,
+    power:-.7,phase:2
+  },
+  {
+    a:4.8,r:17,
+    va:.07,vr:.13,
+    wa:.6,wr:7,
+    power:.75,phase:4
+  },
+  {
+    a:5.7,r:31,
+    va:-.05,vr:-.07,
+    wa:.85,wr:5,
+    power:.5,phase:1.4
+  }
+];
+
+function organicField(j,a,t){
+  let value=0;
+
+  for(const o of organisms){
+    const ca=o.a+t*o.va;
+
+    const cr=
+      o.r+
+      Math.sin(t*o.vr+o.phase)*6;
+
+    const envelope=
+      gauss(angleDist(a,ca),o.wa)*
+      gauss(j-cr,o.wr);
+
+    value+=
+      o.power*
+      envelope*
+      Math.sin(
+        t*.55-j*.11+o.phase
+      );
+  }
+
+  return value;
+}
+
+// ======================================
+// ESPACES VIDES ÉMERGENTS
+// ======================================
+
+const voids=[
+  {
+    a:1.1,r:12,
+    phase:0,speed:.08,
+    wa:.65,wr:4,
+    strength:1.6
+  },
+  {
+    a:3.8,r:25,
+    phase:2.4,speed:-.06,
+    wa:.75,wr:5,
+    strength:1.4
+  },
+  {
+    a:5.2,r:32,
+    phase:4.1,speed:.05,
+    wa:.55,wr:3.5,
+    strength:1.15
+  }
+];
+
+function voidField(j,a,t){
+  let value=0;
+
+  for(const v of voids){
+    const life=smooth(
+      .5+.5*Math.sin(
+        t*.17+v.phase
+      )
+    );
+
+    const ca=v.a+t*v.speed;
+
+    const cr=
+      v.r+
+      Math.sin(t*.1+v.phase)*4;
+
+    value+=
+      v.strength*
+      life*
+      gauss(angleDist(a,ca),v.wa)*
+      gauss(j-cr,v.wr);
+  }
+
+  return value;
+}
+
+// ======================================
+// PINCEAU ÉLASTIQUE
+// ======================================
+
+const touches=new Map();
+
+const SIZE=COUNT*STEPS;
+
+const elastic=new Float32Array(SIZE);
+const velocity=new Float32Array(SIZE);
+const brushForce=new Float32Array(SIZE);
+
+const angleStep=TAU/STEPS;
+
+function indexOf(j,i){
+  return j*STEPS+i;
+}
+
+function toSVG(e){
+  const p=svg.createSVGPoint();
+
+  p.x=e.clientX;
+  p.y=e.clientY;
+
+  const matrix=svg.getScreenCTM();
+
+  return matrix
+    ?p.matrixTransform(matrix.inverse())
+    :{x:0,y:0};
+}
+
+function locate(x,y){
+  const adjustedY=y/.88;
+
+  return {
+    x,
+    y:adjustedY,
+    a:Math.atan2(adjustedY,x),
+    r:clamp(
+      (Math.hypot(x,adjustedY)-BASE)/GAP,
+      0,COUNT-1
+    )
+  };
+}
+
+function pointerDown(e){
+  e.preventDefault();
+
+  svg.setPointerCapture(e.pointerId);
+
+  const p=toSVG(e);
+  const pos=locate(p.x,p.y);
+
+  touches.set(e.pointerId,{
+    x:pos.x,
+    y:pos.y,
+    px:pos.x,
+    py:pos.y,
+    strength:0
+  });
+}
+
+function pointerMove(e){
+  const touch=touches.get(e.pointerId);
+  if(!touch)return;
+
+  e.preventDefault();
+
+  const p=toSVG(e);
+  const pos=locate(p.x,p.y);
+
+  touch.x=pos.x;
+  touch.y=pos.y;
+}
+
+function pointerUp(e){
+  touches.delete(e.pointerId);
+}
+
+svg.addEventListener("pointerdown",pointerDown);
+svg.addEventListener("pointermove",pointerMove);
+svg.addEventListener("pointerup",pointerUp);
+svg.addEventListener("pointercancel",pointerUp);
+
+// ======================================
+// DÉFORMATION PAR LE GESTE
+// ======================================
+
+function applyBrush(dt){
+  brushForce.fill(0);
+
+  for(const touch of touches.values()){
+    touch.strength=lerp(
+      touch.strength,
+      1,
+      1-Math.exp(-dt*4)
+    );
+
+    const dx=touch.x-touch.px;
+    const dy=touch.y-touch.py;
+
+    const distance=Math.hypot(dx,dy);
+
+    if(distance<.001)continue;
+
+    const samples=Math.min(
+      12,
+      Math.max(1,Math.ceil(distance/7))
+    );
+
+    for(let s=0;s<samples;s++){
+      const u=(s+.5)/samples;
+
+      const x=lerp(touch.px,touch.x,u);
+      const y=lerp(touch.py,touch.y,u);
+
+      const pos=locate(x,y);
+
+      const radialDrag=
+        dx*Math.cos(pos.a)+
+        dy*Math.sin(pos.a);
+
+      const drag=clamp(
+        radialDrag,-18,18
+      )/samples;
+
+      for(let j=0;j<COUNT;j++){
+        const wr=gauss(j-pos.r,5.5);
+
+        if(wr<.003)continue;
+
+        for(let i=0;i<STEPS;i++){
+          const a=i*angleStep;
+
+          const wa=gauss(
+            angleDist(a,pos.a),
+            .42
+          );
+
+          const weight=
+            wr*wa*touch.strength;
+
+          if(weight<.003)continue;
+
+          brushForce[indexOf(j,i)]+=
+            drag*weight*1.5;
+        }
+      }
+    }
+
+    touch.px=touch.x;
+    touch.py=touch.y;
+  }
+}
+
+// ======================================
+// RETOUR VISCOÉLASTIQUE
+// ======================================
+
+function updateElastic(dt){
+  const step=Math.min(dt,.035);
+
+  const spring=9;
+  const damping=5.8;
+
+  for(let j=0;j<COUNT;j++){
+    for(let i=0;i<STEPS;i++){
+      const idx=indexOf(j,i);
+
+      const left=indexOf(
+        j,(i+STEPS-1)%STEPS
+      );
+
+      const right=indexOf(
+        j,(i+1)%STEPS
+      );
+
+      const inner=j>0
+        ?indexOf(j-1,i)
+        :idx;
+
+      const outer=j<COUNT-1
+        ?indexOf(j+1,i)
+        :idx;
+
+      const diffusion=
+        (
+          elastic[left]+
+          elastic[right]+
+          elastic[inner]+
+          elastic[outer]-
+          4*elastic[idx]
+        )*2.5;
+
+      const acceleration=
+        -spring*elastic[idx]-
+        damping*velocity[idx]+
+        diffusion+
+        brushForce[idx]*38;
+
+      velocity[idx]+=
+        acceleration*step;
+    }
+  }
+
+  for(let i=0;i<SIZE;i++){
+    elastic[i]+=velocity[i]*step;
+
+    elastic[i]=clamp(
+      elastic[i],-15,15
+    );
+  }
+}
+
+function updateTouches(dt){
+  applyBrush(dt);
+  updateElastic(dt);
+}
+
+// ======================================
+// OPACITÉ PICTURALE
+// ======================================
+
+function opacityField(j,t){
+  return clamp(
+    .37+j/COUNT*.35+
+    Math.sin(j*.41-t*.26)*.12+
+    Math.sin(j*.17+t*.18)*.09+
+    sound.high*
+    Math.sin(j*.62-t*.7)*.12,
+    .12,.91
+  );
+}
+
+// ======================================
+// UN MOT, UNE PRÉSENCE
+// ======================================
+
+const lexicon=[
+  "absence",
+  "douceur",
+  "manque",
+  "présence",
+  "souvenir",
+  "tendresse",
+  "silence",
+  "passage",
+  "fragilité",
+  "lien",
+  "chagrin",
+  "empreinte",
+  "espérance",
+  "respirer",
+  "demeurer",
+  "ensemble",
+  "encore",
+  "vivant"
+];
+
+const word=document.createElementNS(
+  NS,"text"
+);
+
+word.setAttribute("text-anchor","middle");
+word.setAttribute("dominant-baseline","middle");
+word.setAttribute("font-family","Georgia,serif");
+word.setAttribute("font-style","italic");
+word.setAttribute("font-size","24");
+word.setAttribute("fill","#34342f");
+word.setAttribute("opacity","0");
+
+wordGroup.appendChild(word);
+
+let wordIndex=-1;
+let wordClock=0;
+
+const WORD_CYCLE=13;
+const WORD_FADE_IN=3;
+const WORD_HOLD=5;
+const WORD_FADE_OUT=3;
+
+function nextWord(){
+  let index;
+
+  do{
+    index=Math.floor(
+      Math.random()*lexicon.length
+    );
+  }while(
+    index===wordIndex &&
+    lexicon.length>1
+  );
+
+  wordIndex=index;
+  word.textContent=lexicon[index];
+}
+
+nextWord();
+
+function updateWords(dt,t){
+  wordClock+=dt;
+
+  if(wordClock>=WORD_CYCLE){
+    wordClock-=WORD_CYCLE;
+    nextWord();
+  }
+
+  const u=wordClock;
+  let opacity=0;
+
+  if(u<WORD_FADE_IN){
+    opacity=smooth(
+      u/WORD_FADE_IN
+    );
+
+  }else if(
+    u<WORD_FADE_IN+WORD_HOLD
+  ){
+    opacity=1;
+
+  }else if(
+    u<
+    WORD_FADE_IN+
+    WORD_HOLD+
+    WORD_FADE_OUT
+  ){
+    opacity=1-smooth(
+      (
+        u-
+        WORD_FADE_IN-
+        WORD_HOLD
+      )/WORD_FADE_OUT
+    );
+  }
+
+  word.setAttribute(
+    "opacity",
+    (opacity*.92).toFixed(3)
+  );
+
+  const x=Math.sin(t*.09)*2.5;
+  const y=Math.cos(t*.07)*3;
+
+  word.setAttribute(
+    "x",x.toFixed(2)
+  );
+
+  word.setAttribute(
+    "y",y.toFixed(2)
+  );
+
+  const size=24+Math.sin(t*.2)*.5;
+
+  word.setAttribute(
+    "font-size",
+    size.toFixed(2)
+  );
+}
+
+// ======================================
+// RENDU DES EMPREINTES
+// ======================================
+
+const radial=new Float32Array(STEPS);
+
+function draw(t){
+  for(let i=0;i<STEPS;i++){
+    const a=i*angleStep;
+
+    radial[i]=BASE*mother(a,t);
+  }
+
+  for(let j=0;j<COUNT;j++){
+    let d="";
+
+    for(let i=0;i<STEPS;i++){
+      const a=i*angleStep;
+
+      const idx=indexOf(j,i);
+
+      const previous=j>0
+        ?elastic[indexOf(j-1,i)]
+        :0;
+
+      const elasticGap=
+        elastic[idx]-previous;
+
+      const natural=organicField(
+        j,a,t
+      );
+
+      const empty=voidField(
+        j,a,t
+      );
+
+      const audio=
+        Math.sin(
+          a*5-t*.6-j*.13
+        )*sound.mid*.55;
+
+      const gap=Math.max(
+        MIN_GAP,
+        GAP*(
+          1+
+          natural*.45+
+          empty*.9+
+          audio*.4
+        )+
+        elasticGap
+      );
+
+      radial[i]+=gap;
+
+      const r=radial[i];
+
+      const x=Math.cos(a)*r;
+      const y=Math.sin(a)*r*.88;
+
+      d+=(i===0?"M":"L")+
+        x.toFixed(2)+" "+
+        y.toFixed(2)+" ";
+    }
+
+    d+="Z";
+
+    const path=paths[j];
+
+    path.setAttribute("d",d);
+
+    path.setAttribute(
+      "opacity",
+      opacityField(j,t).toFixed(3)
+    );
+
+    const width=
+      .55+
+      j/COUNT*.4+
+      Math.sin(j*.6+t*.1)*.07;
+
+    path.setAttribute(
+      "stroke-width",
+      width.toFixed(2)
+    );
+  }
+}
+
+// ======================================
+// ANIMATION
+// ======================================
+
+let time=0;
+let last=0;
+let lastDraw=0;
+
+function animate(now){
+  requestAnimationFrame(animate);
+
+  const dt=Math.min(
+    (now-last||16)/1000,
+    .05
+  );
+
+  last=now;
+  time+=dt;
+
+  updateSound(time,dt);
+  updateTouches(dt);
+  updateWords(dt,time);
+
+  if(now-lastDraw>=33){
+    lastDraw=now;
+    draw(time);
+  }
+}
+
+requestAnimationFrame(animate);
+
+</script>
+</body>
+</html>
