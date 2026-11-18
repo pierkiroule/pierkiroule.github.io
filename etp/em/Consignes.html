@@ -304,26 +304,11 @@ button{
 
 .question:last-child{border:0}
 
-/* UNLOCK */
+/* NAVIGATION */
 
-.unlock{
+.sequence-next{
   text-align:center;
 }
-
-.unlock input{
-  width:100%;
-  text-align:center;
-  text-transform:uppercase;
-  letter-spacing:3px;
-  padding:15px;
-  border:2px solid #D9DDCF;
-  border-radius:15px;
-  background:white;
-  outline:none;
-  margin:12px 0 8px;
-}
-
-.unlock input:focus{border-color:var(--green2)}
 
 .hint{
   color:var(--muted);
@@ -744,8 +729,6 @@ const sequences = [
 
 ];
 
-const codes=["GRAINE","PLUIE","SOLEIL","FLEUR"];
-
 const celebrations=[
  {
   icon:"🌧️",
@@ -874,50 +857,24 @@ function render(){
    </div>
  </section>
 
- ${unlockBlock()}
+ ${nextStepBlock()}
  `;
 
  updateTimer();
  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function unlockBlock(){
+function nextStepBlock(){
 
- const next=current+1;
-
- if(next>=4){
-   return `
-   <section class="card unlock">
-     <div class="eyebrow">Fin de la dernière séquence</div>
-     <h2>Prêts pour la récolte ?</h2>
-     <p class="hint">Entrez le dernier code donné par le formateur.</p>
-
-     <input id="codeInput"
-       placeholder="CODE"
-       autocomplete="off">
-
-     <button class="primary" onclick="tryUnlock()">
-       Débloquer la récolte
-     </button>
-   </section>`;
- }
+ const last=current===sequences.length-1;
 
  return `
- <section class="card unlock">
-   <div class="eyebrow">Prochaine étape</div>
-   <h2>Votre jardin peut-il continuer à pousser ?</h2>
+ <section class="card sequence-next">
+   <div class="eyebrow">${last ? "Fin de la dernière séquence" : "Prochaine étape"}</div>
+   <h2>${last ? "Prêts pour la récolte ?" : "Votre jardin peut-il continuer à pousser ?"}</h2>
 
-   <p class="hint">
-     Entrez le code donné par le formateur.
-   </p>
-
-   <input id="codeInput"
-     placeholder="CODE"
-     autocomplete="off"
-     onkeydown="if(event.key==='Enter')tryUnlock()">
-
-   <button class="primary" onclick="tryUnlock()">
-     Débloquer la suite
+   <button type="button" class="primary" onclick="advanceSequence()">
+     ${last ? "Accéder à la récolte" : "Continuer le parcours"}
    </button>
  </section>`;
 }
@@ -956,45 +913,16 @@ function updateProgress(){
 }
 
 /* ===============================
-   UNLOCK
+   SEQUENCE NAVIGATION
 ================================ */
 
-function tryUnlock(){
+function advanceSequence(){
 
- const input=document.getElementById("codeInput");
- const value=input.value.trim().toUpperCase();
+ if(current!==unlocked)return;
 
- const expected=codes[current+1] || "FLEUR";
-
- /*
- Séquence 1 terminée → PLUIE
- Séquence 2 terminée → SOLEIL
- Séquence 3 terminée → FLEUR
- Séquence 4 terminée → FLEUR
- */
-
- let correct;
-
- if(current===0) correct="PLUIE";
- if(current===1) correct="SOLEIL";
- if(current===2) correct="FLEUR";
- if(current===3) correct="FLEUR";
-
- if(value!==correct){
-   input.style.borderColor="#B85D4E";
-   input.value="";
-   input.placeholder="Réessayez…";
-   return;
- }
-
- if(current===3){
-   unlocked=4;
- }else{
-   unlocked=current+1;
- }
-
+ pauseTimer();
+ unlocked=current+1;
  localStorage.setItem("jardinierUnlocked",unlocked);
-
  showCelebration(current);
 }
 
