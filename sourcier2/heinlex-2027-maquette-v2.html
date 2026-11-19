@@ -26,12 +26,8 @@
 @media(max-width:740px){.listen-guide{order:6;margin:6px 0 13px;padding-left:14px}.guide-top{font-size:9px}.guide-steps{gap:12px}.step-content{font-size:14px}.guide-outro{margin-left:37px}.detail-controls{order:7}.sim-status{order:8}.detail-foot{order:9}}
 @media(prefers-reduced-motion:reduce){.detail-right canvas,.station-visual canvas,.hero-art canvas{animation:none!important}}
 
-/* Trois formes distinctes correspondant aux trois temps de chaque écoute. */
-.guide-step{width:100%;font:inherit;text-align:left;color:inherit;background:transparent;border:1px solid transparent;border-radius:15px;padding:12px 13px;cursor:pointer;transition:background .3s,border-color .3s,transform .3s}
-.guide-step:hover{background:#e9f2f2;border-color:#d4e4e6}
-.guide-step.chosen{background:#e0ecee;border-color:#b2cbd1;transform:translateX(3px)}
-.guide-step:focus-visible{outline:3px solid #527c91;outline-offset:3px}
-.guide-step.chosen .step-index{color:#315567;font-weight:700}
+/* Les trois étapes sont des invitations textuelles ; la forme reste propre à chaque escale. */
+.guide-step{width:100%;text-align:left;background:transparent;border:0;border-radius:12px;padding:9px 6px}
 </style>
 </head>
 <body>
@@ -39,7 +35,7 @@
 <header class="shell header"><a href="#accueil" class="mark" aria-label="Retour à l’accueil"><div class="symbol" aria-hidden="true">◌</div><div><div class="brand">LES SOURCIERS DU VIVANT •°</div><div class="subbrand">Oreillez-vous ! · Heinlex 2027</div></div></a><div class="header-right"><button class="minor-btn" id="overviewBtn">Les 13 bornes <span aria-hidden="true">↗</span></button></div></header>
 <main>
 <div id="home" class="home"><section class="shell hero"><div><div class="eyebrow">Parcours d’écoute sensible · 2027</div><h1>Oreillez<span style="color:#89a6af">-</span><br>vous<span style="color:#89a6af"> !</span></h1><p>Treize invitations à entendre autrement le vivant. Prenez le temps d'une rencontre avec les paysages sonores de Heinlex.</p><div class="hero-actions"><button class="primary" id="exploreBtn">Explorer les 13 escales <span aria-hidden="true">↗</span></button><span class="hint">Maquette interactive · sans audio</span></div></div><div class="hero-art"><canvas id="heroCanvas" width="740" height="740" aria-label="Formes sensibles en mouvement" role="img"></canvas><span class="art-label">LA FORME DU SON •°</span></div></section><section class="overview shell" id="parcours"><div class="section-intro"><div><div class="eyebrow">Une invitation à la rencontre</div><h2>13 façons d’écouter le vivant</h2></div><span class="count">06 in situ · 06 saisonnières · 01 libre</span></div><div class="filters" aria-label="Filtrer les bornes"><button class="pill active" data-filter="all">Toutes · 13</button><button class="pill" data-filter="situ">Écoutes in situ · 6</button><button class="pill" data-filter="season">Saisonnières · 6</button><button class="pill" data-filter="free">Libre · 1</button></div><div class="station-grid" id="grid"></div></section></div>
-<section id="detail" class="detail shell" aria-live="polite"><div class="detail-wrap"><div class="detail-left"><button class="back" id="backBtn">← Retour aux 13 escales</button><div class="detail-kicker"><span id="detailNum">01 / 13</span><span class="dot"></span><span id="detailType">ÉCOUTE IN SITU</span></div><h2 id="detailTitle"></h2><p class="detail-desc" id="detailDesc"></p><p class="detail-extra" id="detailExtra"></p><section class="listen-guide" aria-label="Exercice d’écoute sensible"><div class="guide-top"><span>UNE EXPÉRIENCE À VIVRE</span><span>TOUCHEZ UNE ÉTAPE POUR CHANGER LA FORME</span></div><div class="guide-steps" id="guideSteps"></div><p class="guide-outro" id="guideOutro"></p></section><div class="detail-controls" id="detailControls"></div><div class="sim-status" id="simStatus"></div><div class="detail-foot"><button class="nav-arrow" id="prevBtn">← Précédente</button><span class="technical-note">HEINLEX · MAQUETTE V3</span><button class="nav-arrow" id="nextBtn">Suivante →</button></div></div><div class="detail-right"><span class="corner">EMPREINTE SENSIBLE •°</span><canvas id="detailCanvas" width="760" height="760" aria-label="Empreinte graphique animée de cette escale" role="img"></canvas><span class="bottom" id="waveCaption">ÉTAPE 1 / 3 · BOUCLE 6 S</span></div></div></section>
+<section id="detail" class="detail shell" aria-live="polite"><div class="detail-wrap"><div class="detail-left"><button class="back" id="backBtn">← Retour aux 13 escales</button><div class="detail-kicker"><span id="detailNum">01 / 13</span><span class="dot"></span><span id="detailType">ÉCOUTE IN SITU</span></div><h2 id="detailTitle"></h2><p class="detail-desc" id="detailDesc"></p><p class="detail-extra" id="detailExtra"></p><section class="listen-guide" aria-label="Exercice d’écoute sensible"><div class="guide-top"><span>UNE EXPÉRIENCE À VIVRE</span><span>TROIS INVITATIONS À ÉCOUTER</span></div><div class="guide-steps" id="guideSteps"></div><p class="guide-outro" id="guideOutro"></p></section><div class="detail-controls" id="detailControls"></div><div class="sim-status" id="simStatus"></div><div class="detail-foot"><button class="nav-arrow" id="prevBtn">← Précédente</button><span class="technical-note">HEINLEX · MAQUETTE V5</span><button class="nav-arrow" id="nextBtn">Suivante →</button></div></div><div class="detail-right"><span class="corner">EMPREINTE SENSIBLE •°</span><canvas id="detailCanvas" width="760" height="760" aria-label="Empreinte graphique animée de cette escale" role="img"></canvas><span class="bottom" id="waveCaption">EMPREINTE DE L’ESCALE · BOUCLE 6 S</span></div></div></section>
 </main><footer class="shell foot"><span>LES SOURCIERS DU VIVANT •° — HEINLEX 2027</span><span>Exploration de design · Exercices proposés à valider · Sans audio</span></footer><div class="toast" id="toast" role="status"></div>
 <script>
 (()=>{'use strict';
@@ -60,88 +56,100 @@ const STATIONS=[
 ];
 const KINDS={situ:'ÉCOUTE IN SITU',season:'ÉCOUTE SAISONNIÈRE',free:'ÉCOUTE LIBRE'};
 const SEASONS=[{id:'printemps',name:'Printemps',a:'Au printemps, le paysage s’éveille : écoutez ce qui recommence.',p:'#89adb5'},{id:'ete',name:'Été',a:'En été, le paysage s’étire : écoutez les mouvements de la saison.',p:'#c6aa88'},{id:'automne',name:'Automne',a:'En automne, les voix changent de texture : écoutez les passages.',p:'#bd9a88'},{id:'hiver',name:'Hiver',a:'En hiver, le paysage révèle ses nuances les plus discrètes.',p:'#a4b7c7'}];
-const byId=id=>document.getElementById(id);let activeStep=0,current=-1,filter='all',season=SEASONS[(new Date().getMonth()+1)%12<3?3:(new Date().getMonth()+1)%12<6?0:(new Date().getMonth()+1)%12<9?1:2].id, surprise=0;
+const byId=id=>document.getElementById(id);let current=-1,filter='all',season=SEASONS[(new Date().getMonth()+1)%12<3?3:(new Date().getMonth()+1)%12<6?0:(new Date().getMonth()+1)%12<9?1:2].id, surprise=0;
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LOOP=6000,TAU=Math.PI*2;
-function drawWave(canvas,seed,ms,accent='#91b0ba',stage=0){
+
+function drawWave(canvas,seed,ms,accent='#91b0ba'){
  const c=canvas.getContext('2d');if(!c)return;
  const w=canvas.width,h=canvas.height;const S=Math.min(w,h),cx=w/2,cy=h/2;
  const phase=TAU*((ms%LOOP)/LOOP),pulse=Math.sin(phase),breath=.5+.5*Math.cos(phase);
  const id=seed===1?5:Math.max(0,Math.min(12,seed-2));
  c.clearRect(0,0,w,h);
  c.save();
- // Les trois gestes d'écoute ont trois morphologies ; la boucle dure toujours 6 s.
- if(stage===0){c.translate(cx,cy);c.scale(.76,.76);c.translate(-cx,-cy)}
- else if(stage===1){c.translate(cx,cy);c.rotate(.16*Math.sin(phase));c.scale(1.09,.83);c.translate(-cx,-cy)}
- else if(stage===2){c.translate(cx,cy);c.rotate(-.13*Math.sin(phase));c.scale(.91,1.12);c.translate(-cx,-cy)}
- const bg=c.createRadialGradient(cx,cy,S*.07,cx,cy,S*.65);
- bg.addColorStop(0,'rgba(250,253,250,.95)');bg.addColorStop(.48,'rgba(233,242,242,.44)');bg.addColorStop(1,'rgba(224,235,238,0)');
+ const bg=c.createRadialGradient(cx,cy,S*.05,cx,cy,S*.68);
+ bg.addColorStop(0,'rgba(251,253,251,.98)');bg.addColorStop(.45,'rgba(233,241,242,.55)');bg.addColorStop(1,'rgba(221,233,236,.08)');
  c.fillStyle=bg;c.fillRect(0,0,w,h);
- const stroke=(fn,width=1,opacity=1)=>{c.save();c.globalAlpha=opacity;c.lineWidth=width;c.lineCap='round';c.lineJoin='round';c.strokeStyle='#F9FCFC';fn();c.translate(-S*.003,-S*.004);c.stroke();c.translate(S*.006,S*.008);c.strokeStyle='#88AAB8';c.lineWidth=width*.65;c.stroke();c.restore();};
- const path=(coords,close=false)=>{c.beginPath();coords.forEach(([x,y],j)=>j?c.lineTo(x,y):c.moveTo(x,y));if(close)c.closePath();};
+ const stroke=(fn,width=1,opacity=1)=>{c.save();c.globalAlpha=opacity;c.lineWidth=width;c.lineCap='round';c.lineJoin='round';c.strokeStyle='#FBFEFE';fn();c.translate(-S*.0025,-S*.0035);c.stroke();c.translate(S*.005,S*.007);c.strokeStyle=accent;c.lineWidth=width*.66;c.stroke();c.restore();};
+ const path=(coords)=>{c.beginPath();coords.forEach(([x,y],j)=>j?c.lineTo(x,y):c.moveTo(x,y));};
  const make=(n,f)=>Array.from({length:n},(_,i)=>f(i/(n-1),i));
- const ell=(rx,ry,shift=0,wiggle=0)=>make(170,(v)=>{const a=v*TAU;const m=1+wiggle*Math.sin(4*a+phase+shift);return[cx+rx*Math.cos(a+shift)*m,cy+ry*Math.sin(a+shift)*m]});
- // Chaque escale compose sa géométrie propre, en boucle exacte de six secondes.
- if(id===0){ // horizons : arcs de plus en plus lointains
-  for(let i=0;i<14;i++){const y=cy-S*.25+i*S*.042;const coords=make(110,v=>[S*(.03+.94*v),y+S*.018*Math.sin(v*TAU*1.7+phase+i*.31)+S*.028*Math.cos(v*TAU*.55+i*.2)]);stroke(()=>path(coords),Math.max(1,S*.0027),.45+i*.035)}
- }else if(id===1){ // silence : minuscules anneaux espacés
-  for(let i=0;i<32;i++){const a=i*2.39996,r=S*(.055+.0157*i),x=cx+Math.cos(a+phase*.04)*r,y=cy+Math.sin(a)*r*.84,sz=S*(.007+.0035*(1+Math.sin(phase+i)));
-   stroke(()=>{c.beginPath();c.arc(x,y,sz,0,TAU)},Math.max(1,S*.0017),.32+.5*(i%5)/5)}
- }else if(id===2){ // présences : foyers distincts qui se répondent
-  for(let cluster=0;cluster<3;cluster++){const a=cluster*TAU/3-.4,x=cx+Math.cos(a)*S*.19,y=cy+Math.sin(a)*S*.17;for(let k=0;k<7;k++){
-   const r=S*(.023+k*.020)*(1+.06*Math.sin(phase+cluster));stroke(()=>path(make(130,v=>{const t=v*TAU;return[x+Math.cos(t)*r,y+Math.sin(t)*r*.73]}),true),Math.max(1,S*.0022),.35+k*.06)}}
- }else if(id===3){ // vent : lignes de flux traversantes
-  for(let k=0;k<19;k++){const offset=(k-9)*S*.024;stroke(()=>path(make(110,v=>{const x=S*(.03+.94*v),y=cy+offset+Math.sin(v*TAU*1.15+phase+k*.26)*S*.048+Math.cos(v*TAU*.55+k)*S*.013;return[x,y]})),Math.max(1,S*.0021),.32+.026*k)}
- }else if(id===4){ // rythmes : battements verticaux
-  for(let k=0;k<31;k++){const x=S*(.13+k*.025),amp=(.09+.12*(.5+.5*Math.sin(k*.61+phase)))*S;
-   stroke(()=>path(make(45,v=>{let y=cy+(v-.5)*amp*2;return[x+S*.011*Math.sin(v*TAU*2+k*.57+phase),y]})),Math.max(1,S*.0026),.42+.42*(k%4)/4)}
- }else if(id===5){ // paysage : cercles superposés souples
-  for(let k=0;k<21;k++){const r=S*(.038+k*.018),e=1+.018*Math.sin(phase+k*.2);stroke(()=>path(make(170,v=>{const a=v*TAU,m=1+.025*Math.sin(a*3+k*.23+phase)+.02*Math.cos(a*7-k*.16);return[cx+r*Math.cos(a)*m*e,cy+r*Math.sin(a)*m*.86]}),true),Math.max(1,S*.0023),.25+.028*k)}
- }else if(id===6){ // oiseaux : trajectoires aériennes qui se croisent
-  for(let k=0;k<18;k++){const y=cy+(k-9)*S*.025;stroke(()=>path(make(85,v=>{const x=S*(.07+.86*v),wing=Math.sin(v*Math.PI*4+k*.42+phase)*Math.sin(v*Math.PI);return[x,y+wing*S*(.035+.003*k)+S*.05*Math.sin(v*TAU*.7+phase*.3+k*.2)]})),Math.max(1,S*.002),.35+.02*k)}
- }else if(id===7){ // arbre : ramification arborescente, sans feuilles figuratives
-  for(let k=0;k<24;k++){const a=TAU*k/24,turn=a+.12*pulse;const st=S*(.025+(k%4)*.008),len=S*(.29+.06*Math.sin(k));stroke(()=>path(make(65,v=>{const radius=st+len*v;return[cx+Math.cos(turn+.21*Math.sin(v*Math.PI+phase+k))*radius,cy+Math.sin(turn+.21*Math.sin(v*Math.PI+phase+k))*radius*.95]})),Math.max(1,S*.003),.27+.55*((k%6)/6))}
- }else if(id===8){ // monde minuscule : nuage de cellules de tailles variées
-  for(let k=0;k<100;k++){const a=k*2.39996,r=S*.034*Math.sqrt(k),x=cx+Math.cos(a)*r*(1+.03*pulse),y=cy+Math.sin(a)*r*.82;const sz=S*(.002+.0055*(.5+.5*Math.sin(k*2.4+phase)));
-   stroke(()=>{c.beginPath();c.arc(x,y,sz,0,TAU)},Math.max(1,S*.0015),.32+.38*(k%9)/9)}
- }else if(id===9){ // éléments : entrelacs fluides
-  for(let k=0;k<23;k++){const off=(k-11)*S*.023;stroke(()=>path(make(105,v=>{const a=v*TAU;return[cx+Math.sin(a+phase*.25+k*.12)*S*(.13+.003*k)+off*.32,cy+(v-.5)*S*.78+Math.sin(a*2+phase+k*.18)*S*.035]})),Math.max(1,S*.0025),.3+.025*k)}
- }else if(id===10){ // heures : strates de demi-soleils / arcs
-  for(let k=0;k<20;k++){const rx=S*(.045+k*.017),ry=rx*(.44+.06*Math.cos(phase));stroke(()=>path(make(96,v=>{const a=-Math.PI+v*Math.PI;return[cx+rx*Math.cos(a),cy+S*.20+ry*Math.sin(a)]})),Math.max(1,S*.0026),.27+.03*k)}
- }else if(id===11){ // métamorphoses : formes organiques évolutives
-  for(let k=0;k<18;k++){const r=S*(.04+k*.019);stroke(()=>path(make(180,v=>{const a=v*TAU;const m=1+.10*Math.sin(a*3+phase+k*.16)+.035*Math.cos(a*5-phase+k*.23);return[cx+Math.cos(a)*r*m,cy+Math.sin(a)*r*m*.89]}),true),Math.max(1,S*.0025),.23+.033*k)}
- }else{ // imprévu : impulsions concentriques décentrées
-  for(let k=0;k<32;k++){const a=k*2.4,rad=S*.23*Math.sqrt(k/32),x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad;const rr=S*(.01+.035*(.5+.5*Math.sin(phase+k*.45)));
-   stroke(()=>{c.beginPath();c.arc(x,y,rr,0,TAU)},Math.max(1,S*.0019),.29+.45*(k%7)/7)}
+ const gauss=(x,m,s)=>Math.exp(-((x-m)*(x-m))/(2*s*s));
+ const rot=(x,y,a)=>{const dx=x-cx,dy=y-cy;return [cx+dx*Math.cos(a)-dy*Math.sin(a),cy+dx*Math.sin(a)+dy*Math.cos(a)]};
+ const presets=[
+  {angle:-.03,count:17,gap:.034,meander:.018,freq:1.12,speed:1.00,phaseShift:.19,xwarp:.004,xfreq:2.1,xspeed:.8,hills:[{x:.68,sx:.15,amp:-.10,tilt:.06,speed2:1,phase:.0},{x:.28,sx:.10,amp:-.05,tilt:-.04,speed2:.7,phase:1.1}]},
+  {angle:.09,count:16,gap:.032,meander:.010,freq:.86,speed:.85,phaseShift:.15,xwarp:.003,xfreq:1.4,xspeed:.6,hills:[{x:.53,sx:.12,amp:-.06,tilt:.00,speed2:.9,phase:.7},{x:.77,sx:.08,amp:-.03,tilt:.02,speed2:1.1,phase:2.2}]},
+  {angle:.16,count:18,gap:.031,meander:.014,freq:1.35,speed:1.05,phaseShift:.17,xwarp:.006,xfreq:1.8,xspeed:.9,hills:[{x:.24,sx:.07,amp:-.06,tilt:-.03,speed2:1.1,phase:.4},{x:.51,sx:.10,amp:-.08,tilt:.02,speed2:.8,phase:1.5},{x:.77,sx:.09,amp:-.05,tilt:.04,speed2:1.2,phase:2.1}]},
+  {angle:-.22,count:19,gap:.029,meander:.021,freq:1.05,speed:1.25,phaseShift:.21,xwarp:.009,xfreq:2.9,xspeed:1.4,hills:[{x:.41,sx:.15,amp:-.04,tilt:.09,speed2:1.4,phase:.3},{x:.73,sx:.18,amp:.03,tilt:-.08,speed2:1.0,phase:1.7}]},
+  {angle:0,count:20,gap:.026,meander:.011,freq:2.15,speed:1.15,phaseShift:.29,xwarp:.002,xfreq:4.3,xspeed:1.0,hills:[{x:.19,sx:.06,amp:-.05,tilt:.02,speed2:1.0,phase:1.3},{x:.52,sx:.07,amp:-.07,tilt:-.01,speed2:1.1,phase:.4},{x:.84,sx:.06,amp:-.05,tilt:.03,speed2:.8,phase:2.5}]},
+  {angle:-.04,count:18,gap:.033,meander:.016,freq:1.22,speed:.95,phaseShift:.17,xwarp:.004,xfreq:1.6,xspeed:.7,hills:[{x:.33,sx:.18,amp:-.05,tilt:.04,speed2:.8,phase:.2},{x:.54,sx:.28,amp:.04,tilt:-.02,speed2:1.0,phase:1.3},{x:.71,sx:.15,amp:-.08,tilt:.03,speed2:1.1,phase:2.0}]},
+  {angle:.06,count:18,gap:.030,meander:.022,freq:1.68,speed:1.20,phaseShift:.18,xwarp:.006,xfreq:2.6,xspeed:1.2,hills:[{x:.22,sx:.10,amp:-.04,tilt:.05,speed2:1.1,phase:.9},{x:.58,sx:.09,amp:-.07,tilt:-.03,speed2:.9,phase:1.8},{x:.82,sx:.10,amp:-.04,tilt:.04,speed2:1.3,phase:2.4}]},
+  {angle:.28,count:20,gap:.027,meander:.014,freq:1.04,speed:.92,phaseShift:.18,xwarp:.003,xfreq:1.7,xspeed:.5,hills:[{x:.29,sx:.11,amp:-.10,tilt:-.05,speed2:1.0,phase:.1},{x:.63,sx:.06,amp:-.06,tilt:.06,speed2:1.2,phase:1.2},{x:.76,sx:.14,amp:.02,tilt:-.07,speed2:.7,phase:2.9}]},
+  {angle:-.11,count:22,gap:.024,meander:.015,freq:2.42,speed:1.28,phaseShift:.24,xwarp:.003,xfreq:3.4,xspeed:1.0,hills:[{x:.18,sx:.05,amp:-.03,tilt:.01,speed2:1.0,phase:.4},{x:.39,sx:.04,amp:-.04,tilt:-.02,speed2:.8,phase:1.6},{x:.61,sx:.05,amp:-.03,tilt:.02,speed2:1.2,phase:2.2},{x:.84,sx:.05,amp:-.04,tilt:-.01,speed2:.9,phase:2.8}]},
+  {angle:-.31,count:17,gap:.034,meander:.019,freq:1.32,speed:1.06,phaseShift:.20,xwarp:.008,xfreq:2.0,xspeed:1.3,hills:[{x:.31,sx:.12,amp:-.09,tilt:.08,speed2:1.1,phase:.5},{x:.67,sx:.17,amp:.05,tilt:-.09,speed2:.8,phase:2.0}]},
+  {angle:0,count:18,gap:.031,meander:.012,freq:.92,speed:.84,phaseShift:.16,xwarp:.001,xfreq:1.4,xspeed:.5,hills:[{x:.23,sx:.19,amp:-.03,tilt:.03,speed2:1.0,phase:.8},{x:.51,sx:.22,amp:-.06,tilt:.00,speed2:.9,phase:1.8},{x:.78,sx:.18,amp:-.03,tilt:-.03,speed2:1.1,phase:2.4}]},
+  {angle:.14,count:19,gap:.028,meander:.020,freq:1.55,speed:1.18,phaseShift:.22,xwarp:.005,xfreq:2.5,xspeed:1.1,hills:[{x:.26,sx:.09,amp:-.05,tilt:-.05,speed2:1.3,phase:.5},{x:.49,sx:.12,amp:-.09,tilt:.04,speed2:.7,phase:1.6},{x:.73,sx:.09,amp:-.05,tilt:.05,speed2:1.2,phase:2.7}]},
+  {angle:-.18,count:18,gap:.029,meander:.023,freq:1.88,speed:1.30,phaseShift:.27,xwarp:.010,xfreq:3.1,xspeed:1.6,hills:[{x:.16,sx:.08,amp:-.04,tilt:.07,speed2:1.1,phase:.2},{x:.44,sx:.07,amp:.03,tilt:-.08,speed2:1.0,phase:1.2},{x:.69,sx:.13,amp:-.08,tilt:.04,speed2:.9,phase:2.0},{x:.87,sx:.06,amp:-.03,tilt:-.02,speed2:1.4,phase:2.9}]}
+ ];
+ const cfg=presets[id]||presets[0];
+ const contour=(line)=>make(170,(v)=>{
+  let x=S*(.06+.88*v);
+  let y=cy+(line-(cfg.count-1)/2)*cfg.gap*S;
+  y+=S*cfg.meander*(Math.sin(v*TAU*cfg.freq+phase*cfg.speed+line*cfg.phaseShift)+.45*Math.sin(v*TAU*(cfg.freq*.47+1.15)-phase*cfg.speed*.75+line*.11));
+  x+=S*cfg.xwarp*Math.sin(v*TAU*(cfg.xfreq||1.6)+phase*cfg.xspeed+line*.15);
+  for(const h of cfg.hills){
+   const ridge=gauss(v,h.x,h.sx);
+   y+=S*h.amp*ridge*(1+.18*Math.sin(phase*h.speed2+line*.17+h.phase));
+   y+=S*h.tilt*(v-h.x)*ridge*1.3;
+  }
+  const edgeFade=Math.sin(v*Math.PI);
+  y+=S*.006*Math.sin(v*TAU*5+line*.33+phase)*edgeFade;
+  return rot(x,y,cfg.angle);
+ });
+ // Tracé topographique principal : lignes de niveau vivantes, distinctes pour chaque escale.
+ for(let k=0;k<cfg.count;k++){
+  const alpha=.16+.028*k;
+  const width=Math.max(1,S*(.0019+.00018*(k%5)));
+  stroke(()=>path(contour(k)),width,Math.min(.82,alpha));
+ }
+ // Quelques lignes d'altitude accentuées pour renforcer le style cartographique.
+ const accents=[1,Math.round(cfg.count*.28),Math.round(cfg.count*.54),Math.round(cfg.count*.79),cfg.count-2].filter((v,i,a)=>v>0&&v<cfg.count&&a.indexOf(v)===i);
+ for(const idx of accents){
+  stroke(()=>path(contour(idx)),Math.max(1.15,S*.0031),.22+.04*(idx%3));
+ }
+ // Quelques lignes courtes de rupture de pente, discrètes et animées, pour éviter l'effet « bulles ».
+ c.save();
+ c.globalAlpha=.18;
+ c.strokeStyle=accent;c.lineWidth=Math.max(1,S*.0016);
+ for(let m=0;m<4;m++){
+  const yy=cy+(-.24+.16*m)*S+.012*S*Math.sin(phase+m);
+  c.beginPath();
+  for(let j=0;j<38;j++){
+   const v=j/37; const x=S*(.18+.16*m*.08+.56*v); const y=yy+Math.sin(v*TAU*(1.3+m*.2)+phase*.8+m)*S*.012;
+   if(j===0)c.moveTo(x,y); else c.lineTo(x,y);
+  }
+  c.stroke();
  }
  c.restore();
+ c.restore();
 }
-let canvases=[],lastFrame=-1000;function register(canvas,seed){if(!canvas)return;canvases.push({canvas,seed})}function animate(ms){if(ms-lastFrame>=33){lastFrame=ms;for(const {canvas,seed} of canvases){if(canvas.offsetParent===null)continue;const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;drawWave(canvas,seed,ms,'#91b0ba',canvas.id==='detailCanvas'?activeStep:0)}}if(!reduced)requestAnimationFrame(animate)}
+
+let canvases=[],lastFrame=-1000;function register(canvas,seed){if(!canvas)return;canvases.push({canvas,seed})}function animate(ms){if(ms-lastFrame>=33){lastFrame=ms;for(const {canvas,seed} of canvases){if(canvas.offsetParent===null)continue;const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;drawWave(canvas,seed,ms,'#91b0ba')}}if(!reduced)requestAnimationFrame(animate)}
 function renderGrid(){const grid=byId('grid');grid.innerHTML='';canvases=canvases.filter(o=>o.canvas.id==='heroCanvas'||o.canvas.id==='detailCanvas');STATIONS.forEach((s,i)=>{if(filter!=='all'&&filter!==s.k)return;const b=document.createElement('button');b.className='station';b.type='button';b.setAttribute('aria-label','Ouvrir la borne '+(i+1)+' : '+s.t);b.innerHTML='<div class="station-visual"><canvas width="460" height="285"></canvas><span class="station-num">'+String(i+1).padStart(2,'0')+'</span></div><div class="station-info"><div class="station-type">'+KINDS[s.k]+'</div><div class="station-title">'+s.t+'</div><div class="station-foot"><span>Découvrir la borne</span><span class="tiny-arrow">↗</span></div></div>';b.onclick=()=>openStation(i);grid.appendChild(b);register(b.querySelector('canvas'),i+2);drawWave(b.querySelector('canvas'),i+2,0)})}
-function selectStep(j){
- activeStep=j;
- document.querySelectorAll('#guideSteps .guide-step').forEach((el,i)=>{
-  el.classList.toggle('chosen',i===j);el.setAttribute('aria-pressed',i===j?'true':'false');
- });
- byId('waveCaption').textContent='ÉTAPE '+(j+1)+' / 3  ·  BOUCLE 6 S';
- drawWave(byId('detailCanvas'),current+2,performance.now(),'#91b0ba',activeStep);
-}
 function renderGuide(s){const box=byId('guideSteps');box.replaceChildren();s.steps.forEach(([title,desc],j)=>{
- const row=document.createElement('button');row.className='guide-step';row.type='button';row.setAttribute('aria-label','Voir la forme de l’étape '+(j+1)+' : '+title);
- row.onclick=()=>selectStep(j);
+ const row=document.createElement('div');row.className='guide-step';
  const index=document.createElement('span');index.className='step-index';index.textContent=String(j+1).padStart(2,'0');
  const content=document.createElement('span');content.className='step-content';const head=document.createElement('strong');head.textContent=title;
  const paragraph=document.createElement('span');paragraph.textContent=desc;content.append(head,paragraph);row.append(index,content);box.appendChild(row)
- });byId('guideOutro').textContent=s.outro;selectStep(0);
+ });byId('guideOutro').textContent=s.outro;
 }
 function visitHome(){current=-1;byId('detail').classList.remove('open');byId('home').style.display='block';document.title='Oreillez-vous ! · Heinlex 2027';history.replaceState(null,'','#accueil');window.scrollTo({top:0,behavior:'instant'})}
-function openStation(i){current=(i+13)%13;const s=STATIONS[current];activeStep=0;byId('home').style.display='none';byId('detail').classList.add('open');byId('detailNum').textContent=String(current+1).padStart(2,'0')+' / 13';byId('detailType').textContent=KINDS[s.k];byId('detailTitle').textContent=s.t;byId('waveCaption').textContent=s.k==='situ'?'ÉCOUTE DU LIEU':s.k==='season'?'VARIATION SAISONNIÈRE':'ÉCOUTE LIBRE';byId('prevBtn').disabled=current===0;byId('nextBtn').disabled=current===12;
+function openStation(i){current=(i+13)%13;const s=STATIONS[current];byId('home').style.display='none';byId('detail').classList.add('open');byId('detailNum').textContent=String(current+1).padStart(2,'0')+' / 13';byId('detailType').textContent=KINDS[s.k];byId('detailTitle').textContent=s.t;byId('waveCaption').textContent='EMPREINTE DE L’ESCALE · BOUCLE 6 S';byId('prevBtn').disabled=current===0;byId('nextBtn').disabled=current===12;
  const c=byId('detailControls');c.innerHTML='';byId('simStatus').textContent='';byId('detailDesc').textContent=s.d;byId('detailExtra').textContent=s.sub;renderGuide(s);
  if(s.k==='season'){
  const group=document.createElement('div');group.className='season-controls';group.setAttribute('aria-label','Choix de saison');for(const ss of SEASONS){const b=document.createElement('button');b.type='button';b.textContent=ss.name;b.className=season===ss.id?'active':'';b.onclick=()=>{season=ss.id;openStation(current)};group.appendChild(b)}c.appendChild(group);const active=SEASONS.find(x=>x.id===season);byId('detailDesc').textContent=s.d;byId('detailExtra').textContent=active.a+' '+s.sub;const action=document.createElement('button');action.className='primary';action.textContent='▷ Écouter · aperçu';action.onclick=()=>notify('Simulation seulement : aucun audio intégré.');c.appendChild(action)
  }else if(s.k==='free'){const b=document.createElement('button');b.className='primary';b.textContent='↗ Découvrir une écoute';b.onclick=()=>{surprise++;byId('guideOutro').textContent=['Un son discret peut devenir une rencontre.','Un monde entier peut surgir d’un froissement.','Il existe mille façons d’être surpris par le familier.'][surprise%3];notify('Expérience libre simulée, sans audio.')};c.appendChild(b)
  }else{const p=document.createElement('div');p.className='season-label';p.textContent='Écoutez autour de vous.';c.appendChild(p)}
- document.title=s.t+' · Heinlex 2027';history.replaceState(null,'','#borne-'+String(current+1).padStart(2,'0'));window.scrollTo({top:0,behavior:'instant'});drawWave(byId('detailCanvas'),current+2,0,'#91b0ba',activeStep)
+ document.title=s.t+' · Heinlex 2027';history.replaceState(null,'','#borne-'+String(current+1).padStart(2,'0'));window.scrollTo({top:0,behavior:'instant'});canvases.find(item=>item.canvas.id==='detailCanvas').seed=current+2;drawWave(byId('detailCanvas'),current+2,0,'#91b0ba')
 }
 let toastHandle;function notify(msg){const toast=byId('toast');toast.textContent=msg;toast.classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>toast.classList.remove('show'),2900)}
 byId('overviewBtn').onclick=()=>{visitHome();setTimeout(()=>byId('parcours').scrollIntoView({behavior:reduced?'instant':'smooth'}),15)};byId('exploreBtn').onclick=()=>byId('parcours').scrollIntoView({behavior:reduced?'instant':'smooth'});byId('backBtn').onclick=visitHome;byId('prevBtn').onclick=()=>openStation(current-1);byId('nextBtn').onclick=()=>openStation(current+1);
