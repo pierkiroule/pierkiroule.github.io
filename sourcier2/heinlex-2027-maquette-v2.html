@@ -25,6 +25,13 @@
 .detail-right canvas{will-change:auto}
 @media(max-width:740px){.listen-guide{order:6;margin:6px 0 13px;padding-left:14px}.guide-top{font-size:9px}.guide-steps{gap:12px}.step-content{font-size:14px}.guide-outro{margin-left:37px}.detail-controls{order:7}.sim-status{order:8}.detail-foot{order:9}}
 @media(prefers-reduced-motion:reduce){.detail-right canvas,.station-visual canvas,.hero-art canvas{animation:none!important}}
+
+/* Trois formes distinctes correspondant aux trois temps de chaque écoute. */
+.guide-step{width:100%;font:inherit;text-align:left;color:inherit;background:transparent;border:1px solid transparent;border-radius:15px;padding:12px 13px;cursor:pointer;transition:background .3s,border-color .3s,transform .3s}
+.guide-step:hover{background:#e9f2f2;border-color:#d4e4e6}
+.guide-step.chosen{background:#e0ecee;border-color:#b2cbd1;transform:translateX(3px)}
+.guide-step:focus-visible{outline:3px solid #527c91;outline-offset:3px}
+.guide-step.chosen .step-index{color:#315567;font-weight:700}
 </style>
 </head>
 <body>
@@ -32,7 +39,7 @@
 <header class="shell header"><a href="#accueil" class="mark" aria-label="Retour à l’accueil"><div class="symbol" aria-hidden="true">◌</div><div><div class="brand">LES SOURCIERS DU VIVANT •°</div><div class="subbrand">Oreillez-vous ! · Heinlex 2027</div></div></a><div class="header-right"><button class="minor-btn" id="overviewBtn">Les 13 bornes <span aria-hidden="true">↗</span></button></div></header>
 <main>
 <div id="home" class="home"><section class="shell hero"><div><div class="eyebrow">Parcours d’écoute sensible · 2027</div><h1>Oreillez<span style="color:#89a6af">-</span><br>vous<span style="color:#89a6af"> !</span></h1><p>Treize invitations à entendre autrement le vivant. Prenez le temps d'une rencontre avec les paysages sonores de Heinlex.</p><div class="hero-actions"><button class="primary" id="exploreBtn">Explorer les 13 escales <span aria-hidden="true">↗</span></button><span class="hint">Maquette interactive · sans audio</span></div></div><div class="hero-art"><canvas id="heroCanvas" width="740" height="740" aria-label="Formes sensibles en mouvement" role="img"></canvas><span class="art-label">LA FORME DU SON •°</span></div></section><section class="overview shell" id="parcours"><div class="section-intro"><div><div class="eyebrow">Une invitation à la rencontre</div><h2>13 façons d’écouter le vivant</h2></div><span class="count">06 in situ · 06 saisonnières · 01 libre</span></div><div class="filters" aria-label="Filtrer les bornes"><button class="pill active" data-filter="all">Toutes · 13</button><button class="pill" data-filter="situ">Écoutes in situ · 6</button><button class="pill" data-filter="season">Saisonnières · 6</button><button class="pill" data-filter="free">Libre · 1</button></div><div class="station-grid" id="grid"></div></section></div>
-<section id="detail" class="detail shell" aria-live="polite"><div class="detail-wrap"><div class="detail-left"><button class="back" id="backBtn">← Retour aux 13 escales</button><div class="detail-kicker"><span id="detailNum">01 / 13</span><span class="dot"></span><span id="detailType">ÉCOUTE IN SITU</span></div><h2 id="detailTitle"></h2><p class="detail-desc" id="detailDesc"></p><p class="detail-extra" id="detailExtra"></p><section class="listen-guide" aria-label="Exercice d’écoute sensible"><div class="guide-top"><span>UNE EXPÉRIENCE À VIVRE</span><span>À VOTRE RYTHME</span></div><div class="guide-steps" id="guideSteps"></div><p class="guide-outro" id="guideOutro"></p></section><div class="detail-controls" id="detailControls"></div><div class="sim-status" id="simStatus"></div><div class="detail-foot"><button class="nav-arrow" id="prevBtn">← Précédente</button><span class="technical-note">HEINLEX · MAQUETTE V2</span><button class="nav-arrow" id="nextBtn">Suivante →</button></div></div><div class="detail-right"><span class="corner">EMPREINTE SENSIBLE •°</span><canvas id="detailCanvas" width="760" height="760" aria-label="Empreinte graphique animée de cette escale" role="img"></canvas><span class="bottom" id="waveCaption">FORME DU VIVANT</span></div></div></section>
+<section id="detail" class="detail shell" aria-live="polite"><div class="detail-wrap"><div class="detail-left"><button class="back" id="backBtn">← Retour aux 13 escales</button><div class="detail-kicker"><span id="detailNum">01 / 13</span><span class="dot"></span><span id="detailType">ÉCOUTE IN SITU</span></div><h2 id="detailTitle"></h2><p class="detail-desc" id="detailDesc"></p><p class="detail-extra" id="detailExtra"></p><section class="listen-guide" aria-label="Exercice d’écoute sensible"><div class="guide-top"><span>UNE EXPÉRIENCE À VIVRE</span><span>TOUCHEZ UNE ÉTAPE POUR CHANGER LA FORME</span></div><div class="guide-steps" id="guideSteps"></div><p class="guide-outro" id="guideOutro"></p></section><div class="detail-controls" id="detailControls"></div><div class="sim-status" id="simStatus"></div><div class="detail-foot"><button class="nav-arrow" id="prevBtn">← Précédente</button><span class="technical-note">HEINLEX · MAQUETTE V3</span><button class="nav-arrow" id="nextBtn">Suivante →</button></div></div><div class="detail-right"><span class="corner">EMPREINTE SENSIBLE •°</span><canvas id="detailCanvas" width="760" height="760" aria-label="Empreinte graphique animée de cette escale" role="img"></canvas><span class="bottom" id="waveCaption">ÉTAPE 1 / 3 · BOUCLE 6 S</span></div></div></section>
 </main><footer class="shell foot"><span>LES SOURCIERS DU VIVANT •° — HEINLEX 2027</span><span>Exploration de design · Exercices proposés à valider · Sans audio</span></footer><div class="toast" id="toast" role="status"></div>
 <script>
 (()=>{'use strict';
@@ -53,15 +60,20 @@ const STATIONS=[
 ];
 const KINDS={situ:'ÉCOUTE IN SITU',season:'ÉCOUTE SAISONNIÈRE',free:'ÉCOUTE LIBRE'};
 const SEASONS=[{id:'printemps',name:'Printemps',a:'Au printemps, le paysage s’éveille : écoutez ce qui recommence.',p:'#89adb5'},{id:'ete',name:'Été',a:'En été, le paysage s’étire : écoutez les mouvements de la saison.',p:'#c6aa88'},{id:'automne',name:'Automne',a:'En automne, les voix changent de texture : écoutez les passages.',p:'#bd9a88'},{id:'hiver',name:'Hiver',a:'En hiver, le paysage révèle ses nuances les plus discrètes.',p:'#a4b7c7'}];
-const byId=id=>document.getElementById(id);let current=-1,filter='all',season=SEASONS[(new Date().getMonth()+1)%12<3?3:(new Date().getMonth()+1)%12<6?0:(new Date().getMonth()+1)%12<9?1:2].id, surprise=0;
+const byId=id=>document.getElementById(id);let activeStep=0,current=-1,filter='all',season=SEASONS[(new Date().getMonth()+1)%12<3?3:(new Date().getMonth()+1)%12<6?0:(new Date().getMonth()+1)%12<9?1:2].id, surprise=0;
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LOOP=6000,TAU=Math.PI*2;
-function drawWave(canvas,seed,ms,accent='#91b0ba'){
+function drawWave(canvas,seed,ms,accent='#91b0ba',stage=0){
  const c=canvas.getContext('2d');if(!c)return;
  const w=canvas.width,h=canvas.height;const S=Math.min(w,h),cx=w/2,cy=h/2;
  const phase=TAU*((ms%LOOP)/LOOP),pulse=Math.sin(phase),breath=.5+.5*Math.cos(phase);
  const id=seed===1?5:Math.max(0,Math.min(12,seed-2));
  c.clearRect(0,0,w,h);
+ c.save();
+ // Les trois gestes d'écoute ont trois morphologies ; la boucle dure toujours 6 s.
+ if(stage===0){c.translate(cx,cy);c.scale(.76,.76);c.translate(-cx,-cy)}
+ else if(stage===1){c.translate(cx,cy);c.rotate(.16*Math.sin(phase));c.scale(1.09,.83);c.translate(-cx,-cy)}
+ else if(stage===2){c.translate(cx,cy);c.rotate(-.13*Math.sin(phase));c.scale(.91,1.12);c.translate(-cx,-cy)}
  const bg=c.createRadialGradient(cx,cy,S*.07,cx,cy,S*.65);
  bg.addColorStop(0,'rgba(250,253,250,.95)');bg.addColorStop(.48,'rgba(233,242,242,.44)');bg.addColorStop(1,'rgba(224,235,238,0)');
  c.fillStyle=bg;c.fillRect(0,0,w,h);
@@ -102,18 +114,34 @@ function drawWave(canvas,seed,ms,accent='#91b0ba'){
   for(let k=0;k<32;k++){const a=k*2.4,rad=S*.23*Math.sqrt(k/32),x=cx+Math.cos(a)*rad,y=cy+Math.sin(a)*rad;const rr=S*(.01+.035*(.5+.5*Math.sin(phase+k*.45)));
    stroke(()=>{c.beginPath();c.arc(x,y,rr,0,TAU)},Math.max(1,S*.0019),.29+.45*(k%7)/7)}
  }
+ c.restore();
 }
-let canvases=[],lastFrame=-1000;function register(canvas,seed){if(!canvas)return;canvases.push({canvas,seed})}function animate(ms){if(ms-lastFrame>=33){lastFrame=ms;for(const {canvas,seed} of canvases){if(canvas.offsetParent===null)continue;const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;drawWave(canvas,seed,ms)}}if(!reduced)requestAnimationFrame(animate)}
+let canvases=[],lastFrame=-1000;function register(canvas,seed){if(!canvas)return;canvases.push({canvas,seed})}function animate(ms){if(ms-lastFrame>=33){lastFrame=ms;for(const {canvas,seed} of canvases){if(canvas.offsetParent===null)continue;const rect=canvas.getBoundingClientRect();if(rect.bottom<0||rect.top>innerHeight)continue;drawWave(canvas,seed,ms,'#91b0ba',canvas.id==='detailCanvas'?activeStep:0)}}if(!reduced)requestAnimationFrame(animate)}
 function renderGrid(){const grid=byId('grid');grid.innerHTML='';canvases=canvases.filter(o=>o.canvas.id==='heroCanvas'||o.canvas.id==='detailCanvas');STATIONS.forEach((s,i)=>{if(filter!=='all'&&filter!==s.k)return;const b=document.createElement('button');b.className='station';b.type='button';b.setAttribute('aria-label','Ouvrir la borne '+(i+1)+' : '+s.t);b.innerHTML='<div class="station-visual"><canvas width="460" height="285"></canvas><span class="station-num">'+String(i+1).padStart(2,'0')+'</span></div><div class="station-info"><div class="station-type">'+KINDS[s.k]+'</div><div class="station-title">'+s.t+'</div><div class="station-foot"><span>Découvrir la borne</span><span class="tiny-arrow">↗</span></div></div>';b.onclick=()=>openStation(i);grid.appendChild(b);register(b.querySelector('canvas'),i+2);drawWave(b.querySelector('canvas'),i+2,0)})}
-function renderGuide(s){const box=byId('guideSteps');box.replaceChildren();s.steps.forEach(([title,desc],j)=>{const row=document.createElement('div');row.className='guide-step';const index=document.createElement('span');index.className='step-index';index.textContent=String(j+1).padStart(2,'0');const content=document.createElement('div');content.className='step-content';const head=document.createElement('strong');head.textContent=title;const paragraph=document.createElement('span');paragraph.textContent=desc;content.append(head,paragraph);row.append(index,content);box.appendChild(row)});byId('guideOutro').textContent=s.outro;}
+function selectStep(j){
+ activeStep=j;
+ document.querySelectorAll('#guideSteps .guide-step').forEach((el,i)=>{
+  el.classList.toggle('chosen',i===j);el.setAttribute('aria-pressed',i===j?'true':'false');
+ });
+ byId('waveCaption').textContent='ÉTAPE '+(j+1)+' / 3  ·  BOUCLE 6 S';
+ drawWave(byId('detailCanvas'),current+2,performance.now(),'#91b0ba',activeStep);
+}
+function renderGuide(s){const box=byId('guideSteps');box.replaceChildren();s.steps.forEach(([title,desc],j)=>{
+ const row=document.createElement('button');row.className='guide-step';row.type='button';row.setAttribute('aria-label','Voir la forme de l’étape '+(j+1)+' : '+title);
+ row.onclick=()=>selectStep(j);
+ const index=document.createElement('span');index.className='step-index';index.textContent=String(j+1).padStart(2,'0');
+ const content=document.createElement('span');content.className='step-content';const head=document.createElement('strong');head.textContent=title;
+ const paragraph=document.createElement('span');paragraph.textContent=desc;content.append(head,paragraph);row.append(index,content);box.appendChild(row)
+ });byId('guideOutro').textContent=s.outro;selectStep(0);
+}
 function visitHome(){current=-1;byId('detail').classList.remove('open');byId('home').style.display='block';document.title='Oreillez-vous ! · Heinlex 2027';history.replaceState(null,'','#accueil');window.scrollTo({top:0,behavior:'instant'})}
-function openStation(i){current=(i+13)%13;const s=STATIONS[current];byId('home').style.display='none';byId('detail').classList.add('open');byId('detailNum').textContent=String(current+1).padStart(2,'0')+' / 13';byId('detailType').textContent=KINDS[s.k];byId('detailTitle').textContent=s.t;byId('waveCaption').textContent=s.k==='situ'?'ÉCOUTE DU LIEU':s.k==='season'?'VARIATION SAISONNIÈRE':'ÉCOUTE LIBRE';byId('prevBtn').disabled=current===0;byId('nextBtn').disabled=current===12;
+function openStation(i){current=(i+13)%13;const s=STATIONS[current];activeStep=0;byId('home').style.display='none';byId('detail').classList.add('open');byId('detailNum').textContent=String(current+1).padStart(2,'0')+' / 13';byId('detailType').textContent=KINDS[s.k];byId('detailTitle').textContent=s.t;byId('waveCaption').textContent=s.k==='situ'?'ÉCOUTE DU LIEU':s.k==='season'?'VARIATION SAISONNIÈRE':'ÉCOUTE LIBRE';byId('prevBtn').disabled=current===0;byId('nextBtn').disabled=current===12;
  const c=byId('detailControls');c.innerHTML='';byId('simStatus').textContent='';byId('detailDesc').textContent=s.d;byId('detailExtra').textContent=s.sub;renderGuide(s);
  if(s.k==='season'){
  const group=document.createElement('div');group.className='season-controls';group.setAttribute('aria-label','Choix de saison');for(const ss of SEASONS){const b=document.createElement('button');b.type='button';b.textContent=ss.name;b.className=season===ss.id?'active':'';b.onclick=()=>{season=ss.id;openStation(current)};group.appendChild(b)}c.appendChild(group);const active=SEASONS.find(x=>x.id===season);byId('detailDesc').textContent=s.d;byId('detailExtra').textContent=active.a+' '+s.sub;const action=document.createElement('button');action.className='primary';action.textContent='▷ Écouter · aperçu';action.onclick=()=>notify('Simulation seulement : aucun audio intégré.');c.appendChild(action)
  }else if(s.k==='free'){const b=document.createElement('button');b.className='primary';b.textContent='↗ Découvrir une écoute';b.onclick=()=>{surprise++;byId('guideOutro').textContent=['Un son discret peut devenir une rencontre.','Un monde entier peut surgir d’un froissement.','Il existe mille façons d’être surpris par le familier.'][surprise%3];notify('Expérience libre simulée, sans audio.')};c.appendChild(b)
  }else{const p=document.createElement('div');p.className='season-label';p.textContent='Écoutez autour de vous.';c.appendChild(p)}
- document.title=s.t+' · Heinlex 2027';history.replaceState(null,'','#borne-'+String(current+1).padStart(2,'0'));window.scrollTo({top:0,behavior:'instant'});drawWave(byId('detailCanvas'),current+2,0)
+ document.title=s.t+' · Heinlex 2027';history.replaceState(null,'','#borne-'+String(current+1).padStart(2,'0'));window.scrollTo({top:0,behavior:'instant'});drawWave(byId('detailCanvas'),current+2,0,'#91b0ba',activeStep)
 }
 let toastHandle;function notify(msg){const toast=byId('toast');toast.textContent=msg;toast.classList.add('show');clearTimeout(toastHandle);toastHandle=setTimeout(()=>toast.classList.remove('show'),2900)}
 byId('overviewBtn').onclick=()=>{visitHome();setTimeout(()=>byId('parcours').scrollIntoView({behavior:reduced?'instant':'smooth'}),15)};byId('exploreBtn').onclick=()=>byId('parcours').scrollIntoView({behavior:reduced?'instant':'smooth'});byId('backBtn').onclick=visitHome;byId('prevBtn').onclick=()=>openStation(current-1);byId('nextBtn').onclick=()=>openStation(current+1);
