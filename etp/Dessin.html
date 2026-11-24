@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voyage en terre inconnue</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #f5f1e7;
+  color: #293e38;
+  font-family: Georgia, serif;
+}
+
+main {
+  max-width: 950px;
+  margin: auto;
+  padding: 40px 24px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.eyebrow {
+  font: 12px Arial, sans-serif;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: clamp(36px, 7vw, 68px);
+  line-height: 1;
+  margin: 20px 0;
+}
+
+.subtitle {
+  font-size: 23px;
+  font-style: italic;
+}
+
+.consigne {
+  padding: 28px;
+  border: 1px solid #a9b5a5;
+  border-radius: 18px;
+  font-size: 23px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin: 25px 0;
+}
+
+.role {
+  background: #fffdf6;
+  padding: 25px;
+  border-radius: 15px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 24px;
+}
+
+p, li {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.planet {
+  display: block;
+  width: 230px;
+  margin: 30px auto;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  font: 14px Arial, sans-serif;
+}
+
+.dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.final {
+  margin-top: 30px;
+  padding: 30px;
+  background: #293e38;
+  color: #fffdf6;
+  border-radius: 15px;
+  text-align: center;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<main>
+  <header>
+    <div class="eyebrow">Formation ETP · Atelier en binôme</div>
+    <h1>Voyage en<br>terre inconnue</h1>
+    <div class="subtitle">
+      À la découverte de la planète patient
+    </div>
+  </header>
+
+  <section class="consigne">
+    Pense à un patient que tu accompagnes.<br>
+    <strong>À quoi ressemble sa planète ?</strong><br>
+    Dessine ce que tu connais de son univers
+    et surtout les territoires qui te restent inconnus.
+  </section>
+
+  <svg class="planet" viewBox="0 0 240 240">
+    <defs>
+      <clipPath id="globe">
+        <circle cx="120" cy="120" r="105"/>
+      </clipPath>
+      <pattern id="unknown" width="8" height="8"
+        patternUnits="userSpaceOnUse">
+        <path d="M0 8L8 0" stroke="#b5b0a5"
+          stroke-width="1"/>
+      </pattern>
+    </defs>
+
+    <circle cx="120" cy="120" r="105" fill="#dce5df"/>
+
+    <g clip-path="url(#globe)">
+      <path d="M0 0H110L145 50L100 95L120 145
+        L50 175L0 130Z" fill="#799b82"/>
+      <path d="M145 50L240 15V150L180 170
+        L120 145L100 95Z" fill="#d9b77c"/>
+      <path d="M50 175L120 145L180 170L240 150
+        V240H0Z" fill="#e9e5db"/>
+      <path d="M50 175L120 145L180 170L240 150
+        V240H0Z" fill="url(#unknown)"/>
+    </g>
+
+    <circle cx="120" cy="120" r="105"
+      fill="none" stroke="#293e38" stroke-width="2"/>
+
+    <g fill="#293e38" text-anchor="middle"
+      font-family="Georgia">
+      <text x="65" y="85" font-size="30">✓</text>
+      <text x="175" y="105" font-size="30">≈</text>
+      <text x="120" y="195" font-size="40">?</text>
+    </g>
+  </svg>
+
+  <div class="legend">
+    <span><i class="dot" style="background:#799b82"></i>Je connais</span>
+    <span><i class="dot" style="background:#d9b77c"></i>Je suppose</span>
+    <span><i class="dot" style="background:#b5b0a5"></i>J'ignore</span>
+  </div>
+
+  <section class="roles">
+    <article class="role">
+      <h2>01 — Le dessinateur</h2>
+      <p>
+        Représente le monde de ton patient,
+        au-delà de sa maladie.
+      </p>
+      <p>
+        Distingue ce que tu sais réellement,
+        ce que tu supposes et ce que tu ignores.
+      </p>
+      <p>
+        Préserve son anonymat.
+      </p>
+    </article>
+
+    <article class="role">
+      <h2>02 — Le facilitateur</h2>
+      <p>
+        Aide ton partenaire à enrichir sa carte
+        en lui posant des questions.
+      </p>
+      <p>
+        Invite-le à repérer ses suppositions
+        et les territoires encore inexplorés.
+      </p>
+      <p>
+        Ne réponds pas à la place du patient.
+      </p>
+    </article>
+  </section>
+
+  <p style="text-align:center">
+    <strong>Inversez ensuite les rôles.</strong>
+  </p>
+
+  <section class="final">
+    <div class="eyebrow">Votre mission commune</div>
+    <h2 style="margin-top:20px">
+      Construisez votre boussole
+    </h2>
+    <p>
+      Quelles questions pourriez-vous poser à vos patients
+      pour découvrir ces terres inconnues ?
+    </p>
+    <p>
+      Organisez ces questions en grandes dimensions
+      pour construire votre propre trame de BEP.
+    </p>
+  </section>
+
+  <footer>
+    Le patient est l'habitant de sa planète.<br>
+    Le soignant en est l'explorateur invité.
+  </footer>
+</main>
+
+</body>
+</html>
